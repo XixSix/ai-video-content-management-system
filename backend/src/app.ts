@@ -1,9 +1,9 @@
 import express, { type Express } from 'express'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { settings } from './config/index.js'
-import { globalErrorHandler, notFoundHandler } from './middleware/error-handler.js'
-import { apiRouter } from './routes/index.js'
+import { config } from './config/index'
+import { globalErrorHandler, notFoundHandler } from './middleware/error-handler'
+import { apiRouter } from './modules/index'
 
 export const createApp = (): Express => {
   const app = express()
@@ -12,8 +12,8 @@ export const createApp = (): Express => {
   app.use(express.json({ limit: '10mb' }))
   app.use(express.urlencoded({ extended: true }))
 
-  if (!settings.app.isTest) {
-    app.use(morgan(settings.app.isProduction ? 'combined' : 'dev'))
+  if (!config.app.isTest) {
+    app.use(morgan(config.app.isProduction ? 'combined' : 'dev'))
   }
 
   app.use('/api', apiRouter)

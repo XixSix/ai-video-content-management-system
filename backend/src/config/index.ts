@@ -1,1 +1,1 @@
-export { settings, type Settings } from './env.js'
+export { config, type Config } from './env'

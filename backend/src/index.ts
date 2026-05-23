@@ -1,8 +1,8 @@
-import { app } from './app.js'
-import { settings } from './config/index.js'
+import { app } from './app'
+import { config } from './config/index'
 
-const server = app.listen(settings.app.port, (): void => {
-  console.log(`Server is running on port ${settings.app.port}`)
+const server = app.listen(config.app.port, (): void => {
+  console.log(`Server is running on port ${config.app.port}`)
 })
 
 const shutdown = (signal: NodeJS.Signals): void => {

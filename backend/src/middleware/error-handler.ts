@@ -1,7 +1,7 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express'
 import { ZodError } from 'zod'
-import { settings } from '../config/index.js'
-import { AppError } from '../utils/app-error.js'
+import { config } from '../config/index'
+import { AppError } from '../utils/app-error'
 
 const toValidationDetails = (error: ZodError): Array<Record<string, unknown>> =>
   error.issues.map(
@@ -43,14 +43,14 @@ export const globalErrorHandler: ErrorRequestHandler = (error, _req, res, _next)
     return
   }
 
-  const message = settings.app.isProduction ? 'Internal server error' : error?.message || 'Internal server error'
+  const message = config.app.isProduction ? 'Internal server error' : error?.message || 'Internal server error'
 
   res.status(500).json({
     success: false,
     error: {
       code: 'INTERNAL_SERVER_ERROR',
       message,
-      stack: settings.app.isProduction ? undefined : error?.stack
+      stack: config.app.isProduction ? undefined : error?.stack
     }
   })
 }
