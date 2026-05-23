@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { settings } from '../config/index.js'
+import { config } from '../../config/index'
 
 export const healthRouter = Router()
 
@@ -8,7 +8,7 @@ healthRouter.get('/health', (_req, res) => {
     success: true,
     data: {
       status: 'ok',
-      environment: settings.app.nodeEnv
+      environment: config.app.nodeEnv
     }
   })
 })

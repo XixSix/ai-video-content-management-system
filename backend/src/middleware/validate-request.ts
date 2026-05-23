@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express'
 import { z } from 'zod'
-import { AppError } from '../utils/app-error.js'
+import { AppError } from '../utils/app-error'
 
 type RequestPart = 'body' | 'params' | 'query'
 export type RequestValidationSchema = Partial<Record<RequestPart, z.ZodType>>

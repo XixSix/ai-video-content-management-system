@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { healthRouter } from './health.routes.js'
+import { healthRouter } from './health/health.routes'
 
 export const apiRouter = Router()
 

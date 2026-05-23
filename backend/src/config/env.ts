@@ -33,7 +33,7 @@ if (!parsedEnv.success) {
 
 const env = parsedEnv.data
 
-export const settings = {
+export const config = {
   app: {
     nodeEnv: env.NODE_ENV,
     isDevelopment: env.NODE_ENV === 'development',
@@ -46,4 +46,4 @@ export const settings = {
   }
 } as const
 
-export type Settings = typeof settings
+export type Config = typeof config
