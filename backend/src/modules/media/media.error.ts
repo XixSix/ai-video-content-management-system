@@ -17,6 +17,10 @@ export class MediaError extends AppError {
     return new MediaError(message, 400, 'INVALID_MEDIA_UPLOAD')
   }
 
+  static invalidState(message = 'Invalid media state'): MediaError {
+    return new MediaError(message, 409, 'INVALID_MEDIA_STATE')
+  }
+
   static storageFailure(message = 'Storage operation failed'): MediaError {
     return new MediaError(message, 502, 'STORAGE_FAILURE')
   }

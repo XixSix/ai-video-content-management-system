@@ -50,6 +50,7 @@ export interface UploadConfig {
   multipartThresholdBytes: number
   multipartPartSizeBytes: number
   presignedUploadExpiredSeconds: number
+  presignedDownloadExpiredSeconds: number
 }
 
 export interface Config {

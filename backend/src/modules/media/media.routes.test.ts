@@ -9,6 +9,7 @@ describe('media routes', () => {
     ['POST', '/api/v1/media/complete-upload'],
     ['POST', '/api/v1/media/abort-upload'],
     ['GET', '/api/v1/media/00000000-0000-4000-8000-000000000001'],
+    ['GET', '/api/v1/media/00000000-0000-4000-8000-000000000001/download-url'],
     ['PATCH', '/api/v1/media/00000000-0000-4000-8000-000000000001'],
     ['DELETE', '/api/v1/media/00000000-0000-4000-8000-000000000001']
   ])('%s %s requires an access token', async (method, path) => {

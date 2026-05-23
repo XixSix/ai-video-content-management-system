@@ -2,6 +2,7 @@ import {
   AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
+  GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3ServiceException,
@@ -15,6 +16,7 @@ import type { CompletedUploadPart, PresignedUploadPart, StorageObjectMetadata } 
 import { presignS3Client, s3Client } from './client'
 
 export const PRESIGNED_UPLOAD_EXPIRES_SECONDS: number = config.upload.presignedUploadExpiredSeconds
+export const PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: number = config.upload.presignedDownloadExpiredSeconds
 
 export const createPresignedPutUrl = async (bucket: string, key: string, mimeType: string): Promise<string> => {
   const command = new PutObjectCommand({
@@ -25,6 +27,17 @@ export const createPresignedPutUrl = async (bucket: string, key: string, mimeTyp
 
   return getSignedUrl(presignS3Client, command, {
     expiresIn: config.upload.presignedUploadExpiredSeconds
+  })
+}
+
+export const createPresignedGetUrl = async (bucket: string, key: string): Promise<string> => {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key
+  })
+
+  return getSignedUrl(presignS3Client, command, {
+    expiresIn: config.upload.presignedDownloadExpiredSeconds
   })
 }
 

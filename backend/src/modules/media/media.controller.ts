@@ -19,6 +19,7 @@ import type {
   CompleteUploadResult,
   CompleteUploadResponseData,
   CreateUploadUrlResult,
+  CreateDownloadUrlResult,
   MediaResponseData,
   PaginatedResult
 } from '../../types/media'
@@ -74,6 +75,16 @@ export const remove: ParamsRequestHandler<MediaParams> = async (req, res, next):
     sendSuccess<{ message: string }>(res, {
       message: 'Media deleted successfully'
     })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const createDownloadUrl: ParamsRequestHandler<MediaParams> = async (req, res, next): Promise<void> => {
+  try {
+    const result: CreateDownloadUrlResult = await mediaService.createDownloadUrl(req.user!.id, req.params.mediaId)
+
+    sendSuccess<CreateDownloadUrlResult>(res, result)
   } catch (error: unknown) {
     next(error)
   }

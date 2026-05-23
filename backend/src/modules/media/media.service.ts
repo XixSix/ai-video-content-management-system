@@ -10,6 +10,7 @@ import type {
   CompleteUploadInput,
   CompleteUploadResult,
   CompletedUploadPart,
+  CreateDownloadUrlResult,
   PaginatedResult
 } from '../../types/media'
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
@@ -93,6 +94,21 @@ export const deleteMedia = async (userId: string, mediaId: string): Promise<void
     uploadId: null,
     status: 'DELETED'
   })
+}
+
+export const createDownloadUrl = async (userId: string, mediaId: string): Promise<CreateDownloadUrlResult> => {
+  const media = await getMedia(userId, mediaId)
+
+  if (media.status !== 'UPLOADED') {
+    throw MediaError.invalidState(`Cannot create download URL for media in status ${media.status}`)
+  }
+
+  const url: string = await storageService.createPresignedGetUrl(media.s3Bucket, media.s3Key)
+
+  return {
+    url,
+    expiresInSeconds: storageService.PRESIGNED_DOWNLOAD_EXPIRES_SECONDS
+  }
 }
 
 export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<CreateUploadUrlResult> => {
