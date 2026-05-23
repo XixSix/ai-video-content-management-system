@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { config } from '../config'
 import type { Media } from '../infrastructure/db/generated/prisma/client'
 import { MediaError } from '../modules/media/media.error'
-import type { CompletedUploadPart, UploadMediaType, UploadedMediaResponse } from '../types/media'
+import type { CompletedUploadPart, MediaResponseData, UploadMediaType, UploadedMediaResponse } from '../types/media'
 
 export const getMultipartPartCount = (fileSizeBytes: number): number => {
   return Math.ceil(fileSizeBytes / config.upload.multipartPartSizeBytes)
@@ -111,8 +111,35 @@ export const getValidCompletedParts = (
 export const toUploadedMediaResponse = (media: Media): UploadedMediaResponse => {
   return {
     id: media.id,
+    title: media.title,
+    description: media.description,
+    originalFilename: media.originalFilename,
     s3Bucket: media.s3Bucket,
     s3Key: media.s3Key,
-    status: media.status
+    duration: media.duration,
+    fileSizeBytes: media.fileSizeBytes ? media.fileSizeBytes.toString() : null,
+    mimeType: media.mimeType,
+    width: media.width,
+    height: media.height,
+    status: media.status,
+    createdAt: media.createdAt,
+    updatedAt: media.updatedAt
+  }
+}
+
+export const toMediaResponseData = (media: Media): MediaResponseData => {
+  return {
+    id: media.id,
+    title: media.title,
+    description: media.description,
+    originalFilename: media.originalFilename,
+    duration: media.duration,
+    fileSizeBytes: media.fileSizeBytes ? media.fileSizeBytes.toString() : null,
+    mimeType: media.mimeType,
+    width: media.width,
+    height: media.height,
+    status: media.status,
+    createdAt: media.createdAt,
+    updatedAt: media.updatedAt
   }
 }

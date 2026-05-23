@@ -9,7 +9,7 @@ export class MediaError extends AppError {
     return new MediaError(message, 403, 'FORBIDDEN')
   }
 
-  static notFound(message = 'Media object was not found'): MediaError {
+  static notFound(message = 'Media not found'): MediaError {
     return new MediaError(message, 404, 'MEDIA_NOT_FOUND')
   }
 

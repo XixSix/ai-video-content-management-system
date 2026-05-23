@@ -1,6 +1,19 @@
 import { z } from 'zod'
+import { MediaStatus } from '../../infrastructure/db/generated/prisma/client'
 
 export const mediaTypeSchema = z.enum(['VIDEO', 'IMAGE'])
+
+export const listMediaQuerySchema = z.strictObject({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(50).default(10),
+  status: z.nativeEnum(MediaStatus).optional(),
+  sortBy: z.enum(['createdAt', 'title', 'duration']).default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc')
+})
+
+export const mediaParamsSchema = z.strictObject({
+  mediaId: z.uuid()
+})
 
 export const createUploadUrlSchema = z
   .strictObject({
@@ -26,6 +39,15 @@ export const completeUploadSchema = z.strictObject({
   parts: z.array(completedUploadPartSchema).optional()
 })
 
+export const updateMediaSchema = z
+  .strictObject({
+    title: z.string().trim().min(1).max(255).nullable().optional(),
+    description: z.string().trim().min(1).nullable().optional()
+  })
+  .refine((value) => Object.hasOwn(value, 'title') || Object.hasOwn(value, 'description'), {
+    message: 'At least one field is required'
+  })
+
 export const abortMultipartUploadSchema = z.strictObject({
   bucket: z.string().trim().min(1),
   key: z.string().trim().min(1),
@@ -43,3 +65,6 @@ const isValidMimeTypeForMedia = (mediaType: 'VIDEO' | 'IMAGE', mimeType: string)
 export type CreateUploadUrlBody = z.infer<typeof createUploadUrlSchema>
 export type CompleteUploadBody = z.infer<typeof completeUploadSchema>
 export type AbortMultipartUploadBody = z.infer<typeof abortMultipartUploadSchema>
+export type ListMediaQuery = z.infer<typeof listMediaQuerySchema>
+export type MediaParams = z.infer<typeof mediaParamsSchema>
+export type UpdateMediaBody = z.infer<typeof updateMediaSchema>

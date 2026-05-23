@@ -7,4 +7,11 @@ export type BodyRequestHandler<TBody> = RequestHandler<ParamsDictionary, unknown
 
 export type ParamsRequestHandler<TParams extends ParamsDictionary> = RequestHandler<TParams>
 
-export type QueryRequestHandler<TQuery> = RequestHandler<ParamsDictionary, unknown, unknown, TQuery>
+export type ParamsBodyRequestHandler<TParams extends ParamsDictionary, TBody> = RequestHandler<TParams, unknown, TBody>
+
+export type QueryRequestHandler<TQuery> = RequestHandler<
+  ParamsDictionary,
+  unknown,
+  unknown,
+  Record<string, unknown> & Partial<Record<keyof TQuery, unknown>>
+>
