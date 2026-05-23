@@ -3,3 +3,5 @@ dist/
 .env
 /src/db/generated
 .agents/
+
+/src/generated/prisma

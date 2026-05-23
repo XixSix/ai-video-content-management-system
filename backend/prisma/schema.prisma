@@ -1,0 +1,640 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/infrastructure/db/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum MediaType {
+  VIDEO
+  IMAGE
+}
+
+enum MediaStatus {
+  UPLOADING
+  UPLOADED
+  FAILED
+  DELETED
+}
+
+enum JobType {
+  TRANSCRIBE
+  GENERATE_SUBTITLE
+  GENERATE_CHAPTERS
+  GENERATE_SHORT_CLIPS
+  GENERATE_AI_SUGGESTIONS
+  BURN_SUBTITLE
+  PUBLISH
+}
+
+enum JobStatus {
+  PENDING
+  QUEUED
+  EXTRACTING_AUDIO
+  TRANSCRIBING
+  PREPROCESSING_TRANSCRIPT
+  GENERATING_SUBTITLE
+  BURNING_SUBTITLE
+  GENERATING_CHAPTERS
+  GENERATING_CLIP_CANDIDATES
+  DEDUPLICATING_CANDIDATES
+  SCORING_SALIENCY
+  SCORING_HIGHLIGHTS
+  FILTERING_DIVERSITY
+  SELECTING_CLIPS
+  CUTTING_VIDEO
+  CONVERTING_ASPECT_RATIO
+  GENERATING_SUGGESTIONS
+  PUBLISHING
+  COMPLETED
+  FAILED
+}
+
+enum TranscriptSource {
+  FASTER_WHISPER
+  WHISPER
+  IMPORTED
+  USER_EDITED
+}
+
+enum ChapterSource {
+  RULE_BASED
+  LLM
+  USER_EDITED
+}
+
+enum ClipCandidateStatus {
+  CANDIDATE
+  SELECTED
+  REJECTED
+}
+
+enum ShortClipStatus {
+  PENDING
+  RENDERING
+  READY
+  FAILED
+  DELETED
+}
+
+enum AssetType {
+  ORIGINAL_MEDIA
+  THUMBNAIL
+  SUBTITLE_SRT
+  SUBTITLE_VTT
+  BURNED_SUBTITLE_VIDEO
+}
+
+enum TargetType {
+  MEDIA
+  VIDEO_CHAPTER
+  SHORT_CLIP
+  PUBLISH_TASK
+}
+
+enum SuggestionType {
+  TITLE
+  CAPTION
+  HASHTAG
+  DESCRIPTION
+  PLATFORM_CONTENT
+}
+
+enum Platform {
+  YOUTUBE
+  TIKTOK
+  FACEBOOK
+  INSTAGRAM
+}
+
+enum PlatformAccountStatus {
+  CONNECTED
+  EXPIRED
+  REVOKED
+}
+
+enum PublishStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
+}
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique @db.VarChar(255)
+  passwordHash String     @map("password_hash") @db.Text
+  fullName     String?    @map("full_name") @db.VarChar(255)
+  avatarUrl    String?    @map("avatar_url") @db.Text
+  role         UserRole   @default(USER)
+  status       UserStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  media            Media[]
+  processingJobs   ProcessingJob[]
+  shortClips       ShortClip[]
+  generatedAssets  GeneratedAsset[]
+  aiSuggestions    AiSuggestion[]
+  platformAccounts PlatformAccount[]
+  publishTasks     PublishTask[]
+  authSessions     AuthSession[]
+  auditLogs        AuditLog[]
+
+  @@map("users")
+}
+
+model AuthSession {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  refreshToken String  @unique @map("refresh_token") @db.Text
+  userAgent    String? @map("user_agent") @db.Text
+  ipAddress    String? @map("ip_address") @db.VarChar(100)
+
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  lastUsedAt DateTime? @map("last_used_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("auth_sessions")
+}
+
+model Media {
+  id     String    @id @default(uuid()) @db.Uuid
+  userId String    @map("user_id") @db.Uuid
+  type   MediaType
+
+  title            String? @db.VarChar(255)
+  description      String? @db.Text
+  originalFilename String  @map("original_filename") @db.VarChar(255)
+
+  s3Bucket String  @map("s3_bucket") @db.VarChar(255)
+  s3Key    String  @map("s3_key") @db.Text
+  s3Region String? @map("s3_region") @db.VarChar(100)
+  s3Etag   String? @map("s3_etag") @db.VarChar(255)
+  uploadId String? @map("upload_id") @db.Text
+
+  duration      Float?
+  fileSizeBytes BigInt? @map("file_size_bytes")
+  mimeType      String? @map("mime_type") @db.VarChar(100)
+  width         Int?
+  height        Int?
+
+  status MediaStatus @default(UPLOADED)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  processingJobs  ProcessingJob[]
+  transcripts     Transcript[]
+  transcriptSegments TranscriptSegment[]
+  videoChapters   VideoChapter[]
+  clipCandidates  ClipCandidate[]
+  shortClips      ShortClip[]
+  generatedAssets GeneratedAsset[]
+  publishTasks    PublishTask[]
+
+  @@unique([s3Bucket, s3Key])
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@map("media")
+}
+
+model ProcessingJob {
+  id      String @id @default(uuid()) @db.Uuid
+  mediaId String @map("media_id") @db.Uuid
+  userId  String @map("user_id") @db.Uuid
+
+  jobType JobType   @map("job_type")
+  status  JobStatus @default(PENDING)
+
+  progress     Int?    @default(0)
+  currentStep  String? @map("current_step") @db.VarChar(255)
+  errorMessage String? @map("error_message") @db.Text
+
+  queueName      String? @map("queue_name") @db.VarChar(100)
+  taskName       String? @map("task_name") @db.VarChar(100)
+  externalTaskId String? @map("external_task_id") @db.VarChar(255)
+  attemptCount   Int     @default(0) @map("attempt_count")
+
+  input  Json?
+  output Json?
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transcripts    Transcript[]
+  videoChapters  VideoChapter[]
+  clipCandidates ClipCandidate[]
+  publishTasks   PublishTask[]
+
+  @@index([userId])
+  @@index([mediaId])
+  @@index([jobType])
+  @@index([status])
+  @@map("processing_jobs")
+}
+
+model Transcript {
+  id      String  @id @default(uuid()) @db.Uuid
+  mediaId String  @map("media_id") @db.Uuid
+  jobId   String? @map("job_id") @db.Uuid
+
+  language String?          @db.VarChar(20)
+  source   TranscriptSource @default(FASTER_WHISPER)
+  model    String?          @db.VarChar(100)
+
+  fullText String? @map("full_text") @db.Text
+  content  Json?
+
+  transcriptQualityScore Float? @map("transcript_quality_score")
+  fillerRatio            Float? @map("filler_ratio")
+  uniqueWordRatio        Float? @map("unique_word_ratio")
+  speechDensity          Float? @map("speech_density")
+  wordCount              Int?   @map("word_count")
+
+  isEdited Boolean @default(false) @map("is_edited")
+  version  Int     @default(1)
+  fullTextDirty     Boolean   @default(false) @map("full_text_dirty")
+  fullTextUpdatedAt DateTime? @map("full_text_updated_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  media Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  job   ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  segments        TranscriptSegment[]
+  videoChapters   VideoChapter[]
+  clipCandidates  ClipCandidate[]
+  shortClips      ShortClip[]
+  generatedAssets GeneratedAsset[]
+
+  @@index([mediaId])
+  @@index([jobId])
+  @@index([source])
+  @@map("transcripts")
+}
+
+model TranscriptSegment {
+  id           String @id @default(uuid()) @db.Uuid
+  transcriptId String @map("transcript_id") @db.Uuid
+  mediaId      String @map("media_id") @db.Uuid
+
+  segmentIndex Int   @map("segment_index")
+  startTime    Float @map("start_time")
+  endTime      Float @map("end_time")
+
+  text      String  @db.Text
+  cleanText String? @map("clean_text") @db.Text
+
+  confidence   Float?
+  speakerLabel String? @map("speaker_label") @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  media      Media      @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([transcriptId, segmentIndex])
+  @@index([transcriptId])
+  @@index([mediaId])
+  @@index([startTime, endTime])
+  @@map("transcript_segments")
+}
+
+model VideoChapter {
+  id           String  @id @default(uuid()) @db.Uuid
+  mediaId      String  @map("media_id") @db.Uuid
+  transcriptId String  @map("transcript_id") @db.Uuid
+  jobId        String? @map("job_id") @db.Uuid
+
+  chapterIndex Int   @map("chapter_index")
+  startTime    Float @map("start_time")
+  endTime      Float @map("end_time")
+
+  title   String @db.VarChar(255)
+  summary String? @db.Text
+
+  transcriptVersion Int @map("transcript_version")
+
+  source ChapterSource @default(LLM)
+  score  Float?
+
+  boundaryScore        Float? @map("boundary_score")
+  pauseScore           Float? @map("pause_score")
+  discourseMarkerScore Float? @map("discourse_marker_score")
+  semanticShiftScore   Float? @map("semantic_shift_score")
+  durationScore        Float? @map("duration_score")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transcript Transcript    @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  clipCandidates  ClipCandidate[]
+  shortClips      ShortClip[]
+  generatedAssets GeneratedAsset[]
+
+  @@unique([transcriptId, chapterIndex])
+  @@index([mediaId])
+  @@index([transcriptId])
+  @@index([jobId])
+  @@index([startTime, endTime])
+  @@map("video_chapters")
+}
+
+model ClipCandidate {
+  id           String  @id @default(uuid()) @db.Uuid
+  mediaId      String  @map("media_id") @db.Uuid
+  transcriptId String  @map("transcript_id") @db.Uuid
+  chapterId    String? @map("chapter_id") @db.Uuid
+  jobId        String? @map("job_id") @db.Uuid
+
+  startTime Float @map("start_time")
+  endTime   Float @map("end_time")
+  duration  Float
+
+  transcriptVersion Int @map("transcript_version")
+
+  text      String? @db.Text
+  cleanText String? @map("clean_text") @db.Text
+
+  hookScore          Float? @map("hook_score")
+  questionScore      Float? @map("question_score")
+  keywordScore       Float? @map("keyword_score")
+  durationScore      Float? @map("duration_score")
+  speechDensityScore Float? @map("speech_density_score")
+  saliencyScore      Float? @map("saliency_score")
+  completenessScore  Float? @map("completeness_score")
+  emotionScore       Float? @map("emotion_score")
+  finalScore         Float? @map("final_score")
+
+  llmScore  Float?  @map("llm_score")
+  llmReason String? @map("llm_reason") @db.Text
+
+  dedupGroupId String? @map("dedup_group_id") @db.VarChar(100)
+  metadata     Json?
+
+  status ClipCandidateStatus @default(CANDIDATE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transcript Transcript    @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  chapter    VideoChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  shortClips ShortClip[]
+
+  @@index([mediaId])
+  @@index([transcriptId])
+  @@index([chapterId])
+  @@index([jobId])
+  @@index([status])
+  @@index([finalScore])
+  @@index([startTime, endTime])
+  @@map("clip_candidates")
+}
+
+model ShortClip {
+  id           String  @id @default(uuid()) @db.Uuid
+  mediaId      String  @map("media_id") @db.Uuid
+  userId       String  @map("user_id") @db.Uuid
+  transcriptId String? @map("transcript_id") @db.Uuid
+  chapterId    String? @map("chapter_id") @db.Uuid
+  candidateId  String? @map("candidate_id") @db.Uuid
+
+  title       String? @db.VarChar(255)
+  caption     String? @db.Text
+  description String? @db.Text
+  hashtags    Json?
+
+  startTime Float @map("start_time")
+  endTime   Float @map("end_time")
+  duration  Float
+
+  transcriptVersion Int? @map("transcript_version")
+
+  score  Float?
+  reason String? @db.Text
+
+  videoPath     String? @map("video_path") @db.Text
+  thumbnailPath String? @map("thumbnail_path") @db.Text
+  subtitlePath  String? @map("subtitle_path") @db.Text
+
+  aspectRatio String?         @map("aspect_ratio") @db.VarChar(20)
+  status      ShortClipStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transcript Transcript?    @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
+  chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  candidate  ClipCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+
+  publishTasks PublishTask[]
+
+  @@index([mediaId])
+  @@index([userId])
+  @@index([transcriptId])
+  @@index([chapterId])
+  @@index([candidateId])
+  @@index([status])
+  @@map("short_clips")
+}
+
+model GeneratedAsset {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  mediaId String @map("media_id") @db.Uuid
+
+  transcriptId String? @map("transcript_id") @db.Uuid
+  chapterId    String? @map("chapter_id") @db.Uuid
+
+  assetType AssetType @map("asset_type")
+  transcriptVersion Int? @map("transcript_version")
+
+  s3Bucket String  @map("s3_bucket") @db.VarChar(255)
+  s3Key    String  @map("s3_key") @db.Text
+  s3Region String? @map("s3_region") @db.VarChar(100)
+  s3Etag   String? @map("s3_etag") @db.VarChar(255)
+
+  mimeType      String? @map("mime_type") @db.VarChar(100)
+  fileSizeBytes BigInt? @map("file_size_bytes")
+
+  metadata Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media      Media         @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transcript Transcript?   @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
+  chapter    VideoChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@unique([s3Bucket, s3Key])
+  @@index([userId])
+  @@index([mediaId])
+  @@index([transcriptId])
+  @@index([chapterId])
+  @@index([assetType])
+  @@map("generated_assets")
+}
+
+model AiSuggestion {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  targetType TargetType @map("target_type")
+  targetId   String     @map("target_id") @db.Uuid
+
+  suggestionType SuggestionType @map("suggestion_type")
+  platform       Platform?
+
+  content Json
+  model   String? @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([targetType, targetId])
+  @@index([suggestionType])
+  @@index([platform])
+  @@map("ai_suggestions")
+}
+
+model PlatformAccount {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  platform Platform
+
+  accountName    String? @map("account_name") @db.VarChar(255)
+  platformUserId String? @map("platform_user_id") @db.VarChar(255)
+
+  accessTokenEncrypted  String? @map("access_token_encrypted") @db.Text
+  refreshTokenEncrypted String? @map("refresh_token_encrypted") @db.Text
+  tokenLast4            String? @map("token_last4") @db.VarChar(10)
+  expiresAt             DateTime? @map("expires_at")
+
+  status PlatformAccountStatus @default(CONNECTED)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  publishTasks PublishTask[]
+
+  @@unique([userId, platform])
+  @@index([userId])
+  @@index([platform])
+  @@map("platform_accounts")
+}
+
+model PublishTask {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  mediaId           String? @map("media_id") @db.Uuid
+  shortClipId       String? @map("short_clip_id") @db.Uuid
+  platformAccountId String? @map("platform_account_id") @db.Uuid
+  jobId             String? @map("job_id") @db.Uuid
+
+  platform Platform
+
+  title       String? @db.Text
+  caption     String? @db.Text
+  description String? @db.Text
+  hashtags    Json?
+
+  status PublishStatus @default(DRAFT)
+
+  scheduledAt DateTime? @map("scheduled_at")
+  publishedAt DateTime? @map("published_at")
+
+  platformPostId  String? @map("platform_post_id") @db.Text
+  platformPostUrl String? @map("platform_post_url") @db.Text
+  errorMessage    String? @map("error_message") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media           Media?           @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  shortClip       ShortClip?       @relation(fields: [shortClipId], references: [id], onDelete: SetNull)
+  platformAccount PlatformAccount? @relation(fields: [platformAccountId], references: [id], onDelete: SetNull)
+  job             ProcessingJob?   @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([mediaId])
+  @@index([shortClipId])
+  @@index([platformAccountId])
+  @@index([jobId])
+  @@index([platform])
+  @@index([status])
+  @@map("publish_tasks")
+}
+
+model AuditLog {
+  id     String  @id @default(uuid()) @db.Uuid
+  userId String? @map("user_id") @db.Uuid
+
+  entityType String @map("entity_type") @db.VarChar(50)
+  entityId   String @map("entity_id") @db.Uuid
+
+  action String @db.VarChar(50)
+
+  beforeData Json? @map("before_data")
+  afterData  Json? @map("after_data")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@map("audit_logs")
+}
