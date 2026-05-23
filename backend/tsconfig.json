@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2023", // Target output cho code
+    "module": "esnext", // Quy định output module được sử dụng
+    "moduleResolution": "bundler",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "outDir": "dist", // Đường dẫn output cho thư mục build
+    "rootDir": "src",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true /* Enable all strict type-checking options. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+    "sourceMap": true,
+    "declaration": true,
+    "removeComments": true,
+    "noEmitOnError": true
+  },
+  "files": ["src/type.d.ts"], // Các file dùng để defined global type cho dự án
+  "include": ["src/**/*"], // Đường dẫn include cho các file cần build
+  "exclude": ["node_modules", "dist"]
+}
