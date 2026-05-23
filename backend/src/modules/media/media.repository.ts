@@ -1,8 +1,37 @@
 import { prisma } from '../../infrastructure/db/prisma'
-import type { Media, Prisma } from '../../infrastructure/db/generated/prisma/client'
+import type { Media, MediaStatus, Prisma } from '../../infrastructure/db/generated/prisma/client'
+
+type MediaSortField = 'createdAt' | 'title' | 'duration'
+type SortOrder = 'asc' | 'desc'
 
 export const createMedia = async (data: Prisma.MediaCreateInput | Prisma.MediaUncheckedCreateInput): Promise<Media> =>
   prisma.media.create({ data })
+
+export const findMediaByUserId = async (
+  userId: string,
+  skip: number,
+  take: number,
+  status?: MediaStatus,
+  sortBy: MediaSortField = 'createdAt',
+  sortOrder: SortOrder = 'desc'
+): Promise<[Media[], number]> => {
+  const where: Prisma.MediaWhereInput = {
+    userId,
+    status: status ?? {
+      not: 'DELETED'
+    }
+  }
+
+  return Promise.all([
+    prisma.media.findMany({
+      where,
+      skip,
+      take,
+      orderBy: { [sortBy]: sortOrder }
+    }),
+    prisma.media.count({ where })
+  ])
+}
 
 export const findMediaByS3Key = async (s3Bucket: string, s3Key: string): Promise<Media | null> =>
   prisma.media.findUnique({

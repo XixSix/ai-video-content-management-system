@@ -1,14 +1,83 @@
-import type { BodyRequestHandler } from '../../types/express'
+import type {
+  BodyRequestHandler,
+  ParamsBodyRequestHandler,
+  ParamsRequestHandler,
+  QueryRequestHandler
+} from '../../types/express'
 import { sendSuccess } from '../../utils/response'
-import type { AbortMultipartUploadBody, CompleteUploadBody, CreateUploadUrlBody } from './media.schema'
+import type {
+  AbortMultipartUploadBody,
+  CompleteUploadBody,
+  CreateUploadUrlBody,
+  ListMediaQuery,
+  MediaParams,
+  UpdateMediaBody
+} from './media.schema'
 import * as mediaService from './media.service'
 import type {
   AbortMultipartUploadResult,
   CompleteUploadResult,
   CompleteUploadResponseData,
-  CreateUploadUrlResult
+  CreateUploadUrlResult,
+  MediaResponseData,
+  PaginatedResult
 } from '../../types/media'
-import { toUploadedMediaResponse } from '../../utils/media.util'
+import { toMediaResponseData, toUploadedMediaResponse } from '../../utils/media.util'
+
+export const list: QueryRequestHandler<ListMediaQuery> = async (req, res, next): Promise<void> => {
+  try {
+    const query = req.query as ListMediaQuery
+    const result = await mediaService.listMedia(req.user!.id, query)
+
+    sendSuccess<{ items: MediaResponseData[]; meta: Omit<PaginatedResult<never>, 'items'> }>(res, {
+      items: result.items.map(toMediaResponseData),
+      meta: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages
+      }
+    })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const get: ParamsRequestHandler<MediaParams> = async (req, res, next): Promise<void> => {
+  try {
+    const media = await mediaService.getMedia(req.user!.id, req.params.mediaId)
+
+    sendSuccess<{ media: MediaResponseData }>(res, {
+      media: toMediaResponseData(media)
+    })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const update: ParamsBodyRequestHandler<MediaParams, UpdateMediaBody> = async (req, res, next): Promise<void> => {
+  try {
+    const media = await mediaService.updateMedia(req.user!.id, req.params.mediaId, req.body)
+
+    sendSuccess<{ media: MediaResponseData }>(res, {
+      media: toMediaResponseData(media)
+    })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const remove: ParamsRequestHandler<MediaParams> = async (req, res, next): Promise<void> => {
+  try {
+    await mediaService.deleteMedia(req.user!.id, req.params.mediaId)
+
+    sendSuccess<{ message: string }>(res, {
+      message: 'Media deleted successfully'
+    })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
 
 export const createUploadUrl: BodyRequestHandler<CreateUploadUrlBody> = async (req, res, next): Promise<void> => {
   try {

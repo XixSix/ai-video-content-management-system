@@ -2,27 +2,33 @@ import { Router } from 'express'
 import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
 import * as mediaController from './media.controller'
-import { abortMultipartUploadSchema, completeUploadSchema, createUploadUrlSchema } from './media.schema'
+import {
+  abortMultipartUploadSchema,
+  completeUploadSchema,
+  createUploadUrlSchema,
+  listMediaQuerySchema,
+  mediaParamsSchema,
+  updateMediaSchema
+} from './media.schema'
 
 const router = Router()
 
-router.post(
-  '/upload-url',
-  authenticate,
-  validateRequest({ body: createUploadUrlSchema }),
-  mediaController.createUploadUrl
-)
-router.post(
-  '/complete-upload',
-  authenticate,
-  validateRequest({ body: completeUploadSchema }),
-  mediaController.completeUpload
-)
+router.use(authenticate)
+
+router.get('/', validateRequest({ query: listMediaQuerySchema }), mediaController.list)
+router.post('/upload-url', validateRequest({ body: createUploadUrlSchema }), mediaController.createUploadUrl)
+router.post('/complete-upload', validateRequest({ body: completeUploadSchema }), mediaController.completeUpload)
 router.post(
   '/abort-upload',
-  authenticate,
   validateRequest({ body: abortMultipartUploadSchema }),
   mediaController.abortMultipartUpload
 )
+router.get('/:mediaId', validateRequest({ params: mediaParamsSchema }), mediaController.get)
+router.patch(
+  '/:mediaId',
+  validateRequest({ params: mediaParamsSchema, body: updateMediaSchema }),
+  mediaController.update
+)
+router.delete('/:mediaId', validateRequest({ params: mediaParamsSchema }), mediaController.remove)
 
 export { router as mediaRoutes }

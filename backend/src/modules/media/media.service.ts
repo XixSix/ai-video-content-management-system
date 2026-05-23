@@ -9,8 +9,11 @@ import type {
   CreateUploadUrlResult,
   CompleteUploadInput,
   CompleteUploadResult,
-  CompletedUploadPart
+  CompletedUploadPart,
+  PaginatedResult
 } from '../../types/media'
+import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import type { ListMediaQuery, UpdateMediaBody } from './media.schema'
 import {
   createUploadObjectKey,
   ensureBucketAndUserKey,
@@ -19,6 +22,78 @@ import {
   getUploadMode,
   getValidCompletedParts
 } from '../../utils/media.util'
+
+export const listMedia = async (userId: string, query: ListMediaQuery): Promise<PaginatedResult<Media>> => {
+  const page: number = query.page
+  const limit: number = query.limit
+  const skip: number = (page - 1) * limit
+
+  const [items, total] = await mediaRepo.findMediaByUserId(
+    userId,
+    skip,
+    limit,
+    query.status,
+    query.sortBy,
+    query.sortOrder
+  )
+
+  return {
+    items,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+  }
+}
+
+const getOwnedMedia = async (userId: string, mediaId: string): Promise<Media> => {
+  const media = await mediaRepo.findMediaById(mediaId)
+
+  if (!media) {
+    throw MediaError.notFound()
+  }
+
+  if (media.userId !== userId) {
+    throw MediaError.forbidden()
+  }
+
+  return media
+}
+
+export const getMedia = async (userId: string, mediaId: string): Promise<Media> => {
+  const media = await getOwnedMedia(userId, mediaId)
+
+  if (media.status === 'DELETED') {
+    throw MediaError.notFound()
+  }
+
+  return media
+}
+
+export const updateMedia = async (userId: string, mediaId: string, data: UpdateMediaBody): Promise<Media> => {
+  const media = await getMedia(userId, mediaId)
+
+  return mediaRepo.updateMedia(media.id, data)
+}
+
+export const deleteMedia = async (userId: string, mediaId: string): Promise<void> => {
+  const media = await getOwnedMedia(userId, mediaId)
+
+  if (media.status === 'DELETED') {
+    return
+  }
+
+  if (media.status === 'UPLOADING' && media.uploadId) {
+    await storageService.abortMultipartUpload(media.s3Bucket, media.s3Key, media.uploadId)
+  } else {
+    await storageService.deleteObject(media.s3Bucket, media.s3Key)
+  }
+
+  await mediaRepo.updateMedia(media.id, {
+    uploadId: null,
+    status: 'DELETED'
+  })
+}
 
 export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<CreateUploadUrlResult> => {
   ensureSupportedFileSize(input.fileSizeBytes)
@@ -138,6 +213,7 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
 
   const updatedMedia = await mediaRepo.updateMedia(media.id, {
     s3Etag: objectMetadata.etag,
+    uploadId: null,
     status: 'UPLOADED'
   })
 

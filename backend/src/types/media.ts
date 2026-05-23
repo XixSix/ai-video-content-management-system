@@ -46,9 +46,34 @@ export type AbortMultipartUploadInput = AbortMultipartUploadBody & { userId: str
 
 export interface UploadedMediaResponse {
   id: string
+  title: string | null
+  description: string | null
+  originalFilename: string
   s3Bucket: string
   s3Key: string
+  duration: number | null
+  fileSizeBytes: string | null
+  mimeType: string | null
+  width: number | null
+  height: number | null
   status: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface MediaResponseData {
+  id: string
+  title: string | null
+  description: string | null
+  originalFilename: string
+  duration: number | null
+  fileSizeBytes: string | null
+  mimeType: string | null
+  width: number | null
+  height: number | null
+  status: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface CompleteUploadResult {
@@ -67,4 +92,12 @@ export interface StorageObjectMetadata {
   contentLength?: number
   contentType?: string
   etag?: string
+}
+
+export interface PaginatedResult<TItem> {
+  items: TItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
