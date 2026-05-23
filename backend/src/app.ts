@@ -18,7 +18,7 @@ export const createApp = (): Express => {
     app.use(morgan(config.app.isProduction ? 'combined' : 'dev'))
   }
 
-  app.use('/api', apiRouter)
+  app.use('/api/v1', apiRouter)
 
   app.use(notFoundHandler)
   app.use(globalErrorHandler)

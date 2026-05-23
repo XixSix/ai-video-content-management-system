@@ -3,9 +3,9 @@ import request from 'supertest'
 import { app } from '../../app'
 
 describe('auth routes', () => {
-  describe('POST /api/auth/register', () => {
+  describe('POST /api/v1/auth/register', () => {
     it('returns validation errors for invalid register payload', async () => {
-      const response = await request(app).post('/api/auth/register').send({
+      const response = await request(app).post('/api/v1/auth/register').send({
         email: 'not-an-email',
         password: 'short'
       })
@@ -30,9 +30,9 @@ describe('auth routes', () => {
     })
   })
 
-  describe('POST /api/auth/login', () => {
+  describe('POST /api/v1/auth/login', () => {
     it('returns validation errors for invalid login payload', async () => {
-      const response = await request(app).post('/api/auth/login').send({
+      const response = await request(app).post('/api/v1/auth/login').send({
         email: 'not-an-email',
         password: ''
       })
@@ -58,9 +58,9 @@ describe('auth routes', () => {
     })
   })
 
-  describe('GET /api/auth/me', () => {
+  describe('GET /api/v1/auth/me', () => {
     it('requires an access token', async () => {
-      const response = await request(app).get('/api/auth/me')
+      const response = await request(app).get('/api/v1/auth/me')
 
       expect(response.status).toBe(401)
       expect(response.body).toMatchObject({

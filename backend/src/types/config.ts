@@ -35,10 +35,29 @@ export interface RateLimitConfig {
   refreshLimit: number
 }
 
+export interface S3Config {
+  endpoint: string
+  publicEndpoint?: string
+  region: string
+  bucket: string
+  accessKeyId: string
+  secretAccessKey: string
+  forcePathStyle: boolean
+}
+
+export interface UploadConfig {
+  maxMultipartParts: number
+  multipartThresholdBytes: number
+  multipartPartSizeBytes: number
+  presignedUploadExpiredSeconds: number
+}
+
 export interface Config {
   app: AppConfig
   database: DatabaseConfig
   security: SecurityConfig
   cookie: CookieConfig
   rateLimit: RateLimitConfig
+  s3: S3Config
+  upload: UploadConfig
 }
