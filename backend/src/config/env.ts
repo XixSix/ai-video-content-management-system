@@ -41,7 +41,26 @@ const envSchema = z.object({
     .default(1000 * 60 * 15),
   AUTH_REGISTER_RATE_LIMIT: z.coerce.number().int().positive().default(5),
   AUTH_LOGIN_RATE_LIMIT: z.coerce.number().int().positive().default(10),
-  AUTH_REFRESH_RATE_LIMIT: z.coerce.number().int().positive().default(30)
+  AUTH_REFRESH_RATE_LIMIT: z.coerce.number().int().positive().default(30),
+  S3_ENDPOINT: z.string().url().default('http://localhost:9000'),
+  S3_PUBLIC_ENDPOINT: z.string().url().optional(),
+  S3_REGION: z.string().min(1).default('us-east-1'),
+  S3_BUCKET: z.string().min(1).default('avcms-media'),
+  S3_ACCESS_KEY_ID: z.string().min(1).default('minioadmin'),
+  S3_SECRET_ACCESS_KEY: z.string().min(1).default('minioadmin'),
+  S3_FORCE_PATH_STYLE: z.coerce.boolean().default(true),
+  MAX_MULTIPART_PARTS: z.coerce.number().int().positive().default(10000),
+  MULTIPART_THRESHOLD_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(100 * 1024 * 1024),
+  MULTIPART_PART_SIZE_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(10 * 1024 * 1024),
+  PRESIGNED_UPLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900)
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
@@ -72,7 +91,7 @@ export const config = {
   },
   cookie: {
     refreshName: env.REFRESH_COOKIE_NAME,
-    refreshPath: '/api/auth',
+    refreshPath: '/api/v1/auth',
     refreshOptions: {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
@@ -85,6 +104,21 @@ export const config = {
     registerLimit: env.AUTH_REGISTER_RATE_LIMIT,
     loginLimit: env.AUTH_LOGIN_RATE_LIMIT,
     refreshLimit: env.AUTH_REFRESH_RATE_LIMIT
+  },
+  s3: {
+    endpoint: env.S3_ENDPOINT,
+    publicEndpoint: env.S3_PUBLIC_ENDPOINT,
+    region: env.S3_REGION,
+    bucket: env.S3_BUCKET,
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+    forcePathStyle: env.S3_FORCE_PATH_STYLE
+  },
+  upload: {
+    maxMultipartParts: env.MAX_MULTIPART_PARTS,
+    multipartThresholdBytes: env.MULTIPART_THRESHOLD_BYTES,
+    multipartPartSizeBytes: env.MULTIPART_PART_SIZE_BYTES,
+    presignedUploadExpiredSeconds: env.PRESIGNED_UPLOAD_EXPIRES_SECONDS
   }
 } as const
 
