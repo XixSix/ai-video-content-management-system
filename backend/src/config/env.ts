@@ -60,7 +60,8 @@ const envSchema = z.object({
     .int()
     .positive()
     .default(10 * 1024 * 1024),
-  PRESIGNED_UPLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900)
+  PRESIGNED_UPLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
+  PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900)
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
@@ -118,7 +119,8 @@ export const config = {
     maxMultipartParts: env.MAX_MULTIPART_PARTS,
     multipartThresholdBytes: env.MULTIPART_THRESHOLD_BYTES,
     multipartPartSizeBytes: env.MULTIPART_PART_SIZE_BYTES,
-    presignedUploadExpiredSeconds: env.PRESIGNED_UPLOAD_EXPIRES_SECONDS
+    presignedUploadExpiredSeconds: env.PRESIGNED_UPLOAD_EXPIRES_SECONDS,
+    presignedDownloadExpiredSeconds: env.PRESIGNED_DOWNLOAD_EXPIRES_SECONDS
   }
 } as const
 

@@ -84,6 +84,11 @@ export interface CompleteUploadResponseData {
   media: UploadedMediaResponse
 }
 
+export interface CreateDownloadUrlResult {
+  url: string
+  expiresInSeconds: number
+}
+
 export interface AbortMultipartUploadResult {
   message: string
 }

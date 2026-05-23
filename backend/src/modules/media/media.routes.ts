@@ -23,6 +23,7 @@ router.post(
   validateRequest({ body: abortMultipartUploadSchema }),
   mediaController.abortMultipartUpload
 )
+router.get('/:mediaId/download-url', validateRequest({ params: mediaParamsSchema }), mediaController.createDownloadUrl)
 router.get('/:mediaId', validateRequest({ params: mediaParamsSchema }), mediaController.get)
 router.patch(
   '/:mediaId',
