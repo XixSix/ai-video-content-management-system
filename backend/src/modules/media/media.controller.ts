@@ -22,8 +22,8 @@ import type {
   CreateDownloadUrlResult,
   MediaResponseData,
   PaginatedResult
-} from '../../types/media'
-import { toMediaResponseData, toUploadedMediaResponse } from '../../utils/media.util'
+} from './media.types'
+import { toMediaResponseData, toUploadedMediaResponse } from './media.util'
 
 export const list: QueryRequestHandler<ListMediaQuery> = async (req, res, next): Promise<void> => {
   try {

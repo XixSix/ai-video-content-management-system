@@ -1,8 +1,8 @@
 import crypto from 'node:crypto'
 import jwt, { type JwtPayload, type SignOptions } from 'jsonwebtoken'
-import { config } from '../config'
-import { AuthError } from '../modules/auth/auth.error'
-import type { AccessTokenPayload } from '../types/auth'
+import { config } from '../../config'
+import { AuthError } from './auth.error'
+import type { AccessTokenPayload } from './auth.types'
 
 export const generateRefreshToken = (): string => crypto.randomBytes(64).toString('base64url')
 

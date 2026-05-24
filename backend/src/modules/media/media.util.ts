@@ -1,9 +1,9 @@
-import path from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { config } from '../config'
-import type { Media } from '../infrastructure/db/generated/prisma/client'
-import { MediaError } from '../modules/media/media.error'
-import type { CompletedUploadPart, MediaResponseData, UploadMediaType, UploadedMediaResponse } from '../types/media'
+import path from 'node:path'
+import { config } from '../../config'
+import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import { MediaError } from './media.error'
+import type { CompletedUploadPart, MediaResponseData, UploadMediaType, UploadedMediaResponse } from './media.types'
 
 export const getMultipartPartCount = (fileSizeBytes: number): number => {
   return Math.ceil(fileSizeBytes / config.upload.multipartPartSizeBytes)

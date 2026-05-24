@@ -12,8 +12,8 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { config } from '../../config'
 import { MediaError } from '../../modules/media/media.error'
-import type { CompletedUploadPart, PresignedUploadPart, StorageObjectMetadata } from '../../types/media'
 import { presignS3Client, s3Client } from './client'
+import type { CompletedUploadPart, PresignedUploadPart, StorageObjectMetadata } from './s3.types'
 
 export const PRESIGNED_UPLOAD_EXPIRES_SECONDS: number = config.upload.presignedUploadExpiredSeconds
 export const PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: number = config.upload.presignedDownloadExpiredSeconds

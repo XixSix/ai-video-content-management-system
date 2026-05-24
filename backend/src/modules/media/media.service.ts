@@ -12,7 +12,7 @@ import type {
   CompletedUploadPart,
   CreateDownloadUrlResult,
   PaginatedResult
-} from '../../types/media'
+} from './media.types'
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
 import type { ListMediaQuery, UpdateMediaBody } from './media.schema'
 import {
@@ -22,7 +22,7 @@ import {
   getMultipartPartCount,
   getUploadMode,
   getValidCompletedParts
-} from '../../utils/media.util'
+} from './media.util'
 
 export const listMedia = async (userId: string, query: ListMediaQuery): Promise<PaginatedResult<Media>> => {
   const page: number = query.page

@@ -1,5 +1,5 @@
 import type { Response } from 'express'
-import { config } from '../config'
+import { config } from '../../config'
 
 export const setRefreshCookie = (res: Response, refreshToken: string): void => {
   res.cookie(config.cookie.refreshName, refreshToken, {

@@ -1,5 +1,5 @@
-import type { AuthSession, User, UserStatus, UserRole } from '../infrastructure/db/generated/prisma/client'
 import type { JwtPayload } from 'jsonwebtoken'
+import type { AuthSession, User, UserRole, UserStatus } from '../../infrastructure/db/generated/prisma/client'
 
 export interface AuthenticatedUser {
   id: string
