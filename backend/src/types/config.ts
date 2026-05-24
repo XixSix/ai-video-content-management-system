@@ -33,6 +33,8 @@ export interface RateLimitConfig {
   registerLimit: number
   loginLimit: number
   refreshLimit: number
+  transcriptGenerateWindowMs: number
+  transcriptGenerateLimit: number
 }
 
 export interface S3Config {

@@ -42,6 +42,12 @@ const envSchema = z.object({
   AUTH_REGISTER_RATE_LIMIT: z.coerce.number().int().positive().default(5),
   AUTH_LOGIN_RATE_LIMIT: z.coerce.number().int().positive().default(10),
   AUTH_REFRESH_RATE_LIMIT: z.coerce.number().int().positive().default(30),
+  TRANSCRIPT_GENERATE_RATE_LIMIT_WINDOW_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(1000 * 60 * 60),
+  TRANSCRIPT_GENERATE_RATE_LIMIT: z.coerce.number().int().positive().default(10),
   S3_ENDPOINT: z.string().url().default('http://localhost:9000'),
   S3_PUBLIC_ENDPOINT: z.string().url().optional(),
   S3_REGION: z.string().min(1).default('us-east-1'),
@@ -105,7 +111,9 @@ export const config = {
     authWindowMs: env.AUTH_RATE_LIMIT_WINDOW_MS,
     registerLimit: env.AUTH_REGISTER_RATE_LIMIT,
     loginLimit: env.AUTH_LOGIN_RATE_LIMIT,
-    refreshLimit: env.AUTH_REFRESH_RATE_LIMIT
+    refreshLimit: env.AUTH_REFRESH_RATE_LIMIT,
+    transcriptGenerateWindowMs: env.TRANSCRIPT_GENERATE_RATE_LIMIT_WINDOW_MS,
+    transcriptGenerateLimit: env.TRANSCRIPT_GENERATE_RATE_LIMIT
   },
   s3: {
     endpoint: env.S3_ENDPOINT,

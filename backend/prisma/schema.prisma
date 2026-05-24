@@ -290,7 +290,6 @@ model Transcript {
 
   isEdited Boolean @default(false) @map("is_edited")
   version  Int     @default(1)
-  fullTextDirty     Boolean   @default(false) @map("full_text_dirty")
   fullTextUpdatedAt DateTime? @map("full_text_updated_at")
 
   createdAt DateTime @default(now()) @map("created_at")

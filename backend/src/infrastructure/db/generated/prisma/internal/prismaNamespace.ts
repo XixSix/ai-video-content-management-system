@@ -1588,7 +1588,6 @@ export const TranscriptScalarFieldEnum = {
   wordCount: 'wordCount',
   isEdited: 'isEdited',
   version: 'version',
-  fullTextDirty: 'fullTextDirty',
   fullTextUpdatedAt: 'fullTextUpdatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -59,7 +59,6 @@ export type TranscriptMinAggregateOutputType = {
   wordCount: number | null
   isEdited: boolean | null
   version: number | null
-  fullTextDirty: boolean | null
   fullTextUpdatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -80,7 +79,6 @@ export type TranscriptMaxAggregateOutputType = {
   wordCount: number | null
   isEdited: boolean | null
   version: number | null
-  fullTextDirty: boolean | null
   fullTextUpdatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -102,7 +100,6 @@ export type TranscriptCountAggregateOutputType = {
   wordCount: number
   isEdited: number
   version: number
-  fullTextDirty: number
   fullTextUpdatedAt: number
   createdAt: number
   updatedAt: number
@@ -143,7 +140,6 @@ export type TranscriptMinAggregateInputType = {
   wordCount?: true
   isEdited?: true
   version?: true
-  fullTextDirty?: true
   fullTextUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -164,7 +160,6 @@ export type TranscriptMaxAggregateInputType = {
   wordCount?: true
   isEdited?: true
   version?: true
-  fullTextDirty?: true
   fullTextUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -186,7 +181,6 @@ export type TranscriptCountAggregateInputType = {
   wordCount?: true
   isEdited?: true
   version?: true
-  fullTextDirty?: true
   fullTextUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -295,7 +289,6 @@ export type TranscriptGroupByOutputType = {
   wordCount: number | null
   isEdited: boolean
   version: number
-  fullTextDirty: boolean
   fullTextUpdatedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -340,7 +333,6 @@ export type TranscriptWhereInput = {
   wordCount?: Prisma.IntNullableFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolFilter<"Transcript"> | boolean
   version?: Prisma.IntFilter<"Transcript"> | number
-  fullTextDirty?: Prisma.BoolFilter<"Transcript"> | boolean
   fullTextUpdatedAt?: Prisma.DateTimeNullableFilter<"Transcript"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
@@ -369,7 +361,6 @@ export type TranscriptOrderByWithRelationInput = {
   wordCount?: Prisma.SortOrderInput | Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
-  fullTextDirty?: Prisma.SortOrder
   fullTextUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -401,7 +392,6 @@ export type TranscriptWhereUniqueInput = Prisma.AtLeast<{
   wordCount?: Prisma.IntNullableFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolFilter<"Transcript"> | boolean
   version?: Prisma.IntFilter<"Transcript"> | number
-  fullTextDirty?: Prisma.BoolFilter<"Transcript"> | boolean
   fullTextUpdatedAt?: Prisma.DateTimeNullableFilter<"Transcript"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
@@ -430,7 +420,6 @@ export type TranscriptOrderByWithAggregationInput = {
   wordCount?: Prisma.SortOrderInput | Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
-  fullTextDirty?: Prisma.SortOrder
   fullTextUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -460,7 +449,6 @@ export type TranscriptScalarWhereWithAggregatesInput = {
   wordCount?: Prisma.IntNullableWithAggregatesFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolWithAggregatesFilter<"Transcript"> | boolean
   version?: Prisma.IntWithAggregatesFilter<"Transcript"> | number
-  fullTextDirty?: Prisma.BoolWithAggregatesFilter<"Transcript"> | boolean
   fullTextUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Transcript"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Transcript"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Transcript"> | Date | string
@@ -480,7 +468,6 @@ export type TranscriptCreateInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -509,7 +496,6 @@ export type TranscriptUncheckedCreateInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -534,7 +520,6 @@ export type TranscriptUpdateInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -563,7 +548,6 @@ export type TranscriptUncheckedUpdateInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -590,7 +574,6 @@ export type TranscriptCreateManyInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -610,7 +593,6 @@ export type TranscriptUpdateManyMutationInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -632,7 +614,6 @@ export type TranscriptUncheckedUpdateManyInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -664,7 +645,6 @@ export type TranscriptCountOrderByAggregateInput = {
   wordCount?: Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
-  fullTextDirty?: Prisma.SortOrder
   fullTextUpdatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -694,7 +674,6 @@ export type TranscriptMaxOrderByAggregateInput = {
   wordCount?: Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
-  fullTextDirty?: Prisma.SortOrder
   fullTextUpdatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -715,7 +694,6 @@ export type TranscriptMinOrderByAggregateInput = {
   wordCount?: Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
-  fullTextDirty?: Prisma.SortOrder
   fullTextUpdatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -920,7 +898,6 @@ export type TranscriptCreateWithoutMediaInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -947,7 +924,6 @@ export type TranscriptUncheckedCreateWithoutMediaInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1003,7 +979,6 @@ export type TranscriptScalarWhereInput = {
   wordCount?: Prisma.IntNullableFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolFilter<"Transcript"> | boolean
   version?: Prisma.IntFilter<"Transcript"> | number
-  fullTextDirty?: Prisma.BoolFilter<"Transcript"> | boolean
   fullTextUpdatedAt?: Prisma.DateTimeNullableFilter<"Transcript"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
@@ -1023,7 +998,6 @@ export type TranscriptCreateWithoutJobInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1050,7 +1024,6 @@ export type TranscriptUncheckedCreateWithoutJobInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1101,7 +1074,6 @@ export type TranscriptCreateWithoutSegmentsInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1129,7 +1101,6 @@ export type TranscriptUncheckedCreateWithoutSegmentsInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1169,7 +1140,6 @@ export type TranscriptUpdateWithoutSegmentsInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1197,7 +1167,6 @@ export type TranscriptUncheckedUpdateWithoutSegmentsInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1221,7 +1190,6 @@ export type TranscriptCreateWithoutVideoChaptersInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1249,7 +1217,6 @@ export type TranscriptUncheckedCreateWithoutVideoChaptersInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1289,7 +1256,6 @@ export type TranscriptUpdateWithoutVideoChaptersInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1317,7 +1283,6 @@ export type TranscriptUncheckedUpdateWithoutVideoChaptersInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1341,7 +1306,6 @@ export type TranscriptCreateWithoutClipCandidatesInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1369,7 +1333,6 @@ export type TranscriptUncheckedCreateWithoutClipCandidatesInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1409,7 +1372,6 @@ export type TranscriptUpdateWithoutClipCandidatesInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1437,7 +1399,6 @@ export type TranscriptUncheckedUpdateWithoutClipCandidatesInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1461,7 +1422,6 @@ export type TranscriptCreateWithoutShortClipsInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1489,7 +1449,6 @@ export type TranscriptUncheckedCreateWithoutShortClipsInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1529,7 +1488,6 @@ export type TranscriptUpdateWithoutShortClipsInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1557,7 +1515,6 @@ export type TranscriptUncheckedUpdateWithoutShortClipsInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1581,7 +1538,6 @@ export type TranscriptCreateWithoutGeneratedAssetsInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1609,7 +1565,6 @@ export type TranscriptUncheckedCreateWithoutGeneratedAssetsInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1649,7 +1604,6 @@ export type TranscriptUpdateWithoutGeneratedAssetsInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1677,7 +1631,6 @@ export type TranscriptUncheckedUpdateWithoutGeneratedAssetsInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1702,7 +1655,6 @@ export type TranscriptCreateManyMediaInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1722,7 +1674,6 @@ export type TranscriptUpdateWithoutMediaInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1749,7 +1700,6 @@ export type TranscriptUncheckedUpdateWithoutMediaInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1775,7 +1725,6 @@ export type TranscriptUncheckedUpdateManyWithoutMediaInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1796,7 +1745,6 @@ export type TranscriptCreateManyJobInput = {
   wordCount?: number | null
   isEdited?: boolean
   version?: number
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1816,7 +1764,6 @@ export type TranscriptUpdateWithoutJobInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1843,7 +1790,6 @@ export type TranscriptUncheckedUpdateWithoutJobInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1869,7 +1815,6 @@ export type TranscriptUncheckedUpdateManyWithoutJobInput = {
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
-  fullTextDirty?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1958,7 +1903,6 @@ export type TranscriptSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1988,7 +1932,6 @@ export type TranscriptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2012,7 +1955,6 @@ export type TranscriptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2036,13 +1978,12 @@ export type TranscriptSelectScalar = {
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
-  fullTextDirty?: boolean
   fullTextUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TranscriptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "jobId" | "language" | "source" | "model" | "fullText" | "content" | "transcriptQualityScore" | "fillerRatio" | "uniqueWordRatio" | "speechDensity" | "wordCount" | "isEdited" | "version" | "fullTextDirty" | "fullTextUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transcript"]>
+export type TranscriptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "jobId" | "language" | "source" | "model" | "fullText" | "content" | "transcriptQualityScore" | "fillerRatio" | "uniqueWordRatio" | "speechDensity" | "wordCount" | "isEdited" | "version" | "fullTextUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transcript"]>
 export type TranscriptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
@@ -2089,7 +2030,6 @@ export type $TranscriptPayload<ExtArgs extends runtime.Types.Extensions.Internal
     wordCount: number | null
     isEdited: boolean
     version: number
-    fullTextDirty: boolean
     fullTextUpdatedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -2538,7 +2478,6 @@ export interface TranscriptFieldRefs {
   readonly wordCount: Prisma.FieldRef<"Transcript", 'Int'>
   readonly isEdited: Prisma.FieldRef<"Transcript", 'Boolean'>
   readonly version: Prisma.FieldRef<"Transcript", 'Int'>
-  readonly fullTextDirty: Prisma.FieldRef<"Transcript", 'Boolean'>
   readonly fullTextUpdatedAt: Prisma.FieldRef<"Transcript", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Transcript", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Transcript", 'DateTime'>
