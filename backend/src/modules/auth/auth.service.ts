@@ -121,10 +121,6 @@ export const getAuthenticatedUser = async (accessToken: string): Promise<Authent
   return toAuthenticatedUser(user)
 }
 
-// ---------------------------------------------------------------------------
-// Internal helpers — contain logic, so they stay in service
-// ---------------------------------------------------------------------------
-
 const createRefreshSession = async (userId: string, metadata: RequestMetadata): Promise<SessionTokenResult> => {
   const refreshToken: string = generateRefreshToken()
   const refreshExpiresAt: Date = getRefreshExpiresAt()

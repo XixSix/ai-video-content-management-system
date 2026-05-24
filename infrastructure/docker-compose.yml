@@ -20,7 +20,7 @@ services:
       - app_network
 
   minio:
-    container_name: cmc-minio
+    container_name: avcms-minio
     image: minio/minio
     ports:
       - '9000:9000'

@@ -2,10 +2,6 @@ import { prisma } from '../../infrastructure/db/prisma'
 import type { AuthSession, User } from '../../infrastructure/db/generated/prisma/client'
 import type { AuthSessionWithUser } from '../../types/auth'
 
-// ---------------------------------------------------------------------------
-// Input types — plain data shapes, no business logic
-// ---------------------------------------------------------------------------
-
 export interface CreateUserData {
   email: string
   passwordHash: string
@@ -28,20 +24,12 @@ export interface UpdateSessionData {
   lastUsedAt?: Date
 }
 
-// ---------------------------------------------------------------------------
-// User queries
-// ---------------------------------------------------------------------------
-
 export const findUserByEmail = async (email: string): Promise<User | null> =>
   prisma.user.findUnique({ where: { email } })
 
 export const findUserById = async (id: string): Promise<User | null> => prisma.user.findUnique({ where: { id } })
 
 export const createUser = async (data: CreateUserData): Promise<User> => prisma.user.create({ data })
-
-// ---------------------------------------------------------------------------
-// Session queries
-// ---------------------------------------------------------------------------
 
 export const findActiveSessionWithUser = async (refreshToken: string): Promise<AuthSessionWithUser | null> =>
   prisma.authSession.findFirst({

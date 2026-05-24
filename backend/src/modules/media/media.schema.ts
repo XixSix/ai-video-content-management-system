@@ -6,7 +6,7 @@ export const mediaTypeSchema = z.enum(['VIDEO', 'IMAGE'])
 export const listMediaQuerySchema = z.strictObject({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(10),
-  status: z.nativeEnum(MediaStatus).optional(),
+  status: z.enum(MediaStatus).optional(),
   sortBy: z.enum(['createdAt', 'title', 'duration']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 })
