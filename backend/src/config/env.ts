@@ -61,7 +61,8 @@ const envSchema = z.object({
     .positive()
     .default(10 * 1024 * 1024),
   PRESIGNED_UPLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
-  PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900)
+  PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
+  RABBITMQ_URL: z.string().url().default('amqp://localhost:5672')
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
@@ -121,6 +122,9 @@ export const config = {
     multipartPartSizeBytes: env.MULTIPART_PART_SIZE_BYTES,
     presignedUploadExpiredSeconds: env.PRESIGNED_UPLOAD_EXPIRES_SECONDS,
     presignedDownloadExpiredSeconds: env.PRESIGNED_DOWNLOAD_EXPIRES_SECONDS
+  },
+  rabbitmq: {
+    url: env.RABBITMQ_URL
   }
 } as const
 
