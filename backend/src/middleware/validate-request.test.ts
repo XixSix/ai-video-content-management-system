@@ -29,6 +29,28 @@ describe('validateRequest', () => {
     expect(response.body).toEqual({ age: 25 })
   })
 
+  it('passes parsed query params to the next handler', async () => {
+    const app = express()
+
+    app.get(
+      '/users',
+      validateRequest({
+        query: z.object({
+          page: z.coerce.number().int().positive()
+        })
+      }),
+      (req, res) => {
+        res.status(200).json({ page: req.query.page })
+      }
+    )
+    app.use(globalErrorHandler)
+
+    const response = await request(app).get('/users?page=2')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ page: 2 })
+  })
+
   it('returns validation errors when a request part is invalid', async () => {
     const app = express()
 

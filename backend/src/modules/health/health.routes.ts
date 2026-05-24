@@ -1,14 +1,6 @@
 import { Router } from 'express'
-import { config } from '../../config/index'
+import * as healthController from './health.controller'
 
 export const healthRouter = Router()
 
-healthRouter.get('/health', (_req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      status: 'ok',
-      environment: config.app.nodeEnv
-    }
-  })
-})
+healthRouter.get('/health', healthController.getHealth)

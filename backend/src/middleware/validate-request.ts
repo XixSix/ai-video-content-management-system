@@ -14,6 +14,15 @@ const formatIssues = (error: z.ZodError): Array<Record<string, unknown>> =>
     })
   )
 
+const setRequestPart = (req: Parameters<RequestHandler>[0], key: RequestPart, value: unknown): void => {
+  Object.defineProperty(req, key, {
+    value,
+    configurable: true,
+    enumerable: true,
+    writable: true
+  })
+}
+
 export const validateRequest =
   (schema: RequestValidationSchema): RequestHandler =>
   (req, _res, next): void => {
@@ -30,7 +39,7 @@ export const validateRequest =
         return next(new AppError('Validation failed', 400, 'VALIDATION_ERROR', formatIssues(result.error)))
       }
 
-      req[key] = result.data as never
+      setRequestPart(req, key, result.data)
     }
 
     return next()
