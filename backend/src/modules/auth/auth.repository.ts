@@ -1,6 +1,6 @@
 import { prisma } from '../../infrastructure/db/prisma'
 import type { AuthSession, User } from '../../infrastructure/db/generated/prisma/client'
-import type { AuthSessionWithUser } from '../../types/auth'
+import type { AuthSessionWithUser } from './auth.types'
 
 export interface CreateUserData {
   email: string

@@ -1,15 +1,7 @@
 import type { Request } from 'express'
-import type { User } from '../infrastructure/db/generated/prisma/client'
-import { config } from '../config'
-import { AuthError } from '../modules/auth/auth.error'
-import type { AuthenticatedUser, RequestMetadata, RequestMetadataSource } from '../types/auth'
-
-export const toAuthenticatedUser = (user: User): AuthenticatedUser => ({
-  id: user.id,
-  email: user.email,
-  role: user.role,
-  status: user.status
-})
+import { config } from '../../config'
+import { AuthError } from './auth.error'
+import type { RequestMetadata, RequestMetadataSource } from './auth.types'
 
 export const getRequestMetadata = (req: RequestMetadataSource): RequestMetadata => ({
   userAgent: req.header('user-agent'),

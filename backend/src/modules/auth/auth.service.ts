@@ -6,12 +6,13 @@ import type {
   AuthSessionWithUser,
   RequestMetadata,
   SessionTokenResult
-} from '../../types/auth'
-import { generateRefreshToken, signAccessToken, verifyAccessToken } from '../../utils/tokens'
+} from './auth.types'
+import { generateRefreshToken, signAccessToken, verifyAccessToken } from './auth.tokens'
 import type { LoginBody, RegisterBody } from './auth.schema'
 import { AuthError } from './auth.error'
 import { config } from '../../config'
-import { getRefreshExpiresAt, toAuthenticatedUser } from '../../utils/auth.util'
+import { toAuthenticatedUser } from './auth.mapper'
+import { getRefreshExpiresAt } from './auth.request'
 import * as authRepo from './auth.repository'
 import { UserStatus } from '../../infrastructure/db/generated/prisma/client'
 

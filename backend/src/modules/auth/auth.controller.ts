@@ -1,14 +1,10 @@
 import * as authService from './auth.service'
 
-import { clearRefreshCookie, setRefreshCookie } from '../../utils/cookies'
-import type { AccessTokenResponseData, AuthResponseData, MessageResponseData } from '../../types/auth'
+import { clearRefreshCookie, setRefreshCookie } from './auth.cookies'
+import type { AccessTokenResponseData, AuthResponseData, MessageResponseData } from './auth.types'
 import type { AppRequestHandler, BodyRequestHandler } from '../../types/express'
-import {
-  getOptionalRefreshTokenFromCookie,
-  getRefreshTokenFromCookie,
-  getRequestMetadata,
-  toAuthenticatedUser
-} from '../../utils/auth.util'
+import { getOptionalRefreshTokenFromCookie, getRefreshTokenFromCookie, getRequestMetadata } from './auth.request'
+import { toAuthenticatedUser } from './auth.mapper'
 import type { LoginBody, RegisterBody } from './auth.schema'
 import { sendSuccess } from '../../utils/response'
 

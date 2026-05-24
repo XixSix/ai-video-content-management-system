@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express'
 import * as authService from '../modules/auth/auth.service'
-import { getBearerToken } from '../utils/auth.util'
+import { getBearerToken } from '../modules/auth/auth.request'
 
 export const authenticate: RequestHandler = async (req, _res, next): Promise<void> => {
   try {

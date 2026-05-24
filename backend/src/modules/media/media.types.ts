@@ -1,16 +1,12 @@
-import type { Media } from '../infrastructure/db/generated/prisma/client'
-import type { AbortMultipartUploadBody, CompleteUploadBody, CreateUploadUrlBody } from '../modules/media/media.schema'
+import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import type { CompletedUploadPart, PresignedUploadPart } from '../../infrastructure/s3/s3.types'
+import type { AbortMultipartUploadBody, CompleteUploadBody, CreateUploadUrlBody } from './media.schema'
 
 export type UploadMediaType = 'VIDEO' | 'IMAGE'
 
 export type UploadMode = 'SINGLE' | 'MULTIPART'
 
 export type CreateMediaUploadInput = CreateUploadUrlBody & { userId: string }
-
-export interface PresignedUploadPart {
-  partNumber: number
-  url: string
-}
 
 export interface SinglePresignResult {
   mode: 'SINGLE'
@@ -34,11 +30,6 @@ export interface MultipartPresignResult {
 }
 
 export type CreateUploadUrlResult = SinglePresignResult | MultipartPresignResult
-
-export interface CompletedUploadPart {
-  partNumber: number
-  etag: string
-}
 
 export type CompleteUploadInput = CompleteUploadBody & { userId: string }
 
@@ -93,12 +84,6 @@ export interface AbortMultipartUploadResult {
   message: string
 }
 
-export interface StorageObjectMetadata {
-  contentLength?: number
-  contentType?: string
-  etag?: string
-}
-
 export interface PaginatedResult<TItem> {
   items: TItem[]
   total: number
@@ -106,3 +91,5 @@ export interface PaginatedResult<TItem> {
   limit: number
   totalPages: number
 }
+
+export type { CompletedUploadPart }
