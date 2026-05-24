@@ -27,6 +27,12 @@ const options: swaggerJsdoc.Options = {
     ],
     components: {
       securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Access token sent in the Authorization header'
+        },
         cookieAuth: {
           type: 'apiKey',
           in: 'cookie',
@@ -113,6 +119,10 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Media',
         description: 'Media upload and management endpoints'
+      },
+      {
+        name: 'Jobs',
+        description: 'Processing job status and event stream endpoints'
       }
     ]
   },
