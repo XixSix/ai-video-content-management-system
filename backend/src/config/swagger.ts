@@ -123,6 +123,10 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Jobs',
         description: 'Processing job status and event stream endpoints'
+      },
+      {
+        name: 'Transcripts',
+        description: 'Transcript generation and read endpoints'
       }
     ]
   },
