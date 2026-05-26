@@ -6,6 +6,7 @@ import type {
   Transcript,
   TranscriptSegment
 } from '../../infrastructure/db/generated/prisma/client'
+import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
 
 export const findMediaById = async (id: string): Promise<Media | null> =>
   prisma.media.findUnique({
@@ -19,6 +20,24 @@ export const updateProcessingJob = async (id: string, data: Prisma.ProcessingJob
   prisma.processingJob.update({
     where: { id },
     data
+  })
+
+export const findActiveTranscriptJobByMediaIdAndUserId = async (
+  mediaId: string,
+  userId: string
+): Promise<ProcessingJob | null> =>
+  prisma.processingJob.findFirst({
+    where: {
+      mediaId,
+      userId,
+      jobType: JobType.TRANSCRIBE,
+      status: {
+        notIn: [JobStatus.COMPLETED, JobStatus.FAILED]
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
   })
 
 export const findTranscriptsByMediaIdAndUserId = async (mediaId: string, userId: string): Promise<Transcript[]> =>

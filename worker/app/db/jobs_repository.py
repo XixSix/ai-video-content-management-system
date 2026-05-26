@@ -5,12 +5,60 @@ from typing import Any
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.schemas.jobs import JobStatus, ProcessingJobRow
 
-def find_processing_job(session: Session, job_id: str) -> dict[str, Any] | None:
+def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | None:
     row = session.execute(
         text(
             """
             SELECT
+            id,
+            media_id AS "mediaId",
+            user_id AS "userId",
+            job_type AS "jobType",
+            status,
+            progress,
+            current_step AS "currentStep",
+            error_message AS "errorMessage",
+            queue_name AS "queueName",
+            task_name AS "taskName",
+            external_task_id AS "externalTaskId",
+            attempt_count AS "attemptCount",
+            input,
+            output,
+            created_at AS "createdAt",
+            updated_at AS "updatedAt",
+            started_at AS "startedAt",
+            completed_at AS "completedAt"
+            FROM processing_jobs
+            WHERE id = :job_id
+            """
+        ),
+        {"job_id": job_id},
+    ).mappings().one_or_none()
+
+    if row is None:
+        return None
+
+    return ProcessingJobRow.model_validate(dict(row))
+
+
+def mark_job_queued_from_pending(session: Session, job_id: str) -> ProcessingJobRow | None:
+    now = datetime.now(UTC)
+    row = session.execute(
+        text(
+            """
+            UPDATE processing_jobs
+            SET
+              status = :queued_status,
+              progress = :progress,
+              current_step = :current_step,
+              error_message = NULL,
+              updated_at = :now,
+              completed_at = NULL
+            WHERE id = :job_id
+              AND status = :pending_status
+            RETURNING
               id,
               media_id AS "mediaId",
               user_id AS "userId",
@@ -29,24 +77,29 @@ def find_processing_job(session: Session, job_id: str) -> dict[str, Any] | None:
               updated_at AS "updatedAt",
               started_at AS "startedAt",
               completed_at AS "completedAt"
-            FROM processing_jobs
-            WHERE id = :job_id
             """
         ),
-        {"job_id": job_id},
+        {
+            "job_id": job_id,
+            "queued_status": JobStatus.QUEUED.value,
+            "progress": 0,
+            "current_step": "Queued for transcription",
+            "pending_status": JobStatus.PENDING.value,
+            "now": now,
+        },
     ).mappings().one_or_none()
 
     if row is None:
         return None
 
-    return dict(row)
+    return ProcessingJobRow.model_validate(dict(row))
 
 
 def mark_job_step(
     session: Session,
     job_id: str,
     *,
-    status: str,
+    status: JobStatus,
     progress: int,
     current_step: str,
 ) -> None:
@@ -67,7 +120,7 @@ def mark_job_step(
         ),
         {
             "job_id": job_id,
-            "status": status,
+            "status": status.value,
             "progress": progress,
             "current_step": current_step,
             "now": datetime.now(UTC),
@@ -96,7 +149,7 @@ def mark_job_failed(session: Session, job_id: str, error_message: str) -> None:
             """
             UPDATE processing_jobs
             SET
-              status = 'FAILED',
+              status = :status,
               progress = COALESCE(progress, 0),
               current_step = 'Failed',
               error_message = :error_message,
@@ -107,6 +160,7 @@ def mark_job_failed(session: Session, job_id: str, error_message: str) -> None:
         ),
         {
             "job_id": job_id,
+            "status": JobStatus.FAILED.value,
             "error_message": error_message,
             "now": datetime.now(UTC),
         },
@@ -124,7 +178,7 @@ def mark_job_completed(
             """
             UPDATE processing_jobs
             SET
-              status = 'COMPLETED',
+              status = :status,
               progress = 100,
               current_step = 'Completed',
               error_message = NULL,
@@ -136,6 +190,7 @@ def mark_job_completed(
         ),
         {
             "job_id": job_id,
+            "status": JobStatus.COMPLETED.value,
             "output": json.dumps(output or {}),
             "now": datetime.now(UTC),
         },

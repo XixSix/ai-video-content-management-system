@@ -9,6 +9,8 @@ import type {
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
 const createProcessingJobMock = jest.fn<(data: unknown) => Promise<ProcessingJob>>()
 const updateProcessingJobMock = jest.fn<(id: string, data: unknown) => Promise<ProcessingJob>>()
+const findActiveTranscriptJobByMediaIdAndUserIdMock =
+  jest.fn<(mediaId: string, userId: string) => Promise<ProcessingJob | null>>()
 const findTranscriptsByMediaIdAndUserIdMock = jest.fn<(mediaId: string, userId: string) => Promise<Transcript[]>>()
 const findTranscriptByIdAndUserIdMock = jest.fn<(transcriptId: string, userId: string) => Promise<Transcript | null>>()
 const findTranscriptSegmentsByTranscriptIdAndUserIdMock =
@@ -18,6 +20,7 @@ const publishTranscriptJobMock =
 
 jest.unstable_mockModule('./transcripts.repository', () => ({
   createProcessingJob: createProcessingJobMock,
+  findActiveTranscriptJobByMediaIdAndUserId: findActiveTranscriptJobByMediaIdAndUserIdMock,
   findMediaById: findMediaByIdMock,
   findTranscriptByIdAndUserId: findTranscriptByIdAndUserIdMock,
   findTranscriptSegmentsByTranscriptIdAndUserId: findTranscriptSegmentsByTranscriptIdAndUserIdMock,
@@ -125,23 +128,17 @@ describe('transcripts service', () => {
     findMediaByIdMock.mockReset()
     createProcessingJobMock.mockReset()
     updateProcessingJobMock.mockReset()
+    findActiveTranscriptJobByMediaIdAndUserIdMock.mockReset()
     findTranscriptsByMediaIdAndUserIdMock.mockReset()
     findTranscriptByIdAndUserIdMock.mockReset()
     findTranscriptSegmentsByTranscriptIdAndUserIdMock.mockReset()
     publishTranscriptJobMock.mockReset()
   })
 
-  it('creates a transcribe job, publishes it, and marks it queued', async () => {
+  it('creates a pending transcribe job and publishes it', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
+    findActiveTranscriptJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
-    updateProcessingJobMock.mockResolvedValue(
-      createProcessingJob({
-        status: 'QUEUED',
-        queueName: 'transcript_queue',
-        taskName: 'transcribe',
-        currentStep: 'Queued for transcription'
-      })
-    )
     publishTranscriptJobMock.mockResolvedValue()
 
     const result = await transcriptsService.generateTranscript({
@@ -174,14 +171,41 @@ describe('transcripts service', () => {
       })
     )
     expect(publishTranscriptJobMock).toHaveBeenCalledWith({ jobId, mediaId, userId, s3Key })
-    expect(updateProcessingJobMock).toHaveBeenCalledWith(
-      jobId,
-      expect.objectContaining({
+    expect(updateProcessingJobMock).not.toHaveBeenCalled()
+    expect(result.job).toMatchObject({
+      id: jobId,
+      mediaId,
+      jobType: 'TRANSCRIBE',
+      status: 'PENDING'
+    })
+  })
+
+  it('returns an active transcribe job without publishing a duplicate', async () => {
+    findMediaByIdMock.mockResolvedValue(createMedia())
+    findActiveTranscriptJobByMediaIdAndUserIdMock.mockResolvedValue(
+      createProcessingJob({
         status: 'QUEUED',
         queueName: 'transcript_queue',
-        taskName: 'transcribe'
+        taskName: 'transcribe',
+        currentStep: 'Queued for transcription'
       })
     )
+
+    const result = await transcriptsService.generateTranscript({
+      mediaId,
+      userId,
+      language: 'vi',
+      generateSrt: true,
+      generateVtt: true,
+      burnTranscript: false,
+      useVad: true,
+      sourceSeparation: true,
+      useDiarization: true
+    })
+
+    expect(findActiveTranscriptJobByMediaIdAndUserIdMock).toHaveBeenCalledWith(mediaId, userId)
+    expect(createProcessingJobMock).not.toHaveBeenCalled()
+    expect(publishTranscriptJobMock).not.toHaveBeenCalled()
     expect(result.job).toMatchObject({
       id: jobId,
       mediaId,
@@ -236,6 +260,7 @@ describe('transcripts service', () => {
 
   it('marks the job failed when publishing fails', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
+    findActiveTranscriptJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
     publishTranscriptJobMock.mockRejectedValue(new Error('RabbitMQ is unavailable'))

@@ -1,4 +1,6 @@
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
+import { MediaStatus } from '../../infrastructure/db/generated/prisma/client'
 import { MediaError } from '../media/media.error'
 import { TranscriptError } from './transcripts.error'
 import {
@@ -16,7 +18,6 @@ import type {
   TranscriptSegmentData,
   TranscriptSummaryData
 } from './transcripts.types'
-import { TRANSCRIPT_QUEUE_NAME, TRANSCRIPT_TASK_NAME } from './transcripts.types'
 
 export const generateTranscript = async (input: GenerateTranscriptInput): Promise<GenerateTranscriptResult> => {
   const media = await getOwnedMedia(input.userId, input.mediaId)
@@ -29,11 +30,19 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
     throw MediaError.invalidState('Cannot generate transcript for non-video media')
   }
 
+  const activeJob = await transcriptsRepo.findActiveTranscriptJobByMediaIdAndUserId(media.id, input.userId)
+
+  if (activeJob) {
+    return {
+      job: toJobResponseData(activeJob)
+    }
+  }
+
   const job = await transcriptsRepo.createProcessingJob({
     mediaId: media.id,
     userId: input.userId,
-    jobType: 'TRANSCRIBE',
-    status: 'PENDING',
+    jobType: JobType.TRANSCRIBE,
+    status: JobStatus.PENDING,
     progress: 0,
     input: {
       language: input.language,
@@ -55,7 +64,7 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
     })
   } catch {
     await transcriptsRepo.updateProcessingJob(job.id, {
-      status: 'FAILED',
+      status: JobStatus.FAILED,
       progress: 0,
       errorMessage: 'Failed to publish transcript generation job',
       completedAt: new Date()
@@ -64,22 +73,15 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
     throw TranscriptError.queuePublishFailed()
   }
 
-  const queuedJob = await transcriptsRepo.updateProcessingJob(job.id, {
-    status: 'QUEUED',
-    queueName: TRANSCRIPT_QUEUE_NAME,
-    taskName: TRANSCRIPT_TASK_NAME,
-    currentStep: 'Queued for transcription'
-  })
-
   return {
-    job: toJobResponseData(queuedJob)
+    job: toJobResponseData(job)
   }
 }
 
 export const listMediaTranscripts = async (userId: string, mediaId: string): Promise<TranscriptSummaryData[]> => {
   const media = await getOwnedMedia(userId, mediaId)
 
-  if (media.status === 'DELETED') {
+  if (media.status === MediaStatus.DELETED) {
     throw MediaError.notFound()
   }
 
