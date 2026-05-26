@@ -72,5 +72,11 @@ class Settings(BaseSettings):
     s3_force_path_style: bool = Field(default=True, alias="S3_FORCE_PATH_STYLE")
     tmp_dir: Path = Field(default=Path("/tmp/avcms-worker"), alias="TMP_DIR")
 
+    ffmpeg_binary: str = Field(default="ffmpeg", alias="FFMPEG_BINARY")
+    ffprobe_binary: str = Field(default="ffprobe", alias="FFPROBE_BINARY")
+    ffmpeg_timeout_seconds: PositiveInt = Field(default=1800, alias="FFMPEG_TIMEOUT_SECONDS")
+    audio_sample_rate: PositiveInt = Field(default=16000, alias="AUDIO_SAMPLE_RATE")
+    audio_channels: PositiveInt = Field(default=1, alias="AUDIO_CHANNELS")
+
 
 settings = Settings()
