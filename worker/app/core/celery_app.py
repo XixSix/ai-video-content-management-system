@@ -1,13 +1,11 @@
 from celery import Celery
-from kombu import Exchange, Queue
+from kombu import Queue
 
 from .config import settings
 
-transcript_exchange = Exchange("transcript", type="direct")
-
 celery_app = Celery(
     main="worker",
-    broker=str(settings.broker_url),
+    broker=str(settings.rabbitmq_url),
     backend=None,
     include=["app.consumers.transcript_consumer"],
 )
@@ -15,18 +13,38 @@ celery_app = Celery(
 celery_app.conf.update(
     task_queues=(
         Queue(
-            "transcript_queue",
-            transcript_exchange,
-            routing_key="transcript_queue",
+            settings.transcript_queue_name,
+            routing_key=settings.transcript_queue_name,
+            durable=True,
         ),
     ),
-    task_default_queue="transcript_queue",
-    task_default_exchange="transcript",
-    task_default_exchange_type="direct",
-    task_default_routing_key="transcript_queue",
+    task_default_queue=settings.transcript_queue_name,
+    task_default_routing_key=settings.transcript_queue_name,
+    task_routes={
+        settings.transcript_task_name: {
+            "queue": settings.transcript_queue_name,
+            "routing_key": settings.transcript_queue_name,
+        },
+    },
+    task_protocol=2,
+    task_track_started=True,
     task_serializer="json",
+    result_serializer="json",
     accept_content=["json"],
-    worker_prefetch_multiplier=1,
+    task_ignore_result=True,
+    task_store_errors_even_if_ignored=False,
     task_acks_late=True,
+    task_acks_on_failure_or_timeout=True,
+    task_reject_on_worker_lost=True,
+    task_default_retry_delay=settings.task_default_retry_delay_seconds,
+    task_soft_time_limit=settings.task_soft_time_limit_seconds,
+    task_time_limit=settings.task_time_limit_seconds,
+    broker_connection_retry_on_startup=True,
+    broker_heartbeat=settings.broker_heartbeat_seconds,
+    worker_concurrency=settings.worker_concurrency,
+    worker_prefetch_multiplier=settings.worker_prefetch_multiplier,
+    worker_max_tasks_per_child=settings.worker_max_tasks_per_child,
+    worker_cancel_long_running_tasks_on_connection_loss=True,
     enable_utc=True,
+    timezone="UTC",
 )

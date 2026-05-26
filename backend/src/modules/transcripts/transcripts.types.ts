@@ -1,8 +1,9 @@
 import type { JobResponseData } from '../jobs/jobs.types'
 import type { GenerateTranscriptBody } from './transcripts.schema'
 
-export const TRANSCRIPT_QUEUE_NAME = 'transcript'
+export const TRANSCRIPT_QUEUE_NAME = 'transcript_queue'
 export const TRANSCRIPT_TASK_NAME = 'transcribe'
+export const TRANSCRIPT_CELERY_TASK_NAME = 'transcript_task'
 
 export type GenerateTranscriptInput = GenerateTranscriptBody & {
   mediaId: string

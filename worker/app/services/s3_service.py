@@ -1,30 +1,29 @@
-import boto3
-from botocore.exceptions import ClientError
-from app.core.config import settings
-
-# from app.core.logger import logger
 import os
+
+import boto3
+from app.core.config import settings
+from botocore.exceptions import ClientError
 
 
 class S3Service:
     def __init__(self):
         self.client = boto3.client(
             "s3",
-            endpoint_url=settings.S3_ENDPOINT,
-            aws_access_key_id=settings.S3_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
-            region_name=settings.S3_REGION,
+            endpoint_url=settings.s3_endpoint,
+            aws_access_key_id=settings.s3_access_key_id,
+            aws_secret_access_key=settings.s3_secret_access_key,
+            region_name=settings.s3_region,
         )
-        self.bucket = settings.S3_BUCKET
+        self.bucket = settings.s3_bucket
 
     def download(self, s3_key: str) -> str:
         """Download file from S3 to local path
         :return: dest_path
         """
-        dest_path = os.path.join(settings.TMP_DIR, os.path.basename(s3_key))
+        os.makedirs(settings.tmp_dir, exist_ok=True)
+        dest_path = os.path.join(settings.tmp_dir, os.path.basename(s3_key))
 
         self.client.download_file(self.bucket, s3_key, dest_path)
-        # logger.info(f"Download done: {dest_path}")
 
         return dest_path
 
@@ -41,14 +40,7 @@ class S3Service:
 
             return s3_key
         except ClientError as e:
-            # logger.error(f"Upload failed: {e}")
             raise e
-            return None
 
 
 s3_service = S3Service()
-
-result = s3_service.upload_file(
-    "/home/dva205/Documents/nodejs/ai-video-content-management-system/worker/app/storage/result/transcript.txt",
-    "result/test",
-)
