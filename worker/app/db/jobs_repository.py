@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 
 def find_processing_job(session: Session, job_id: str) -> dict[str, Any] | None:
-    return session.execute(
+    row = session.execute(
         text(
             """
             SELECT
@@ -35,6 +35,11 @@ def find_processing_job(session: Session, job_id: str) -> dict[str, Any] | None:
         ),
         {"job_id": job_id},
     ).mappings().one_or_none()
+
+    if row is None:
+        return None
+
+    return dict(row)
 
 
 def mark_job_step(
