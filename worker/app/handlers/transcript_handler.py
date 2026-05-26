@@ -1,25 +1,20 @@
-from typing import Any, Literal
-from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict, Field, constr
+from typing import Any
 
 from app.core.config import settings
 from app.db import jobs_repository
 from app.db.client import get_db_session
-
-
-class TranscriptJobMessage(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-    job_id: UUID = Field(alias="jobId")
-    media_id: UUID = Field(alias="mediaId")
-    user_id: UUID = Field(alias="userId")
-    s3_key: constr(strip_whitespace=True, min_length=1) = Field(alias="s3Key")
-    task_name: Literal["transcribe"] = Field(alias="taskName")
+from app.schemas.jobs import JobStatus, JobType, ProcessingJobRow
+from app.schemas.transcripts import TranscriptJobMessage
 
 
 class TerminalTranscriptJobError(Exception):
     pass
+
+IN_PROGRESS_JOB_STATUSES = {
+    JobStatus.EXTRACTING_AUDIO,
+    JobStatus.TRANSCRIBING,
+    JobStatus.PREPROCESSING_TRANSCRIPT,
+}
 
 
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
@@ -29,24 +24,44 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
         job = jobs_repository.find_processing_job(session, job_id)
         _guard_job(message, job)
 
-    if job["status"] == "COMPLETED":
-        return {"jobId": job_id, "status": "COMPLETED", "skipped": True}
+    if job.status == JobStatus.FAILED:
+        raise TerminalTranscriptJobError("Processing job is already failed")
+
+    if job.attempt_count >= settings.task_max_retries:
+        raise TerminalTranscriptJobError("Processing job exceeded max attempts")
+
+    if job.status != JobStatus.PENDING:
+        return {"jobId": job_id, "status": job.status.value, "skipped": True}
+
+    with get_db_session() as session:
+        queued_job = jobs_repository.mark_job_queued_from_pending(session, job_id)
+
+    if not queued_job:
+        with get_db_session() as session:
+            current_job = jobs_repository.find_processing_job(session, job_id)
+            _guard_job(message, current_job)
+
+        if current_job and current_job.status in IN_PROGRESS_JOB_STATUSES | {JobStatus.QUEUED, JobStatus.COMPLETED}:
+            return {"jobId": job_id, "status": current_job.status.value, "skipped": True}
+
+        raise TerminalTranscriptJobError("Processing job could not be marked queued")
 
     _mark_job_step(
         job_id,
-        status="EXTRACTING_AUDIO",
+        status=JobStatus.EXTRACTING_AUDIO,
         progress=10,
         current_step="Extracting audio",
     )
+
     _mark_job_step(
         job_id,
-        status="TRANSCRIBING",
+        status=JobStatus.TRANSCRIBING,
         progress=50,
         current_step="Transcribing audio",
     )
     _mark_job_step(
         job_id,
-        status="PREPROCESSING_TRANSCRIPT",
+        status=JobStatus.PREPROCESSING_TRANSCRIPT,
         progress=80,
         current_step="Preparing transcript",
     )
@@ -65,7 +80,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     return {"jobId": job_id, "status": "COMPLETED", "mock": True}
 
 
-def _mark_job_step(job_id: str, *, status: str, progress: int, current_step: str) -> None:
+def _mark_job_step(job_id: str, *, status: JobStatus, progress: int, current_step: str) -> None:
     with get_db_session() as session:
         jobs_repository.mark_job_step(
             session,
@@ -89,27 +104,21 @@ def increment_transcript_job_attempt(job_id: str) -> int | None:
     if not job:
         return None
 
-    return int(job["attemptCount"])
+    return job.attempt_count
 
 
-def _guard_job(message: TranscriptJobMessage, job: dict[str, Any] | None) -> None:
+def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> None:
     if not job:
         raise TerminalTranscriptJobError("Processing job was not found")
 
-    if job["jobType"] != "TRANSCRIBE":
-        raise TerminalTranscriptJobError(f"Expected TRANSCRIBE job, got {job['jobType']}")
+    if job.job_type != JobType.TRANSCRIBE:
+        raise TerminalTranscriptJobError(f"Expected TRANSCRIBE job, got {job.job_type.value}")
 
-    if str(job["mediaId"]) != str(message.media_id):
+    if str(job.media_id) != str(message.media_id):
         raise TerminalTranscriptJobError("Message mediaId does not match processing job")
 
-    if str(job["userId"]) != str(message.user_id):
+    if str(job.user_id) != str(message.user_id):
         raise TerminalTranscriptJobError("Message userId does not match processing job")
 
-    if job["status"] == "FAILED":
+    if job.status == JobStatus.FAILED:
         raise TerminalTranscriptJobError("Processing job is already failed")
-
-    if job["status"] == "COMPLETED":
-        return
-
-    if int(job["attemptCount"]) >= settings.task_max_retries:
-        raise TerminalTranscriptJobError("Processing job exceeded max attempts")
