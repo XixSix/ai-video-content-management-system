@@ -14,7 +14,7 @@ const findTranscriptByIdAndUserIdMock = jest.fn<(transcriptId: string, userId: s
 const findTranscriptSegmentsByTranscriptIdAndUserIdMock =
   jest.fn<(transcriptId: string, userId: string) => Promise<TranscriptSegment[] | null>>()
 const publishTranscriptJobMock =
-  jest.fn<(message: { jobId: string; mediaId: string; userId: string }) => Promise<void>>()
+  jest.fn<(message: { jobId: string; mediaId: string; userId: string; s3Key: string }) => Promise<void>>()
 
 jest.unstable_mockModule('./transcripts.repository', () => ({
   createProcessingJob: createProcessingJobMock,
@@ -36,6 +36,7 @@ const userId = '00000000-0000-4000-8000-000000000002'
 const jobId = '00000000-0000-4000-8000-000000000003'
 const transcriptId = '00000000-0000-4000-8000-000000000004'
 const now = new Date('2026-05-24T10:00:00.000Z')
+const s3Key = 'uploads/users/user/videos/video.mp4'
 
 const createMedia = (overrides: Partial<Media> = {}): Media => ({
   id: mediaId,
@@ -45,7 +46,7 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
   description: null,
   originalFilename: 'video.mp4',
   s3Bucket: 'avcms-media',
-  s3Key: 'uploads/users/user/videos/video.mp4',
+  s3Key,
   s3Region: 'us-east-1',
   s3Etag: null,
   uploadId: null,
@@ -136,7 +137,7 @@ describe('transcripts service', () => {
     updateProcessingJobMock.mockResolvedValue(
       createProcessingJob({
         status: 'QUEUED',
-        queueName: 'transcript',
+        queueName: 'transcript_queue',
         taskName: 'transcribe',
         currentStep: 'Queued for transcription'
       })
@@ -172,12 +173,12 @@ describe('transcripts service', () => {
         }
       })
     )
-    expect(publishTranscriptJobMock).toHaveBeenCalledWith({ jobId, mediaId, userId })
+    expect(publishTranscriptJobMock).toHaveBeenCalledWith({ jobId, mediaId, userId, s3Key })
     expect(updateProcessingJobMock).toHaveBeenCalledWith(
       jobId,
       expect.objectContaining({
         status: 'QUEUED',
-        queueName: 'transcript',
+        queueName: 'transcript_queue',
         taskName: 'transcribe'
       })
     )

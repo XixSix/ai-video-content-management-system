@@ -50,7 +50,8 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
     await transcriptQueue.publishTranscriptJob({
       jobId: job.id,
       mediaId: media.id,
-      userId: input.userId
+      userId: input.userId,
+      s3Key: media.s3Key
     })
   } catch {
     await transcriptsRepo.updateProcessingJob(job.id, {
