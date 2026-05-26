@@ -52,6 +52,14 @@ class Settings(BaseSettings):
         alias="BROKER_HEARTBEAT_SECONDS",
     )
 
+    database_url: str = Field(alias="DATABASE_URL")
+    database_pool_size: PositiveInt = Field(default=5, alias="DATABASE_POOL_SIZE")
+    database_max_overflow: int = Field(default=5, ge=0, alias="DATABASE_MAX_OVERFLOW")
+    database_pool_recycle_seconds: PositiveInt = Field(
+        default=1800,
+        alias="DATABASE_POOL_RECYCLE_SECONDS",
+    )
+
     s3_endpoint: str = Field(alias="S3_ENDPOINT")
     s3_public_endpoint: str = Field(
         default="http://localhost:9000",
