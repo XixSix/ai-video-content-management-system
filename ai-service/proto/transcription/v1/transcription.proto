@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package transcription.v1;
+
+service TranscriptionService {
+  rpc Transcribe(TranscribeRequest) returns (TranscribeResponse);
+}
+
+message TranscribeRequest {
+  string request_id = 1;
+  string local_path = 2;
+  string filename = 3;
+  string content_type = 4;
+  TranscriptionOptions options = 5;
+}
+
+message TranscriptionOptions {
+  string language = 1;
+  bool enable_vad = 2;
+  bool enable_diarization = 3;
+  bool enable_source_separation = 4;
+}
+
+message TranscribeResponse {
+  string request_id = 1;
+  string full_text = 2;
+  repeated TranscriptSegment segments = 3;
+  string language = 4;
+  string asr_model = 5;
+  string diarization_model = 6;
+  string source_separation_model = 7;
+}
+
+message TranscriptSegment {
+  string segment_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string text = 4;
+}
