@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.jobs import JobStatus, ProcessingJobRow
+from app.schemas.db.processsing_job import JobStatus, ProcessingJobRow
 
 def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | None:
     row = session.execute(

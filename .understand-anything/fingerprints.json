@@ -1,0 +1,5710 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "0c84db4bac85ab5e44ec1d5fe76ef1724fb3b01f",
+  "generatedAt": "2026-05-27T03:55:52.607Z",
+  "files": {
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "dbb60063a6b7fca4c1ace1011892d196be25810b380ed3ae6bf80a2ecea4d154",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    ".understand-anything/config.json": {
+      "filePath": ".understand-anything/config.json",
+      "contentHash": "fc45c2c2e3bbd9a1f0df975e5b3e8605705401f2709fb67fa1206b8ac196c0e1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": true
+    },
+    "ai-service/.python-version": {
+      "filePath": "ai-service/.python-version",
+      "contentHash": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    "ai-service/app/main.py": {
+      "filePath": "ai-service/app/main.py",
+      "contentHash": "49c88f0b8aad8b002ecd9d020965e82a022cba4eb10a37b7b91e952bf900efb7",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "ai-service/pyproject.toml": {
+      "filePath": "ai-service/pyproject.toml",
+      "contentHash": "ef0ba1770f5f007edc9017d823513aa93a4a776c42ba2671ac3c8a88e4d39835",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "ai-service/README.md": {
+      "filePath": "ai-service/README.md",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "backend/.env.example": {
+      "filePath": "backend/.env.example",
+      "contentHash": "6a0951a28acb8fb1787f48a9ee4305fb9e6ca2974c07eac14807cf75d28eae10",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "backend/.prettierignore": {
+      "filePath": "backend/.prettierignore",
+      "contentHash": "237b66cd3fe1ede8c596b68e7979cdfc7df665fcb06b4df28c80d050cafdef3d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": false
+    },
+    "backend/eslint.config.mjs": {
+      "filePath": "backend/eslint.config.mjs",
+      "contentHash": "b03b50e00481ff4b37d0f2035741211cf08e82b5bdf05275241b0f569773749e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@eslint/js",
+          "specifiers": [
+            "js"
+          ]
+        },
+        {
+          "source": "globals",
+          "specifiers": [
+            "globals"
+          ]
+        },
+        {
+          "source": "typescript-eslint",
+          "specifiers": [
+            "tseslint"
+          ]
+        },
+        {
+          "source": "@eslint/markdown",
+          "specifiers": [
+            "markdown"
+          ]
+        },
+        {
+          "source": "eslint/config",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "eslint-plugin-prettier",
+          "specifiers": [
+            "eslintPluginPrettier"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    "backend/jest.config.cjs": {
+      "filePath": "backend/jest.config.cjs",
+      "contentHash": "82942a7553779f385ad72fdf94680fddafd1633ad03664702f31a0ef79eb513a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "backend/nodemon.json": {
+      "filePath": "backend/nodemon.json",
+      "contentHash": "ac5b56af2c5a52240061c3e18dabe3b0c47211f2628461890dd0cbefab7409bc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "backend/package.json": {
+      "filePath": "backend/package.json",
+      "contentHash": "bfa176abe14d74b7552d6895078c79b5e557660093a2deb72c7b9c2f6dc0e462",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": true
+    },
+    "backend/prisma.config.ts": {
+      "filePath": "backend/prisma.config.ts",
+      "contentHash": "12cc7e10d4117f04921b4cbc51b2dc2ebd37fa5268b5e2fd20a8dd9b60baddba",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:fs",
+          "specifiers": [
+            "existsSync"
+          ]
+        },
+        {
+          "source": "node:path",
+          "specifiers": [
+            "path"
+          ]
+        },
+        {
+          "source": "node:url",
+          "specifiers": [
+            "fileURLToPath"
+          ]
+        },
+        {
+          "source": "dotenv",
+          "specifiers": [
+            "loadDotenv"
+          ]
+        },
+        {
+          "source": "prisma/config",
+          "specifiers": [
+            "defineConfig",
+            "env"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": true
+    },
+    "backend/prisma/migrations/20260523180558_init/migration.sql": {
+      "filePath": "backend/prisma/migrations/20260523180558_init/migration.sql",
+      "contentHash": "542bf0900f59839d83a93409d8c8a3e141f43ec7358b951cf4055871e9d953f0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 628,
+      "hasStructuralAnalysis": true
+    },
+    "backend/prisma/migrations/20260524000000_remove_transcript_full_text_dirty/migration.sql": {
+      "filePath": "backend/prisma/migrations/20260524000000_remove_transcript_full_text_dirty/migration.sql",
+      "contentHash": "b955c83ad172a7ca26a407b6fcc6bf4d1a1d1c7364aafea0357d5775a14acb5f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "backend/prisma/migrations/migration_lock.toml": {
+      "filePath": "backend/prisma/migrations/migration_lock.toml",
+      "contentHash": "99836963713b4f5b269ad49af0ed3d7b0b2e336115c2f92dc9ac683d139d0900",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4,
+      "hasStructuralAnalysis": true
+    },
+    "backend/prisma/schema.prisma": {
+      "filePath": "backend/prisma/schema.prisma",
+      "contentHash": "e9ad20e3c79a537bc993aec2dd007130ded9f0aba9cb52299639bdd55d35096e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 640,
+      "hasStructuralAnalysis": false
+    },
+    "backend/src/app.ts": {
+      "filePath": "backend/src/app.ts",
+      "contentHash": "0f5cad9cc9f4a2dda32eb155bc625a846a692d558c5d317f1be7270f87a6a5f9",
+      "functions": [
+        {
+          "name": "createApp",
+          "params": [],
+          "returnType": "Express",
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cookie-parser",
+          "specifiers": [
+            "cookieParser"
+          ]
+        },
+        {
+          "source": "express",
+          "specifiers": [
+            "express",
+            "Express"
+          ]
+        },
+        {
+          "source": "helmet",
+          "specifiers": [
+            "helmet"
+          ]
+        },
+        {
+          "source": "morgan",
+          "specifiers": [
+            "morgan"
+          ]
+        },
+        {
+          "source": "swagger-ui-express",
+          "specifiers": [
+            "swaggerUi"
+          ]
+        },
+        {
+          "source": "./config/index",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./config/swagger",
+          "specifiers": [
+            "swaggerSpec"
+          ]
+        },
+        {
+          "source": "./middleware/error-handler",
+          "specifiers": [
+            "globalErrorHandler",
+            "notFoundHandler"
+          ]
+        },
+        {
+          "source": "./modules/index",
+          "specifiers": [
+            "apiRouter"
+          ]
+        }
+      ],
+      "exports": [
+        "createApp",
+        "app"
+      ],
+      "totalLines": 38,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/config/env.ts": {
+      "filePath": "backend/src/config/env.ts",
+      "contentHash": "77aa46e640a2b12e28c27b702534e8004c71f3a657b4e747183bf91105966716",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:fs",
+          "specifiers": [
+            "existsSync"
+          ]
+        },
+        {
+          "source": "node:path",
+          "specifiers": [
+            "path"
+          ]
+        },
+        {
+          "source": "node:url",
+          "specifiers": [
+            "fileURLToPath"
+          ]
+        },
+        {
+          "source": "dotenv",
+          "specifiers": [
+            "loadDotenv"
+          ]
+        },
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        }
+      ],
+      "exports": [
+        "config"
+      ],
+      "totalLines": 140,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/config/index.ts": {
+      "filePath": "backend/src/config/index.ts",
+      "contentHash": "062d443615c0677e981cdf9b6de8cc0090a2968262aa48b508e35be350d50251",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "config",
+        "Config"
+      ],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/config/swagger.ts": {
+      "filePath": "backend/src/config/swagger.ts",
+      "contentHash": "5ddd7d6dc511a6cb63a4ac1711ac735602cca1cf10fa8942e556b434b516291c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:path",
+          "specifiers": [
+            "path"
+          ]
+        },
+        {
+          "source": "node:url",
+          "specifiers": [
+            "fileURLToPath"
+          ]
+        },
+        {
+          "source": "swagger-jsdoc",
+          "specifiers": [
+            "swaggerJsdoc"
+          ]
+        },
+        {
+          "source": "./index",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "swaggerSpec"
+      ],
+      "totalLines": 137,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/index.ts": {
+      "filePath": "backend/src/index.ts",
+      "contentHash": "1dde95f6d2d226957083139ce0f6be32190667862643d852baae5529f1d52725",
+      "functions": [
+        {
+          "name": "shutdown",
+          "params": [
+            "signal"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 28
+        },
+        {
+          "name": "bootstrap",
+          "params": [],
+          "returnType": "Promise<void>",
+          "exported": false,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./app",
+          "specifiers": [
+            "app"
+          ]
+        },
+        {
+          "source": "./config/index",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./infrastructure/rabbitmq/client",
+          "specifiers": [
+            "connectRabbitMQ",
+            "disconnectRabbitMQ"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/browser.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/browser.ts",
+      "contentHash": "8b07234b694b47cd3234be7449fa620c2fe37f87d03272ce1e8b908dcb394bdc",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./internal/prismaNamespaceBrowser",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [
+        "Prisma"
+      ],
+      "totalLines": 90,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/client.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/client.ts",
+      "contentHash": "3cd12b4f30a64aa0cafd3545231fcad88aff710c5c8e28d28ef6a9eea9034946",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:process",
+          "specifiers": [
+            "* as process"
+          ]
+        },
+        {
+          "source": "node:path",
+          "specifiers": [
+            "* as path"
+          ]
+        },
+        {
+          "source": "node:url",
+          "specifiers": [
+            "fileURLToPath"
+          ]
+        },
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "./enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "./internal/class",
+          "specifiers": [
+            "* as $Class"
+          ]
+        },
+        {
+          "source": "./internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [
+        "PrismaClient",
+        "Prisma"
+      ],
+      "totalLines": 114,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/commonInputTypes.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/commonInputTypes.ts",
+      "contentHash": "d18a433c1d08b09a31c2bbe3adfcc00834591b975d77f8116bd1acfc3791c179",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "./enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "./internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 1379,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/enums.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/enums.ts",
+      "contentHash": "6f8b672f0e3b2a6d97e202e6a91092dc53194a9a6ff787304246ce3a721cd5cc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "UserRole",
+        "UserStatus",
+        "MediaType",
+        "MediaStatus",
+        "JobType",
+        "JobStatus",
+        "TranscriptSource",
+        "ChapterSource",
+        "ClipCandidateStatus",
+        "ShortClipStatus",
+        "AssetType",
+        "TargetType",
+        "SuggestionType",
+        "Platform",
+        "PlatformAccountStatus",
+        "PublishStatus"
+      ],
+      "totalLines": 184,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/internal/class.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/internal/class.ts",
+      "contentHash": "a7c52427f83bd0c6da4468a38f28732f4b062c62ce2c88a60fe0218776296bb1",
+      "functions": [
+        {
+          "name": "decodeBase64AsWasm",
+          "params": [
+            "wasmBase64"
+          ],
+          "returnType": "Promise<WebAssembly.Module>",
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "getPrismaClientClass",
+          "params": [],
+          "returnType": "PrismaClientConstructor",
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "./prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [
+        "getPrismaClientClass"
+      ],
+      "totalLines": 335,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/internal/prismaNamespace.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/internal/prismaNamespace.ts",
+      "contentHash": "9bdd89e949f435d216e6554022845ba73bd56d0d00dda8698aa8ec5255743200",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../models",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        },
+        {
+          "source": "./class",
+          "specifiers": [
+            "PrismaClient"
+          ]
+        }
+      ],
+      "exports": [
+        "PrismaClientKnownRequestError",
+        "PrismaClientUnknownRequestError",
+        "PrismaClientRustPanicError",
+        "PrismaClientInitializationError",
+        "PrismaClientValidationError",
+        "sql",
+        "empty",
+        "join",
+        "raw",
+        "Sql",
+        "Decimal",
+        "getExtensionContext",
+        "prismaVersion",
+        "NullTypes",
+        "DbNull",
+        "JsonNull",
+        "AnyNull",
+        "ModelName",
+        "TransactionIsolationLevel",
+        "UserScalarFieldEnum",
+        "AuthSessionScalarFieldEnum",
+        "MediaScalarFieldEnum",
+        "ProcessingJobScalarFieldEnum",
+        "TranscriptScalarFieldEnum",
+        "TranscriptSegmentScalarFieldEnum",
+        "VideoChapterScalarFieldEnum",
+        "ClipCandidateScalarFieldEnum",
+        "ShortClipScalarFieldEnum",
+        "GeneratedAssetScalarFieldEnum",
+        "AiSuggestionScalarFieldEnum",
+        "PlatformAccountScalarFieldEnum",
+        "PublishTaskScalarFieldEnum",
+        "AuditLogScalarFieldEnum",
+        "SortOrder",
+        "NullableJsonNullValueInput",
+        "JsonNullValueInput",
+        "QueryMode",
+        "NullsOrder",
+        "JsonNullValueFilter",
+        "defineExtension"
+      ],
+      "totalLines": 2350,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/internal/prismaNamespaceBrowser.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/internal/prismaNamespaceBrowser.ts",
+      "contentHash": "0981e4b7bb3b29cfa39a6bf672b4a8d58ab3607aeb0d2059ccb20a50f86fd2fe",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/index-browser",
+          "specifiers": [
+            "* as runtime"
+          ]
+        }
+      ],
+      "exports": [
+        "Decimal",
+        "NullTypes",
+        "DbNull",
+        "JsonNull",
+        "AnyNull",
+        "ModelName",
+        "TransactionIsolationLevel",
+        "UserScalarFieldEnum",
+        "AuthSessionScalarFieldEnum",
+        "MediaScalarFieldEnum",
+        "ProcessingJobScalarFieldEnum",
+        "TranscriptScalarFieldEnum",
+        "TranscriptSegmentScalarFieldEnum",
+        "VideoChapterScalarFieldEnum",
+        "ClipCandidateScalarFieldEnum",
+        "ShortClipScalarFieldEnum",
+        "GeneratedAssetScalarFieldEnum",
+        "AiSuggestionScalarFieldEnum",
+        "PlatformAccountScalarFieldEnum",
+        "PublishTaskScalarFieldEnum",
+        "AuditLogScalarFieldEnum",
+        "SortOrder",
+        "NullableJsonNullValueInput",
+        "JsonNullValueInput",
+        "QueryMode",
+        "NullsOrder",
+        "JsonNullValueFilter"
+      ],
+      "totalLines": 433,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models.ts",
+      "contentHash": "0c86f0a62323b170a0961077b09fa17df6aa7032867ca5e23a90763fe1532baa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/AiSuggestion.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/AiSuggestion.ts",
+      "contentHash": "fcd26a56ea643612b9ece718c43582fb9ac1ea71cfd520be792f813c3f853549",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 1492,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/AuditLog.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/AuditLog.ts",
+      "contentHash": "0bf126f9cf1916ed66dd78dfe8e0bbc876d3edeed4d3a8f6c2b3041dd2d812e6",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 1458,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/AuthSession.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/AuthSession.ts",
+      "contentHash": "057aac10e888d0c8f43995675d24c3f65ecb0e12ca2f7407962934c3a0518e37",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 1525,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/ClipCandidate.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/ClipCandidate.ts",
+      "contentHash": "51ed49b5ba064f411974303bf040d0b2df0323ecc00b4f0e2fdfaadc178820da",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 3212,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/GeneratedAsset.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/GeneratedAsset.ts",
+      "contentHash": "e4855cd49ac4e2f685c1f3706010c0447d11e17d83d713c4b7c8fe366e183485",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 2328,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/Media.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/Media.ts",
+      "contentHash": "00d6aaf9c030ac6b14fd1967deacae38e8ec8261a9bc96d5c32c7b0465b269e1",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 3522,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/PlatformAccount.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/PlatformAccount.ts",
+      "contentHash": "bb9b0a75d446b4c1ec97d2463b4d176f6ab005d2de40a723ae3f612d1f93fddd",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 1772,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/ProcessingJob.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/ProcessingJob.ts",
+      "contentHash": "a0e62f9cae4358b4142dacd20c8fe97ccdc6eadf1c282bef606a8b71ab421568",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 2800,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/PublishTask.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/PublishTask.ts",
+      "contentHash": "b3eefa33e21f070309cb57c7c047892a95c89f13c332c84c4524a0e36324c590",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 2726,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/ShortClip.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/ShortClip.ts",
+      "contentHash": "2fcd14828e7bf434cbead0d37c8a6f9fc2658a8bec78631e7bebe2cc40b06f77",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 3238,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/Transcript.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/Transcript.ts",
+      "contentHash": "79076f31347e122f39ebb6ba7f557eb2490543a931019d969144bbdea82a689d",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 3040,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/TranscriptSegment.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/TranscriptSegment.ts",
+      "contentHash": "fd029be3f6d8189c411c9cec7be2df2a842c29b8c65f0f16bbeca884d51772e1",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 1788,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/User.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/User.ts",
+      "contentHash": "a17033e149084f17c59cc9d0f0d832f46321445627a5548005b620bb1c5f0cd1",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 2747,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/generated/prisma/models/VideoChapter.ts": {
+      "filePath": "backend/src/infrastructure/db/generated/prisma/models/VideoChapter.ts",
+      "contentHash": "60528b5e6880ecc46317dc6bf29ea2790ff7613a8f8e564191bfa3d6eb16fafc",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@prisma/client/runtime/client",
+          "specifiers": [
+            "* as runtime"
+          ]
+        },
+        {
+          "source": "../enums",
+          "specifiers": [
+            "* as $Enums"
+          ]
+        },
+        {
+          "source": "../internal/prismaNamespace",
+          "specifiers": [
+            "* as Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 2950,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/db/prisma.ts": {
+      "filePath": "backend/src/infrastructure/db/prisma.ts",
+      "contentHash": "e55e31026c6d31257be8c453506d73245fe5e9a3d95a8955acfeec36f01b3042",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "dotenv/config",
+          "specifiers": []
+        },
+        {
+          "source": "@prisma/adapter-pg",
+          "specifiers": [
+            "PrismaPg"
+          ]
+        },
+        {
+          "source": "./generated/prisma/client",
+          "specifiers": [
+            "PrismaClient"
+          ]
+        },
+        {
+          "source": "../../config/index",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "prisma"
+      ],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/rabbitmq/client.ts": {
+      "filePath": "backend/src/infrastructure/rabbitmq/client.ts",
+      "contentHash": "3903f0838c50b6aea40973e9b5468b3afc33b02c219634b216ee835503ba4227",
+      "functions": [
+        {
+          "name": "connectRabbitMQ",
+          "params": [],
+          "returnType": "Promise<ChannelModel>",
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "getRabbitMQConnection",
+          "params": [],
+          "returnType": "ChannelModel",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "disconnectRabbitMQ",
+          "params": [],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "amqplib",
+          "specifiers": [
+            "* as amqp"
+          ]
+        },
+        {
+          "source": "amqplib",
+          "specifiers": [
+            "ChannelModel"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "connectRabbitMQ",
+        "getRabbitMQConnection",
+        "disconnectRabbitMQ"
+      ],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/rabbitmq/publisher.ts": {
+      "filePath": "backend/src/infrastructure/rabbitmq/publisher.ts",
+      "contentHash": "7bed66cb788439f005e59be95db9b02342afbe811d59fe0619692afb99217589",
+      "functions": [
+        {
+          "name": "publishJsonToQueue",
+          "params": [
+            "queueName",
+            "message",
+            "options"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "publishCeleryTaskToQueue",
+          "params": [
+            "{\n  queueName,\n  taskName,\n  kwargs,\n  args = [],\n  taskId = randomUUID(),\n  options = {}\n}"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 62
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "amqplib",
+          "specifiers": [
+            "Options"
+          ]
+        },
+        {
+          "source": "node:crypto",
+          "specifiers": [
+            "randomUUID"
+          ]
+        },
+        {
+          "source": "node:os",
+          "specifiers": [
+            "hostname"
+          ]
+        },
+        {
+          "source": "./client",
+          "specifiers": [
+            "getRabbitMQConnection"
+          ]
+        }
+      ],
+      "exports": [
+        "publishJsonToQueue",
+        "publishCeleryTaskToQueue"
+      ],
+      "totalLines": 102,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/s3/client.ts": {
+      "filePath": "backend/src/infrastructure/s3/client.ts",
+      "contentHash": "8c3a430e158914c0d8e4610c7b71a4cb7bb18bbd9d3ea5e318d75e59b7dbd2ff",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-s3",
+          "specifiers": [
+            "S3Client"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "s3Client",
+        "presignS3Client"
+      ],
+      "totalLines": 21,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/s3/s3.types.ts": {
+      "filePath": "backend/src/infrastructure/s3/s3.types.ts",
+      "contentHash": "0619b1b8f4b8d588fafa347789e0145dddfc306586a77c502f589bf85b1c0b60",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/infrastructure/s3/uploader.ts": {
+      "filePath": "backend/src/infrastructure/s3/uploader.ts",
+      "contentHash": "470102907fc1af6446b88fbdd8fd58e1fa306e9fe1ff0e6e1e6c158827722472",
+      "functions": [
+        {
+          "name": "createPresignedPutUrl",
+          "params": [
+            "bucket",
+            "key",
+            "mimeType"
+          ],
+          "returnType": "Promise<string>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "createPresignedGetUrl",
+          "params": [
+            "bucket",
+            "key"
+          ],
+          "returnType": "Promise<string>",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "createMultipartUpload",
+          "params": [
+            "bucket",
+            "key",
+            "mimeType"
+          ],
+          "returnType": "Promise<string>",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "createPresignedUploadPartUrls",
+          "params": [
+            "bucket",
+            "key",
+            "multipartUploadId",
+            "partCount"
+          ],
+          "returnType": "Promise<PresignedUploadPart[]>",
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "completeMultipartUpload",
+          "params": [
+            "bucket",
+            "key",
+            "multipartUploadId",
+            "parts"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "abortMultipartUpload",
+          "params": [
+            "bucket",
+            "key",
+            "multipartUploadId"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "deleteObject",
+          "params": [
+            "bucket",
+            "key"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "headObject",
+          "params": [
+            "bucket",
+            "key"
+          ],
+          "returnType": "Promise<StorageObjectMetadata>",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "isObjectNotFoundError",
+          "params": [
+            "error"
+          ],
+          "returnType": "boolean",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "toStorageError",
+          "params": [
+            "error",
+            "fallbackMessage"
+          ],
+          "returnType": "MediaError",
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-s3",
+          "specifiers": [
+            "AbortMultipartUploadCommand",
+            "CompleteMultipartUploadCommand",
+            "CreateMultipartUploadCommand",
+            "GetObjectCommand",
+            "HeadObjectCommand",
+            "PutObjectCommand",
+            "S3ServiceException",
+            "UploadPartCommand",
+            "DeleteObjectCommand"
+          ]
+        },
+        {
+          "source": "@aws-sdk/s3-request-presigner",
+          "specifiers": [
+            "getSignedUrl"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "../../modules/media/media.error",
+          "specifiers": [
+            "MediaError"
+          ]
+        },
+        {
+          "source": "./client",
+          "specifiers": [
+            "presignS3Client",
+            "s3Client"
+          ]
+        },
+        {
+          "source": "./s3.types",
+          "specifiers": [
+            "CompletedUploadPart",
+            "PresignedUploadPart",
+            "StorageObjectMetadata"
+          ]
+        }
+      ],
+      "exports": [
+        "PRESIGNED_UPLOAD_EXPIRES_SECONDS",
+        "PRESIGNED_DOWNLOAD_EXPIRES_SECONDS",
+        "createPresignedPutUrl",
+        "createPresignedGetUrl",
+        "createMultipartUpload",
+        "createPresignedUploadPartUrls",
+        "completeMultipartUpload",
+        "abortMultipartUpload",
+        "deleteObject",
+        "headObject"
+      ],
+      "totalLines": 185,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/middleware/auth-rate-limit.middleware.ts": {
+      "filePath": "backend/src/middleware/auth-rate-limit.middleware.ts",
+      "contentHash": "26c884587764b2024353b9ff666de0b1d9f28d22b2ec993567216f27d3533dfc",
+      "functions": [
+        {
+          "name": "createAuthRateLimiter",
+          "params": [
+            "limit",
+            "message"
+          ],
+          "exported": false,
+          "lineCount": 14
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express-rate-limit",
+          "specifiers": [
+            "rateLimit"
+          ]
+        },
+        {
+          "source": "../config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "registerRateLimiter",
+        "loginRateLimiter",
+        "refreshRateLimiter"
+      ],
+      "totalLines": 30,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/middleware/auth.middleware.ts": {
+      "filePath": "backend/src/middleware/auth.middleware.ts",
+      "contentHash": "38c0765f28a7f46562423dc0242eee8b0fc43d5a7aeb17f447bf398e21b9d7bd",
+      "functions": [
+        {
+          "name": "authenticate",
+          "params": [
+            "req",
+            "_res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "../modules/auth/auth.service",
+          "specifiers": [
+            "* as authService"
+          ]
+        },
+        {
+          "source": "../modules/auth/auth.request",
+          "specifiers": [
+            "getBearerToken"
+          ]
+        }
+      ],
+      "exports": [
+        "authenticate"
+      ],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/middleware/error-handler.ts": {
+      "filePath": "backend/src/middleware/error-handler.ts",
+      "contentHash": "5df2dcb02000ddb02dc0e1395d11e2961d2a35d637a8b75a173e8ee94649f219",
+      "functions": [
+        {
+          "name": "toValidationDetails",
+          "params": [
+            "error"
+          ],
+          "returnType": "Array<Record<string, unknown>>",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "notFoundHandler",
+          "params": [
+            "req",
+            "_res",
+            "next"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "globalErrorHandler",
+          "params": [
+            "error",
+            "_req",
+            "res",
+            "_next"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 38
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "ErrorRequestHandler",
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "zod",
+          "specifiers": [
+            "ZodError"
+          ]
+        },
+        {
+          "source": "../config/index",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "../utils/app-error",
+          "specifiers": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        "notFoundHandler",
+        "globalErrorHandler"
+      ],
+      "totalLines": 57,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/middleware/transcript-rate-limit.middleware.ts": {
+      "filePath": "backend/src/middleware/transcript-rate-limit.middleware.ts",
+      "contentHash": "55cdbd7661854a54e4e613a91b0768d38e8664c304c8df3da1f3a322ff1bd3bc",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express-rate-limit",
+          "specifiers": [
+            "rateLimit",
+            "ipKeyGenerator"
+          ]
+        },
+        {
+          "source": "../config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "transcriptGenerateRateLimiter"
+      ],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/middleware/validate-request.ts": {
+      "filePath": "backend/src/middleware/validate-request.ts",
+      "contentHash": "d3312d4241af391fee79be8ff73ef185ed6b289b318a1c09714aafe2aea6b420",
+      "functions": [
+        {
+          "name": "formatIssues",
+          "params": [
+            "error"
+          ],
+          "returnType": "Array<Record<string, unknown>>",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "setRequestPart",
+          "params": [
+            "req",
+            "key",
+            "value"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "validateRequest",
+          "params": [
+            "schema"
+          ],
+          "returnType": "RequestHandler",
+          "exported": true,
+          "lineCount": 21
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "../utils/app-error",
+          "specifiers": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        "validateRequest"
+      ],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.controller.ts": {
+      "filePath": "backend/src/modules/auth/auth.controller.ts",
+      "contentHash": "0b374a2a45e0bee899fda60a3ef8ef69f5e4d76a86f6aa10c6ef7b9e82e82e0b",
+      "functions": [
+        {
+          "name": "register",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "login",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "refresh",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "logout",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "logoutAll",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "me",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./auth.service",
+          "specifiers": [
+            "* as authService"
+          ]
+        },
+        {
+          "source": "./auth.cookies",
+          "specifiers": [
+            "clearRefreshCookie",
+            "setRefreshCookie"
+          ]
+        },
+        {
+          "source": "./auth.types",
+          "specifiers": [
+            "AccessTokenResponseData",
+            "AuthResponseData",
+            "MessageResponseData"
+          ]
+        },
+        {
+          "source": "../../types/express",
+          "specifiers": [
+            "AppRequestHandler",
+            "BodyRequestHandler"
+          ]
+        },
+        {
+          "source": "./auth.request",
+          "specifiers": [
+            "getOptionalRefreshTokenFromCookie",
+            "getRefreshTokenFromCookie",
+            "getRequestMetadata"
+          ]
+        },
+        {
+          "source": "./auth.mapper",
+          "specifiers": [
+            "toAuthenticatedUser"
+          ]
+        },
+        {
+          "source": "./auth.schema",
+          "specifiers": [
+            "LoginBody",
+            "RegisterBody"
+          ]
+        },
+        {
+          "source": "../../utils/response",
+          "specifiers": [
+            "sendSuccess"
+          ]
+        }
+      ],
+      "exports": [
+        "register",
+        "login",
+        "refresh",
+        "logout",
+        "logoutAll",
+        "me"
+      ],
+      "totalLines": 89,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.cookies.ts": {
+      "filePath": "backend/src/modules/auth/auth.cookies.ts",
+      "contentHash": "aae465735abc716583cba065f63f57c7934204373942967bec4e01025235cd06",
+      "functions": [
+        {
+          "name": "setRefreshCookie",
+          "params": [
+            "res",
+            "refreshToken"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "clearRefreshCookie",
+          "params": [
+            "res"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Response"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "setRefreshCookie",
+        "clearRefreshCookie"
+      ],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.error.ts": {
+      "filePath": "backend/src/modules/auth/auth.error.ts",
+      "contentHash": "bf51249f97b7a357823a09ca21d639883e89bcbff8a3777bf798fb33f56f36d5",
+      "functions": [],
+      "classes": [
+        {
+          "name": "AuthError",
+          "methods": [
+            "constructor",
+            "unauthorized",
+            "forbidden",
+            "conflict"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "imports": [
+        {
+          "source": "../../utils/app-error",
+          "specifiers": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        "AuthError"
+      ],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.mapper.ts": {
+      "filePath": "backend/src/modules/auth/auth.mapper.ts",
+      "contentHash": "18eac0928855a615e9c4a098c87d9397b801c33139c1721f3216fcb2a57b896d",
+      "functions": [
+        {
+          "name": "toAuthenticatedUser",
+          "params": [
+            "user"
+          ],
+          "returnType": "AuthenticatedUser",
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "User"
+          ]
+        },
+        {
+          "source": "./auth.types",
+          "specifiers": [
+            "AuthenticatedUser"
+          ]
+        }
+      ],
+      "exports": [
+        "toAuthenticatedUser"
+      ],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.repository.ts": {
+      "filePath": "backend/src/modules/auth/auth.repository.ts",
+      "contentHash": "8dc0415ea7f38efe2eef5c87fee7badd67ea561abe98f2a82bd64cabfed10edb",
+      "functions": [
+        {
+          "name": "findUserByEmail",
+          "params": [
+            "email"
+          ],
+          "returnType": "Promise<User | null>",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "findUserById",
+          "params": [
+            "id"
+          ],
+          "returnType": "Promise<User | null>",
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "createUser",
+          "params": [
+            "data"
+          ],
+          "returnType": "Promise<User>",
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "findActiveSessionWithUser",
+          "params": [
+            "refreshToken"
+          ],
+          "returnType": "Promise<AuthSessionWithUser | null>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "findActiveSessionByToken",
+          "params": [
+            "refreshToken"
+          ],
+          "returnType": "Promise<AuthSession | null>",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "createSession",
+          "params": [
+            "data"
+          ],
+          "returnType": "Promise<AuthSession>",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "updateSession",
+          "params": [
+            "id",
+            "data"
+          ],
+          "returnType": "Promise<AuthSession>",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "revokeSession",
+          "params": [
+            "id"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "revokeAllUserSessions",
+          "params": [
+            "userId"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/prisma",
+          "specifiers": [
+            "prisma"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "AuthSession",
+            "User"
+          ]
+        },
+        {
+          "source": "./auth.types",
+          "specifiers": [
+            "AuthSessionWithUser"
+          ]
+        }
+      ],
+      "exports": [
+        "findUserByEmail",
+        "findUserById",
+        "createUser",
+        "findActiveSessionWithUser",
+        "findActiveSessionByToken",
+        "createSession",
+        "updateSession",
+        "revokeSession",
+        "revokeAllUserSessions"
+      ],
+      "totalLines": 71,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.request.ts": {
+      "filePath": "backend/src/modules/auth/auth.request.ts",
+      "contentHash": "b512403d3ea8eee789f0e5ec94ee29bc1d13a9f2bb919cceea8fd206a6629532",
+      "functions": [
+        {
+          "name": "getRequestMetadata",
+          "params": [
+            "req"
+          ],
+          "returnType": "RequestMetadata",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "getRefreshExpiresAt",
+          "params": [],
+          "returnType": "Date",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getRefreshTokenFromCookie",
+          "params": [
+            "req"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "getOptionalRefreshTokenFromCookie",
+          "params": [
+            "req"
+          ],
+          "returnType": "string | undefined",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "getBearerToken",
+          "params": [
+            "req"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Request"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./auth.error",
+          "specifiers": [
+            "AuthError"
+          ]
+        },
+        {
+          "source": "./auth.types",
+          "specifiers": [
+            "RequestMetadata",
+            "RequestMetadataSource"
+          ]
+        }
+      ],
+      "exports": [
+        "getRequestMetadata",
+        "getRefreshExpiresAt",
+        "getRefreshTokenFromCookie",
+        "getOptionalRefreshTokenFromCookie",
+        "getBearerToken"
+      ],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.routes.ts": {
+      "filePath": "backend/src/modules/auth/auth.routes.ts",
+      "contentHash": "860e6157570a3785062d0ea4793b65a2aebc3103fb1bab34ec7c3d6ec9f52715",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router"
+          ]
+        },
+        {
+          "source": "./auth.controller",
+          "specifiers": [
+            "* as authController"
+          ]
+        },
+        {
+          "source": "./auth.schema",
+          "specifiers": [
+            "loginSchema",
+            "registerSchema"
+          ]
+        },
+        {
+          "source": "../../middleware/auth.middleware",
+          "specifiers": [
+            "authenticate"
+          ]
+        },
+        {
+          "source": "../../middleware/auth-rate-limit.middleware",
+          "specifiers": [
+            "loginRateLimiter",
+            "refreshRateLimiter",
+            "registerRateLimiter"
+          ]
+        },
+        {
+          "source": "../../middleware/validate-request",
+          "specifiers": [
+            "validateRequest"
+          ]
+        }
+      ],
+      "exports": [
+        "authRoutes"
+      ],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.schema.ts": {
+      "filePath": "backend/src/modules/auth/auth.schema.ts",
+      "contentHash": "ed931ae57fae71ec4ea65cd6f51f4acc597e191de03b4e4b2ec2ca94fe4c0e1b",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        }
+      ],
+      "exports": [
+        "registerSchema",
+        "loginSchema"
+      ],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.service.ts": {
+      "filePath": "backend/src/modules/auth/auth.service.ts",
+      "contentHash": "dfba384b45ebcf034467a7cf9f340d84b6d83b8f30ac2a24c403dff8df1f10a2",
+      "functions": [
+        {
+          "name": "register",
+          "params": [
+            "input",
+            "metadata"
+          ],
+          "returnType": "Promise<AuthResult>",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "login",
+          "params": [
+            "input",
+            "metadata"
+          ],
+          "returnType": "Promise<AuthResult>",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "refresh",
+          "params": [
+            "refreshToken",
+            "metadata"
+          ],
+          "returnType": "Promise<AuthResult>",
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "logout",
+          "params": [
+            "refreshToken"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "logoutAll",
+          "params": [
+            "userId"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getAuthenticatedUser",
+          "params": [
+            "accessToken"
+          ],
+          "returnType": "Promise<AuthenticatedUser>",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "createRefreshSession",
+          "params": [
+            "userId",
+            "metadata"
+          ],
+          "returnType": "Promise<SessionTokenResult>",
+          "exported": false,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "bcrypt",
+          "specifiers": [
+            "bcrypt"
+          ]
+        },
+        {
+          "source": "./auth.types",
+          "specifiers": [
+            "AuthenticatedUser",
+            "AuthResult",
+            "AuthSessionWithUser",
+            "RequestMetadata",
+            "SessionTokenResult"
+          ]
+        },
+        {
+          "source": "./auth.tokens",
+          "specifiers": [
+            "generateRefreshToken",
+            "signAccessToken",
+            "verifyAccessToken"
+          ]
+        },
+        {
+          "source": "./auth.schema",
+          "specifiers": [
+            "LoginBody",
+            "RegisterBody"
+          ]
+        },
+        {
+          "source": "./auth.error",
+          "specifiers": [
+            "AuthError"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./auth.mapper",
+          "specifiers": [
+            "toAuthenticatedUser"
+          ]
+        },
+        {
+          "source": "./auth.request",
+          "specifiers": [
+            "getRefreshExpiresAt"
+          ]
+        },
+        {
+          "source": "./auth.repository",
+          "specifiers": [
+            "* as authRepo"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "UserStatus"
+          ]
+        }
+      ],
+      "exports": [
+        "register",
+        "login",
+        "refresh",
+        "logout",
+        "logoutAll",
+        "getAuthenticatedUser"
+      ],
+      "totalLines": 140,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.swagger.ts": {
+      "filePath": "backend/src/modules/auth/auth.swagger.ts",
+      "contentHash": "a68c4e4969f7b243c248e509ebaab0559ea528e35a530f32b18ae279e82d4fe6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 305,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.tokens.ts": {
+      "filePath": "backend/src/modules/auth/auth.tokens.ts",
+      "contentHash": "9cc0d1cbb780ad4b37997bc243f4f40f4544292947209ef27308b47d6f93a4a3",
+      "functions": [
+        {
+          "name": "generateRefreshToken",
+          "params": [],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "signAccessToken",
+          "params": [
+            "userId"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "verifyAccessToken",
+          "params": [
+            "accessToken"
+          ],
+          "returnType": "AccessTokenPayload",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "isAccessTokenPayload",
+          "params": [
+            "value"
+          ],
+          "exported": false,
+          "lineCount": 2
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:crypto",
+          "specifiers": [
+            "crypto"
+          ]
+        },
+        {
+          "source": "jsonwebtoken",
+          "specifiers": [
+            "jwt",
+            "JwtPayload",
+            "SignOptions"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./auth.error",
+          "specifiers": [
+            "AuthError"
+          ]
+        },
+        {
+          "source": "./auth.types",
+          "specifiers": [
+            "AccessTokenPayload"
+          ]
+        }
+      ],
+      "exports": [
+        "generateRefreshToken",
+        "signAccessToken",
+        "verifyAccessToken"
+      ],
+      "totalLines": 34,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/auth/auth.types.ts": {
+      "filePath": "backend/src/modules/auth/auth.types.ts",
+      "contentHash": "06eb1163e55aa39b18253503a8222c7dbb4a1de8e2a1b7d28957e7b7260c300e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "jsonwebtoken",
+          "specifiers": [
+            "JwtPayload"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "AuthSession",
+            "User",
+            "UserRole",
+            "UserStatus"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 53,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/health/health.controller.ts": {
+      "filePath": "backend/src/modules/health/health.controller.ts",
+      "contentHash": "b0501349f9a04a9edbbc5f87c4c65489968f646820a567fadb2642c22f119f84",
+      "functions": [
+        {
+          "name": "getHealth",
+          "params": [
+            "_req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../types/express",
+          "specifiers": [
+            "AppRequestHandler"
+          ]
+        },
+        {
+          "source": "./health.service",
+          "specifiers": [
+            "* as healthService"
+          ]
+        }
+      ],
+      "exports": [
+        "getHealth"
+      ],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/health/health.repository.ts": {
+      "filePath": "backend/src/modules/health/health.repository.ts",
+      "contentHash": "177a6651d7b4323390840972b4e5750f26a9e568f4815f243e477608678dd17e",
+      "functions": [
+        {
+          "name": "checkDatabaseConnection",
+          "params": [],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/prisma",
+          "specifiers": [
+            "prisma"
+          ]
+        }
+      ],
+      "exports": [
+        "checkDatabaseConnection"
+      ],
+      "totalLines": 6,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/health/health.routes.ts": {
+      "filePath": "backend/src/modules/health/health.routes.ts",
+      "contentHash": "7d710f1ef9bc243fd87cdac016b96595d1134d34407fbf031e2cfc2bbcfecb66",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router"
+          ]
+        },
+        {
+          "source": "./health.controller",
+          "specifiers": [
+            "* as healthController"
+          ]
+        }
+      ],
+      "exports": [
+        "healthRouter"
+      ],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/health/health.service.ts": {
+      "filePath": "backend/src/modules/health/health.service.ts",
+      "contentHash": "71ef17130a28fd9d0544830a3aac0cc72dc72ed960afcb2eaef2c33755a36cff",
+      "functions": [
+        {
+          "name": "getErrorMessage",
+          "params": [
+            "error"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 2
+        },
+        {
+          "name": "getHealth",
+          "params": [],
+          "returnType": "Promise<HealthCheck>",
+          "exported": true,
+          "lineCount": 30
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../config/index",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./health.repository",
+          "specifiers": [
+            "* as healthRepo"
+          ]
+        }
+      ],
+      "exports": [
+        "getHealth"
+      ],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/health/health.swagger.ts": {
+      "filePath": "backend/src/modules/health/health.swagger.ts",
+      "contentHash": "8f568e7b395ae230bd0f96ac5e9ba3e17b16c92588b3d3a10c1e25cb965ccd1e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/index.ts": {
+      "filePath": "backend/src/modules/index.ts",
+      "contentHash": "1ec45243e238cc0e53be14260e46ba77891d5850b4dd7bb0e2736225fb70a6d8",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router"
+          ]
+        },
+        {
+          "source": "./auth/auth.routes",
+          "specifiers": [
+            "authRoutes"
+          ]
+        },
+        {
+          "source": "./health/health.routes",
+          "specifiers": [
+            "healthRouter"
+          ]
+        },
+        {
+          "source": "./jobs/jobs.routes",
+          "specifiers": [
+            "jobsRoutes"
+          ]
+        },
+        {
+          "source": "./media/media.routes",
+          "specifiers": [
+            "mediaRoutes"
+          ]
+        },
+        {
+          "source": "./transcripts/transcripts.routes",
+          "specifiers": [
+            "mediaTranscriptRoutes",
+            "transcriptsRoutes"
+          ]
+        }
+      ],
+      "exports": [
+        "apiRouter"
+      ],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.controller.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.controller.ts",
+      "contentHash": "30b9f787eee8e0b946223aaf5be60afac3ac8f530bafc77b22ddd81bc4e5d7f1",
+      "functions": [
+        {
+          "name": "get",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "events",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../types/express",
+          "specifiers": [
+            "ParamsRequestHandler"
+          ]
+        },
+        {
+          "source": "../../utils/response",
+          "specifiers": [
+            "sendSuccess"
+          ]
+        },
+        {
+          "source": "./jobs.events",
+          "specifiers": [
+            "streamJobEvents"
+          ]
+        },
+        {
+          "source": "./jobs.schema",
+          "specifiers": [
+            "JobParams"
+          ]
+        },
+        {
+          "source": "./jobs.service",
+          "specifiers": [
+            "* as jobsService"
+          ]
+        },
+        {
+          "source": "./jobs.types",
+          "specifiers": [
+            "JobResponseData"
+          ]
+        }
+      ],
+      "exports": [
+        "get",
+        "events"
+      ],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.error.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.error.ts",
+      "contentHash": "9d151600c7d77826a46646fcefe27fe57c9a502d4bb573f9279715d910394272",
+      "functions": [],
+      "classes": [
+        {
+          "name": "JobsError",
+          "methods": [
+            "constructor",
+            "notFound"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "imports": [
+        {
+          "source": "../../utils/app-error",
+          "specifiers": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        "JobsError"
+      ],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.events.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.events.ts",
+      "contentHash": "b6d83a448fcb516119781be9763b04f33b864744e234ff0df9fd0a83e7eea267",
+      "functions": [
+        {
+          "name": "streamJobEvents",
+          "params": [
+            "{ jobId, onError, res, userId }"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 72
+        },
+        {
+          "name": "prepareEventStream",
+          "params": [
+            "res"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "emitJobEvent",
+          "params": [
+            "res",
+            "event",
+            "job"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "emitEvent",
+          "params": [
+            "res",
+            "event",
+            "data"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Response"
+          ]
+        },
+        {
+          "source": "./jobs.service",
+          "specifiers": [
+            "* as jobsService"
+          ]
+        },
+        {
+          "source": "./jobs.types",
+          "specifiers": [
+            "JobEventData",
+            "JobEventName",
+            "JobResponseData"
+          ]
+        }
+      ],
+      "exports": [
+        "streamJobEvents"
+      ],
+      "totalLines": 102,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.repository.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.repository.ts",
+      "contentHash": "71d65946a0813d9e11d8f88f287dbbfb03385086e689d6e4423e3aec4f71311b",
+      "functions": [
+        {
+          "name": "findJobByIdAndUserId",
+          "params": [
+            "id",
+            "userId"
+          ],
+          "returnType": "Promise<ProcessingJob | null>",
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/prisma",
+          "specifiers": [
+            "prisma"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "ProcessingJob"
+          ]
+        }
+      ],
+      "exports": [
+        "findJobByIdAndUserId"
+      ],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.routes.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.routes.ts",
+      "contentHash": "66e74db15251a1fa5999da59245c345c5d15ce8b8ec8bcaf2a0a901b4cbb9c60",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router"
+          ]
+        },
+        {
+          "source": "../../middleware/auth.middleware",
+          "specifiers": [
+            "authenticate"
+          ]
+        },
+        {
+          "source": "../../middleware/validate-request",
+          "specifiers": [
+            "validateRequest"
+          ]
+        },
+        {
+          "source": "./jobs.controller",
+          "specifiers": [
+            "* as jobsController"
+          ]
+        },
+        {
+          "source": "./jobs.schema",
+          "specifiers": [
+            "jobParamsSchema"
+          ]
+        }
+      ],
+      "exports": [
+        "jobsRoutes"
+      ],
+      "totalLines": 15,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.schema.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.schema.ts",
+      "contentHash": "c58d86a8f8f3ceda764c2efd8a2d66f717ae877f6bbd58df63977cf73ed550c9",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        }
+      ],
+      "exports": [
+        "jobParamsSchema"
+      ],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.service.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.service.ts",
+      "contentHash": "c17fad4a9d48301ee6cb2821f8c2f852e05cfbacaaac3b3a406a164761af11d7",
+      "functions": [
+        {
+          "name": "getJob",
+          "params": [
+            "userId",
+            "jobId"
+          ],
+          "returnType": "Promise<JobResponseData>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "toJobEventData",
+          "params": [
+            "job"
+          ],
+          "returnType": "JobEventData",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "getJobEventName",
+          "params": [
+            "job"
+          ],
+          "returnType": "JobEventName",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "isTerminalJob",
+          "params": [
+            "job"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "hasJobChanged",
+          "params": [
+            "previous",
+            "next"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "toJobResponseData",
+          "params": [
+            "job"
+          ],
+          "returnType": "JobResponseData",
+          "exported": false,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "ProcessingJob"
+          ]
+        },
+        {
+          "source": "./jobs.error",
+          "specifiers": [
+            "JobsError"
+          ]
+        },
+        {
+          "source": "./jobs.repository",
+          "specifiers": [
+            "* as jobsRepo"
+          ]
+        },
+        {
+          "source": "./jobs.types",
+          "specifiers": [
+            "JobEventData",
+            "JobEventName",
+            "JobResponseData"
+          ]
+        }
+      ],
+      "exports": [
+        "JOB_EVENT_POLL_INTERVAL_MS",
+        "JOB_EVENT_HEARTBEAT_INTERVAL_MS",
+        "getJob",
+        "toJobEventData",
+        "getJobEventName",
+        "isTerminalJob",
+        "hasJobChanged"
+      ],
+      "totalLines": 61,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.swagger.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.swagger.ts",
+      "contentHash": "92631334eb6a158ead64353388abfde3a17fce5959ac689099722ca47c314ec7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 153,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/jobs/jobs.types.ts": {
+      "filePath": "backend/src/modules/jobs/jobs.types.ts",
+      "contentHash": "7e86c296523d694ba10f91b14268dfe9ca797ef4e99230e01ffc3c86085f489c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "JobStatus",
+            "JobType",
+            "Prisma"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.controller.ts": {
+      "filePath": "backend/src/modules/media/media.controller.ts",
+      "contentHash": "e4bcf46171ed7c28ec347f8bd5c8dedde05ae0206698175ad3635deb280d260d",
+      "functions": [
+        {
+          "name": "list",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "get",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "update",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "remove",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "createDownloadUrl",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "createUploadUrl",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "completeUpload",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "abortMultipartUpload",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 18
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../types/express",
+          "specifiers": [
+            "BodyRequestHandler",
+            "ParamsBodyRequestHandler",
+            "ParamsRequestHandler",
+            "QueryRequestHandler"
+          ]
+        },
+        {
+          "source": "../../utils/response",
+          "specifiers": [
+            "sendSuccess"
+          ]
+        },
+        {
+          "source": "./media.schema",
+          "specifiers": [
+            "AbortMultipartUploadBody",
+            "CompleteUploadBody",
+            "CreateUploadUrlBody",
+            "ListMediaQuery",
+            "MediaParams",
+            "UpdateMediaBody"
+          ]
+        },
+        {
+          "source": "./media.service",
+          "specifiers": [
+            "* as mediaService"
+          ]
+        },
+        {
+          "source": "./media.types",
+          "specifiers": [
+            "AbortMultipartUploadResult",
+            "CompleteUploadResult",
+            "CompleteUploadResponseData",
+            "CreateUploadUrlResult",
+            "CreateDownloadUrlResult",
+            "MediaResponseData",
+            "PaginatedResult"
+          ]
+        },
+        {
+          "source": "./media.util",
+          "specifiers": [
+            "toMediaResponseData",
+            "toUploadedMediaResponse"
+          ]
+        }
+      ],
+      "exports": [
+        "list",
+        "get",
+        "update",
+        "remove",
+        "createDownloadUrl",
+        "createUploadUrl",
+        "completeUpload",
+        "abortMultipartUpload"
+      ],
+      "totalLines": 149,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.error.ts": {
+      "filePath": "backend/src/modules/media/media.error.ts",
+      "contentHash": "470881bf6ef9610718ea5959c7e0e32531611ffeeb405cd2c604ed888842415f",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MediaError",
+          "methods": [
+            "constructor",
+            "forbidden",
+            "notFound",
+            "invalidUpload",
+            "invalidState",
+            "storageFailure"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "imports": [
+        {
+          "source": "../../utils/app-error",
+          "specifiers": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        "MediaError"
+      ],
+      "totalLines": 28,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.repository.ts": {
+      "filePath": "backend/src/modules/media/media.repository.ts",
+      "contentHash": "4c7ce3acd1ab55912d1bc056921a79dad2521cccb5f5f1bbfeb9f8727f1c04e1",
+      "functions": [
+        {
+          "name": "createMedia",
+          "params": [
+            "data"
+          ],
+          "returnType": "Promise<Media>",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "findMediaByUserId",
+          "params": [
+            "userId",
+            "skip",
+            "take",
+            "status",
+            "sortBy",
+            "sortOrder"
+          ],
+          "returnType": "Promise<[Media[], number]>",
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "findMediaByS3Key",
+          "params": [
+            "s3Bucket",
+            "s3Key"
+          ],
+          "returnType": "Promise<Media | null>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "findMediaById",
+          "params": [
+            "id"
+          ],
+          "returnType": "Promise<Media | null>",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "updateMedia",
+          "params": [
+            "id",
+            "data"
+          ],
+          "returnType": "Promise<Media>",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "findExistingUploadedMediaById",
+          "params": [
+            "id"
+          ],
+          "returnType": "Promise<{ media?: Media } | undefined>",
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/prisma",
+          "specifiers": [
+            "prisma"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "Media",
+            "MediaStatus",
+            "Prisma"
+          ]
+        }
+      ],
+      "exports": [
+        "createMedia",
+        "findMediaByUserId",
+        "findMediaByS3Key",
+        "findMediaById",
+        "updateMedia",
+        "findExistingUploadedMediaById"
+      ],
+      "totalLines": 63,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.routes.ts": {
+      "filePath": "backend/src/modules/media/media.routes.ts",
+      "contentHash": "f0ecb443e16666746633ba5ecc1cb886de6bc1d1e3c1caf6b5213bad833d260e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router"
+          ]
+        },
+        {
+          "source": "../../middleware/auth.middleware",
+          "specifiers": [
+            "authenticate"
+          ]
+        },
+        {
+          "source": "../../middleware/validate-request",
+          "specifiers": [
+            "validateRequest"
+          ]
+        },
+        {
+          "source": "./media.controller",
+          "specifiers": [
+            "* as mediaController"
+          ]
+        },
+        {
+          "source": "./media.schema",
+          "specifiers": [
+            "abortMultipartUploadSchema",
+            "completeUploadSchema",
+            "createUploadUrlSchema",
+            "listMediaQuerySchema",
+            "mediaParamsSchema",
+            "updateMediaSchema"
+          ]
+        }
+      ],
+      "exports": [
+        "mediaRoutes"
+      ],
+      "totalLines": 36,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.schema.ts": {
+      "filePath": "backend/src/modules/media/media.schema.ts",
+      "contentHash": "a3507349c9f11e850e7d6bc7d404843c332146e98c9bbf479601251fe6eb0026",
+      "functions": [
+        {
+          "name": "isValidMimeTypeForMedia",
+          "params": [
+            "mediaType",
+            "mimeType"
+          ],
+          "returnType": "boolean",
+          "exported": false,
+          "lineCount": 7
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "MediaStatus"
+          ]
+        }
+      ],
+      "exports": [
+        "mediaTypeSchema",
+        "listMediaQuerySchema",
+        "mediaParamsSchema",
+        "createUploadUrlSchema",
+        "completeUploadSchema",
+        "updateMediaSchema",
+        "abortMultipartUploadSchema"
+      ],
+      "totalLines": 71,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.service.ts": {
+      "filePath": "backend/src/modules/media/media.service.ts",
+      "contentHash": "c8c99068a5d364c166d27b938436fae623990d8304bee9d2aa2b605985dd8536",
+      "functions": [
+        {
+          "name": "listMedia",
+          "params": [
+            "userId",
+            "query"
+          ],
+          "returnType": "Promise<PaginatedResult<Media>>",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "getOwnedMedia",
+          "params": [
+            "userId",
+            "mediaId"
+          ],
+          "returnType": "Promise<Media>",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "getMedia",
+          "params": [
+            "userId",
+            "mediaId"
+          ],
+          "returnType": "Promise<Media>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "updateMedia",
+          "params": [
+            "userId",
+            "mediaId",
+            "data"
+          ],
+          "returnType": "Promise<Media>",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "deleteMedia",
+          "params": [
+            "userId",
+            "mediaId"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "createDownloadUrl",
+          "params": [
+            "userId",
+            "mediaId"
+          ],
+          "returnType": "Promise<CreateDownloadUrlResult>",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "createUploadUrl",
+          "params": [
+            "input"
+          ],
+          "returnType": "Promise<CreateUploadUrlResult>",
+          "exported": true,
+          "lineCount": 71
+        },
+        {
+          "name": "completeUpload",
+          "params": [
+            "input"
+          ],
+          "returnType": "Promise<CompleteUploadResult>",
+          "exported": true,
+          "lineCount": 52
+        },
+        {
+          "name": "abortMultipartUpload",
+          "params": [
+            "input"
+          ],
+          "returnType": "Promise<AbortMultipartUploadResult>",
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./media.repository",
+          "specifiers": [
+            "* as mediaRepo"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "./media.error",
+          "specifiers": [
+            "MediaError"
+          ]
+        },
+        {
+          "source": "../../infrastructure/s3/uploader",
+          "specifiers": [
+            "* as storageService"
+          ]
+        },
+        {
+          "source": "./media.types",
+          "specifiers": [
+            "AbortMultipartUploadInput",
+            "AbortMultipartUploadResult",
+            "CreateMediaUploadInput",
+            "CreateUploadUrlResult",
+            "CompleteUploadInput",
+            "CompleteUploadResult",
+            "CompletedUploadPart",
+            "CreateDownloadUrlResult",
+            "PaginatedResult"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "Media"
+          ]
+        },
+        {
+          "source": "./media.schema",
+          "specifiers": [
+            "ListMediaQuery",
+            "UpdateMediaBody"
+          ]
+        },
+        {
+          "source": "./media.util",
+          "specifiers": [
+            "createUploadObjectKey",
+            "ensureBucketAndUserKey",
+            "ensureSupportedFileSize",
+            "getMultipartPartCount",
+            "getUploadMode",
+            "getValidCompletedParts"
+          ]
+        }
+      ],
+      "exports": [
+        "listMedia",
+        "getMedia",
+        "updateMedia",
+        "deleteMedia",
+        "createDownloadUrl",
+        "createUploadUrl",
+        "completeUpload",
+        "abortMultipartUpload"
+      ],
+      "totalLines": 247,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.swagger.ts": {
+      "filePath": "backend/src/modules/media/media.swagger.ts",
+      "contentHash": "9b96c166765660d5b6023e6ba45fbd64ce2715544026912e675b1fd12ba3ca71",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 628,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.types.ts": {
+      "filePath": "backend/src/modules/media/media.types.ts",
+      "contentHash": "0cba0c21864d864fa0aceeef2d0a5254e84db69f37c9ec39f6aae301c7c13551",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "Media"
+          ]
+        },
+        {
+          "source": "../../infrastructure/s3/s3.types",
+          "specifiers": [
+            "CompletedUploadPart",
+            "PresignedUploadPart"
+          ]
+        },
+        {
+          "source": "./media.schema",
+          "specifiers": [
+            "AbortMultipartUploadBody",
+            "CompleteUploadBody",
+            "CreateUploadUrlBody"
+          ]
+        }
+      ],
+      "exports": [
+        "CompletedUploadPart"
+      ],
+      "totalLines": 96,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/media/media.util.ts": {
+      "filePath": "backend/src/modules/media/media.util.ts",
+      "contentHash": "7cc114e0500b3a46269cc30dfd59756795b40bbab5311a551440c6551c2e26eb",
+      "functions": [
+        {
+          "name": "getMultipartPartCount",
+          "params": [
+            "fileSizeBytes"
+          ],
+          "returnType": "number",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "ensureSupportedFileSize",
+          "params": [
+            "fileSizeBytes"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "getMediaFolder",
+          "params": [
+            "mediaType"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getSafeFileExtension",
+          "params": [
+            "originalFilename"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "createUploadObjectKey",
+          "params": [
+            "userId",
+            "mediaType",
+            "originalFilename"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "getUploadMode",
+          "params": [
+            "fileSizeBytes"
+          ],
+          "returnType": "'SINGLE' | 'MULTIPART'",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "ensureExpectedUploadMode",
+          "params": [
+            "mode",
+            "fileSizeBytes"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "ensureUploadTargetIsAllowed",
+          "params": [
+            "userId",
+            "mediaType",
+            "bucket",
+            "key"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "ensureBucketAndUserKey",
+          "params": [
+            "userId",
+            "bucket",
+            "key"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "getValidCompletedParts",
+          "params": [
+            "fileSizeBytes",
+            "parts"
+          ],
+          "returnType": "readonly CompletedUploadPart[]",
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "toUploadedMediaResponse",
+          "params": [
+            "media"
+          ],
+          "returnType": "UploadedMediaResponse",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "toMediaResponseData",
+          "params": [
+            "media"
+          ],
+          "returnType": "MediaResponseData",
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:crypto",
+          "specifiers": [
+            "randomUUID"
+          ]
+        },
+        {
+          "source": "node:path",
+          "specifiers": [
+            "path"
+          ]
+        },
+        {
+          "source": "../../config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "Media"
+          ]
+        },
+        {
+          "source": "./media.error",
+          "specifiers": [
+            "MediaError"
+          ]
+        },
+        {
+          "source": "./media.types",
+          "specifiers": [
+            "CompletedUploadPart",
+            "MediaResponseData",
+            "UploadMediaType",
+            "UploadedMediaResponse"
+          ]
+        }
+      ],
+      "exports": [
+        "getMultipartPartCount",
+        "ensureSupportedFileSize",
+        "getMediaFolder",
+        "getSafeFileExtension",
+        "createUploadObjectKey",
+        "getUploadMode",
+        "ensureExpectedUploadMode",
+        "ensureUploadTargetIsAllowed",
+        "ensureBucketAndUserKey",
+        "getValidCompletedParts",
+        "toUploadedMediaResponse",
+        "toMediaResponseData"
+      ],
+      "totalLines": 146,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.controller.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.controller.ts",
+      "contentHash": "6ed52203f69ce9b11c85a5ca47f7c3e19b9acc02bc6c69ef9274edb4cf825b1b",
+      "functions": [
+        {
+          "name": "generate",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "listByMedia",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "get",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "segments",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../types/express",
+          "specifiers": [
+            "ParamsBodyRequestHandler",
+            "ParamsRequestHandler"
+          ]
+        },
+        {
+          "source": "../../utils/response",
+          "specifiers": [
+            "sendSuccess"
+          ]
+        },
+        {
+          "source": "./transcripts.schema",
+          "specifiers": [
+            "GenerateTranscriptBody",
+            "MediaTranscriptParams",
+            "TranscriptParams"
+          ]
+        },
+        {
+          "source": "./transcripts.service",
+          "specifiers": [
+            "* as transcriptsService"
+          ]
+        },
+        {
+          "source": "./transcripts.types",
+          "specifiers": [
+            "GenerateTranscriptResult",
+            "TranscriptDetailData",
+            "TranscriptSegmentData",
+            "TranscriptSummaryData"
+          ]
+        }
+      ],
+      "exports": [
+        "generate",
+        "listByMedia",
+        "get",
+        "segments"
+      ],
+      "totalLines": 59,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.error.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.error.ts",
+      "contentHash": "d414d4faa6fca9e2be7d0467973e0e515ab3ab0bc6e2ead9c49c2d64a5e79f20",
+      "functions": [],
+      "classes": [
+        {
+          "name": "TranscriptError",
+          "methods": [
+            "constructor",
+            "notFound",
+            "queuePublishFailed"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "imports": [
+        {
+          "source": "../../utils/app-error",
+          "specifiers": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        "TranscriptError"
+      ],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.mapper.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.mapper.ts",
+      "contentHash": "50619c1f05a920e44dc3481bf1e7cd5a58cf686f98ab0f3c6abc6023f8377ce3",
+      "functions": [
+        {
+          "name": "toJobResponseData",
+          "params": [
+            "job"
+          ],
+          "returnType": "JobResponseData",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "toTranscriptSummaryData",
+          "params": [
+            "transcript"
+          ],
+          "returnType": "TranscriptSummaryData",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "toTranscriptDetailData",
+          "params": [
+            "transcript"
+          ],
+          "returnType": "TranscriptDetailData",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "toTranscriptSegmentData",
+          "params": [
+            "segment"
+          ],
+          "returnType": "TranscriptSegmentData",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "toFullTextPreview",
+          "params": [
+            "fullText"
+          ],
+          "returnType": "string | null",
+          "exported": false,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "ProcessingJob",
+            "Transcript",
+            "TranscriptSegment"
+          ]
+        },
+        {
+          "source": "../jobs/jobs.types",
+          "specifiers": [
+            "JobResponseData"
+          ]
+        },
+        {
+          "source": "./transcripts.types",
+          "specifiers": [
+            "TranscriptDetailData",
+            "TranscriptSegmentData",
+            "TranscriptSummaryData"
+          ]
+        }
+      ],
+      "exports": [
+        "toJobResponseData",
+        "toTranscriptSummaryData",
+        "toTranscriptDetailData",
+        "toTranscriptSegmentData"
+      ],
+      "totalLines": 83,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.queue.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.queue.ts",
+      "contentHash": "63a463fa1f78d3deea82cdcb4fdbc7c9ce4d0c4f314957ff414acea6376b8105",
+      "functions": [
+        {
+          "name": "publishTranscriptJob",
+          "params": [
+            "message"
+          ],
+          "returnType": "Promise<void>",
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/rabbitmq/publisher",
+          "specifiers": [
+            "* as rabbitPublisher"
+          ]
+        },
+        {
+          "source": "./transcripts.types",
+          "specifiers": [
+            "TRANSCRIPT_CELERY_TASK_NAME",
+            "TRANSCRIPT_QUEUE_NAME",
+            "TRANSCRIPT_TASK_NAME"
+          ]
+        }
+      ],
+      "exports": [
+        "publishTranscriptJob"
+      ],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.repository.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.repository.ts",
+      "contentHash": "1132d651d915f88ee1610cdce38364af21f07f1ea032ad21aa8117b988c0017f",
+      "functions": [
+        {
+          "name": "findMediaById",
+          "params": [
+            "id"
+          ],
+          "returnType": "Promise<Media | null>",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "createProcessingJob",
+          "params": [
+            "data"
+          ],
+          "returnType": "Promise<ProcessingJob>",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "updateProcessingJob",
+          "params": [
+            "id",
+            "data"
+          ],
+          "returnType": "Promise<ProcessingJob>",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "findActiveTranscriptJobByMediaIdAndUserId",
+          "params": [
+            "mediaId",
+            "userId"
+          ],
+          "returnType": "Promise<ProcessingJob | null>",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "findTranscriptsByMediaIdAndUserId",
+          "params": [
+            "mediaId",
+            "userId"
+          ],
+          "returnType": "Promise<Transcript[]>",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "findTranscriptByIdAndUserId",
+          "params": [
+            "transcriptId",
+            "userId"
+          ],
+          "returnType": "Promise<Transcript | null>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "findTranscriptSegmentsByTranscriptIdAndUserId",
+          "params": [
+            "transcriptId",
+            "userId"
+          ],
+          "returnType": "Promise<TranscriptSegment[] | null>",
+          "exported": true,
+          "lineCount": 29
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/prisma",
+          "specifiers": [
+            "prisma"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "Media",
+            "Prisma",
+            "ProcessingJob",
+            "Transcript",
+            "TranscriptSegment"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "JobStatus",
+            "JobType"
+          ]
+        }
+      ],
+      "exports": [
+        "findMediaById",
+        "createProcessingJob",
+        "updateProcessingJob",
+        "findActiveTranscriptJobByMediaIdAndUserId",
+        "findTranscriptsByMediaIdAndUserId",
+        "findTranscriptByIdAndUserId",
+        "findTranscriptSegmentsByTranscriptIdAndUserId"
+      ],
+      "totalLines": 95,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.routes.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.routes.ts",
+      "contentHash": "91caf075640750e30802e9f29b5a3a80e37dcc2dd8e6ab24fd91a4dd4bbffb04",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router"
+          ]
+        },
+        {
+          "source": "../../middleware/auth.middleware",
+          "specifiers": [
+            "authenticate"
+          ]
+        },
+        {
+          "source": "../../middleware/transcript-rate-limit.middleware",
+          "specifiers": [
+            "transcriptGenerateRateLimiter"
+          ]
+        },
+        {
+          "source": "../../middleware/validate-request",
+          "specifiers": [
+            "validateRequest"
+          ]
+        },
+        {
+          "source": "./transcripts.controller",
+          "specifiers": [
+            "* as transcriptsController"
+          ]
+        },
+        {
+          "source": "./transcripts.schema",
+          "specifiers": [
+            "generateTranscriptSchema",
+            "mediaTranscriptParamsSchema",
+            "transcriptParamsSchema"
+          ]
+        }
+      ],
+      "exports": [
+        "mediaTranscriptRoutes",
+        "transcriptsRoutes"
+      ],
+      "totalLines": 34,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.schema.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.schema.ts",
+      "contentHash": "64027c43e7d927fbd973f59be2a53ecbbfe238a181bbaf46750dfbf606d9b81c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        }
+      ],
+      "exports": [
+        "mediaTranscriptParamsSchema",
+        "transcriptParamsSchema",
+        "generateTranscriptSchema"
+      ],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.service.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.service.ts",
+      "contentHash": "ce0f36dc30e2ef9cc6a534ad7cd4010049e12c06eb17c84d9642a8a7720b272d",
+      "functions": [
+        {
+          "name": "generateTranscript",
+          "params": [
+            "input"
+          ],
+          "returnType": "Promise<GenerateTranscriptResult>",
+          "exported": true,
+          "lineCount": 58
+        },
+        {
+          "name": "listMediaTranscripts",
+          "params": [
+            "userId",
+            "mediaId"
+          ],
+          "returnType": "Promise<TranscriptSummaryData[]>",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "getTranscript",
+          "params": [
+            "userId",
+            "transcriptId"
+          ],
+          "returnType": "Promise<TranscriptDetailData>",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "listTranscriptSegments",
+          "params": [
+            "userId",
+            "transcriptId"
+          ],
+          "returnType": "Promise<TranscriptSegmentData[]>",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "getOwnedMedia",
+          "params": [
+            "userId",
+            "mediaId"
+          ],
+          "returnType": "Promise<Media>",
+          "exported": false,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "Media"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "JobStatus",
+            "JobType"
+          ]
+        },
+        {
+          "source": "../../infrastructure/db/generated/prisma/client",
+          "specifiers": [
+            "MediaStatus"
+          ]
+        },
+        {
+          "source": "../media/media.error",
+          "specifiers": [
+            "MediaError"
+          ]
+        },
+        {
+          "source": "./transcripts.error",
+          "specifiers": [
+            "TranscriptError"
+          ]
+        },
+        {
+          "source": "./transcripts.mapper",
+          "specifiers": [
+            "toJobResponseData",
+            "toTranscriptDetailData",
+            "toTranscriptSegmentData",
+            "toTranscriptSummaryData"
+          ]
+        },
+        {
+          "source": "./transcripts.queue",
+          "specifiers": [
+            "* as transcriptQueue"
+          ]
+        },
+        {
+          "source": "./transcripts.repository",
+          "specifiers": [
+            "* as transcriptsRepo"
+          ]
+        },
+        {
+          "source": "./transcripts.types",
+          "specifiers": [
+            "GenerateTranscriptInput",
+            "GenerateTranscriptResult",
+            "TranscriptDetailData",
+            "TranscriptSegmentData",
+            "TranscriptSummaryData"
+          ]
+        }
+      ],
+      "exports": [
+        "generateTranscript",
+        "listMediaTranscripts",
+        "getTranscript",
+        "listTranscriptSegments"
+      ],
+      "totalLines": 129,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.swagger.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.swagger.ts",
+      "contentHash": "fab95a280743367f67b04cc7bd12a81ccd99bc6ea42d77a6516cba75cba49f7d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 194,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/modules/transcripts/transcripts.types.ts": {
+      "filePath": "backend/src/modules/transcripts/transcripts.types.ts",
+      "contentHash": "60e129e5b605ffbe484e1033e57bc07d058ec6e5d67dcb5bdaa197152e0c1c53",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../jobs/jobs.types",
+          "specifiers": [
+            "JobResponseData"
+          ]
+        },
+        {
+          "source": "./transcripts.schema",
+          "specifiers": [
+            "GenerateTranscriptBody"
+          ]
+        }
+      ],
+      "exports": [
+        "TRANSCRIPT_QUEUE_NAME",
+        "TRANSCRIPT_TASK_NAME",
+        "TRANSCRIPT_CELERY_TASK_NAME"
+      ],
+      "totalLines": 67,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/test/setup-env.ts": {
+      "filePath": "backend/src/test/setup-env.ts",
+      "contentHash": "ff3e761b26be57ca5697e615309d2925049c9b72033554dc8f4942b09b0a8975",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/type.d.ts": {
+      "filePath": "backend/src/type.d.ts",
+      "contentHash": "4c245670856b95a8a94dc013d0b61bf30cd5401734855f1eb9a834e36bb33d26",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./modules/auth/auth.types",
+          "specifiers": [
+            "AuthenticatedUser"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/config.ts": {
+      "filePath": "backend/src/types/config.ts",
+      "contentHash": "6e7844c416bf712a3649803441ff506a9ae64d9bb4bc6d35ea82d917cfaa2276",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 67,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/express.ts": {
+      "filePath": "backend/src/types/express.ts",
+      "contentHash": "6e5e09fa2da9528aae8ba91895a21499eadfe287aa3b19377ef50e15bf6ee01c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "express-serve-static-core",
+          "specifiers": [
+            "ParamsDictionary"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/response.ts": {
+      "filePath": "backend/src/types/response.ts",
+      "contentHash": "088518514c15fff7dc9f4df4b54503bdae403265e2e689e7c1b6b0419ba6f3be",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/utils/app-error.ts": {
+      "filePath": "backend/src/utils/app-error.ts",
+      "contentHash": "999970d968d6fbcd7fe0a11ee0bcd9901063cda4bd3920ea9804b81030b329d8",
+      "functions": [],
+      "classes": [
+        {
+          "name": "AppError",
+          "methods": [
+            "constructor"
+          ],
+          "properties": [
+            "code",
+            "details",
+            "isOperational",
+            "statusCode"
+          ],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "imports": [],
+      "exports": [
+        "AppError"
+      ],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/utils/response.ts": {
+      "filePath": "backend/src/utils/response.ts",
+      "contentHash": "852590961a18ae9887ac6d261c13924e54b22c41589efe0c5cea63ec5193d22d",
+      "functions": [
+        {
+          "name": "sendSuccess",
+          "params": [
+            "res",
+            "data",
+            "statusCode"
+          ],
+          "returnType": "Response<SuccessResponseBody<TData>>",
+          "exported": true,
+          "lineCount": 10
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Response"
+          ]
+        },
+        {
+          "source": "../types/response",
+          "specifiers": [
+            "SuccessResponseBody"
+          ]
+        }
+      ],
+      "exports": [
+        "sendSuccess"
+      ],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "backend/SWAGGER.md": {
+      "filePath": "backend/SWAGGER.md",
+      "contentHash": "c5c74ead6f0f50f10abe950200d6d67e9477acca0eb5d119799c540ddeaac4c4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 137,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tsconfig.json": {
+      "filePath": "backend/tsconfig.json",
+      "contentHash": "566adb8ce4293f557d4a353bbb0bd19538e22a70c9aaf546961a4a20772d07e0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "infrastructure/.env.example": {
+      "filePath": "infrastructure/.env.example",
+      "contentHash": "e54e56835c98ab3baf3c6038408df1f77a3829d06d003e1a04d7a725df43a90d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "infrastructure/docker-compose.yml": {
+      "filePath": "infrastructure/docker-compose.yml",
+      "contentHash": "182e93567f7bc797b04e81e53c30952c935b03a3aac8cb81ef62e27ea567ea50",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": true
+    },
+    "worker/.env.example": {
+      "filePath": "worker/.env.example",
+      "contentHash": "277c8c19fa7c4f4e849e2ccacd510d9f327410ca115f217d71349ef5fef2acef",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": true
+    },
+    "worker/.python-version": {
+      "filePath": "worker/.python-version",
+      "contentHash": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    "worker/app/__init__.py": {
+      "filePath": "worker/app/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/consumers/chaptering_consumer.py": {
+      "filePath": "worker/app/consumers/chaptering_consumer.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/consumers/publish_consumer.py": {
+      "filePath": "worker/app/consumers/publish_consumer.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/consumers/short_clip_consumer.py": {
+      "filePath": "worker/app/consumers/short_clip_consumer.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/consumers/transcript_consumer.py": {
+      "filePath": "worker/app/consumers/transcript_consumer.py",
+      "contentHash": "39bdfb18c9a8452c604d7831b93f789ac9e5c79da0bdbdf2f5794a2f1631e8f8",
+      "functions": [
+        {
+          "name": "handle_transcript_job",
+          "params": [],
+          "returnType": "dict[str, Any]",
+          "exported": true,
+          "lineCount": 32
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "celery.exceptions",
+          "specifiers": [
+            "MaxRetriesExceededError"
+          ]
+        },
+        {
+          "source": "pydantic",
+          "specifiers": [
+            "ValidationError"
+          ]
+        },
+        {
+          "source": "app.core.celery_app",
+          "specifiers": [
+            "celery_app"
+          ]
+        },
+        {
+          "source": "app.core.config",
+          "specifiers": [
+            "settings"
+          ]
+        },
+        {
+          "source": "app.handlers.transcript_handler",
+          "specifiers": [
+            "TerminalTranscriptJobError",
+            "TranscriptJobMessage",
+            "increment_transcript_job_attempt",
+            "process_transcript_job",
+            "record_transcript_job_failure"
+          ]
+        }
+      ],
+      "exports": [
+        "handle_transcript_job"
+      ],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/core/__init__.py": {
+      "filePath": "worker/app/core/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/core/celery_app.py": {
+      "filePath": "worker/app/core/celery_app.py",
+      "contentHash": "6d4b36b97c507f904b302e55eaa4363a388cb8383180c590e81d8560f33d007e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "celery",
+          "specifiers": [
+            "Celery"
+          ]
+        },
+        {
+          "source": "kombu",
+          "specifiers": [
+            "Queue"
+          ]
+        },
+        {
+          "source": ".config",
+          "specifiers": [
+            "settings"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/core/config.py": {
+      "filePath": "worker/app/core/config.py",
+      "contentHash": "338eaa295379e7d4376e84f453e0bf155e0b84aa25e7ccfd126daba5045a92a6",
+      "functions": [],
+      "classes": [
+        {
+          "name": "Settings",
+          "methods": [],
+          "properties": [
+            "rabbitmq_url",
+            "transcript_queue_name",
+            "transcript_task_name",
+            "worker_concurrency",
+            "worker_prefetch_multiplier",
+            "worker_max_tasks_per_child",
+            "task_max_retries",
+            "task_default_retry_delay_seconds",
+            "task_soft_time_limit_seconds",
+            "task_time_limit_seconds",
+            "broker_heartbeat_seconds",
+            "database_url",
+            "database_pool_size",
+            "database_max_overflow",
+            "database_pool_recycle_seconds",
+            "s3_endpoint",
+            "s3_public_endpoint",
+            "s3_region",
+            "s3_bucket",
+            "s3_access_key_id",
+            "s3_secret_access_key",
+            "s3_force_path_style",
+            "tmp_dir",
+            "ffmpeg_binary",
+            "ffprobe_binary",
+            "ffmpeg_timeout_seconds",
+            "audio_sample_rate",
+            "audio_channels"
+          ],
+          "exported": true,
+          "lineCount": 70
+        }
+      ],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pydantic",
+          "specifiers": [
+            "AmqpDsn",
+            "Field",
+            "PositiveInt"
+          ]
+        },
+        {
+          "source": "pydantic_settings",
+          "specifiers": [
+            "BaseSettings",
+            "SettingsConfigDict"
+          ]
+        }
+      ],
+      "exports": [
+        "Settings"
+      ],
+      "totalLines": 83,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/core/logger.py": {
+      "filePath": "worker/app/core/logger.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/db/__init__.py": {
+      "filePath": "worker/app/db/__init__.py",
+      "contentHash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/db/client.py": {
+      "filePath": "worker/app/db/client.py",
+      "contentHash": "9f53798ecbadcdcbbf9c462e819199d33dd349a7d3624b6b5c9a80566b3ca5ba",
+      "functions": [
+        {
+          "name": "_to_sqlalchemy_database_url",
+          "params": [
+            "database_url"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "get_db_session",
+          "params": [],
+          "returnType": "Iterator[Session]",
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Iterator"
+          ]
+        },
+        {
+          "source": "contextlib",
+          "specifiers": [
+            "contextmanager"
+          ]
+        },
+        {
+          "source": "sqlalchemy",
+          "specifiers": [
+            "create_engine"
+          ]
+        },
+        {
+          "source": "sqlalchemy.engine",
+          "specifiers": [
+            "Engine"
+          ]
+        },
+        {
+          "source": "sqlalchemy.orm",
+          "specifiers": [
+            "Session",
+            "sessionmaker"
+          ]
+        },
+        {
+          "source": "app.core.config",
+          "specifiers": [
+            "settings"
+          ]
+        }
+      ],
+      "exports": [
+        "_to_sqlalchemy_database_url",
+        "get_db_session"
+      ],
+      "totalLines": 46,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/db/jobs_repository.py": {
+      "filePath": "worker/app/db/jobs_repository.py",
+      "contentHash": "0c6e151e7fe681df884dc8d3d3b033e41e368ce0c73f7fcc21f8e02fee34e267",
+      "functions": [
+        {
+          "name": "find_processing_job",
+          "params": [
+            "session",
+            "job_id"
+          ],
+          "returnType": "ProcessingJobRow | None",
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "mark_job_queued_from_pending",
+          "params": [
+            "session",
+            "job_id"
+          ],
+          "returnType": "ProcessingJobRow | None",
+          "exported": true,
+          "lineCount": 50
+        },
+        {
+          "name": "mark_job_step",
+          "params": [
+            "session",
+            "job_id",
+            "status",
+            "progress",
+            "current_step"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "increment_attempt_count",
+          "params": [
+            "session",
+            "job_id"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "mark_job_failed",
+          "params": [
+            "session",
+            "job_id",
+            "error_message"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "mark_job_completed",
+          "params": [
+            "session",
+            "job_id",
+            "output"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "UTC",
+            "datetime"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "sqlalchemy",
+          "specifiers": [
+            "text"
+          ]
+        },
+        {
+          "source": "sqlalchemy.orm",
+          "specifiers": [
+            "Session"
+          ]
+        },
+        {
+          "source": "app.schemas.jobs",
+          "specifiers": [
+            "JobStatus",
+            "ProcessingJobRow"
+          ]
+        }
+      ],
+      "exports": [
+        "find_processing_job",
+        "mark_job_queued_from_pending",
+        "mark_job_step",
+        "increment_attempt_count",
+        "mark_job_failed",
+        "mark_job_completed"
+      ],
+      "totalLines": 198,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/handlers/__init__.py": {
+      "filePath": "worker/app/handlers/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/handlers/chaptering_handler.py": {
+      "filePath": "worker/app/handlers/chaptering_handler.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/handlers/publish_handler.py": {
+      "filePath": "worker/app/handlers/publish_handler.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/handlers/short_clip_handler.py": {
+      "filePath": "worker/app/handlers/short_clip_handler.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/handlers/transcript_handler.py": {
+      "filePath": "worker/app/handlers/transcript_handler.py",
+      "contentHash": "92b487dbb5bf5e207caf575837d14af23e46f782251c6fe2d53d7e7f271e3c3d",
+      "functions": [
+        {
+          "name": "process_transcript_job",
+          "params": [
+            "message"
+          ],
+          "returnType": "dict[str, Any]",
+          "exported": true,
+          "lineCount": 61
+        },
+        {
+          "name": "_mark_job_step",
+          "params": [
+            "job_id",
+            "status",
+            "progress",
+            "current_step"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "record_transcript_job_failure",
+          "params": [
+            "job_id",
+            "error_message"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "increment_transcript_job_attempt",
+          "params": [
+            "job_id"
+          ],
+          "returnType": "int | None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "_guard_job",
+          "params": [
+            "message",
+            "job"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [
+        {
+          "name": "TerminalTranscriptJobError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "imports": [
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "app.core.config",
+          "specifiers": [
+            "settings"
+          ]
+        },
+        {
+          "source": "app.db",
+          "specifiers": [
+            "jobs_repository"
+          ]
+        },
+        {
+          "source": "app.db.client",
+          "specifiers": [
+            "get_db_session"
+          ]
+        },
+        {
+          "source": "app.schemas.jobs",
+          "specifiers": [
+            "JobStatus",
+            "JobType",
+            "ProcessingJobRow"
+          ]
+        },
+        {
+          "source": "app.schemas.transcripts",
+          "specifiers": [
+            "TranscriptJobMessage"
+          ]
+        }
+      ],
+      "exports": [
+        "TerminalTranscriptJobError",
+        "process_transcript_job",
+        "_mark_job_step",
+        "record_transcript_job_failure",
+        "increment_transcript_job_attempt",
+        "_guard_job"
+      ],
+      "totalLines": 125,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/main.py": {
+      "filePath": "worker/app/main.py",
+      "contentHash": "e3287d023a9f4b609f38446fba43007e4fcea93e00f49301740e34ccdd49be86",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/schemas/jobs.py": {
+      "filePath": "worker/app/schemas/jobs.py",
+      "contentHash": "32b8f3fa2d75f6d998ae50cc33fc08555a65fba1ebee36b5d5ad673d84a67a8e",
+      "functions": [],
+      "classes": [
+        {
+          "name": "JobType",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "JobStatus",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "ProcessingJobRow",
+          "methods": [],
+          "properties": [
+            "id",
+            "media_id",
+            "user_id",
+            "job_type",
+            "status",
+            "progress",
+            "current_step",
+            "error_message",
+            "queue_name",
+            "task_name",
+            "external_task_id",
+            "attempt_count",
+            "input",
+            "output",
+            "created_at",
+            "updated_at",
+            "started_at",
+            "completed_at"
+          ],
+          "exported": true,
+          "lineCount": 21
+        }
+      ],
+      "imports": [
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "enum",
+          "specifiers": [
+            "StrEnum"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "uuid",
+          "specifiers": [
+            "UUID"
+          ]
+        },
+        {
+          "source": "pydantic",
+          "specifiers": [
+            "BaseModel",
+            "ConfigDict",
+            "Field"
+          ]
+        }
+      ],
+      "exports": [
+        "JobType",
+        "JobStatus",
+        "ProcessingJobRow"
+      ],
+      "totalLines": 63,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/schemas/transcripts.py": {
+      "filePath": "worker/app/schemas/transcripts.py",
+      "contentHash": "648a71f46cd1ca5b42ac89d8f644572f24d0a94ab4f50e374cc7790b07fccf10",
+      "functions": [],
+      "classes": [
+        {
+          "name": "TranscriptJobMessage",
+          "methods": [],
+          "properties": [
+            "job_id",
+            "media_id",
+            "user_id",
+            "s3_key",
+            "task_name"
+          ],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "imports": [
+        {
+          "source": "typing",
+          "specifiers": [
+            "Literal"
+          ]
+        },
+        {
+          "source": "uuid",
+          "specifiers": [
+            "UUID"
+          ]
+        },
+        {
+          "source": "pydantic",
+          "specifiers": [
+            "BaseModel",
+            "ConfigDict",
+            "Field",
+            "constr"
+          ]
+        }
+      ],
+      "exports": [
+        "TranscriptJobMessage"
+      ],
+      "totalLines": 15,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/services/__init__.py": {
+      "filePath": "worker/app/services/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/services/ai_service.py": {
+      "filePath": "worker/app/services/ai_service.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/services/db_service.py": {
+      "filePath": "worker/app/services/db_service.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/services/ffmpeg_service.py": {
+      "filePath": "worker/app/services/ffmpeg_service.py",
+      "contentHash": "885f6944645886e8c657cde0811769f9772897b3479f19a06d7f5cd01f53f796",
+      "functions": [
+        {
+          "name": "_first_stream",
+          "params": [
+            "payload"
+          ],
+          "returnType": "dict[str, Any]",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "_to_int",
+          "params": [
+            "value"
+          ],
+          "returnType": "int | None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "_to_float",
+          "params": [
+            "value"
+          ],
+          "returnType": "float | None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "_command_name",
+          "params": [
+            "command"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "classes": [
+        {
+          "name": "FFmpegServiceError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "AudioMetadata",
+          "methods": [],
+          "properties": [
+            "path",
+            "duration_seconds",
+            "sample_rate",
+            "channels",
+            "codec_name"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "FFmpegService",
+          "methods": [
+            "__init__",
+            "extract_audio",
+            "probe_audio",
+            "_run"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 81
+        }
+      ],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "subprocess",
+          "specifiers": [
+            "subprocess"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "app.core.config",
+          "specifiers": [
+            "settings"
+          ]
+        }
+      ],
+      "exports": [
+        "FFmpegServiceError",
+        "AudioMetadata",
+        "FFmpegService",
+        "_first_stream",
+        "_to_int",
+        "_to_float",
+        "_command_name"
+      ],
+      "totalLines": 139,
+      "hasStructuralAnalysis": true
+    },
+    "worker/app/services/s3_service.py": {
+      "filePath": "worker/app/services/s3_service.py",
+      "contentHash": "7531188c10b35129db68d5942d32eeae2bd4b5edffe60c487aa110396115198c",
+      "functions": [],
+      "classes": [
+        {
+          "name": "S3ServiceError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "S3Service",
+          "methods": [
+            "__init__",
+            "download_file",
+            "download_to_tmp",
+            "upload_file",
+            "object_exists"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 63
+        }
+      ],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "boto3",
+          "specifiers": [
+            "boto3"
+          ]
+        },
+        {
+          "source": "botocore.exceptions",
+          "specifiers": [
+            "BotoCoreError",
+            "ClientError"
+          ]
+        },
+        {
+          "source": "app.core.config",
+          "specifiers": [
+            "settings"
+          ]
+        }
+      ],
+      "exports": [
+        "S3ServiceError",
+        "S3Service"
+      ],
+      "totalLines": 79,
+      "hasStructuralAnalysis": true
+    },
+    "worker/pyproject.toml": {
+      "filePath": "worker/pyproject.toml",
+      "contentHash": "ba67451d689cafbbe3e39d7ab2a9b4bbe267b319343645c59c1a2fc1ef0edd10",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "worker/README.md": {
+      "filePath": "worker/README.md",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    }
+  }
+}
