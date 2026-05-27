@@ -3,14 +3,13 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.jobs import JobStatus
-from app.schemas.transcripts import (
+from app.schemas.db.processsing_job import JobStatus
+from app.schemas.jobs.transcript_message import TranscriptJobMessage, TranscriptJobResultMessage
+from app.schemas.transcript.output import (
     TranscriptArtifactsOutput,
     TranscriptAudioOutput,
     TranscriptCompletedOutput,
-    TranscriptJobMessage,
     TranscriptJobOptions,
-    TranscriptJobResultMessage,
     TranscriptOutputSummary,
 )
 
@@ -44,9 +43,6 @@ def test_result_message_has_stable_shape_for_completed_and_skipped() -> None:
         "media_id": MEDIA_ID,
         "user_id": USER_ID,
         "status": JobStatus.COMPLETED,
-        "transcript_id": TRANSCRIPT_ID,
-        "segment_count": 2,
-        "word_count": 12,
     }
 
     completed = TranscriptJobResultMessage(skipped=False, **base).model_dump(mode="json", by_alias=True)
@@ -55,7 +51,15 @@ def test_result_message_has_stable_shape_for_completed_and_skipped() -> None:
     assert completed.keys() == skipped.keys()
     assert completed["type"] == "transcript.job.result"
     assert completed["version"] == 1
-    assert completed["transcriptId"] == str(TRANSCRIPT_ID)
+    assert completed == {
+        "type": "transcript.job.result",
+        "version": 1,
+        "jobId": str(JOB_ID),
+        "mediaId": str(MEDIA_ID),
+        "userId": str(USER_ID),
+        "status": "COMPLETED",
+        "skipped": False,
+    }
 
 
 def test_completed_output_shape_has_no_mock_field() -> None:

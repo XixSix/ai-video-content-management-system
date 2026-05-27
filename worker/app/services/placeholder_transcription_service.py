@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from app.schemas.transcripts import TranscriptJobOptions
+from app.schemas.transcript.output import TranscriptJobOptions
 from app.services.ffmpeg_service import AudioSanityResult
 
 PLACEHOLDER_TRANSCRIBER_MODEL = "worker-placeholder-transcriber-v1"

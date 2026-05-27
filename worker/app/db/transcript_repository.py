@@ -34,10 +34,13 @@ class PersistedTranscriptSummary:
         return self.full_text
 
 
-def find_transcript_by_job_id(session: Session, job_id: str) -> PersistedTranscriptSummary | None:
-    row = session.execute(
-        text(
-            """
+def find_transcript_by_job_id(
+    session: Session, job_id: str
+) -> PersistedTranscriptSummary | None:
+    row = (
+        session.execute(
+            text(
+                """
             SELECT
               t.id,
               t.media_id,
@@ -53,9 +56,12 @@ def find_transcript_by_job_id(session: Session, job_id: str) -> PersistedTranscr
             WHERE t.job_id = :job_id
             GROUP BY t.id
             """
-        ),
-        {"job_id": job_id},
-    ).mappings().one_or_none()
+            ),
+            {"job_id": job_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
 
     if row is None:
         return None

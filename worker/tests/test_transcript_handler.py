@@ -6,9 +6,9 @@ from uuid import UUID
 import pytest
 
 from app.handlers import transcript_handler
-from app.schemas.jobs import JobStatus, JobType, ProcessingJobRow
-from app.schemas.transcripts import TranscriptJobMessage
-from app.services.db_service import PersistedTranscriptSummary
+from app.db.transcript_repository import PersistedTranscriptSummary
+from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
+from app.schemas.jobs.transcript_message import TranscriptJobMessage
 from app.services.ffmpeg_service import AudioMetadata, AudioSanityError, AudioSanityResult
 from app.services.s3_service import S3ServiceError, S3SourceObjectNotFoundError
 
@@ -132,8 +132,8 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
 
     monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_step", mark_step)
     monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_completed", mark_completed)
-    monkeypatch.setattr(transcript_handler.db_service, "find_transcript_by_job_id", lambda session, job_id: None)
-    monkeypatch.setattr(transcript_handler.db_service, "save_transcript", save_transcript)
+    monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: None)
+    monkeypatch.setattr(transcript_handler.transcript_repository, "save_transcript", save_transcript)
     monkeypatch.setattr(transcript_handler.s3_service, "download_file", download_file)
     monkeypatch.setattr(transcript_handler.ffmpeg_service, "extract_audio", extract_audio)
     monkeypatch.setattr(transcript_handler.ffmpeg_service, "validate_audio", lambda audio_path: _audio(tmp_path))
@@ -157,9 +157,6 @@ def test_process_transcript_job_happy_path_returns_contract(
         "userId": str(USER_ID),
         "status": "COMPLETED",
         "skipped": False,
-        "transcriptId": str(TRANSCRIPT_ID),
-        "segmentCount": 2,
-        "wordCount": 4,
     }
     assert calls["downloaded"] == 1
     assert calls["extracted"] == 1
@@ -182,12 +179,14 @@ def test_process_transcript_job_checks_existing_before_download(
     tmp_path: Path,
 ) -> None:
     calls = _patch_common(monkeypatch, tmp_path)
-    monkeypatch.setattr(transcript_handler.db_service, "find_transcript_by_job_id", lambda session, job_id: _summary())
+    monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: _summary())
 
     result = transcript_handler.process_transcript_job(_message())
 
     assert result["skipped"] is True
-    assert result["transcriptId"] == str(TRANSCRIPT_ID)
+    assert "transcriptId" not in result
+    assert "segmentCount" not in result
+    assert "wordCount" not in result
     assert calls["downloaded"] == 0
     assert calls["extracted"] == 0
     assert calls["saved"] == 0
@@ -203,14 +202,16 @@ def test_process_transcript_job_skips_non_pending_with_result_contract(
         "find_processing_job",
         lambda session, job_id: _job(JobStatus.TRANSCRIBING),
     )
-    monkeypatch.setattr(transcript_handler.db_service, "find_transcript_by_job_id", lambda session, job_id: None)
+    monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: None)
 
     result = transcript_handler.process_transcript_job(_message())
 
     assert result["type"] == "transcript.job.result"
     assert result["status"] == "TRANSCRIBING"
     assert result["skipped"] is True
-    assert result["transcriptId"] is None
+    assert "transcriptId" not in result
+    assert "segmentCount" not in result
+    assert "wordCount" not in result
 
 
 def test_source_not_found_is_terminal(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

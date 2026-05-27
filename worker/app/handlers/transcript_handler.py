@@ -3,21 +3,28 @@ from pathlib import Path
 from typing import Any
 
 from app.core.config import settings
-from app.db import jobs_repository
+from app.db import jobs_repository, transcript_repository
 from app.db.client import get_db_session
-from app.schemas.jobs import JobStatus, JobType, ProcessingJobRow
-from app.schemas.transcripts import (
+from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
+from app.schemas.jobs.transcript_message import (
+    TranscriptJobMessage,
+    TranscriptJobResultMessage,
+)
+from app.schemas.transcript.output import (
     TranscriptArtifactsOutput,
     TranscriptAudioOutput,
     TranscriptCompletedOutput,
-    TranscriptJobMessage,
     TranscriptJobOptions,
-    TranscriptJobResultMessage,
     TranscriptOutputSummary,
 )
-from app.services import db_service
-from app.services.ffmpeg_service import AudioSanityError, AudioSanityResult, ffmpeg_service
-from app.services.placeholder_transcription_service import placeholder_transcription_service
+from app.services.ffmpeg_service import (
+    AudioSanityError,
+    AudioSanityResult,
+    ffmpeg_service,
+)
+from app.services.placeholder_transcription_service import (
+    placeholder_transcription_service,
+)
 from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
 
 
@@ -30,11 +37,11 @@ class TerminalTranscriptJobError(Exception):
 IN_PROGRESS_JOB_STATUSES = {
     JobStatus.EXTRACTING_AUDIO,
     JobStatus.TRANSCRIBING,
-    JobStatus.PREPROCESSING_TRANSCRIPT,
 }
 
 
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
+    """ """
     job_id = str(message.job_id)
 
     with get_db_session() as session:
@@ -58,7 +65,10 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
             current_job = jobs_repository.find_processing_job(session, job_id)
             _guard_job(message, current_job)
 
-        if current_job and current_job.status in IN_PROGRESS_JOB_STATUSES | {JobStatus.QUEUED, JobStatus.COMPLETED}:
+        if current_job and current_job.status in IN_PROGRESS_JOB_STATUSES | {
+            JobStatus.QUEUED,
+            JobStatus.COMPLETED,
+        }:
             return _skipped_result(message, current_job.status)
 
         raise TerminalTranscriptJobError("Processing job could not be marked queued")
@@ -72,7 +82,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
         if existing_transcript:
             output = _completed_output(existing_transcript, options=options, audio=None)
             _mark_completed(job_id, output)
-            return _result_message(message, status=JobStatus.COMPLETED, skipped=True, transcript=existing_transcript)
+            return _result_message(message, status=JobStatus.COMPLETED, skipped=True)
 
         _mark_job_step(
             job_id,
@@ -98,7 +108,9 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
             progress=60,
             current_step="Generating placeholder transcript",
         )
-        transcript_result = placeholder_transcription_service.transcribe(audio=audio, options=options)
+        transcript_result = placeholder_transcription_service.transcribe(
+            audio=audio, options=options
+        )
 
         _mark_job_step(
             job_id,
@@ -107,7 +119,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
             current_step="Saving transcript",
         )
         with get_db_session() as session:
-            transcript = db_service.save_transcript(
+            transcript = transcript_repository.save_transcript(
                 session,
                 job_id=job_id,
                 media_id=str(message.media_id),
@@ -117,16 +129,22 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
         output = _completed_output(transcript, options=options, audio=audio)
         _mark_completed(job_id, output)
 
-        return _result_message(message, status=JobStatus.COMPLETED, skipped=False, transcript=transcript)
+        return _result_message(message, status=JobStatus.COMPLETED, skipped=False)
     except S3SourceObjectNotFoundError as error:
-        raise TerminalTranscriptJobError(str(error), error_code=error.error_code) from error
+        raise TerminalTranscriptJobError(
+            str(error), error_code=error.error_code
+        ) from error
     except AudioSanityError as error:
-        raise TerminalTranscriptJobError(str(error), error_code=error.error_code) from error
+        raise TerminalTranscriptJobError(
+            str(error), error_code=error.error_code
+        ) from error
     finally:
         _cleanup_workspace(workspace)
 
 
-def _mark_job_step(job_id: str, *, status: JobStatus, progress: int, current_step: str) -> None:
+def _mark_job_step(
+    job_id: str, *, status: JobStatus, progress: int, current_step: str
+) -> None:
     with get_db_session() as session:
         jobs_repository.mark_job_step(
             session,
@@ -167,10 +185,14 @@ def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> N
         raise TerminalTranscriptJobError("Processing job was not found")
 
     if job.job_type != JobType.TRANSCRIBE:
-        raise TerminalTranscriptJobError(f"Expected TRANSCRIBE job, got {job.job_type.value}")
+        raise TerminalTranscriptJobError(
+            f"Expected TRANSCRIBE job, got {job.job_type.value}"
+        )
 
     if str(job.media_id) != str(message.media_id):
-        raise TerminalTranscriptJobError("Message mediaId does not match processing job")
+        raise TerminalTranscriptJobError(
+            "Message mediaId does not match processing job"
+        )
 
     if str(job.user_id) != str(message.user_id):
         raise TerminalTranscriptJobError("Message userId does not match processing job")
@@ -194,13 +216,15 @@ def _cleanup_workspace(workspace: Path) -> None:
     shutil.rmtree(workspace, ignore_errors=True)
 
 
-def _find_existing_transcript(job_id: str) -> db_service.PersistedTranscriptSummary | None:
+def _find_existing_transcript(
+    job_id: str,
+) -> transcript_repository.PersistedTranscriptSummary | None:
     with get_db_session() as session:
-        return db_service.find_transcript_by_job_id(session, job_id)
+        return transcript_repository.find_transcript_by_job_id(session, job_id)
 
 
 def _completed_output(
-    transcript: db_service.PersistedTranscriptSummary,
+    transcript: transcript_repository.PersistedTranscriptSummary,
     *,
     options: TranscriptJobOptions,
     audio: AudioSanityResult | None,
@@ -230,7 +254,6 @@ def _result_message(
     *,
     status: JobStatus,
     skipped: bool,
-    transcript: db_service.PersistedTranscriptSummary | None,
 ) -> dict[str, Any]:
     result = TranscriptJobResultMessage(
         job_id=message.job_id,
@@ -238,15 +261,10 @@ def _result_message(
         user_id=message.user_id,
         status=status,
         skipped=skipped,
-        transcript_id=transcript.id if transcript else None,
-        segment_count=transcript.segment_count if transcript else 0,
-        word_count=transcript.word_count if transcript else 0,
     )
 
     return result.model_dump(mode="json", by_alias=True)
 
 
 def _skipped_result(message: TranscriptJobMessage, status: JobStatus) -> dict[str, Any]:
-    existing_transcript = _find_existing_transcript(str(message.job_id))
-
-    return _result_message(message, status=status, skipped=True, transcript=existing_transcript)
+    return _result_message(message, status=status, skipped=True)
