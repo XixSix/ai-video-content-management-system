@@ -71,6 +71,10 @@ class Settings(BaseSettings):
     s3_secret_access_key: str = Field(alias="S3_SECRET_ACCESS_KEY")
     s3_force_path_style: bool = Field(default=True, alias="S3_FORCE_PATH_STYLE")
     tmp_dir: Path = Field(default=Path("/tmp/avcms-worker"), alias="TMP_DIR")
+    storage_dir: Path = Field(
+        default=WORKER_DIR / "app" / "storage",
+        alias="STORAGE_DIR",
+    )
 
     ffmpeg_binary: str = Field(default="ffmpeg", alias="FFMPEG_BINARY")
     ffprobe_binary: str = Field(default="ffprobe", alias="FFPROBE_BINARY")
