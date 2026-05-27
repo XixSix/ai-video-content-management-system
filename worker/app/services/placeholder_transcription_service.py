@@ -33,6 +33,7 @@ class PlaceholderTranscriptionService:
         audio: AudioSanityResult,
         options: TranscriptJobOptions,
     ) -> PlaceholderTranscriptResult:
+        """Create deterministic placeholder segments for a validated audio file."""
         duration = audio.metadata.duration_seconds or 1.0
         language = "vi" if options.language == "auto" else options.language
         midpoint = max(0.5, min(duration / 2, duration - 0.1))
@@ -64,6 +65,7 @@ class PlaceholderTranscriptionService:
 
 
 def count_words(text: str) -> int:
+    """Count non-empty whitespace-delimited words in transcript text."""
     return len([word for word in text.split() if word.strip()])
 
 

@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.schemas.db.processsing_job import JobStatus, ProcessingJobRow
 
+
 def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | None:
+    """Return the processing job row for a job id if it exists."""
     row = session.execute(
         text(
             """
@@ -44,6 +46,7 @@ def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | Non
 
 
 def mark_job_queued_from_pending(session: Session, job_id: str) -> ProcessingJobRow | None:
+    """Atomically move a pending job to queued and return the claimed job row."""
     now = datetime.now(UTC)
     row = session.execute(
         text(
@@ -103,6 +106,7 @@ def mark_job_step(
     progress: int,
     current_step: str,
 ) -> None:
+    """Record the current worker step, progress, and running status for a job."""
     session.execute(
         text(
             """
@@ -129,6 +133,7 @@ def mark_job_step(
 
 
 def increment_attempt_count(session: Session, job_id: str) -> None:
+    """Increase the retry attempt counter for a processing job."""
     session.execute(
         text(
             """
@@ -144,6 +149,7 @@ def increment_attempt_count(session: Session, job_id: str) -> None:
 
 
 def mark_job_failed(session: Session, job_id: str, error_message: str) -> None:
+    """Mark a processing job as failed with its terminal error message."""
     session.execute(
         text(
             """
@@ -173,6 +179,7 @@ def mark_job_completed(
     *,
     output: dict[str, Any] | None = None,
 ) -> None:
+    """Mark a processing job as completed and persist its output payload."""
     session.execute(
         text(
             """

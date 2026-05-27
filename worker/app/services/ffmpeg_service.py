@@ -53,6 +53,7 @@ class FFmpegService:
         sample_rate: int = settings.audio_sample_rate,
         channels: int = settings.audio_channels,
     ) -> Path:
+        """Extract a normalized WAV audio track from a source media file."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         command = [
@@ -75,6 +76,7 @@ class FFmpegService:
         return output_path
 
     def probe_audio(self, audio_path: Path) -> AudioMetadata:
+        """Read the first audio stream metadata with ffprobe."""
         command = [
             self.ffprobe_binary,
             "-v",
@@ -108,6 +110,7 @@ class FFmpegService:
         expected_channels: int = settings.audio_channels,
         silence_threshold: float = 0.95,
     ) -> AudioSanityResult:
+        """Validate extracted audio metadata and reject unusable audio files."""
         if not audio_path.exists() or audio_path.stat().st_size == 0:
             raise AudioSanityError("AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty")
 
@@ -124,6 +127,7 @@ class FFmpegService:
         )
 
     def detect_silence_ratio(self, audio_path: Path, duration_seconds: float | None) -> float:
+        """Estimate how much of an audio file is silence using ffmpeg silencedetect."""
         if duration_seconds is None or duration_seconds <= 0:
             return 0.0
 
@@ -144,6 +148,7 @@ class FFmpegService:
         return parse_silence_ratio(result.stderr, duration_seconds)
 
     def _run(self, command: list[str]) -> subprocess.CompletedProcess[str]:
+        """Run an FFmpeg command and normalize process failures."""
         try:
             return subprocess.run(
                 command,
@@ -162,6 +167,7 @@ class FFmpegService:
 
 
 def _first_stream(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return the first ffprobe stream or raise a service error."""
     streams = payload.get("streams")
 
     if not isinstance(streams, list) or not streams:
@@ -190,6 +196,7 @@ def _to_float(value: Any) -> float | None:
 
 
 def parse_silence_ratio(stderr: str, duration_seconds: float) -> float:
+    """Calculate the bounded silence ratio from ffmpeg silencedetect output."""
     if duration_seconds <= 0:
         return 0.0
 
@@ -208,6 +215,7 @@ def validate_audio_sanity(
     expected_channels: int,
     silence_threshold: float = 0.95,
 ) -> AudioSanityResult:
+    """Validate audio extraction output against worker transcription requirements."""
     if not audio_path.exists() or audio_path.stat().st_size == 0:
         raise AudioSanityError("AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty")
 

@@ -34,6 +34,7 @@ class S3Service:
         )
 
     def download_file(self, object_key: str, destination_path: Path) -> Path:
+        """Download an object to disk and map missing sources to terminal errors."""
         destination_path.parent.mkdir(parents=True, exist_ok=True)
 
         try:
@@ -51,6 +52,7 @@ class S3Service:
         return destination_path
 
     def download_to_tmp(self, object_key: str, *, tmp_dir: Path = settings.tmp_dir) -> Path:
+        """Download an object into the worker temporary directory."""
         filename = Path(object_key).name
 
         if not filename:
@@ -59,6 +61,7 @@ class S3Service:
         return self.download_file(object_key, tmp_dir / filename)
 
     def upload_file(self, source_path: Path, object_key: str, *, content_type: str | None = None) -> str:
+        """Upload a local file and return the stored object key."""
         extra_args = {"ContentType": content_type} if content_type else None
 
         try:
@@ -72,6 +75,7 @@ class S3Service:
         return object_key
 
     def object_exists(self, object_key: str) -> bool:
+        """Return whether an object key exists in the configured bucket."""
         try:
             self.client.head_object(Bucket=self.bucket, Key=object_key)
             return True
@@ -87,6 +91,7 @@ class S3Service:
 
 
 def _is_not_found_error(error: ClientError) -> bool:
+    """Return whether an S3 client error represents a missing object."""
     error_payload = error.response.get("Error", {})
     error_code = str(error_payload.get("Code", ""))
     status_code = error.response.get("ResponseMetadata", {}).get("HTTPStatusCode")

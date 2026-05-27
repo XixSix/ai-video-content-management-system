@@ -9,6 +9,7 @@ from app.core.config import settings
 
 
 def _to_sqlalchemy_database_url(database_url: str) -> str:
+    """Convert Prisma-style PostgreSQL URLs to SQLAlchemy psycopg URLs."""
     if database_url.startswith("postgresql://"):
         return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
@@ -33,6 +34,7 @@ SessionLocal = sessionmaker(
 
 @contextmanager
 def get_db_session() -> Iterator[Session]:
+    """Yield a database session and commit or roll back the unit of work."""
     session = SessionLocal()
 
     try:

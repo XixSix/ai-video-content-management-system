@@ -33,7 +33,12 @@ class TerminalTranscriptJobError(Exception):
 
 
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
-    """Process audio before go to ai service"""
+    """Run the transcript pipeline from job validation through persistence.
+
+    The handler claims a pending job, reuses an existing transcript when present,
+    downloads source media, extracts and validates audio, persists transcript
+    output, and returns the stable result-message contract for the queue layer.
+    """
     job_id = str(message.job_id)
 
     with get_db_session() as session:
@@ -136,6 +141,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
 def _mark_job_step(
     job_id: str, *, status: JobStatus, progress: int, current_step: str
 ) -> None:
+    """Persist the current transcript job step in a short-lived session."""
     with get_db_session() as session:
         jobs_repository.mark_job_step(
             session,
@@ -147,6 +153,7 @@ def _mark_job_step(
 
 
 def _mark_completed(job_id: str, output: TranscriptCompletedOutput) -> None:
+    """Persist the completed transcript output payload for a job."""
     with get_db_session() as session:
         jobs_repository.mark_job_completed(
             session,
@@ -156,11 +163,13 @@ def _mark_completed(job_id: str, output: TranscriptCompletedOutput) -> None:
 
 
 def record_transcript_job_failure(job_id: str, error_message: str) -> None:
+    """Record a terminal transcript job failure for consumer error paths."""
     with get_db_session() as session:
         jobs_repository.mark_job_failed(session, job_id, error_message)
 
 
 def increment_transcript_job_attempt(job_id: str) -> int | None:
+    """Increment a transcript job retry counter and return the latest count."""
     with get_db_session() as session:
         jobs_repository.increment_attempt_count(session, job_id)
         job = jobs_repository.find_processing_job(session, job_id)
@@ -172,6 +181,7 @@ def increment_transcript_job_attempt(job_id: str) -> int | None:
 
 
 def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> None:
+    """Reject jobs that are missing, mismatched, failed, or the wrong type."""
     if not job:
         raise TerminalTranscriptJobError("Processing job was not found")
 
@@ -193,19 +203,23 @@ def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> N
 
 
 def _guard_retry_budget(job: ProcessingJobRow) -> None:
+    """Reject a job when the worker retry budget is already exhausted."""
     if job.attempt_count >= settings.task_max_retries:
         raise TerminalTranscriptJobError("Processing job exceeded max attempts")
 
 
 def _should_skip_job(job: ProcessingJobRow) -> bool:
+    """Return whether a job should be skipped because it is not pending."""
     return job.status != JobStatus.PENDING
 
 
 def _workspace_for_job(job_id: str) -> Path:
+    """Return the isolated temporary workspace path for a transcript job."""
     return settings.tmp_dir / "transcripts" / job_id
 
 
 def _download_source(s3_key: str, workspace: Path) -> Path:
+    """Download source media into the job workspace with its original suffix."""
     suffix = Path(s3_key).suffix or ".source"
     source_path = workspace / f"source{suffix}"
 
@@ -213,12 +227,14 @@ def _download_source(s3_key: str, workspace: Path) -> Path:
 
 
 def _cleanup_workspace(workspace: Path) -> None:
+    """Remove a transcript job workspace without failing cleanup."""
     shutil.rmtree(workspace, ignore_errors=True)
 
 
 def _find_existing_transcript(
     job_id: str,
 ) -> transcript_repository.PersistedTranscriptSummary | None:
+    """Return an existing transcript for idempotent transcript job handling."""
     with get_db_session() as session:
         return transcript_repository.find_transcript_by_job_id(session, job_id)
 
@@ -229,6 +245,7 @@ def _completed_output(
     options: TranscriptJobOptions,
     audio: AudioSanityResult | None,
 ) -> TranscriptCompletedOutput:
+    """Build the completed job output from transcript, audio, and options data."""
     return TranscriptCompletedOutput(
         transcript=TranscriptOutputSummary(
             id=transcript.id,
@@ -255,6 +272,7 @@ def _result_message(
     status: JobStatus,
     skipped: bool,
 ) -> dict[str, Any]:
+    """Build the queue result message with API-compatible JSON aliases."""
     result = TranscriptJobResultMessage(
         job_id=message.job_id,
         media_id=message.media_id,
@@ -267,4 +285,5 @@ def _result_message(
 
 
 def _skipped_result(message: TranscriptJobMessage, status: JobStatus) -> dict[str, Any]:
+    """Build a skipped transcript result for already claimed or completed jobs."""
     return _result_message(message, status=status, skipped=True)

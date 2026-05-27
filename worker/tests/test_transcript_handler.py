@@ -165,7 +165,6 @@ def test_process_transcript_job_happy_path_returns_contract(
         JobStatus.EXTRACTING_AUDIO,
         JobStatus.EXTRACTING_AUDIO,
         JobStatus.TRANSCRIBING,
-        JobStatus.PREPROCESSING_TRANSCRIPT,
     ]
     assert calls["completed_output"]["type"] == "transcript.completed"
     assert calls["completed_output"]["transcript"]["source"] == "IMPORTED"

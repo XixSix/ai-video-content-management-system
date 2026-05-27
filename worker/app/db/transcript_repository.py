@@ -25,6 +25,7 @@ class PersistedTranscriptSummary:
 
     @property
     def full_text_preview(self) -> str | None:
+        """Return a bounded preview of transcript text for job outputs."""
         if not self.full_text:
             return None
 
@@ -37,6 +38,7 @@ class PersistedTranscriptSummary:
 def find_transcript_by_job_id(
     session: Session, job_id: str
 ) -> PersistedTranscriptSummary | None:
+    """Find an already persisted transcript summary for a processing job."""
     row = (
         session.execute(
             text(
@@ -76,6 +78,7 @@ def save_transcript(
     media_id: str,
     result: PlaceholderTranscriptResult,
 ) -> PersistedTranscriptSummary:
+    """Persist a transcript and timestamped segments unless the job already has one."""
     existing = find_transcript_by_job_id(session, job_id)
 
     if existing:
@@ -205,6 +208,7 @@ def save_transcript(
 
 
 def _summary_from_row(row: object) -> PersistedTranscriptSummary:
+    """Map a SQLAlchemy result row into a transcript summary."""
     return PersistedTranscriptSummary(
         id=UUID(str(row["id"])),
         media_id=UUID(str(row["media_id"])),

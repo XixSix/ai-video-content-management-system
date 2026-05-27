@@ -25,6 +25,7 @@ def handle_transcript_job(
     self,
     **kwargs: Any,
 ) -> dict[str, Any]:
+    """Validate a transcript task payload and apply terminal or retry handling."""
     job_id = kwargs.get("jobId")
 
     try:
