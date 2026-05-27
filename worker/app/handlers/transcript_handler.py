@@ -22,9 +22,7 @@ from app.services.ffmpeg_service import (
     AudioSanityResult,
     ffmpeg_service,
 )
-from app.services.placeholder_transcription_service import (
-    placeholder_transcription_service,
-)
+from app.services.placeholder_transcription_service import placeholder_transcription_service
 from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
 
 
@@ -34,38 +32,37 @@ class TerminalTranscriptJobError(Exception):
         super().__init__(f"{error_code}: {message}" if error_code else message)
 
 
-IN_PROGRESS_JOB_STATUSES = {
-    JobStatus.EXTRACTING_AUDIO,
-    JobStatus.TRANSCRIBING,
-}
-
-
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
-    """ """
+    """Process audio before go to ai service"""
     job_id = str(message.job_id)
 
     with get_db_session() as session:
         job = jobs_repository.find_processing_job(session, job_id)
         _guard_job(message, job)
+        _guard_retry_budget(job)
 
-    if job.status == JobStatus.FAILED:
-        raise TerminalTranscriptJobError("Processing job is already failed")
-
-    if job.attempt_count >= settings.task_max_retries:
-        raise TerminalTranscriptJobError("Processing job exceeded max attempts")
-
-    if job.status != JobStatus.PENDING:
+    if _should_skip_job(job):
         return _skipped_result(message, job.status)
 
     with get_db_session() as session:
         queued_job = jobs_repository.mark_job_queued_from_pending(session, job_id)
 
+    """
+    Handle race condition when other worker pick up job
+    Flows:
+    - Query job again
+    - Find current status
+    - Check if processing => return skipped message
+    - Else mark failed
+    """
     if not queued_job:
         with get_db_session() as session:
             current_job = jobs_repository.find_processing_job(session, job_id)
             _guard_job(message, current_job)
 
-        if current_job and current_job.status in IN_PROGRESS_JOB_STATUSES | {
+        if current_job and current_job.status in {
+            JobStatus.EXTRACTING_AUDIO,
+            JobStatus.TRANSCRIBING,
             JobStatus.QUEUED,
             JobStatus.COMPLETED,
         }:
@@ -112,12 +109,6 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
             audio=audio, options=options
         )
 
-        _mark_job_step(
-            job_id,
-            status=JobStatus.PREPROCESSING_TRANSCRIPT,
-            progress=80,
-            current_step="Saving transcript",
-        )
         with get_db_session() as session:
             transcript = transcript_repository.save_transcript(
                 session,
@@ -199,6 +190,15 @@ def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> N
 
     if job.status == JobStatus.FAILED:
         raise TerminalTranscriptJobError("Processing job is already failed")
+
+
+def _guard_retry_budget(job: ProcessingJobRow) -> None:
+    if job.attempt_count >= settings.task_max_retries:
+        raise TerminalTranscriptJobError("Processing job exceeded max attempts")
+
+
+def _should_skip_job(job: ProcessingJobRow) -> bool:
+    return job.status != JobStatus.PENDING
 
 
 def _workspace_for_job(job_id: str) -> Path:
