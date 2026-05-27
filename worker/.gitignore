@@ -1,4 +1,6 @@
 __pycache__/
 **/__pycache__/
 *.py[cod]
-storage/
+storage/*
+app/storage/*
+!app/storage/.gitkeep

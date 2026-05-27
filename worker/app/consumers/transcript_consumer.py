@@ -26,21 +26,22 @@ def handle_transcript_job(
     **kwargs: Any,
 ) -> dict[str, Any]:
     """Validate a transcript task payload and apply terminal or retry handling."""
-    job_id = kwargs.get("jobId")
+    raw_job_id = kwargs.get("jobId")
+    job_id = raw_job_id if isinstance(raw_job_id, str) else None
 
     try:
         message = TranscriptJobMessage.model_validate(kwargs)
         return process_transcript_job(message)
     except ValidationError as error:
-        if isinstance(job_id, str):
+        if job_id is not None:
             record_transcript_job_failure(job_id, f"Invalid transcript task payload: {error}")
         raise
     except TerminalTranscriptJobError as error:
-        if isinstance(job_id, str):
+        if job_id is not None:
             record_transcript_job_failure(job_id, str(error))
         raise
     except Exception as error:
-        if not isinstance(job_id, str):
+        if job_id is None:
             raise
 
         attempt_count = increment_transcript_job_attempt(job_id)
