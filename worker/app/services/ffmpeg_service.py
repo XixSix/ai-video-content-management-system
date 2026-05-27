@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,6 +12,12 @@ class FFmpegServiceError(Exception):
     pass
 
 
+class AudioSanityError(Exception):
+    def __init__(self, error_code: str, message: str) -> None:
+        self.error_code = error_code
+        super().__init__(f"{error_code}: {message}")
+
+
 @dataclass(frozen=True)
 class AudioMetadata:
     path: Path
@@ -18,6 +25,12 @@ class AudioMetadata:
     sample_rate: int | None
     channels: int | None
     codec_name: str | None
+
+
+@dataclass(frozen=True)
+class AudioSanityResult:
+    metadata: AudioMetadata
+    silence_ratio: float
 
 
 class FFmpegService:
@@ -87,6 +100,49 @@ class FFmpegService:
             codec_name=stream.get("codec_name"),
         )
 
+    def validate_audio(
+        self,
+        audio_path: Path,
+        *,
+        expected_sample_rate: int = settings.audio_sample_rate,
+        expected_channels: int = settings.audio_channels,
+        silence_threshold: float = 0.95,
+    ) -> AudioSanityResult:
+        if not audio_path.exists() or audio_path.stat().st_size == 0:
+            raise AudioSanityError("AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty")
+
+        metadata = self.probe_audio(audio_path)
+        silence_ratio = self.detect_silence_ratio(audio_path, metadata.duration_seconds)
+
+        return validate_audio_sanity(
+            audio_path,
+            metadata=metadata,
+            silence_ratio=silence_ratio,
+            expected_sample_rate=expected_sample_rate,
+            expected_channels=expected_channels,
+            silence_threshold=silence_threshold,
+        )
+
+    def detect_silence_ratio(self, audio_path: Path, duration_seconds: float | None) -> float:
+        if duration_seconds is None or duration_seconds <= 0:
+            return 0.0
+
+        command = [
+            self.ffmpeg_binary,
+            "-hide_banner",
+            "-nostats",
+            "-i",
+            str(audio_path),
+            "-af",
+            "silencedetect=noise=-50dB:d=0.5",
+            "-f",
+            "null",
+            "-",
+        ]
+
+        result = self._run(command)
+        return parse_silence_ratio(result.stderr, duration_seconds)
+
     def _run(self, command: list[str]) -> subprocess.CompletedProcess[str]:
         try:
             return subprocess.run(
@@ -96,6 +152,8 @@ class FFmpegService:
                 text=True,
                 timeout=self.timeout_seconds,
             )
+        except FileNotFoundError as error:
+            raise FFmpegServiceError(f"FFmpeg binary not found: {command[0]}") from error
         except subprocess.TimeoutExpired as error:
             raise FFmpegServiceError(f"Command timed out: {_command_name(command)}") from error
         except subprocess.CalledProcessError as error:
@@ -129,6 +187,46 @@ def _to_float(value: Any) -> float | None:
         return None
 
     return float(value)
+
+
+def parse_silence_ratio(stderr: str, duration_seconds: float) -> float:
+    if duration_seconds <= 0:
+        return 0.0
+
+    durations = [float(match) for match in re.findall(r"silence_duration:\s*([0-9.]+)", stderr)]
+    total_silence = sum(durations)
+
+    return min(1.0, max(0.0, total_silence / duration_seconds))
+
+
+def validate_audio_sanity(
+    audio_path: Path,
+    *,
+    metadata: AudioMetadata,
+    silence_ratio: float,
+    expected_sample_rate: int,
+    expected_channels: int,
+    silence_threshold: float = 0.95,
+) -> AudioSanityResult:
+    if not audio_path.exists() or audio_path.stat().st_size == 0:
+        raise AudioSanityError("AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty")
+
+    if metadata.duration_seconds is None or metadata.duration_seconds <= 0:
+        raise AudioSanityError("AUDIO_INVALID_DURATION", "Extracted audio duration is missing or invalid")
+
+    if metadata.sample_rate is None or metadata.sample_rate != expected_sample_rate:
+        raise AudioSanityError(
+            "AUDIO_INVALID_SAMPLE_RATE",
+            f"Expected sample rate {expected_sample_rate}, got {metadata.sample_rate}",
+        )
+
+    if metadata.channels is None or metadata.channels != expected_channels:
+        raise AudioSanityError("AUDIO_INVALID_CHANNELS", f"Expected {expected_channels} channel(s), got {metadata.channels}")
+
+    if silence_ratio > silence_threshold:
+        raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")
+
+    return AudioSanityResult(metadata=metadata, silence_ratio=silence_ratio)
 
 
 def _command_name(command: list[str]) -> str:

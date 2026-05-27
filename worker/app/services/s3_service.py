@@ -10,6 +10,10 @@ class S3ServiceError(Exception):
     pass
 
 
+class S3SourceObjectNotFoundError(S3ServiceError):
+    error_code = "SOURCE_OBJECT_NOT_FOUND"
+
+
 class S3Service:
     def __init__(
         self,
@@ -34,7 +38,14 @@ class S3Service:
 
         try:
             self.client.download_file(self.bucket, object_key, str(destination_path))
-        except (BotoCoreError, ClientError) as error:
+        except ClientError as error:
+            if _is_not_found_error(error):
+                raise S3SourceObjectNotFoundError(
+                    f"{S3SourceObjectNotFoundError.error_code}: s3://{self.bucket}/{object_key} was not found"
+                ) from error
+
+            raise S3ServiceError(f"Failed to download s3://{self.bucket}/{object_key}") from error
+        except BotoCoreError as error:
             raise S3ServiceError(f"Failed to download s3://{self.bucket}/{object_key}") from error
 
         return destination_path
@@ -73,6 +84,14 @@ class S3Service:
             raise S3ServiceError(f"Failed to check s3://{self.bucket}/{object_key}") from error
         except BotoCoreError as error:
             raise S3ServiceError(f"Failed to check s3://{self.bucket}/{object_key}") from error
+
+
+def _is_not_found_error(error: ClientError) -> bool:
+    error_payload = error.response.get("Error", {})
+    error_code = str(error_payload.get("Code", ""))
+    status_code = error.response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+    return status_code == 404 or error_code in {"404", "NoSuchKey", "NotFound"}
 
 
 s3_service = S3Service()
