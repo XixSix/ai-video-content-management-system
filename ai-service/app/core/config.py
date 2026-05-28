@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 
 from pydantic import Field, PositiveInt
@@ -26,4 +27,9 @@ class Settings(BaseSettings):
         return f"{self.ai_service_host}:{self.ai_service_port}"
 
 
-settings = Settings()
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
