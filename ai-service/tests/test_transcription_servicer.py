@@ -4,7 +4,7 @@ import grpc
 import pytest
 
 from app.grpc.transcription_servicer import TranscriptionServicer
-from app.transcription.mock_transcriber import MOCK_TRANSCRIBER_MODEL
+from app.workflows.transcription.mock_transcriber import MOCK_TRANSCRIBER_MODEL
 from transcription.v1 import transcription_pb2
 
 

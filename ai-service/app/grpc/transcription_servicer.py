@@ -3,7 +3,7 @@ from pathlib import Path
 import grpc
 
 from app.proto_path import ensure_proto_generated_on_path
-from app.transcription.mock_transcriber import mock_transcriber
+from app.workflows.transcription.mock_transcriber import mock_transcriber
 
 ensure_proto_generated_on_path()
 
