@@ -82,5 +82,14 @@ class Settings(BaseSettings):
     audio_sample_rate: PositiveInt = Field(default=16000, alias="AUDIO_SAMPLE_RATE")
     audio_channels: PositiveInt = Field(default=1, alias="AUDIO_CHANNELS")
 
+    ai_service_grpc_target: str = Field(
+        default="localhost:50051",
+        alias="AI_SERVICE_GRPC_TARGET",
+    )
+    ai_service_grpc_timeout_seconds: PositiveInt = Field(
+        default=30,
+        alias="AI_SERVICE_GRPC_TIMEOUT_SECONDS",
+    )
+
 
 settings = Settings()

@@ -22,9 +22,7 @@ class TranscriptOutputSummary(BaseModel):
     id: UUID
     language: str | None
     source: Literal["IMPORTED"] = "IMPORTED"
-    model: Literal["worker-placeholder-transcriber-v1"] = (
-        "worker-placeholder-transcriber-v1"
-    )
+    model: str | None = None
     segment_count: int = Field(alias="segmentCount")
     word_count: int = Field(alias="wordCount")
     full_text_preview: str | None = Field(alias="fullTextPreview")
