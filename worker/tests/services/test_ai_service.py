@@ -5,6 +5,8 @@ import pytest
 
 from app.schemas.transcript.output import TranscriptJobOptions
 from app.services import ai_service
+from app.services.ai_service import AIServiceTerminalError
+from app.utils import ai_transcription_mapper
 from transcription.v1 import transcription_pb2
 
 
@@ -45,7 +47,7 @@ def _response(request_id: str = "job-1") -> transcription_pb2.TranscribeResponse
 def test_build_request_maps_transcript_options(tmp_path: Path) -> None:
     audio_path = tmp_path / "audio.wav"
 
-    request = ai_service._build_request(
+    request = ai_transcription_mapper.build_transcribe_request(
         request_id="job-1",
         audio_path=audio_path,
         options=_options(),
@@ -62,7 +64,7 @@ def test_build_request_maps_transcript_options(tmp_path: Path) -> None:
 
 
 def test_map_response_returns_transcript_result() -> None:
-    result = ai_service._map_response(
+    result = ai_transcription_mapper.map_transcribe_response(
         request_id="job-1",
         response=_response(),
     )
@@ -76,13 +78,11 @@ def test_map_response_returns_transcript_result() -> None:
 
 
 def test_map_response_rejects_mismatched_request_id() -> None:
-    with pytest.raises(ai_service.AIServiceTerminalError) as error:
-        ai_service._map_response(
+    with pytest.raises(ValueError, match="request_id does not match"):
+        ai_transcription_mapper.map_transcribe_response(
             request_id="job-1",
             response=_response(request_id="other-job"),
         )
-
-    assert error.value.error_code == "AI_SERVICE_INVALID_RESPONSE"
 
 
 def test_map_response_rejects_empty_segments() -> None:
@@ -93,10 +93,8 @@ def test_map_response_rejects_empty_segments() -> None:
         asr_model="ai-service-mock-transcriber-v1",
     )
 
-    with pytest.raises(ai_service.AIServiceTerminalError) as error:
-        ai_service._map_response(request_id="job-1", response=response)
-
-    assert error.value.error_code == "AI_SERVICE_INVALID_RESPONSE"
+    with pytest.raises(ValueError, match="did not include transcript segments"):
+        ai_transcription_mapper.map_transcribe_response(request_id="job-1", response=response)
 
 
 class FakeRpcError(grpc.RpcError):
@@ -131,6 +129,19 @@ class RaisingStub:
         raise self.error
 
 
+class RespondingStub:
+    def __init__(self, response: transcription_pb2.TranscribeResponse) -> None:
+        self.response = response
+
+    def Transcribe(
+        self,
+        request: transcription_pb2.TranscribeRequest,
+        *,
+        timeout: int,
+    ) -> transcription_pb2.TranscribeResponse:
+        return self.response
+
+
 def test_client_maps_terminal_grpc_error(monkeypatch: pytest.MonkeyPatch) -> None:
     grpc_error = FakeRpcError(grpc.StatusCode.NOT_FOUND)
     monkeypatch.setattr(ai_service.grpc, "insecure_channel", lambda target: FakeChannel())
@@ -140,7 +151,7 @@ def test_client_maps_terminal_grpc_error(monkeypatch: pytest.MonkeyPatch) -> Non
         lambda channel: RaisingStub(grpc_error),
     )
 
-    with pytest.raises(ai_service.AIServiceTerminalError) as error:
+    with pytest.raises(AIServiceTerminalError) as error:
         ai_service.AIServiceClient(target="unused").transcribe(
             request_id="job-1",
             audio_path=Path("audio.wav"),
@@ -148,6 +159,24 @@ def test_client_maps_terminal_grpc_error(monkeypatch: pytest.MonkeyPatch) -> Non
         )
 
     assert error.value.error_code == "AI_SERVICE_NOT_FOUND"
+
+
+def test_client_maps_invalid_response_to_terminal_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(ai_service.grpc, "insecure_channel", lambda target: FakeChannel())
+    monkeypatch.setattr(
+        ai_service.transcription_pb2_grpc,
+        "TranscriptionServiceStub",
+        lambda channel: RespondingStub(_response(request_id="other-job")),
+    )
+
+    with pytest.raises(AIServiceTerminalError) as error:
+        ai_service.AIServiceClient(target="unused").transcribe(
+            request_id="job-1",
+            audio_path=Path("audio.wav"),
+            options=_options(),
+        )
+
+    assert error.value.error_code == "AI_SERVICE_INVALID_RESPONSE"
 
 
 def test_client_bubbles_retryable_grpc_error(monkeypatch: pytest.MonkeyPatch) -> None:

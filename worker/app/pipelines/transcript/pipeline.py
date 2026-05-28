@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from app.core.config import settings
@@ -19,6 +20,8 @@ from app.services.ffmpeg_service import (
 from app.services.ai_service import AIServiceTerminalError, ai_service_client
 from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
 
+logger = logging.getLogger(__name__)
+
 
 class TerminalTranscriptPipelineError(Exception):
     def __init__(self, message: str, *, error_code: str | None = None) -> None:
@@ -34,17 +37,32 @@ def run_transcript_pipeline(
     """Run transcript media processing and return the completed output payload."""
     job_id = str(message.job_id)
     workspace = _workspace_for_job(job_id)
+    logger.info("Starting transcript pipeline job_id=%s workspace=%s", job_id, workspace)
 
     try:
         source_path = _download_source(message.s3_key, workspace)
+        logger.info("Downloaded source media job_id=%s path=%s", job_id, source_path)
         audio_path = workspace / "audio.wav"
         ffmpeg_service.extract_audio(source_path, audio_path)
+        logger.info("Extracted audio job_id=%s path=%s", job_id, audio_path)
         audio = ffmpeg_service.validate_audio(audio_path)
+        logger.info(
+            "Validated audio job_id=%s duration_seconds=%s silence_ratio=%s",
+            job_id,
+            audio.metadata.duration_seconds,
+            audio.silence_ratio,
+        )
 
         transcript_result = ai_service_client.transcribe(
             request_id=job_id,
             audio_path=audio_path,
             options=options,
+        )
+        logger.info(
+            "Received transcript result job_id=%s segment_count=%s word_count=%s",
+            job_id,
+            len(transcript_result.segments),
+            transcript_result.word_count,
         )
 
         with get_db_session() as session:
@@ -55,18 +73,22 @@ def run_transcript_pipeline(
                 result=transcript_result,
             )
 
+        logger.info("Persisted transcript job_id=%s transcript_id=%s", job_id, transcript.id)
         return _completed_output(transcript, options=options, audio=audio)
     except S3SourceObjectNotFoundError as error:
+        logger.warning("Source media not found job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,
         ) from error
     except AudioSanityError as error:
+        logger.warning("Audio sanity check failed job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,
         ) from error
     except AIServiceTerminalError as error:
+        logger.warning("AI service rejected transcript job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,
