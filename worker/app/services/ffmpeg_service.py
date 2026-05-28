@@ -1,11 +1,11 @@
 import json
 import re
 import subprocess
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from app.core.config import settings
+from app.schemas.transcript.audio import AudioMetadata, AudioSanityResult
 
 
 class FFmpegServiceError(Exception):
@@ -16,21 +16,6 @@ class AudioSanityError(Exception):
     def __init__(self, error_code: str, message: str) -> None:
         self.error_code = error_code
         super().__init__(f"{error_code}: {message}")
-
-
-@dataclass(frozen=True)
-class AudioMetadata:
-    path: Path
-    duration_seconds: float | None
-    sample_rate: int | None
-    channels: int | None
-    codec_name: str | None
-
-
-@dataclass(frozen=True)
-class AudioSanityResult:
-    metadata: AudioMetadata
-    silence_ratio: float
 
 
 class FFmpegService:

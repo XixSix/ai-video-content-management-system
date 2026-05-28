@@ -8,9 +8,10 @@ import pytest
 from app.db.transcript_repository import PersistedTranscriptSummary
 from app.pipelines.transcript import pipeline as transcript_pipeline
 from app.schemas.jobs.transcript_message import TranscriptJobMessage
+from app.schemas.transcript.audio import AudioMetadata, AudioSanityResult
 from app.schemas.transcript.output import TranscriptJobOptions
 from app.schemas.transcript.result import TranscriptResult, TranscriptSegmentResult
-from app.services.ffmpeg_service import AudioMetadata, AudioSanityError, AudioSanityResult
+from app.services.ffmpeg_service import AudioSanityError
 from app.services.s3_service import S3SourceObjectNotFoundError
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")

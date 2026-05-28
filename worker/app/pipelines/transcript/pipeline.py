@@ -12,9 +12,9 @@ from app.schemas.transcript.output import (
     TranscriptJobOptions,
     TranscriptOutputSummary,
 )
+from app.schemas.transcript.audio import AudioSanityResult
 from app.services.ffmpeg_service import (
     AudioSanityError,
-    AudioSanityResult,
     ffmpeg_service,
 )
 from app.services.ai_service import AIServiceTerminalError, ai_service_client

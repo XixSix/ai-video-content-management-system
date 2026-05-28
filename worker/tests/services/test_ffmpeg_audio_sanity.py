@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
+from app.schemas.transcript.audio import AudioMetadata
 from app.services.ffmpeg_service import (
-    AudioMetadata,
     AudioSanityError,
     FFmpegService,
     FFmpegServiceError,
