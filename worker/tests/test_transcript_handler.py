@@ -10,6 +10,7 @@ from app.pipelines.transcript import pipeline as transcript_pipeline
 from app.db.transcript_repository import PersistedTranscriptSummary
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.transcript_message import TranscriptJobMessage
+from app.schemas.transcript.result import TranscriptResult, TranscriptSegmentResult
 from app.services.ffmpeg_service import AudioMetadata, AudioSanityError, AudioSanityResult
 from app.services.s3_service import S3ServiceError, S3SourceObjectNotFoundError
 
@@ -76,7 +77,7 @@ def _summary() -> PersistedTranscriptSummary:
         job_id=JOB_ID,
         language="vi",
         source="IMPORTED",
-        model="worker-placeholder-transcriber-v1",
+        model="ai-service-mock-transcriber-v1",
         full_text="Xin chao the gioi",
         segment_count=2,
         word_count=4,
@@ -103,6 +104,7 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
         "extracted": 0,
         "steps": [],
         "saved": 0,
+        "called_ai_service": 0,
     }
 
     monkeypatch.setattr(transcript_handler, "get_db_session", _session)
@@ -132,6 +134,35 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
         calls["saved"] += 1
         return _summary()
 
+    def transcribe(
+        *,
+        request_id: str,
+        audio_path: Path,
+        options: object,
+    ) -> TranscriptResult:
+        calls["called_ai_service"] += 1
+        assert request_id == str(JOB_ID)
+        assert audio_path == tmp_path / "storage" / "transcripts" / str(JOB_ID) / "audio.wav"
+        return TranscriptResult(
+            language="vi",
+            source="IMPORTED",
+            model="ai-service-mock-transcriber-v1",
+            full_text="Xin chao the gioi",
+            segments=[
+                TranscriptSegmentResult(
+                    start_time=0.0,
+                    end_time=1.0,
+                    text="Xin chao",
+                ),
+                TranscriptSegmentResult(
+                    start_time=1.0,
+                    end_time=2.0,
+                    text="the gioi",
+                ),
+            ],
+            word_count=4,
+        )
+
     monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_completed", mark_completed)
     monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_step", mark_step)
     monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: None)
@@ -140,6 +171,7 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
     monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)
     monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio)
     monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "validate_audio", lambda audio_path: _audio(tmp_path))
+    monkeypatch.setattr(transcript_pipeline.ai_service_client, "transcribe", transcribe)
 
     return calls
 
@@ -163,13 +195,14 @@ def test_process_transcript_job_happy_path_returns_contract(
     }
     assert calls["downloaded"] == 1
     assert calls["extracted"] == 1
+    assert calls["called_ai_service"] == 1
     assert calls["saved"] == 1
     assert calls["steps"] == [
         (JobStatus.TRANSCRIBING, 50, "Processing transcript"),
     ]
     assert calls["completed_output"]["type"] == "transcript.completed"
     assert calls["completed_output"]["transcript"]["source"] == "IMPORTED"
-    assert calls["completed_output"]["transcript"]["model"] == "worker-placeholder-transcriber-v1"
+    assert calls["completed_output"]["transcript"]["model"] == "ai-service-mock-transcriber-v1"
     assert "mock" not in calls["completed_output"]
     storage_workspace = tmp_path / "storage" / "transcripts" / str(JOB_ID)
     assert (storage_workspace / "source.mp4").read_bytes() == b"video"

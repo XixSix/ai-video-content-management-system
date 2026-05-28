@@ -9,11 +9,8 @@ from app.db.transcript_repository import PersistedTranscriptSummary
 from app.pipelines.transcript import pipeline as transcript_pipeline
 from app.schemas.jobs.transcript_message import TranscriptJobMessage
 from app.schemas.transcript.output import TranscriptJobOptions
+from app.schemas.transcript.result import TranscriptResult, TranscriptSegmentResult
 from app.services.ffmpeg_service import AudioMetadata, AudioSanityError, AudioSanityResult
-from app.services.placeholder_transcription_service import (
-    PlaceholderTranscriptResult,
-    PlaceholderTranscriptSegment,
-)
 from app.services.s3_service import S3SourceObjectNotFoundError
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
@@ -66,20 +63,20 @@ def _audio(audio_path: Path) -> AudioSanityResult:
     )
 
 
-def _transcript_result() -> PlaceholderTranscriptResult:
-    return PlaceholderTranscriptResult(
+def _transcript_result() -> TranscriptResult:
+    return TranscriptResult(
         language="vi",
         source="IMPORTED",
-        model="worker-placeholder-transcriber-v1",
+        model="ai-service-mock-transcriber-v1",
         full_text="Xin chao the gioi",
         segments=[
-            PlaceholderTranscriptSegment(
+            TranscriptSegmentResult(
                 start_time=0.0,
                 end_time=1.0,
                 text="Xin chao",
                 confidence=1.0,
             ),
-            PlaceholderTranscriptSegment(
+            TranscriptSegmentResult(
                 start_time=1.0,
                 end_time=2.0,
                 text="the gioi",
@@ -97,7 +94,7 @@ def _summary() -> PersistedTranscriptSummary:
         job_id=JOB_ID,
         language="vi",
         source="IMPORTED",
-        model="worker-placeholder-transcriber-v1",
+        model="ai-service-mock-transcriber-v1",
         full_text="Xin chao the gioi",
         segment_count=2,
         word_count=4,
@@ -111,7 +108,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
     calls: dict[str, object] = {
         "downloaded": 0,
         "extracted": 0,
-        "transcribed": 0,
+        "called_ai_service": 0,
         "saved": 0,
     }
     storage_dir = tmp_path / "storage"
@@ -138,9 +135,15 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         assert audio_path.read_bytes() == b"wav"
         return _audio(audio_path)
 
-    def transcribe(*, audio: AudioSanityResult, options: TranscriptJobOptions) -> PlaceholderTranscriptResult:
-        calls["transcribed"] += 1
-        assert audio.metadata.duration_seconds == 12.5
+    def transcribe(
+        *,
+        request_id: str,
+        audio_path: Path,
+        options: TranscriptJobOptions,
+    ) -> TranscriptResult:
+        calls["called_ai_service"] += 1
+        assert request_id == str(JOB_ID)
+        assert audio_path == storage_dir / "transcripts" / str(JOB_ID) / "audio.wav"
         assert options.language == "vi"
         return _transcript_result()
 
@@ -149,7 +152,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         *,
         job_id: str,
         media_id: str,
-        result: PlaceholderTranscriptResult,
+        result: TranscriptResult,
     ) -> PersistedTranscriptSummary:
         calls["saved"] += 1
         assert job_id == str(JOB_ID)
@@ -161,7 +164,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
     monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio)
     monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "validate_audio", validate_audio)
     monkeypatch.setattr(
-        transcript_pipeline.placeholder_transcription_service,
+        transcript_pipeline.ai_service_client,
         "transcribe",
         transcribe,
     )
@@ -172,7 +175,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
     assert calls == {
         "downloaded": 1,
         "extracted": 1,
-        "transcribed": 1,
+        "called_ai_service": 1,
         "saved": 1,
     }
     assert (storage_dir / "transcripts" / str(JOB_ID) / "source.mp4").read_bytes() == b"video"

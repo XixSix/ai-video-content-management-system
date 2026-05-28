@@ -67,6 +67,7 @@ def test_completed_output_shape_has_no_mock_field() -> None:
         transcript=TranscriptOutputSummary(
             id=TRANSCRIPT_ID,
             language="vi",
+            model="ai-service-mock-transcriber-v1",
             segment_count=2,
             word_count=12,
             full_text_preview="Xin chao",
@@ -89,7 +90,7 @@ def test_completed_output_shape_has_no_mock_field() -> None:
             "id": str(TRANSCRIPT_ID),
             "language": "vi",
             "source": "IMPORTED",
-            "model": "worker-placeholder-transcriber-v1",
+            "model": "ai-service-mock-transcriber-v1",
             "segmentCount": 2,
             "wordCount": 12,
             "fullTextPreview": "Xin chao",

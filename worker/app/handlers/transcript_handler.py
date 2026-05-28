@@ -178,6 +178,7 @@ def _completed_output(
         transcript=TranscriptOutputSummary(
             id=transcript.id,
             language=transcript.language,
+            model=transcript.model,
             segment_count=transcript.segment_count,
             word_count=transcript.word_count,
             full_text_preview=transcript.full_text_preview,

@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.services.placeholder_transcription_service import PlaceholderTranscriptResult
+from app.schemas.transcript.result import TranscriptResult
 
 FULL_TEXT_PREVIEW_MAX_LENGTH = 300
 
@@ -76,7 +76,7 @@ def save_transcript(
     *,
     job_id: str,
     media_id: str,
-    result: PlaceholderTranscriptResult,
+    result: TranscriptResult,
 ) -> PersistedTranscriptSummary:
     """Persist a transcript and timestamped segments unless the job already has one."""
     existing = find_transcript_by_job_id(session, job_id)
@@ -87,7 +87,6 @@ def save_transcript(
     now = datetime.now(UTC)
     transcript_id = str(uuid4())
     content = {
-        "placeholder": True,
         "segments": [
             {
                 "startTime": segment.start_time,
