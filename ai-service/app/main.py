@@ -1,5 +1,8 @@
-def main():
-    print("Hello from ai-service!")
+from app.grpc.server import serve
+
+
+def main() -> None:
+    serve()
 
 
 if __name__ == "__main__":
