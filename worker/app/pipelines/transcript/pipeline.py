@@ -41,28 +41,14 @@ def run_transcript_pipeline(
 
     try:
         source_path = _download_source(message.s3_key, workspace)
-        logger.info("Downloaded source media job_id=%s path=%s", job_id, source_path)
         audio_path = workspace / "audio.wav"
         ffmpeg_service.extract_audio(source_path, audio_path)
-        logger.info("Extracted audio job_id=%s path=%s", job_id, audio_path)
         audio = ffmpeg_service.validate_audio(audio_path)
-        logger.info(
-            "Validated audio job_id=%s duration_seconds=%s silence_ratio=%s",
-            job_id,
-            audio.metadata.duration_seconds,
-            audio.silence_ratio,
-        )
 
         transcript_result = ai_service_client.transcribe(
             request_id=job_id,
             audio_path=audio_path,
             options=options,
-        )
-        logger.info(
-            "Received transcript result job_id=%s segment_count=%s word_count=%s",
-            job_id,
-            len(transcript_result.segments),
-            transcript_result.word_count,
         )
 
         with get_db_session() as session:
@@ -73,7 +59,6 @@ def run_transcript_pipeline(
                 result=transcript_result,
             )
 
-        logger.info("Persisted transcript job_id=%s transcript_id=%s", job_id, transcript.id)
         return _completed_output(transcript, options=options, audio=audio)
     except S3SourceObjectNotFoundError as error:
         logger.warning("Source media not found job_id=%s error=%s", job_id, error)

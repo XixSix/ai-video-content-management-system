@@ -1,12 +1,9 @@
-import logging
 from pathlib import Path
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.core.config import settings
-
-logger = logging.getLogger(__name__)
 
 
 class S3ServiceError(Exception):
@@ -39,7 +36,6 @@ class S3Service:
     def download_file(self, object_key: str, destination_path: Path) -> Path:
         """Download an object to disk and map missing sources to terminal errors."""
         destination_path.parent.mkdir(parents=True, exist_ok=True)
-        logger.info("Downloading object from S3 bucket=%s key=%s", self.bucket, object_key)
 
         try:
             self.client.download_file(self.bucket, object_key, str(destination_path))
@@ -53,7 +49,6 @@ class S3Service:
         except BotoCoreError as error:
             raise S3ServiceError(f"Failed to download s3://{self.bucket}/{object_key}") from error
 
-        logger.info("Downloaded object from S3 bucket=%s key=%s path=%s", self.bucket, object_key, destination_path)
         return destination_path
 
     def download_to_tmp(self, object_key: str, *, tmp_dir: Path = settings.tmp_dir) -> Path:
@@ -68,7 +63,6 @@ class S3Service:
     def upload_file(self, source_path: Path, object_key: str, *, content_type: str | None = None) -> str:
         """Upload a local file and return the stored object key."""
         extra_args = {"ContentType": content_type} if content_type else None
-        logger.info("Uploading object to S3 bucket=%s key=%s path=%s", self.bucket, object_key, source_path)
 
         try:
             if extra_args:
@@ -78,7 +72,6 @@ class S3Service:
         except (BotoCoreError, ClientError) as error:
             raise S3ServiceError(f"Failed to upload {source_path} to s3://{self.bucket}/{object_key}") from error
 
-        logger.info("Uploaded object to S3 bucket=%s key=%s", self.bucket, object_key)
         return object_key
 
     def object_exists(self, object_key: str) -> bool:

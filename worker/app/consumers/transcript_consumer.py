@@ -63,7 +63,7 @@ def handle_transcript_job(
             raise
 
         try:
-            logger.info(
+            logger.warning(
                 "Retrying transcript job job_id=%s attempt_count=%s max_retries=%s",
                 job_id,
                 attempt_count,

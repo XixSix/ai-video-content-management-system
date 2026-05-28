@@ -41,11 +41,6 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
         _guard_retry_budget(job)
 
     if _should_skip_job(job):
-        logger.info(
-            "Skipping transcript job job_id=%s status=%s",
-            job_id,
-            job.status.value,
-        )
         return _skipped_result(message, job.status)
 
     with get_db_session() as session:
@@ -63,11 +58,6 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
             JobStatus.QUEUED,
             JobStatus.COMPLETED,
         }:
-            logger.info(
-                "Skipping already claimed transcript job job_id=%s status=%s",
-                job_id,
-                current_job.status.value,
-            )
             return _skipped_result(message, current_job.status)
 
         raise TerminalTranscriptJobError("Processing job could not be marked queued")
@@ -76,7 +66,6 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     existing_transcript = _find_existing_transcript(job_id)
 
     if existing_transcript:
-        logger.info("Transcript already exists for job_id=%s", job_id)
         output = _completed_output(
             existing_transcript,
             options=options,
@@ -95,7 +84,6 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
         ) from error
 
     _mark_completed(job_id, output)
-    logger.info("Completed transcript job job_id=%s", job_id)
 
     return _result_message(
         message,

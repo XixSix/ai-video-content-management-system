@@ -84,6 +84,7 @@ class AIServiceClient:
                 response=response,
             )
         except ValueError as error:
+            logger.warning("ai-service returned invalid response request_id=%s error=%s", request_id, error)
             raise AIServiceTerminalError(
                 str(error),
                 error_code="AI_SERVICE_INVALID_RESPONSE",
