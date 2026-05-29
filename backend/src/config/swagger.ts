@@ -127,6 +127,10 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Transcripts',
         description: 'Transcript generation and read endpoints'
+      },
+      {
+        name: 'Chapters',
+        description: 'Video chapter generation and read endpoints'
       }
     ]
   },

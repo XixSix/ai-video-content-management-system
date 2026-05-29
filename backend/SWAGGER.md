@@ -23,9 +23,11 @@ http://localhost:3000/api-docs.json
 ## Các Module đã được document
 
 ### 1. Health Check
+
 - `GET /api/v1/health` - Kiểm tra trạng thái API
 
 ### 2. Authentication
+
 - `POST /api/v1/auth/register` - Đăng ký user mới
 - `POST /api/v1/auth/login` - Đăng nhập
 - `POST /api/v1/auth/refresh` - Refresh access token
@@ -34,6 +36,7 @@ http://localhost:3000/api-docs.json
 - `GET /api/v1/auth/me` - Lấy thông tin user hiện tại
 
 ### 3. Media Management
+
 - `GET /api/v1/media` - Lấy danh sách media files (có pagination)
 - `POST /api/v1/media/upload-url` - Tạo presigned URL để upload
 - `POST /api/v1/media/complete-upload` - Hoàn tất upload
@@ -43,9 +46,15 @@ http://localhost:3000/api-docs.json
 - `PATCH /api/v1/media/:mediaId` - Cập nhật media (title, description)
 - `DELETE /api/v1/media/:mediaId` - Xóa media (soft delete)
 
+### 4. Video Chapters
+
+- `POST /api/v1/media/:mediaId/chapters/generate` - Tạo job generate video chapters
+- `GET /api/v1/media/:mediaId/chapters` - Lấy danh sách chapters của media
+
 ## Authentication trong Swagger UI
 
 API sử dụng HTTP-only cookies để authentication:
+
 - `accessToken` - Dùng cho các protected endpoints
 - `refreshToken` - Dùng cho refresh token endpoint
 
@@ -74,8 +83,10 @@ backend/src/
 │   │   └── auth.swagger.ts     # Auth endpoints documentation
 │   ├── health/
 │   │   └── health.swagger.ts   # Health check documentation
-│   └── media/
-│       └── media.swagger.ts    # Media endpoints documentation
+│   ├── media/
+│   │   └── media.swagger.ts    # Media endpoints documentation
+│   └── chaptering/
+│       └── chaptering.swagger.ts # Chapter endpoints documentation
 └── app.ts                      # Swagger UI integration
 ```
 
@@ -115,6 +126,7 @@ Tất cả request/response schemas trong Swagger documentation đều match v�
 ## Development
 
 Khi thay đổi swagger documentation:
+
 1. Sửa file `*.swagger.ts` tương ứng
 2. Restart server để thấy changes
 3. Refresh Swagger UI page
@@ -122,6 +134,7 @@ Khi thay đổi swagger documentation:
 ## Production
 
 Trong production, bạn có thể:
+
 - Disable Swagger UI bằng cách check `config.app.isProduction`
 - Hoặc protect Swagger UI endpoint với authentication middleware
 - Hoặc chỉ expose Swagger UI cho internal network
