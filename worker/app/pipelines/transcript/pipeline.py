@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from app.core.config import settings
@@ -11,13 +12,15 @@ from app.schemas.transcript.output import (
     TranscriptJobOptions,
     TranscriptOutputSummary,
 )
+from app.schemas.transcript.audio import AudioSanityResult
 from app.services.ffmpeg_service import (
     AudioSanityError,
-    AudioSanityResult,
     ffmpeg_service,
 )
 from app.services.ai_service import AIServiceTerminalError, ai_service_client
 from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
+
+logger = logging.getLogger(__name__)
 
 
 class TerminalTranscriptPipelineError(Exception):
@@ -34,6 +37,7 @@ def run_transcript_pipeline(
     """Run transcript media processing and return the completed output payload."""
     job_id = str(message.job_id)
     workspace = _workspace_for_job(job_id)
+    logger.info("Starting transcript pipeline job_id=%s workspace=%s", job_id, workspace)
 
     try:
         source_path = _download_source(message.s3_key, workspace)
@@ -57,16 +61,19 @@ def run_transcript_pipeline(
 
         return _completed_output(transcript, options=options, audio=audio)
     except S3SourceObjectNotFoundError as error:
+        logger.warning("Source media not found job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,
         ) from error
     except AudioSanityError as error:
+        logger.warning("Audio sanity check failed job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,
         ) from error
     except AIServiceTerminalError as error:
+        logger.warning("AI service rejected transcript job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,

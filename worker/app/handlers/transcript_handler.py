@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from app.core.config import settings
@@ -20,6 +21,8 @@ from app.schemas.transcript.output import (
     TranscriptOutputSummary,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class TerminalTranscriptJobError(Exception):
     def __init__(self, message: str, *, error_code: str | None = None) -> None:
@@ -30,6 +33,7 @@ class TerminalTranscriptJobError(Exception):
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     """Claim and validate a transcript job before delegating pipeline work."""
     job_id = str(message.job_id)
+    logger.info("Processing transcript job job_id=%s media_id=%s", job_id, message.media_id)
 
     with get_db_session() as session:
         job = jobs_repository.find_processing_job(session, job_id)
@@ -74,6 +78,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     try:
         output = run_transcript_pipeline(message, options=options)
     except TerminalTranscriptPipelineError as error:
+        logger.warning("Transcript pipeline terminal failure job_id=%s error=%s", job_id, error)
         raise TerminalTranscriptJobError(
             str(error), error_code=error.error_code
         ) from error

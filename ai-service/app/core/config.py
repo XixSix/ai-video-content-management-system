@@ -1,6 +1,8 @@
+from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
-from pydantic import Field, PositiveInt
+from pydantic import Field, PositiveInt, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 AI_SERVICE_DIR = Path(__file__).resolve().parents[2]
@@ -20,10 +22,38 @@ class Settings(BaseSettings):
         default=4,
         alias="AI_SERVICE_MAX_WORKERS",
     )
+    asr_provider: Literal["noop", "faster-whisper"] = Field(
+        default="noop",
+        alias="ASR_PROVIDER",
+    )
+    asr_language: str = Field(default="vi", alias="ASR_LANGUAGE")
+    asr_model_size: str = Field(default="small", alias="ASR_MODEL_SIZE")
+    asr_device: str = Field(default="cpu", alias="ASR_DEVICE")
+    asr_compute_type: str = Field(default="int8", alias="ASR_COMPUTE_TYPE")
+    asr_cpu_threads: PositiveInt = Field(default=4, alias="ASR_CPU_THREADS")
+    asr_num_workers: PositiveInt = Field(default=1, alias="ASR_NUM_WORKERS")
+    asr_model_storage_path: Path | None = Field(
+        default=None,
+        alias="ASR_MODEL_STORAGE_PATH",
+    )
+    asr_local_files_only: bool = Field(default=False, alias="ASR_LOCAL_FILES_ONLY")
 
     @property
     def bind_address(self) -> str:
         return f"{self.ai_service_host}:{self.ai_service_port}"
 
+    @field_validator("asr_model_storage_path", mode="before")
+    @classmethod
+    def empty_model_storage_path_as_none(cls, value: object) -> object:
+        if value == "":
+            return None
 
-settings = Settings()
+        return value
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()

@@ -5,7 +5,7 @@ from app.schemas.transcript.result import (
     TranscriptSegmentResult,
     count_words,
 )
-from app.services.ffmpeg_service import AudioSanityResult
+from app.schemas.transcript.audio import AudioSanityResult
 
 PLACEHOLDER_TRANSCRIBER_MODEL = "worker-placeholder-transcriber-v1"
 PLACEHOLDER_TRANSCRIPT_SOURCE = TRANSCRIPT_SOURCE_IMPORTED

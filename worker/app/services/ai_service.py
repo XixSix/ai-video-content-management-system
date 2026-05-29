@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import grpc
@@ -5,16 +6,17 @@ import grpc
 from app.core.config import settings
 from app.proto_path import ensure_proto_generated_on_path
 from app.schemas.transcript.output import TranscriptJobOptions
-from app.schemas.transcript.result import (
-    TRANSCRIPT_SOURCE_IMPORTED,
-    TranscriptResult,
-    TranscriptSegmentResult,
-    count_words,
+from app.schemas.transcript.result import TranscriptResult
+from app.utils.ai_transcription_mapper import (
+    build_transcribe_request,
+    map_transcribe_response,
 )
 
 ensure_proto_generated_on_path()
 
-from transcription.v1 import transcription_pb2, transcription_pb2_grpc  # noqa: E402
+from transcription.v1 import transcription_pb2_grpc  # type: ignore # noqa: E402
+
+logger = logging.getLogger(__name__)
 
 
 TERMINAL_GRPC_CODES = {
@@ -46,11 +48,12 @@ class AIServiceClient:
         audio_path: Path,
         options: TranscriptJobOptions,
     ) -> TranscriptResult:
-        request = _build_request(
+        request = build_transcribe_request(
             request_id=request_id,
             audio_path=audio_path,
             options=options,
         )
+        logger.info("Calling ai-service transcription request_id=%s target=%s", request_id, self.target)
 
         try:
             with grpc.insecure_channel(self.target) as channel:
@@ -61,82 +64,31 @@ class AIServiceClient:
                 )
         except grpc.RpcError as error:
             if error.code() in TERMINAL_GRPC_CODES:
+                logger.warning(
+                    "ai-service terminal gRPC error request_id=%s code=%s",
+                    request_id,
+                    error.code().name,
+                )
                 raise AIServiceTerminalError(
                     error.details() or "ai-service rejected transcript request",
                     error_code=f"AI_SERVICE_{error.code().name}",
                 ) from error
 
+            logger.exception("ai-service retryable gRPC error request_id=%s", request_id)
             raise
 
-        return _map_response(
-            request_id=request_id,
-            response=response,
-        )
-
-
-def _build_request(
-    *,
-    request_id: str,
-    audio_path: Path,
-    options: TranscriptJobOptions,
-) -> transcription_pb2.TranscribeRequest:
-    return transcription_pb2.TranscribeRequest(
-        request_id=request_id,
-        local_path=str(audio_path),
-        filename=audio_path.name,
-        content_type="audio/wav",
-        options=transcription_pb2.TranscriptionOptions(
-            language=options.language,
-            enable_vad=options.use_vad,
-            enable_diarization=options.use_diarization,
-            enable_source_separation=options.source_separation,
-        ),
-    )
-
-
-def _map_response(
-    *,
-    request_id: str,
-    response: transcription_pb2.TranscribeResponse,
-) -> TranscriptResult:
-    if response.request_id != request_id:
-        raise AIServiceTerminalError(
-            "ai-service response request_id does not match request",
-            error_code="AI_SERVICE_INVALID_RESPONSE",
-        )
-
-    segments = [
-        TranscriptSegmentResult(
-            start_time=segment.start_seconds,
-            end_time=segment.end_seconds,
-            text=segment.text,
-            confidence=None,
-            speaker_label=None,
-        )
-        for segment in response.segments
-        if segment.text.strip()
-    ]
-
-    if not segments:
-        raise AIServiceTerminalError(
-            "ai-service response did not include transcript segments",
-            error_code="AI_SERVICE_INVALID_RESPONSE",
-        )
-
-    full_text = response.full_text.strip() or " ".join(
-        segment.text for segment in segments
-    )
-    model = response.asr_model.strip() or "ai-service-unknown"
-    language = response.language.strip() or "auto"
-
-    return TranscriptResult(
-        language=language,
-        source=TRANSCRIPT_SOURCE_IMPORTED,
-        model=model,
-        full_text=full_text,
-        segments=segments,
-        word_count=count_words(full_text),
-    )
+        logger.info("ai-service transcription completed request_id=%s", request_id)
+        try:
+            return map_transcribe_response(
+                request_id=request_id,
+                response=response,
+            )
+        except ValueError as error:
+            logger.warning("ai-service returned invalid response request_id=%s error=%s", request_id, error)
+            raise AIServiceTerminalError(
+                str(error),
+                error_code="AI_SERVICE_INVALID_RESPONSE",
+            ) from error
 
 
 ai_service_client = AIServiceClient()
