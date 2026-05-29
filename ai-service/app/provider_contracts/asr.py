@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Protocol
 
-from app.provider_contracts.audio_decoder import AudioWaveform
 from app.schemas.transcript import TranscriptResult
 
 
@@ -12,4 +12,9 @@ class AsrPort(Protocol):
 
     def warm_up(self) -> None: ...
 
-    def transcribe(self, audio: AudioWaveform, language: str | None) -> TranscriptResult: ...
+    def transcribe(
+        self,
+        *,
+        local_path: Path,
+        language: str | None,
+    ) -> TranscriptResult: ...

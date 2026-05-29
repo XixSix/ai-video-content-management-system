@@ -11,10 +11,12 @@ class MockTranscriber:
         self,
         *,
         local_path: Path,
-        language: str,
+        language: str | None,
     ) -> TranscriptResult:
         """Return deterministic transcript text without running an ML model."""
-        selected_language = MOCK_LANGUAGE_DEFAULT if language in {"", "auto"} else language
+        selected_language = (
+            MOCK_LANGUAGE_DEFAULT if language in {None, "", "auto"} else language
+        )
         filename = local_path.name
         segments = [
             TranscriptSegmentResult(
@@ -38,6 +40,13 @@ class MockTranscriber:
             segments=segments,
             asr_model=MOCK_TRANSCRIBER_MODEL,
         )
+
+    @property
+    def model_name(self) -> str:
+        return MOCK_TRANSCRIBER_MODEL
+
+    def warm_up(self) -> None:
+        return None
 
 
 mock_transcriber = MockTranscriber()
