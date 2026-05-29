@@ -7,7 +7,7 @@ from app.workflows.transcription.mock_transcriber import mock_transcriber
 
 ensure_proto_generated_on_path()
 
-from transcription.v1 import transcription_pb2, transcription_pb2_grpc  # noqa: E402
+from transcription.v1 import transcription_pb2, transcription_pb2_grpc  # type: ignore # noqa: E402
 
 
 class TranscriptionServicer(transcription_pb2_grpc.TranscriptionServiceServicer):
