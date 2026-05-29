@@ -1,6 +1,6 @@
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
 import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
-import { MediaStatus } from '../../infrastructure/db/generated/prisma/client'
+import { MediaStatus, MediaType } from '../../infrastructure/db/generated/prisma/client'
 import { MediaError } from '../media/media.error'
 import { TranscriptError } from './transcripts.error'
 import {
@@ -22,11 +22,11 @@ import type {
 export const generateTranscript = async (input: GenerateTranscriptInput): Promise<GenerateTranscriptResult> => {
   const media = await getOwnedMedia(input.userId, input.mediaId)
 
-  if (media.status !== 'UPLOADED') {
+  if (media.status !== MediaStatus.UPLOADED) {
     throw MediaError.invalidState(`Cannot generate transcript for media in status ${media.status}`)
   }
 
-  if (media.type !== 'VIDEO') {
+  if (media.type !== MediaType.VIDEO) {
     throw MediaError.invalidState('Cannot generate transcript for non-video media')
   }
 
@@ -83,6 +83,14 @@ export const listMediaTranscripts = async (userId: string, mediaId: string): Pro
 
   if (media.status === MediaStatus.DELETED) {
     throw MediaError.notFound()
+  }
+
+  if (media.status !== MediaStatus.UPLOADED) {
+    throw MediaError.invalidState(`Cannot list transcripts for media in status ${media.status}`)
+  }
+
+  if (media.type !== 'VIDEO') {
+    throw MediaError.invalidState('Cannot list transcripts for non-video media')
   }
 
   const transcripts = await transcriptsRepo.findTranscriptsByMediaIdAndUserId(media.id, userId)
