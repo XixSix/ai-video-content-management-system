@@ -4,7 +4,6 @@ import grpc
 import pytest
 
 from app.grpc.transcription_servicer import TranscriptionServicer
-from app.workflows.transcription.mock_transcriber import MOCK_TRANSCRIBER_MODEL
 from transcription.v1 import transcription_pb2
 
 
@@ -35,7 +34,7 @@ def _request(audio_path: Path) -> transcription_pb2.TranscribeRequest:
     )
 
 
-def test_transcribe_returns_mock_response(tmp_path: Path) -> None:
+def test_transcribe_returns_noop_response(tmp_path: Path) -> None:
     audio_path = tmp_path / "audio.wav"
     audio_path.write_bytes(b"wav")
 
@@ -43,9 +42,9 @@ def test_transcribe_returns_mock_response(tmp_path: Path) -> None:
 
     assert response.request_id == "job-1"
     assert response.language == "vi"
-    assert response.asr_model == MOCK_TRANSCRIBER_MODEL
+    assert response.asr_model == ""
     assert response.full_text
-    assert len(response.segments) == 2
+    assert len(response.segments) == 1
     assert response.segments[0].start_seconds == 0.0
 
 

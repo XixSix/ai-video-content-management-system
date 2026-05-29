@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, PositiveInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,6 +22,20 @@ class Settings(BaseSettings):
         default=4,
         alias="AI_SERVICE_MAX_WORKERS",
     )
+    asr_provider: Literal["noop", "faster-whisper"] = Field(
+        default="noop",
+        alias="ASR_PROVIDER",
+    )
+    asr_model_size: str = Field(default="small", alias="ASR_MODEL_SIZE")
+    asr_device: str = Field(default="cpu", alias="ASR_DEVICE")
+    asr_compute_type: str = Field(default="int8", alias="ASR_COMPUTE_TYPE")
+    asr_cpu_threads: PositiveInt = Field(default=4, alias="ASR_CPU_THREADS")
+    asr_num_workers: PositiveInt = Field(default=1, alias="ASR_NUM_WORKERS")
+    asr_model_storage_path: Path | None = Field(
+        default=None,
+        alias="ASR_MODEL_STORAGE_PATH",
+    )
+    asr_local_files_only: bool = Field(default=False, alias="ASR_LOCAL_FILES_ONLY")
 
     @property
     def bind_address(self) -> str:
