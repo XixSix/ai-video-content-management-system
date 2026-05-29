@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from app.provider_contracts.asr import AsrPort
 from app.provider_contracts.audio_normalizer import AudioNormalizerPort
 from app.provider_contracts.source_separation import SourceSeparationPort
@@ -8,8 +6,6 @@ from app.schemas.transcript import TranscriptResult
 from app.schemas.transcription_request import TranscriptionRequest
 from app.workflows.transcription.errors import (
     InvalidTranscriptResultError,
-    LocalMediaNotFoundError,
-    MissingTranscriptionFieldError,
 )
 
 
@@ -28,11 +24,7 @@ class TranscriptionWorkflow:
         self._asr = asr
 
     def execute(self, request: TranscriptionRequest) -> TranscriptResult:
-        self._validate_request(request)
-
-        local_path = self._validate_request(request)
-
-        audio_path = self._normalizer.normalize(local_path)
+        audio_path = self._normalizer.normalize(request.local_path)
 
         if request.options.enable_source_separation:
             audio_path = self._source_separator.separate(audio_path)
@@ -46,18 +38,6 @@ class TranscriptionWorkflow:
         )
         self._validate_result(result)
         return result
-
-    def _validate_request(self, request: TranscriptionRequest) -> Path:
-        if not request.request_id.strip():
-            raise MissingTranscriptionFieldError("request_id")
-
-        if request.local_path is None:
-            raise MissingTranscriptionFieldError("local_path")
-
-        if not request.local_path.exists():
-            raise LocalMediaNotFoundError(request.local_path)
-
-        return request.local_path
 
     def _validate_result(self, result: TranscriptResult) -> None:
         if not result.segments:

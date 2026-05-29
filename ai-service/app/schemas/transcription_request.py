@@ -16,7 +16,7 @@ class TranscriptionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     request_id: str
-    local_path: Path | None
+    local_path: Path
     filename: str = ""
     content_type: str = ""
     options: TranscriptionOptionsInput = TranscriptionOptionsInput()

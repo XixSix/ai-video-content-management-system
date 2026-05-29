@@ -78,3 +78,61 @@ def test_transcribe_rejects_missing_local_path(tmp_path: Path) -> None:
         TranscriptionServicer().Transcribe(_request(missing_path), FakeContext())
 
     assert error.value.code == grpc.StatusCode.NOT_FOUND
+
+
+@pytest.mark.parametrize(
+    ("filename", "content_type"),
+    [
+        ("", "audio/wav"),
+        ("audio.wav", ""),
+    ],
+)
+def test_transcribe_rejects_missing_file_metadata(
+    tmp_path: Path,
+    filename: str,
+    content_type: str,
+) -> None:
+    audio_path = tmp_path / "audio.wav"
+    audio_path.write_bytes(b"wav")
+    request = _request(audio_path)
+    request.filename = filename
+    request.content_type = content_type
+
+    with pytest.raises(AbortError) as error:
+        TranscriptionServicer().Transcribe(request, FakeContext())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_transcribe_rejects_path_like_filename(tmp_path: Path) -> None:
+    audio_path = tmp_path / "audio.wav"
+    audio_path.write_bytes(b"wav")
+    request = _request(audio_path)
+    request.filename = "../audio.wav"
+
+    with pytest.raises(AbortError) as error:
+        TranscriptionServicer().Transcribe(request, FakeContext())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_transcribe_rejects_unsupported_content_type(tmp_path: Path) -> None:
+    audio_path = tmp_path / "audio.txt"
+    audio_path.write_text("not media")
+    request = _request(audio_path)
+    request.content_type = "text/plain"
+
+    with pytest.raises(AbortError) as error:
+        TranscriptionServicer().Transcribe(request, FakeContext())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_transcribe_rejects_directory_local_path(tmp_path: Path) -> None:
+    request = _request(tmp_path)
+    request.filename = "audio.wav"
+
+    with pytest.raises(AbortError) as error:
+        TranscriptionServicer().Transcribe(request, FakeContext())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
