@@ -27,6 +27,14 @@ class _CeleryAppSettings(BaseModel):
         default="transcript_task",
         alias="TRANSCRIPT_TASK_NAME",
     )
+    chaptering_queue_name: str = Field(
+        default="chaptering_queue",
+        alias="CHAPTERING_QUEUE_NAME",
+    )
+    chaptering_task_name: str = Field(
+        default="chaptering_task",
+        alias="CHAPTERING_TASK_NAME",
+    )
     worker_concurrency: PositiveInt = Field(default=1, alias="WORKER_CONCURRENCY")
     worker_prefetch_multiplier: PositiveInt = Field(
         default=1,
