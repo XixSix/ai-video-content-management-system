@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class TranscriptJobOptions(BaseModel):
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
-    language: Literal["vi", "auto"] = "auto"
+    language: Literal["vi", "auto", "en"] = "auto"
     generate_srt: bool = Field(default=True, alias="generateSrt")
     generate_vtt: bool = Field(default=True, alias="generateVtt")
     burn_transcript: bool = Field(default=False, alias="burnTranscript")

@@ -26,6 +26,7 @@ def build_transcription_workflow(
 def _build_asr(settings: Settings) -> AsrPort:
     if settings.asr_provider == "faster-whisper":
         return FasterWhisperAsr(
+            default_language=settings.asr_language,
             model_size=settings.asr_model_size,
             device=settings.asr_device,
             compute_type=settings.asr_compute_type,
@@ -35,4 +36,4 @@ def _build_asr(settings: Settings) -> AsrPort:
             local_files_only=settings.asr_local_files_only,
         )
 
-    return NoopAsr()
+    return NoopAsr(default_language=settings.asr_language)

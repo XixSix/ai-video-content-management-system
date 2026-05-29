@@ -9,13 +9,12 @@ from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_LANGUAGE = "vi"
-
 
 class FasterWhisperAsr:
     def __init__(
         self,
         *,
+        default_language: str,
         model_size: str,
         device: str,
         compute_type: str,
@@ -24,6 +23,7 @@ class FasterWhisperAsr:
         download_root: Path | None,
         local_files_only: bool,
     ) -> None:
+        self._default_language = default_language
         self._model_size = model_size
         self._device = device
         self._compute_type = compute_type
@@ -48,7 +48,8 @@ class FasterWhisperAsr:
         language: str | None,
     ) -> TranscriptResult:
         model = self._load_model()
-        requested_language = _language_for_faster_whisper(language)
+        selected_language = _selected_language(language, self._default_language)
+        requested_language = _language_for_faster_whisper(selected_language)
         segments, info = model.transcribe(
             str(local_path),
             language=requested_language,
@@ -66,7 +67,9 @@ class FasterWhisperAsr:
         ]
         full_text = " ".join(segment.text for segment in segment_results)
         detected_language = (
-            getattr(info, "language", None) or language or DEFAULT_LANGUAGE
+            getattr(info, "language", None)
+            or selected_language
+            or self._default_language
         )
 
         return TranscriptResult(
@@ -107,7 +110,14 @@ class FasterWhisperAsr:
             return self._model
 
 
-def _language_for_faster_whisper(language: str | None) -> str | None:
+def _selected_language(language: str | None, default_language: str) -> str:
+    if language in {None, ""}:
+        return default_language
+
+    return language
+
+
+def _language_for_faster_whisper(language: str) -> str | None:
     if language in {None, "", "auto"}:
         return None
 

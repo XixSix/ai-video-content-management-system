@@ -10,9 +10,10 @@ from app.schemas.db.processsing_job import JobStatus, ProcessingJobRow
 
 def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | None:
     """Return the processing job row for a job id if it exists."""
-    row = session.execute(
-        text(
-            """
+    row = (
+        session.execute(
+            text(
+                """
             SELECT
             id,
             media_id AS "mediaId",
@@ -35,9 +36,12 @@ def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | Non
             FROM processing_jobs
             WHERE id = :job_id
             """
-        ),
-        {"job_id": job_id},
-    ).mappings().one_or_none()
+            ),
+            {"job_id": job_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
 
     if row is None:
         return None
@@ -45,12 +49,15 @@ def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | Non
     return ProcessingJobRow.model_validate(dict(row))
 
 
-def mark_job_queued_from_pending(session: Session, job_id: str) -> ProcessingJobRow | None:
+def mark_job_queued_from_pending(
+    session: Session, job_id: str
+) -> ProcessingJobRow | None:
     """Atomically move a pending job to queued and return the claimed job row."""
     now = datetime.now(UTC)
-    row = session.execute(
-        text(
-            """
+    row = (
+        session.execute(
+            text(
+                """
             UPDATE processing_jobs
             SET
               status = :queued_status,
@@ -81,16 +88,19 @@ def mark_job_queued_from_pending(session: Session, job_id: str) -> ProcessingJob
               started_at AS "startedAt",
               completed_at AS "completedAt"
             """
-        ),
-        {
-            "job_id": job_id,
-            "queued_status": JobStatus.QUEUED.value,
-            "progress": 0,
-            "current_step": "Queued for transcription",
-            "pending_status": JobStatus.PENDING.value,
-            "now": now,
-        },
-    ).mappings().one_or_none()
+            ),
+            {
+                "job_id": job_id,
+                "queued_status": JobStatus.QUEUED.value,
+                "progress": 0,
+                "current_step": "Queued for transcription",
+                "pending_status": JobStatus.PENDING.value,
+                "now": now,
+            },
+        )
+        .mappings()
+        .one_or_none()
+    )
 
     if row is None:
         return None
@@ -133,18 +143,27 @@ def mark_job_step(
 
 
 def increment_attempt_count(session: Session, job_id: str) -> None:
-    """Increase the retry attempt counter for a processing job."""
+    """Increase retry attempts and release the job so Celery retry can reclaim it."""
     session.execute(
         text(
             """
             UPDATE processing_jobs
             SET
               attempt_count = attempt_count + 1,
+              status = :status,
+              progress = 0,
+              current_step = :current_step,
+              error_message = NULL,
               updated_at = :now
             WHERE id = :job_id
             """
         ),
-        {"job_id": job_id, "now": datetime.now(UTC)},
+        {
+            "job_id": job_id,
+            "status": JobStatus.PENDING.value,
+            "current_step": "Queued for retry",
+            "now": datetime.now(UTC),
+        },
     )
 
 

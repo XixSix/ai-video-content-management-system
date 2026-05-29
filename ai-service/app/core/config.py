@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, PositiveInt
+from pydantic import Field, PositiveInt, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 AI_SERVICE_DIR = Path(__file__).resolve().parents[2]
@@ -26,6 +26,7 @@ class Settings(BaseSettings):
         default="noop",
         alias="ASR_PROVIDER",
     )
+    asr_language: str = Field(default="vi", alias="ASR_LANGUAGE")
     asr_model_size: str = Field(default="small", alias="ASR_MODEL_SIZE")
     asr_device: str = Field(default="cpu", alias="ASR_DEVICE")
     asr_compute_type: str = Field(default="int8", alias="ASR_COMPUTE_TYPE")
@@ -40,6 +41,14 @@ class Settings(BaseSettings):
     @property
     def bind_address(self) -> str:
         return f"{self.ai_service_host}:{self.ai_service_port}"
+
+    @field_validator("asr_model_storage_path", mode="before")
+    @classmethod
+    def empty_model_storage_path_as_none(cls, value: object) -> object:
+        if value == "":
+            return None
+
+        return value
 
 
 @lru_cache(maxsize=1)

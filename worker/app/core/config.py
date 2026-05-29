@@ -76,7 +76,9 @@ class _StorageSettings(BaseModel):
 class _FfmpegSettings(BaseModel):
     ffmpeg_binary: str = Field(default="ffmpeg", alias="FFMPEG_BINARY")
     ffprobe_binary: str = Field(default="ffprobe", alias="FFPROBE_BINARY")
-    ffmpeg_timeout_seconds: PositiveInt = Field(default=1800, alias="FFMPEG_TIMEOUT_SECONDS")
+    ffmpeg_timeout_seconds: PositiveInt = Field(
+        default=1800, alias="FFMPEG_TIMEOUT_SECONDS"
+    )
     audio_sample_rate: PositiveInt = Field(default=16000, alias="AUDIO_SAMPLE_RATE")
     audio_channels: PositiveInt = Field(default=1, alias="AUDIO_CHANNELS")
 
@@ -87,7 +89,7 @@ class _AiServiceGrpcSettings(BaseModel):
         alias="AI_SERVICE_GRPC_TARGET",
     )
     ai_service_grpc_timeout_seconds: PositiveInt = Field(
-        default=30,
+        default=1800,
         alias="AI_SERVICE_GRPC_TIMEOUT_SECONDS",
     )
 

@@ -1,7 +1,11 @@
 from uuid import UUID
 
-from app.db import transcript_repository
-from app.services.placeholder_transcription_service import PlaceholderTranscriptResult, PlaceholderTranscriptSegment
+from app.db import jobs_repository, transcript_repository
+from app.schemas.db.processsing_job import JobStatus
+from app.services.placeholder_transcription_service import (
+    PlaceholderTranscriptResult,
+    PlaceholderTranscriptSegment,
+)
 
 JOB_ID = "00000000-0000-4000-8000-000000000001"
 MEDIA_ID = "00000000-0000-4000-8000-000000000002"
@@ -40,8 +44,12 @@ def _result() -> PlaceholderTranscriptResult:
         full_text="Xin chao the gioi",
         word_count=4,
         segments=[
-            PlaceholderTranscriptSegment(start_time=0.0, end_time=1.0, text="Xin chao", confidence=1.0),
-            PlaceholderTranscriptSegment(start_time=1.0, end_time=2.0, text="the gioi", confidence=1.0),
+            PlaceholderTranscriptSegment(
+                start_time=0.0, end_time=1.0, text="Xin chao", confidence=1.0
+            ),
+            PlaceholderTranscriptSegment(
+                start_time=1.0, end_time=2.0, text="the gioi", confidence=1.0
+            ),
         ],
     )
 
@@ -49,7 +57,9 @@ def _result() -> PlaceholderTranscriptResult:
 def test_save_transcript_inserts_transcript_and_segments() -> None:
     session = FakeSession(rows=[None])
 
-    summary = transcript_repository.save_transcript(session, job_id=JOB_ID, media_id=MEDIA_ID, result=_result())
+    summary = transcript_repository.save_transcript(
+        session, job_id=JOB_ID, media_id=MEDIA_ID, result=_result()
+    )
 
     assert summary.id
     assert summary.job_id == UUID(JOB_ID)
@@ -76,8 +86,20 @@ def test_save_transcript_returns_existing_summary_without_duplicate_insert() -> 
     }
     session = FakeSession(rows=[existing_row])
 
-    summary = transcript_repository.save_transcript(session, job_id=JOB_ID, media_id=MEDIA_ID, result=_result())
+    summary = transcript_repository.save_transcript(
+        session, job_id=JOB_ID, media_id=MEDIA_ID, result=_result()
+    )
 
     assert summary.id == UUID(existing_row["id"])
     assert summary.full_text == "existing"
     assert len(session.params) == 1
+
+
+def test_increment_attempt_count_releases_job_for_retry() -> None:
+    session = FakeSession(rows=[])
+
+    jobs_repository.increment_attempt_count(session, JOB_ID)
+
+    assert session.params[0]["job_id"] == JOB_ID
+    assert session.params[0]["status"] == JobStatus.PENDING.value
+    assert session.params[0]["current_step"] == "Queued for retry"

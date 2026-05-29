@@ -4,6 +4,9 @@ from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
 
 
 class NoopAsr:
+    def __init__(self, *, default_language: str = "vi") -> None:
+        self._default_language = default_language
+
     @property
     def model_name(self) -> str:
         return ""
@@ -17,7 +20,9 @@ class NoopAsr:
         local_path: Path,
         language: str | None,
     ) -> TranscriptResult:
-        selected_language = "vi" if language in {None, "", "auto"} else language
+        selected_language = (
+            self._default_language if language in {None, ""} else language
+        )
         text = f"Noop transcript placeholder for {local_path.name}."
 
         return TranscriptResult(
