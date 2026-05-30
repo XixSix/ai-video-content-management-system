@@ -7,7 +7,10 @@ celery_app = Celery(
     main="worker",
     broker=str(settings.rabbitmq_url),
     backend=None,
-    include=["app.consumers.transcript_consumer"],
+    include=[
+        "app.consumers.transcript_consumer",
+        "app.consumers.chaptering_consumer",
+    ],
 )
 
 celery_app.conf.update(
@@ -17,6 +20,11 @@ celery_app.conf.update(
             routing_key=settings.transcript_queue_name,
             durable=True,
         ),
+        Queue(
+            settings.chaptering_queue_name,
+            routing_key=settings.chaptering_queue_name,
+            durable=True,
+        ),
     ),
     task_default_queue=settings.transcript_queue_name,
     task_default_routing_key=settings.transcript_queue_name,
@@ -24,6 +32,10 @@ celery_app.conf.update(
         settings.transcript_task_name: {
             "queue": settings.transcript_queue_name,
             "routing_key": settings.transcript_queue_name,
+        },
+        settings.chaptering_task_name: {
+            "queue": settings.chaptering_queue_name,
+            "routing_key": settings.chaptering_queue_name,
         },
     },
     task_protocol=2,
