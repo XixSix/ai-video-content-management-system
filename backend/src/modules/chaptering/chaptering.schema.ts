@@ -6,11 +6,11 @@ export const mediaChapterParamsSchema = z.strictObject({
 
 export const generateChaptersSchema = z
   .strictObject({
-    minChapterDuration: z.number().min(120).max(600).default(180),
-    targetChapterDuration: z.number().min(180).max(1800).default(300),
+    minChapterDuration: z.number().min(60).max(600).default(180),
+    targetChapterDuration: z.number().min(300).max(1800).default(300),
     maxChapters: z.number().int().min(3).max(20).default(5),
-    useLlm: z.boolean().default(true),
-    useEmbeddings: z.boolean().default(true)
+    useLlm: z.boolean().default(false),
+    useEmbeddings: z.boolean().default(false)
   })
   .refine((data) => data.targetChapterDuration >= data.minChapterDuration, {
     message: 'targetChapterDuration must be greater than or equal to minChapterDuration',

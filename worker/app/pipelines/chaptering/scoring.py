@@ -27,6 +27,7 @@ TRANSITION_MARKERS = (
     "now",
     "finally",
     "in summary",
+    "to conclude"
 )
 LONG_PAUSE_SECONDS = 1.2
 
