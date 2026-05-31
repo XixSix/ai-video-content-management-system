@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chaptering.v1;
+
+service ChapteringService {
+  rpc EmbedTexts(EmbedTextsRequest) returns (EmbedTextsResponse);
+}
+
+message EmbedTextsRequest {
+  string request_id = 1;
+  repeated string texts = 2;
+}
+
+message EmbedTextsResponse {
+  string request_id = 1;
+  repeated TextEmbedding embeddings = 2;
+  string model = 3;
+  int32 dimension = 4;
+}
+
+message TextEmbedding {
+  int32 index = 1;
+  repeated float values = 2;
+}

@@ -9,7 +9,6 @@ from grpc_tools import protoc
 AI_SERVICE_DIR = Path(__file__).resolve().parents[2]
 REPO_ROOT = AI_SERVICE_DIR.parent
 PROTO_ROOT = AI_SERVICE_DIR / "proto"
-PROTO_FILE = PROTO_ROOT / "transcription/v1/transcription.proto"
 
 
 def main() -> None:
@@ -41,6 +40,7 @@ def _resolve_targets(target: str) -> dict[str, Path]:
 
 def _generate_project(*, name: str, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
+    proto_files = _proto_files()
 
     exit_code = protoc.main(
         [
@@ -48,24 +48,39 @@ def _generate_project(*, name: str, output_dir: Path) -> None:
             f"-I{PROTO_ROOT}",
             f"--python_out={output_dir}",
             f"--grpc_python_out={output_dir}",
-            str(PROTO_FILE),
+            *[str(proto_file) for proto_file in proto_files],
         ]
     )
     if exit_code:
         raise SystemExit(exit_code)
 
-    _ensure_package_files(output_dir)
+    _ensure_package_files(output_dir, proto_files)
     print(f"Generated {name} gRPC code in {output_dir.relative_to(REPO_ROOT)}")
 
 
-def _ensure_package_files(output_dir: Path) -> None:
-    for package_dir in [
-        output_dir / "transcription",
-        output_dir / "transcription/v1",
-    ]:
-        package_dir.mkdir(parents=True, exist_ok=True)
-        init_file = package_dir / "__init__.py"
-        init_file.touch(exist_ok=True)
+def _proto_files() -> list[Path]:
+    proto_files = sorted(PROTO_ROOT.glob("**/*.proto"))
+    if not proto_files:
+        raise SystemExit(f"No proto files found in {PROTO_ROOT}")
+
+    return proto_files
+
+
+def _ensure_package_files(output_dir: Path, proto_files: list[Path]) -> None:
+    for proto_file in proto_files:
+        proto_dir = proto_file.relative_to(PROTO_ROOT).parent
+        for parent in proto_dir.parents:
+            if parent == Path("."):
+                continue
+            _touch_init(output_dir / parent)
+
+        _touch_init(output_dir / proto_dir)
+
+
+def _touch_init(package_dir: Path) -> None:
+    package_dir.mkdir(parents=True, exist_ok=True)
+    init_file = package_dir / "__init__.py"
+    init_file.touch(exist_ok=True)
 
 
 if __name__ == "__main__":
