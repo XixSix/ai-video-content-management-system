@@ -67,10 +67,10 @@ const createTranscript = (overrides: Partial<Transcript> = {}): Transcript => ({
   id: transcriptId,
   mediaId,
   jobId,
-  language: 'vi',
+  language: 'en',
   source: 'FASTER_WHISPER',
   model: 'faster-whisper-large-v3',
-  fullText: 'Xin chao. Day la transcript.',
+  fullText: 'Hello. This is a transcript.',
   content: null,
   transcriptQualityScore: 0.95,
   fillerRatio: 0.1,
@@ -115,8 +115,8 @@ const createChapter = (overrides: Partial<VideoChapter> = {}): VideoChapter => (
   chapterIndex: 1,
   startTime: 0,
   endTime: 120,
-  title: 'Giới thiệu',
-  summary: 'Giới thiệu nội dung chính.',
+  title: 'Introduction',
+  summary: 'Introduces the main content.',
   transcriptVersion: 2,
   source: 'LLM',
   score: 0.9,
@@ -295,7 +295,7 @@ describe('chaptering service', () => {
         id: chapterId,
         mediaId,
         transcriptId,
-        title: 'Giới thiệu',
+        title: 'Introduction',
         semanticShiftScore: 0.9
       })
     ])

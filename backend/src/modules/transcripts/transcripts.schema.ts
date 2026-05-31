@@ -9,7 +9,7 @@ export const transcriptParamsSchema = z.strictObject({
 })
 
 export const generateTranscriptSchema = z.strictObject({
-  language: z.enum(['vi', 'auto', 'en']).default('auto'),
+  language: z.enum(['auto', 'en']).default('auto'),
   generateSrt: z.boolean().default(true),
   generateVtt: z.boolean().default(true),
   burnTranscript: z.boolean().default(false),
