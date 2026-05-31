@@ -13,7 +13,7 @@ from transcription.v1 import transcription_pb2
 def _options() -> TranscriptJobOptions:
     return TranscriptJobOptions.model_validate(
         {
-            "language": "vi",
+            "language": "en",
             "useVad": True,
             "useDiarization": True,
             "sourceSeparation": False,
@@ -24,21 +24,21 @@ def _options() -> TranscriptJobOptions:
 def _response(request_id: str = "job-1") -> transcription_pb2.TranscribeResponse:
     return transcription_pb2.TranscribeResponse(
         request_id=request_id,
-        full_text="Xin chao the gioi",
-        language="vi",
+        full_text="Hello world",
+        language="en",
         asr_model="ai-service-mock-transcriber-v1",
         segments=[
             transcription_pb2.TranscriptSegment(
                 segment_id="seg-1",
                 start_seconds=0.0,
                 end_seconds=1.0,
-                text="Xin chao",
+                text="Hello",
             ),
             transcription_pb2.TranscriptSegment(
                 segment_id="seg-2",
                 start_seconds=1.0,
                 end_seconds=2.0,
-                text="the gioi",
+                text="world",
             ),
         ],
     )
@@ -57,7 +57,7 @@ def test_build_request_maps_transcript_options(tmp_path: Path) -> None:
     assert request.local_path == str(audio_path)
     assert request.filename == "audio.wav"
     assert request.content_type == "audio/wav"
-    assert request.options.language == "vi"
+    assert request.options.language == "en"
     assert request.options.enable_vad is True
     assert request.options.enable_diarization is True
     assert request.options.enable_source_separation is False
@@ -69,11 +69,11 @@ def test_map_response_returns_transcript_result() -> None:
         response=_response(),
     )
 
-    assert result.language == "vi"
+    assert result.language == "en"
     assert result.source == "IMPORTED"
     assert result.model == "ai-service-mock-transcriber-v1"
-    assert result.full_text == "Xin chao the gioi"
-    assert result.word_count == 4
+    assert result.full_text == "Hello world"
+    assert result.word_count == 2
     assert len(result.segments) == 2
 
 
@@ -89,7 +89,7 @@ def test_map_response_rejects_empty_segments() -> None:
     response = transcription_pb2.TranscribeResponse(
         request_id="job-1",
         full_text="",
-        language="vi",
+        language="en",
         asr_model="ai-service-mock-transcriber-v1",
     )
 

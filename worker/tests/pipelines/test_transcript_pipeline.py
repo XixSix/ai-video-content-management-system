@@ -40,7 +40,7 @@ def _message() -> TranscriptJobMessage:
 def _options() -> TranscriptJobOptions:
     return TranscriptJobOptions.model_validate(
         {
-            "language": "vi",
+            "language": "en",
             "generateSrt": True,
             "generateVtt": True,
             "burnTranscript": False,
@@ -66,25 +66,25 @@ def _audio(audio_path: Path) -> AudioSanityResult:
 
 def _transcript_result() -> TranscriptResult:
     return TranscriptResult(
-        language="vi",
+        language="en",
         source="IMPORTED",
         model="ai-service-mock-transcriber-v1",
-        full_text="Xin chao the gioi",
+        full_text="Hello world",
         segments=[
             TranscriptSegmentResult(
                 start_time=0.0,
                 end_time=1.0,
-                text="Xin chao",
+                text="Hello",
                 confidence=1.0,
             ),
             TranscriptSegmentResult(
                 start_time=1.0,
                 end_time=2.0,
-                text="the gioi",
+                text="world",
                 confidence=1.0,
             ),
         ],
-        word_count=4,
+        word_count=2,
     )
 
 
@@ -93,12 +93,12 @@ def _summary() -> PersistedTranscriptSummary:
         id=TRANSCRIPT_ID,
         media_id=MEDIA_ID,
         job_id=JOB_ID,
-        language="vi",
+        language="en",
         source="IMPORTED",
         model="ai-service-mock-transcriber-v1",
-        full_text="Xin chao the gioi",
+        full_text="Hello world",
         segment_count=2,
-        word_count=4,
+        word_count=2,
     )
 
 
@@ -145,7 +145,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         calls["called_ai_service"] += 1
         assert request_id == str(JOB_ID)
         assert audio_path == storage_dir / "transcripts" / str(JOB_ID) / "audio.wav"
-        assert options.language == "vi"
+        assert options.language == "en"
         return _transcript_result()
 
     def save_transcript(
@@ -158,7 +158,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         calls["saved"] += 1
         assert job_id == str(JOB_ID)
         assert media_id == str(MEDIA_ID)
-        assert result.full_text == "Xin chao the gioi"
+        assert result.full_text == "Hello world"
         return _summary()
 
     monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)

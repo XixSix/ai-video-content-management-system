@@ -66,11 +66,11 @@ def test_completed_output_shape_has_no_mock_field() -> None:
     output = TranscriptCompletedOutput(
         transcript=TranscriptOutputSummary(
             id=TRANSCRIPT_ID,
-            language="vi",
+            language="en",
             model="ai-service-mock-transcriber-v1",
             segment_count=2,
             word_count=12,
-            full_text_preview="Xin chao",
+            full_text_preview="Hello",
         ),
         audio=TranscriptAudioOutput(
             duration_seconds=12.34,
@@ -80,7 +80,7 @@ def test_completed_output_shape_has_no_mock_field() -> None:
             silence_ratio=0.12,
         ),
         artifacts=TranscriptArtifactsOutput(),
-        options=TranscriptJobOptions(language="vi"),
+        options=TranscriptJobOptions(language="en"),
     ).model_dump(mode="json", by_alias=True)
 
     assert output == {
@@ -88,12 +88,12 @@ def test_completed_output_shape_has_no_mock_field() -> None:
         "version": 1,
         "transcript": {
             "id": str(TRANSCRIPT_ID),
-            "language": "vi",
+            "language": "en",
             "source": "IMPORTED",
             "model": "ai-service-mock-transcriber-v1",
             "segmentCount": 2,
             "wordCount": 12,
-            "fullTextPreview": "Xin chao",
+            "fullTextPreview": "Hello",
         },
         "audio": {
             "durationSeconds": 12.34,
@@ -107,7 +107,7 @@ def test_completed_output_shape_has_no_mock_field() -> None:
             "vttKey": None,
         },
         "options": {
-            "language": "vi",
+            "language": "en",
             "generateSrt": True,
             "generateVtt": True,
             "burnTranscript": False,

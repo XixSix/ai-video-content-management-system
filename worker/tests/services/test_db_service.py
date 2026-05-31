@@ -51,17 +51,17 @@ class FakeSession:
 
 def _result() -> PlaceholderTranscriptResult:
     return PlaceholderTranscriptResult(
-        language="vi",
+        language="en",
         source="IMPORTED",
         model="worker-placeholder-transcriber-v1",
-        full_text="Xin chao the gioi",
-        word_count=4,
+        full_text="Hello world",
+        word_count=2,
         segments=[
             PlaceholderTranscriptSegment(
-                start_time=0.0, end_time=1.0, text="Xin chao", confidence=1.0
+                start_time=0.0, end_time=1.0, text="Hello", confidence=1.0
             ),
             PlaceholderTranscriptSegment(
-                start_time=1.0, end_time=2.0, text="the gioi", confidence=1.0
+                start_time=1.0, end_time=2.0, text="world", confidence=1.0
             ),
         ],
     )
@@ -78,7 +78,7 @@ def test_save_transcript_inserts_transcript_and_segments() -> None:
     assert summary.job_id == UUID(JOB_ID)
     assert summary.media_id == UUID(MEDIA_ID)
     assert summary.segment_count == 2
-    assert summary.word_count == 4
+    assert summary.word_count == 2
     assert len(session.params) == 4
     assert session.params[1]["source"] == "IMPORTED"
     assert session.params[2]["segment_index"] == 0
@@ -90,7 +90,7 @@ def test_save_transcript_returns_existing_summary_without_duplicate_insert() -> 
         "id": "00000000-0000-4000-8000-000000000003",
         "media_id": MEDIA_ID,
         "job_id": JOB_ID,
-        "language": "vi",
+        "language": "en",
         "source": "IMPORTED",
         "model": "worker-placeholder-transcriber-v1",
         "full_text": "existing",
@@ -127,8 +127,8 @@ def test_save_chapters_persists_boundary_scores() -> None:
         "chapter_index": 1,
         "start_time": 0.0,
         "end_time": 120.0,
-        "title": "Giới thiệu",
-        "summary": "Tóm tắt chương.",
+        "title": "Introduction",
+        "summary": "Chapter summary.",
         "transcript_version": 2,
         "source": "RULE_BASED",
         "score": 0.91,
@@ -143,9 +143,9 @@ def test_save_chapters_persists_boundary_scores() -> None:
         chapter_index=1,
         start_time=0.0,
         end_time=120.0,
-        title="Giới thiệu",
-        summary="Tóm tắt chương.",
-        text="Giới thiệu nội dung.",
+        title="Introduction",
+        summary="Chapter summary.",
+        text="Introduction content.",
         score=ChapterBoundaryScore(
             score=0.91,
             boundary_score=0.91,

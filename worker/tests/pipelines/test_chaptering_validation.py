@@ -35,7 +35,7 @@ def _segment(
     segment_id: UUID = SEGMENT_ID,
     start_time: float = 0.0,
     end_time: float = 4.0,
-    text: str = "Xin chào mọi người.",
+    text: str = "Hello everyone.",
 ) -> ChapteringTranscriptSegment:
     return ChapteringTranscriptSegment(
         id=segment_id,
@@ -55,7 +55,7 @@ def _transcript(
     return ChapteringTranscript(
         id=TRANSCRIPT_ID,
         media_id=MEDIA_ID,
-        language="vi",
+        language="en",
         version=version,
         media_duration=media_duration,
         segments=segments if segments is not None else [_segment()],

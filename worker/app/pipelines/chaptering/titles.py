@@ -17,7 +17,7 @@ def chapter_title(text: str, index: int) -> str:
     """Build a stable fallback title from the first meaningful sentence."""
     cleaned = re.sub(r"\s+", " ", text).strip()
     if not cleaned:
-        return f"Phần {index}"
+        return f"Part {index}"
 
     first_sentence = re.split(r"(?<=[.!?。])\s+", cleaned, maxsplit=1)[0]
     title = first_sentence[:TITLE_MAX_LENGTH].strip()
@@ -25,7 +25,7 @@ def chapter_title(text: str, index: int) -> str:
     if len(first_sentence) > TITLE_MAX_LENGTH:
         title = f"{title.rstrip()}..."
 
-    return title or f"Phần {index}"
+    return title or f"Part {index}"
 
 
 def chapter_summary(text: str) -> str | None:

@@ -6,28 +6,21 @@ from app.schemas.chaptering.result import (
 )
 
 TRANSITION_MARKERS = (
-    "dau tien",
-    "đầu tiên",
-    "tiep theo",
-    "tiếp theo",
-    "phan tiep theo",
-    "phần tiếp theo",
-    "bay gio",
-    "bây giờ",
-    "sang phan",
-    "sang phần",
-    "tom lai",
-    "tóm lại",
-    "cuoi cung",
-    "cuối cùng",
-    "quan trong nhat",
-    "quan trọng nhất",
+    "so the next part",
+    "next part",
+    "next topic",
+    "moving on",
+    "now let's talk about",
     "first",
+    "firstly",
     "next",
     "now",
     "finally",
     "in summary",
-    "to conclude"
+    "to summarize",
+    "to conclude",
+    "let's move on",
+    "another important point",
 )
 LONG_PAUSE_SECONDS = 1.2
 
