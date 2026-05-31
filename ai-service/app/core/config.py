@@ -26,7 +26,7 @@ class Settings(BaseSettings):
         default="noop",
         alias="ASR_PROVIDER",
     )
-    asr_language: str = Field(default="vi", alias="ASR_LANGUAGE")
+    asr_language: str = Field(default="en", alias="ASR_LANGUAGE")
     asr_model_size: str = Field(default="small", alias="ASR_MODEL_SIZE")
     asr_device: str = Field(default="cpu", alias="ASR_DEVICE")
     asr_compute_type: str = Field(default="int8", alias="ASR_COMPUTE_TYPE")

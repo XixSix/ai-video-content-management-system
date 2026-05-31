@@ -17,11 +17,11 @@ def test_faster_whisper_adapter_maps_segments(
         def transcribe(self, audio, **kwargs):
             model_calls.append({"audio": audio, "kwargs": kwargs})
             segments = [
-                SimpleNamespace(start=0.0, end=1.5, text=" Xin chao "),
-                SimpleNamespace(start=1.5, end=3.0, text=" ban "),
+                SimpleNamespace(start=0.0, end=1.5, text=" Hello "),
+                SimpleNamespace(start=1.5, end=3.0, text=" world "),
                 SimpleNamespace(start=3.0, end=4.0, text=" "),
             ]
-            info = SimpleNamespace(language="vi")
+            info = SimpleNamespace(language="en")
             return iter(segments), info
 
     fake_module = ModuleType("faster_whisper")
@@ -31,7 +31,7 @@ def test_faster_whisper_adapter_maps_segments(
     audio_path = tmp_path / "audio.wav"
     audio_path.write_bytes(b"wav")
     asr = FasterWhisperAsr(
-        default_language="vi",
+        default_language="en",
         model_size="small",
         device="cpu",
         compute_type="int8",
@@ -43,8 +43,8 @@ def test_faster_whisper_adapter_maps_segments(
 
     result = asr.transcribe(local_path=audio_path, language="auto")
 
-    assert result.language == "vi"
-    assert result.full_text == "Xin chao ban"
+    assert result.language == "en"
+    assert result.full_text == "Hello world"
     assert result.asr_model == "small"
     assert len(result.segments) == 2
     assert result.segments[0].segment_id == "seg-0001"

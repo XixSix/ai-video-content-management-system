@@ -96,7 +96,7 @@ def _request(
         filename=local_path.name,
         content_type="audio/wav",
         options=TranscriptionOptionsInput(
-            language="vi",
+            language="en",
             enable_source_separation=enable_source_separation,
             enable_vad=enable_vad,
             enable_diarization=enable_diarization,
@@ -171,7 +171,7 @@ class _RecordingAsr:
     ) -> TranscriptResult:
         self._calls.append("asr")
         return TranscriptResult(
-            language=language or "vi",
+            language=language or "en",
             full_text="placeholder",
             segments=[
                 TranscriptSegmentResult(
