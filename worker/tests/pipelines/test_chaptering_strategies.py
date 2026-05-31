@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.pipelines.chaptering import pipeline
-from app.pipelines.chaptering.schemas import ChapterUnit
+from app.pipelines.chaptering.schemas import ChapterBoundaryContextWindow, ChapterUnit
 from app.pipelines.chaptering.strategies import candidate_chapter, rule_based_chapter
 from app.schemas.chaptering.output import ChapteringJobOptions
 from app.schemas.chaptering.result import (
@@ -158,6 +158,7 @@ def test_rule_based_strategy_uses_raw_segment_start_candidates(monkeypatch) -> N
 
 def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> None:
     captured: dict[str, list[float]] = {}
+    windows_called = False
     units = [
         _unit(1, start_time=0.0, end_time=30.0),
         _unit(2, start_time=50.0, end_time=80.0),
@@ -176,10 +177,32 @@ def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> N
         captured["candidate_times"] = candidate_times or []
         return [0.0]
 
+    def build_context_windows(units_arg, candidates_arg, *, context_duration):
+        nonlocal windows_called
+        windows_called = True
+        assert units_arg == units
+        assert [candidate.time for candidate in candidates_arg] == [50.0, 100.0]
+        assert context_duration == candidate_chapter.settings.chaptering_context_window_seconds
+        return [
+            ChapterBoundaryContextWindow(
+                candidate_time=candidate.time,
+                left_text="left",
+                right_text="right",
+                left_unit_ids=["left"],
+                right_unit_ids=["right"],
+            )
+            for candidate in candidates_arg
+        ]
+
     monkeypatch.setattr(
         candidate_chapter,
         "build_chapter_units",
         lambda segments, *, max_unit_duration, pause_boundary_seconds: units,
+    )
+    monkeypatch.setattr(
+        candidate_chapter,
+        "build_context_windows",
+        build_context_windows,
     )
     monkeypatch.setattr(candidate_chapter, "select_boundaries", select_boundaries)
     monkeypatch.setattr(
@@ -197,4 +220,5 @@ def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> N
         ),
     )
 
+    assert windows_called is True
     assert captured["candidate_times"] == [50.0, 100.0]

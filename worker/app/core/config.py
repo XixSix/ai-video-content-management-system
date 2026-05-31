@@ -120,6 +120,10 @@ class _ChapteringPipelineSettings(BaseModel):
         default=4,
         alias="CHAPTERING_CANDIDATE_DENSITY_MULTIPLIER",
     )
+    chaptering_context_window_seconds: PositiveFloat = Field(
+        default=90.0,
+        alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",
+    )
 
 
 class _LoggingSettings(BaseModel):
