@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import AmqpDsn, BaseModel, Field, PositiveFloat, PositiveInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -103,6 +104,10 @@ class _AiServiceGrpcSettings(BaseModel):
 
 
 class _ChapteringPipelineSettings(BaseModel):
+    chaptering_pipeline_strategy: Literal["candidate", "rule_based"] = Field(
+        default="candidate",
+        alias="CHAPTERING_PIPELINE_STRATEGY",
+    )
     chaptering_max_unit_duration_seconds: PositiveFloat = Field(
         default=30.0,
         alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",

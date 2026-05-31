@@ -33,7 +33,7 @@ def run_chaptering_pipeline(
     *,
     options: ChapteringJobOptions,
 ) -> ChapteringCompletedOutput:
-    """Generate rule-based video chapters from persisted transcript segments."""
+    """Generate video chapters from persisted transcript segments."""
     job_id = str(message.job_id)
     logger.info("Starting chaptering pipeline job_id=%s", job_id)
 
@@ -51,7 +51,8 @@ def run_chaptering_pipeline(
         )
 
     validate_transcript(transcript, message)
-    result = _generate_chapters(transcript, options)
+
+    result = _generate_chapters_for_configured_strategy(transcript, options)
 
     with get_db_session() as session:
         persisted = chaptering_repository.save_chapters(
@@ -67,7 +68,32 @@ def run_chaptering_pipeline(
     return _completed_output(persisted, options=options)
 
 
-def _generate_chapters(
+def _generate_chapters_for_configured_strategy(
+    transcript: ChapteringTranscript,
+    options: ChapteringJobOptions,
+) -> ChapteringResult:
+    if settings.chaptering_pipeline_strategy == "rule_based":
+        return _generate_rule_based_chapters(transcript, options)
+
+    return _generate_candidate_chapters(transcript, options)
+
+
+def _generate_rule_based_chapters(
+    transcript: ChapteringTranscript,
+    options: ChapteringJobOptions,
+) -> ChapteringResult:
+    media_duration = _media_duration(transcript)
+    boundaries = select_boundaries(
+        transcript.segments,
+        media_duration=media_duration,
+        min_duration=options.min_chapter_duration,
+        target_duration=options.target_chapter_duration,
+        max_chapters=options.max_chapters,
+    )
+    return _chaptering_result(transcript, options, media_duration, boundaries)
+
+
+def _generate_candidate_chapters(
     transcript: ChapteringTranscript,
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
@@ -92,6 +118,15 @@ def _generate_chapters(
         max_chapters=options.max_chapters,
         candidate_times=[candidate.time for candidate in candidates],
     )
+    return _chaptering_result(transcript, options, media_duration, boundaries)
+
+
+def _chaptering_result(
+    transcript: ChapteringTranscript,
+    options: ChapteringJobOptions,
+    media_duration: float,
+    boundaries: list[float],
+) -> ChapteringResult:
     chapters: list[ChapterCandidate] = []
 
     for index, start_time in enumerate(boundaries, start=1):
