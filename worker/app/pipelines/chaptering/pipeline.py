@@ -2,10 +2,12 @@ import logging
 
 from app.db import chaptering_repository
 from app.db.client import get_db_session
+from app.pipelines.chaptering.candidates import generate_boundary_candidates
 from app.pipelines.chaptering.errors import TerminalChapteringPipelineError
 from app.pipelines.chaptering.scoring import score_boundary
 from app.pipelines.chaptering.selection import select_boundaries
 from app.pipelines.chaptering.titles import chapter_summary, chapter_text, chapter_title
+from app.pipelines.chaptering.units import build_chapter_units
 from app.pipelines.chaptering.validation import validate_transcript
 from app.schemas.chaptering.output import (
     ChapteringCompletedOutput,
@@ -69,12 +71,20 @@ def _generate_chapters(
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
     media_duration = _media_duration(transcript)
+    units = build_chapter_units(transcript.segments)
+    candidates = generate_boundary_candidates(
+        units,
+        media_duration=media_duration,
+        min_chapter_duration=options.min_chapter_duration,
+        max_chapters=options.max_chapters,
+    )
     boundaries = select_boundaries(
         transcript.segments,
         media_duration=media_duration,
         min_duration=options.min_chapter_duration,
         target_duration=options.target_chapter_duration,
         max_chapters=options.max_chapters,
+        candidate_times=[candidate.time for candidate in candidates],
     )
     chapters: list[ChapterCandidate] = []
 

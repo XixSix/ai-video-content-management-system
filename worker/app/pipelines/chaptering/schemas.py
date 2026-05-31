@@ -12,3 +12,14 @@ class ChapterUnit:
     text: str
     clean_text: str
     segment_ids: list[UUID]
+
+
+@dataclass(frozen=True)
+class ChapterBoundaryCandidate:
+    """Store a possible chapter boundary derived from a chapter unit start."""
+
+    time: float
+    unit_index: int
+    unit_id: str
+    previous_unit_ids: list[str]
+    next_unit_ids: list[str]
