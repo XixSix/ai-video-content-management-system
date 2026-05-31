@@ -3,6 +3,8 @@ from uuid import UUID
 from app.pipelines.chaptering.candidates import generate_boundary_candidates
 from app.pipelines.chaptering.schemas import ChapterUnit
 
+CANDIDATE_DENSITY_MULTIPLIER = 4
+
 
 def _unit(index: int, *, start_time: float, end_time: float) -> ChapterUnit:
     return ChapterUnit(
@@ -27,6 +29,7 @@ def test_generate_boundary_candidates_uses_unit_starts_after_first_unit() -> Non
         media_duration=180.0,
         min_chapter_duration=45.0,
         max_chapters=4,
+        density_multiplier=CANDIDATE_DENSITY_MULTIPLIER,
     )
 
     assert [candidate.time for candidate in candidates] == [50.0, 100.0]
@@ -48,6 +51,7 @@ def test_generate_boundary_candidates_filters_invalid_chapter_lengths() -> None:
         media_duration=200.0,
         min_chapter_duration=60.0,
         max_chapters=4,
+        density_multiplier=CANDIDATE_DENSITY_MULTIPLIER,
     )
 
     assert [candidate.time for candidate in candidates] == [80.0]

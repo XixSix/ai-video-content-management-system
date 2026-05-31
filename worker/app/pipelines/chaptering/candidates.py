@@ -1,7 +1,5 @@
 from app.pipelines.chaptering.schemas import ChapterBoundaryCandidate, ChapterUnit
 
-DEFAULT_CANDIDATE_DENSITY_MULTIPLIER = 4
-
 
 def generate_boundary_candidates(
     units: list[ChapterUnit],
@@ -9,7 +7,7 @@ def generate_boundary_candidates(
     media_duration: float,
     min_chapter_duration: float,
     max_chapters: int,
-    density_multiplier: int = DEFAULT_CANDIDATE_DENSITY_MULTIPLIER,
+    density_multiplier: int,
 ) -> list[ChapterBoundaryCandidate]:
     """Create candidate chapter starts from sentence-like unit boundaries.
 

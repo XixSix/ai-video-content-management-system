@@ -1,5 +1,6 @@
 import logging
 
+from app.core.config import settings
 from app.db import chaptering_repository
 from app.db.client import get_db_session
 from app.pipelines.chaptering.candidates import generate_boundary_candidates
@@ -71,12 +72,17 @@ def _generate_chapters(
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
     media_duration = _media_duration(transcript)
-    units = build_chapter_units(transcript.segments)
+    units = build_chapter_units(
+        transcript.segments,
+        max_unit_duration=settings.chaptering_max_unit_duration_seconds,
+        pause_boundary_seconds=settings.chaptering_pause_boundary_seconds,
+    )
     candidates = generate_boundary_candidates(
         units,
         media_duration=media_duration,
         min_chapter_duration=options.min_chapter_duration,
         max_chapters=options.max_chapters,
+        density_multiplier=settings.chaptering_candidate_density_multiplier,
     )
     boundaries = select_boundaries(
         transcript.segments,
