@@ -19,15 +19,16 @@ def generate_boundary_candidates(
     if len(units) < 2 or media_duration <= 0 or max_chapters <= 1:
         return []
 
-    candidates = [
-        _candidate_from_unit(units, unit_index)
-        for unit_index, unit in enumerate(units[1:], start=1)
+    candidates: list[ChapterBoundaryCandidate] = []
+
+    # Loop all units except the first one
+    for unit_index, unit in enumerate(units[1:], start=1):
         if _is_valid_candidate_time(
             unit.start_time,
             media_duration=media_duration,
             min_chapter_duration=min_chapter_duration,
-        )
-    ]
+        ):
+            candidates.append(_candidate_from_unit(units, unit_index))
 
     max_candidates = max(1, max_chapters * density_multiplier)
     if len(candidates) <= max_candidates:
