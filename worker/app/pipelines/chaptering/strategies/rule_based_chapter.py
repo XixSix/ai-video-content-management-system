@@ -10,7 +10,7 @@ from app.schemas.chaptering.result import (
 )
 
 
-def _generate_rule_based_chapters(
+def generate_rule_based_chapters(
     transcript: ChapteringTranscript,
     options: ChapteringJobOptions,
 ) -> ChapteringResult:

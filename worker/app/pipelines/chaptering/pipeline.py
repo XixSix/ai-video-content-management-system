@@ -5,10 +5,10 @@ from app.db import chaptering_repository
 from app.db.client import get_db_session
 from app.pipelines.chaptering.errors import TerminalChapteringPipelineError
 from app.pipelines.chaptering.strategies.candidate_chapter import (
-    _generate_candidate_chapters,
+    generate_candidate_chapters,
 )
 from app.pipelines.chaptering.strategies.rule_based_chapter import (
-    _generate_rule_based_chapters,
+    generate_rule_based_chapters,
 )
 from app.pipelines.chaptering.validation import validate_transcript
 from app.schemas.chaptering.output import (
@@ -70,9 +70,9 @@ def _generate_chapters_for_configured_strategy(
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
     if settings.chaptering_pipeline_strategy == "rule_based":
-        return _generate_rule_based_chapters(transcript, options)
+        return generate_rule_based_chapters(transcript, options)
 
-    return _generate_candidate_chapters(transcript, options)
+    return generate_candidate_chapters(transcript, options)
 
 
 def _completed_output(

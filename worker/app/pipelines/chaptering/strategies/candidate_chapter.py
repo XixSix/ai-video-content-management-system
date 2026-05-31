@@ -13,7 +13,7 @@ from app.schemas.chaptering.result import (
 )
 
 
-def _generate_candidate_chapters(
+def generate_candidate_chapters(
     transcript: ChapteringTranscript,
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
