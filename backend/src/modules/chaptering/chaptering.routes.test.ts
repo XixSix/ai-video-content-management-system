@@ -63,8 +63,8 @@ const createChapter = (): ChapterData => ({
   chapterIndex: 1,
   startTime: 0,
   endTime: 180,
-  title: 'Giới thiệu hệ thống',
-  summary: 'Phần này giới thiệu mục tiêu chính của hệ thống.',
+  title: 'System overview',
+  summary: 'This chapter introduces the main system goal.',
   transcriptVersion: 2,
   source: 'LLM',
   score: 0.91,
@@ -165,11 +165,11 @@ describe('chaptering routes', () => {
     expect(generateChaptersMock).toHaveBeenCalledWith({
       userId: authenticatedUser.id,
       mediaId,
-      minChapterDuration: 60,
-      targetChapterDuration: 180,
+      minChapterDuration: 180,
+      targetChapterDuration: 300,
       maxChapters: 8,
       useLlm: false,
-      useEmbeddings: true
+      useEmbeddings: false
     })
   })
 

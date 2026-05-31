@@ -4,7 +4,7 @@ from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
 
 
 class NoopAsr:
-    def __init__(self, *, default_language: str = "vi") -> None:
+    def __init__(self, *, default_language: str = "en") -> None:
         self._default_language = default_language
 
     @property

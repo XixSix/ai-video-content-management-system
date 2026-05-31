@@ -3,7 +3,9 @@ from pathlib import Path
 import grpc
 import pytest
 
+from app.core.config import Settings
 from app.grpc.transcription_servicer import TranscriptionServicer
+from app.runtime.container import build_transcription_workflow
 from transcription.v1 import transcription_pb2
 
 
@@ -26,7 +28,7 @@ def _request(audio_path: Path) -> transcription_pb2.TranscribeRequest:
         filename=audio_path.name,
         content_type="audio/wav",
         options=transcription_pb2.TranscriptionOptions(
-            language="vi",
+            language="en",
             enable_vad=True,
             enable_diarization=False,
             enable_source_separation=False,
@@ -38,10 +40,15 @@ def test_transcribe_returns_noop_response(tmp_path: Path) -> None:
     audio_path = tmp_path / "audio.wav"
     audio_path.write_bytes(b"wav")
 
-    response = TranscriptionServicer().Transcribe(_request(audio_path), FakeContext())
+    workflow = build_transcription_workflow(
+        Settings(asr_provider="noop", asr_language="en")
+    )
+    response = TranscriptionServicer(workflow).Transcribe(
+        _request(audio_path), FakeContext()
+    )
 
     assert response.request_id == "job-1"
-    assert response.language == "vi"
+    assert response.language == "en"
     assert response.asr_model == ""
     assert response.full_text
     assert len(response.segments) == 1

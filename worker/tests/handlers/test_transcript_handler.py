@@ -54,7 +54,7 @@ def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
             "externalTaskId": None,
             "attemptCount": 0,
             "input": {
-                "language": "vi",
+                "language": "en",
                 "generateSrt": True,
                 "generateVtt": True,
                 "burnTranscript": False,
@@ -76,12 +76,12 @@ def _summary() -> PersistedTranscriptSummary:
         id=TRANSCRIPT_ID,
         media_id=MEDIA_ID,
         job_id=JOB_ID,
-        language="vi",
+        language="en",
         source="IMPORTED",
         model="ai-service-mock-transcriber-v1",
-        full_text="Xin chao the gioi",
+        full_text="Hello world",
         segment_count=2,
-        word_count=4,
+        word_count=2,
     )
 
 
@@ -145,23 +145,23 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
         assert request_id == str(JOB_ID)
         assert audio_path == tmp_path / "storage" / "transcripts" / str(JOB_ID) / "audio.wav"
         return TranscriptResult(
-            language="vi",
+            language="en",
             source="IMPORTED",
             model="ai-service-mock-transcriber-v1",
-            full_text="Xin chao the gioi",
+            full_text="Hello world",
             segments=[
                 TranscriptSegmentResult(
                     start_time=0.0,
                     end_time=1.0,
-                    text="Xin chao",
+                    text="Hello",
                 ),
                 TranscriptSegmentResult(
                     start_time=1.0,
                     end_time=2.0,
-                    text="the gioi",
+                    text="world",
                 ),
             ],
-            word_count=4,
+            word_count=2,
         )
 
     monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_completed", mark_completed)

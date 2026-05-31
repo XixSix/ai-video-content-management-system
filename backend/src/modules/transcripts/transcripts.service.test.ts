@@ -90,10 +90,10 @@ const createTranscript = (overrides: Partial<Transcript> = {}): Transcript => ({
   id: transcriptId,
   mediaId,
   jobId,
-  language: 'vi',
+  language: 'en',
   source: 'FASTER_WHISPER',
   model: 'faster-whisper-large-v3',
-  fullText: 'Xin chao. Day la transcript.',
+  fullText: 'Hello. This is a transcript.',
   content: null,
   transcriptQualityScore: 0.95,
   fillerRatio: 0.1,
@@ -115,8 +115,8 @@ const createSegment = (overrides: Partial<TranscriptSegment> = {}): TranscriptSe
   segmentIndex: 0,
   startTime: 0,
   endTime: 4.2,
-  text: 'Xin chao.',
-  cleanText: 'Xin chao.',
+  text: 'Hello.',
+  cleanText: 'Hello.',
   confidence: 0.98,
   speakerLabel: null,
   createdAt: now,
@@ -144,7 +144,7 @@ describe('transcripts service', () => {
     const result = await transcriptsService.generateTranscript({
       mediaId,
       userId,
-      language: 'vi',
+      language: 'en',
       generateSrt: true,
       generateVtt: true,
       burnTranscript: false,
@@ -160,7 +160,7 @@ describe('transcripts service', () => {
         jobType: 'TRANSCRIBE',
         status: 'PENDING',
         input: {
-          language: 'vi',
+          language: 'en',
           generateSrt: true,
           generateVtt: true,
           burnTranscript: false,
@@ -194,7 +194,7 @@ describe('transcripts service', () => {
     const result = await transcriptsService.generateTranscript({
       mediaId,
       userId,
-      language: 'vi',
+      language: 'en',
       generateSrt: true,
       generateVtt: true,
       burnTranscript: false,
@@ -300,7 +300,7 @@ describe('transcripts service', () => {
     expect(transcripts).toEqual([
       expect.objectContaining({
         id: transcriptId,
-        fullTextPreview: 'Xin chao. Day la transcript.',
+        fullTextPreview: 'Hello. This is a transcript.',
         version: 1
       })
     ])
@@ -313,7 +313,7 @@ describe('transcripts service', () => {
 
     expect(transcript).toMatchObject({
       id: transcriptId,
-      fullText: 'Xin chao. Day la transcript.',
+      fullText: 'Hello. This is a transcript.',
       wordCount: 5
     })
   })
@@ -327,7 +327,7 @@ describe('transcripts service', () => {
       expect.objectContaining({
         id: '00000000-0000-4000-8000-000000000005',
         segmentIndex: 0,
-        text: 'Xin chao.'
+        text: 'Hello.'
       })
     ])
   })

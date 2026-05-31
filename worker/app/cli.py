@@ -16,7 +16,7 @@ def _run_worker(
     argv: Sequence[str] | None = None,
 ) -> None:
     """Start a Celery worker for a single configured queue."""
-    logger.info("Starting transcript worker for queue %s", queue_name)
+    logger.info("Starting worker for queue %s", queue_name)
     celery_app.worker_main(
         [
             "worker",
@@ -32,3 +32,9 @@ def transcript_worker() -> None:
     """Start the transcript Celery worker."""
     configure_logging(settings.log_level)
     _run_worker(settings.transcript_queue_name, log_level=settings.log_level)
+
+
+def chaptering_worker() -> None:
+    """Start the chaptering Celery worker."""
+    configure_logging(settings.log_level)
+    _run_worker(settings.chaptering_queue_name, log_level=settings.log_level)

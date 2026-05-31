@@ -83,7 +83,7 @@ def _output(options: ChapteringJobOptions) -> ChapteringCompletedOutput:
                 chapter_index=1,
                 start_time=0.0,
                 end_time=180.0,
-                title="Giới thiệu chủ đề",
+                title="Introduction",
                 summary=None,
                 transcript_version=2,
                 source="RULE_BASED",

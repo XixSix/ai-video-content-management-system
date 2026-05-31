@@ -27,7 +27,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   taskName: 'transcribe',
   externalTaskId: 'external-task-id',
   attemptCount: 1,
-  input: { language: 'vi' },
+  input: { language: 'en' },
   output: { transcriptId: '00000000-0000-4000-8000-000000000004' },
   createdAt: now,
   updatedAt: now,

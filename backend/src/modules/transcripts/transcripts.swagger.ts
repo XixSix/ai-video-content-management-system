@@ -7,7 +7,7 @@
  *       properties:
  *         language:
  *           type: string
- *           enum: [vi, auto]
+ *           enum: [auto, en]
  *           default: auto
  *         generateSrt:
  *           type: boolean

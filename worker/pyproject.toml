@@ -19,6 +19,7 @@ dependencies = [
 
 [project.scripts]
 transcript_worker = "app.cli:transcript_worker"
+chaptering_worker = "app.cli:chaptering_worker"
 
 [build-system]
 requires = ["hatchling"]

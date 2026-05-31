@@ -66,10 +66,10 @@ const createTranscriptSummary = (): TranscriptSummaryData => ({
   id: transcriptId,
   mediaId,
   jobId,
-  language: 'vi',
+  language: 'en',
   source: 'FASTER_WHISPER',
   model: 'faster-whisper-large-v3',
-  fullTextPreview: 'Xin chao.',
+  fullTextPreview: 'Hello.',
   transcriptQualityScore: 0.95,
   wordCount: 2,
   isEdited: false,
@@ -81,7 +81,7 @@ const createTranscriptSummary = (): TranscriptSummaryData => ({
 
 const createTranscriptDetail = (): TranscriptDetailData => ({
   ...createTranscriptSummary(),
-  fullText: 'Xin chao.',
+  fullText: 'Hello.',
   fillerRatio: 0.1,
   uniqueWordRatio: 0.8,
   speechDensity: 0.7
@@ -94,8 +94,8 @@ const createSegment = (): TranscriptSegmentData => ({
   segmentIndex: 0,
   startTime: 0,
   endTime: 2.4,
-  text: 'Xin chao.',
-  cleanText: 'Xin chao.',
+  text: 'Hello.',
+  cleanText: 'Hello.',
   confidence: 0.98,
   speakerLabel: null,
   createdAt: now
@@ -202,7 +202,7 @@ describe('transcript routes', () => {
       .post(`/api/v1/media/${mediaId}/transcripts/generate`)
       .set('Authorization', 'Bearer access-token')
       .send({
-        language: 'vi',
+        language: 'en',
         sourceSeparation: true,
         useDiarization: true
       })
@@ -223,7 +223,7 @@ describe('transcript routes', () => {
     expect(generateTranscriptMock).toHaveBeenCalledWith({
       userId: authenticatedUser.id,
       mediaId,
-      language: 'vi',
+      language: 'en',
       generateSrt: true,
       generateVtt: true,
       burnTranscript: false,
@@ -263,7 +263,7 @@ describe('transcript routes', () => {
     expect(response.status).toBe(200)
     expect(response.body.data.transcript).toMatchObject({
       id: transcriptId,
-      fullText: 'Xin chao.',
+      fullText: 'Hello.',
       fullTextUpdatedAt: now.toISOString()
     })
     expect(getTranscriptMock).toHaveBeenCalledWith(authenticatedUser.id, transcriptId)
