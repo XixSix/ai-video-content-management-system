@@ -29,7 +29,7 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
     ) -> chaptering_pb2.EmbedTextsResponse:
         self._validate_request(request, context)
         workflow_request = self._map_request(request)
-        result = self._workflow.embed_texts(workflow_request)
+        result = self._workflow.execute(workflow_request)
         return self._map_response(result)
 
     def _map_response(

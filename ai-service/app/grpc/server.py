@@ -6,7 +6,10 @@ from app.core.config import Settings
 from app.grpc.chaptering_servicer import ChapteringServicer
 from app.grpc.transcription_servicer import TranscriptionServicer
 from app.proto_path import ensure_proto_generated_on_path
-from app.runtime.container import build_transcription_workflow
+from app.runtime.container import (
+    build_transcription_workflow,
+    build_chaptering_workflow,
+)
 
 ensure_proto_generated_on_path()
 
@@ -23,7 +26,7 @@ def create_server(settings: Settings) -> grpc.Server:
         server,
     )
     chaptering_pb2_grpc.add_ChapteringServiceServicer_to_server(
-        ChapteringServicer(),
+        ChapteringServicer(build_chaptering_workflow()),
         server,
     )
     return server

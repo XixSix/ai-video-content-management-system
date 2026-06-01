@@ -49,7 +49,7 @@ def test_embed_texts_returns_noop_embeddings() -> None:
 def test_chaptering_workflow_returns_noop_embeddings() -> None:
     workflow = ChapteringWorkflow(embedding=NoopTextEmbeddingProvider())
 
-    result = workflow.embed_texts(
+    result = workflow.execute(
         ChapteringEmbeddingRequest(
             request_id="job-1",
             texts=["Topic introduction"],
