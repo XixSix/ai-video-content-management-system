@@ -1,3 +1,5 @@
+# pyright: reportAttributeAccessIssue=false
+
 from pathlib import Path
 
 import grpc

@@ -3,6 +3,7 @@ from concurrent import futures
 import grpc
 
 from app.core.config import Settings
+from app.grpc.chaptering_servicer import ChapteringServicer
 from app.grpc.transcription_servicer import TranscriptionServicer
 from app.proto_path import ensure_proto_generated_on_path
 from app.runtime.container import build_transcription_workflow
@@ -10,6 +11,7 @@ from app.runtime.container import build_transcription_workflow
 ensure_proto_generated_on_path()
 
 from transcription.v1 import transcription_pb2_grpc  # type: ignore # noqa: E402
+from chaptering.v1 import chaptering_pb2_grpc  # type: ignore # noqa: E402
 
 
 def create_server(settings: Settings) -> grpc.Server:
@@ -18,6 +20,10 @@ def create_server(settings: Settings) -> grpc.Server:
     )
     transcription_pb2_grpc.add_TranscriptionServiceServicer_to_server(
         TranscriptionServicer(build_transcription_workflow()),
+        server,
+    )
+    chaptering_pb2_grpc.add_ChapteringServiceServicer_to_server(
+        ChapteringServicer(),
         server,
     )
     return server
