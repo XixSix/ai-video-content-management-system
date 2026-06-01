@@ -1,7 +1,8 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
-from pydantic import AmqpDsn, BaseModel, Field, PositiveInt
+from pydantic import AmqpDsn, BaseModel, Field, PositiveFloat, PositiveInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 WORKER_DIR = Path(__file__).resolve().parents[2]
@@ -102,12 +103,36 @@ class _AiServiceGrpcSettings(BaseModel):
     )
 
 
+class _ChapteringPipelineSettings(BaseModel):
+    chaptering_pipeline_strategy: Literal["candidate", "rule_based"] = Field(
+        default="candidate",
+        alias="CHAPTERING_PIPELINE_STRATEGY",
+    )
+    chaptering_max_unit_duration_seconds: PositiveFloat = Field(
+        default=30.0,
+        alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",
+    )
+    chaptering_pause_boundary_seconds: PositiveFloat = Field(
+        default=1.2,
+        alias="CHAPTERING_PAUSE_BOUNDARY_SECONDS",
+    )
+    chaptering_candidate_density_multiplier: PositiveInt = Field(
+        default=4,
+        alias="CHAPTERING_CANDIDATE_DENSITY_MULTIPLIER",
+    )
+    chaptering_context_window_seconds: PositiveFloat = Field(
+        default=90.0,
+        alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",
+    )
+
+
 class _LoggingSettings(BaseModel):
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
 
 class Settings(
     _CeleryAppSettings,
+    _ChapteringPipelineSettings,
     _DatabaseSettings,
     _FfmpegSettings,
     _AiServiceGrpcSettings,

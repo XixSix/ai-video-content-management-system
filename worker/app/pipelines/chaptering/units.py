@@ -4,25 +4,29 @@ from app.pipelines.chaptering.schemas import ChapterUnit
 from app.schemas.chaptering.result import ChapteringTranscriptSegment
 
 SENTENCE_END_RE = re.compile(r"[.!?。！？…]['\")\]]*$")
-DEFAULT_MAX_UNIT_DURATION_SECONDS = 30.0
-DEFAULT_PAUSE_BOUNDARY_SECONDS = 1.2
 
 
 def build_chapter_units(
     segments: list[ChapteringTranscriptSegment],
     *,
-    max_unit_duration: float = DEFAULT_MAX_UNIT_DURATION_SECONDS,
-    pause_boundary_seconds: float = DEFAULT_PAUSE_BOUNDARY_SECONDS,
+    max_unit_duration: float,
+    pause_boundary_seconds: float,
 ) -> list[ChapterUnit]:
-    """Merge ASR segments into sentence-like units while preserving timing."""
+    """Merge ASR segments into sentence-like units while preserving timing.
+
+    A long positive gap closes the current unit before the next segment is
+    appended. Overlapping segments produce a negative gap and are treated as
+    continuous audio by this step.
+    """
     units: list[ChapterUnit] = []
     current: list[ChapteringTranscriptSegment] = []
 
     for segment in segments:
         if not segment.text.strip():
             continue
-
-        if current and _starts_after_pause(
+        
+        # Check if long pause
+        if current and _starts_after_long_pause(
             current[-1],
             segment,
             pause_boundary_seconds=pause_boundary_seconds,
@@ -32,7 +36,10 @@ def build_chapter_units(
 
         current.append(segment)
 
-        if _should_close_unit(current, max_unit_duration=max_unit_duration):
+        if _has_sentence_end_or_exceeds_max_duration(
+            current,
+            max_unit_duration=max_unit_duration,
+        ):
             units.append(_unit_from_segments(len(units), current))
             current = []
 
@@ -42,22 +49,24 @@ def build_chapter_units(
     return units
 
 
-def _should_close_unit(
+def _has_sentence_end_or_exceeds_max_duration(
     segments: list[ChapteringTranscriptSegment],
     *,
     max_unit_duration: float,
 ) -> bool:
+    """Return true when buffered text has sentence punctuation or is too long."""
     text = _join_text(segments)
     duration = segments[-1].end_time - segments[0].start_time
     return bool(SENTENCE_END_RE.search(text)) or duration >= max_unit_duration
 
 
-def _starts_after_pause(
+def _starts_after_long_pause(
     previous: ChapteringTranscriptSegment,
     current: ChapteringTranscriptSegment,
     *,
     pause_boundary_seconds: float,
 ) -> bool:
+    """Return true only when the current segment starts after a long pause."""
     return current.start_time - previous.end_time >= pause_boundary_seconds
 
 

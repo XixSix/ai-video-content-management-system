@@ -1,0 +1,14 @@
+{
+  "include": [
+    "ai-service/app",
+    "ai-service/tests",
+    "ai-service/proto/generated",
+    "worker/app",
+    "worker/tests",
+    "worker/proto/generated"
+  ],
+  "extraPaths": [
+    "ai-service/proto/generated",
+    "worker/proto/generated"
+  ]
+}

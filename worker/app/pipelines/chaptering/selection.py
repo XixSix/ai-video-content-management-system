@@ -9,6 +9,7 @@ def select_boundaries(
     min_duration: float,
     target_duration: float,
     max_chapters: int,
+    candidate_times: list[float] | None = None,
 ) -> list[float]:
     """Select deterministic chapter starts from transcript segment boundaries.
 
@@ -22,6 +23,9 @@ def select_boundaries(
         min_duration: Minimum allowed chapter duration in seconds.
         target_duration: Preferred chapter duration in seconds.
         max_chapters: Maximum number of chapter starts to return.
+        candidate_times: Optional candidate start times. When omitted, raw
+            transcript segment starts are used for backwards-compatible fallback
+            behavior.
 
     Returns:
         Chapter start times in ascending order. The first item is always ``0``.
@@ -35,7 +39,11 @@ def select_boundaries(
         breaker.
     """
     boundaries = [0.0]
-    candidate_times = [segment.start_time for segment in segments[1:]]
+    candidate_times = (
+        candidate_times
+        if candidate_times is not None
+        else [segment.start_time for segment in segments[1:]]
+    )
 
     while len(boundaries) < max_chapters:
         previous = boundaries[-1]

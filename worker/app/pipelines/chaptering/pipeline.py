@@ -1,11 +1,15 @@
 import logging
 
+from app.core.config import settings
 from app.db import chaptering_repository
 from app.db.client import get_db_session
 from app.pipelines.chaptering.errors import TerminalChapteringPipelineError
-from app.pipelines.chaptering.scoring import score_boundary
-from app.pipelines.chaptering.selection import select_boundaries
-from app.pipelines.chaptering.titles import chapter_summary, chapter_text, chapter_title
+from app.pipelines.chaptering.strategies.candidate_chapter import (
+    generate_candidate_chapters,
+)
+from app.pipelines.chaptering.strategies.rule_based_chapter import (
+    generate_rule_based_chapters,
+)
 from app.pipelines.chaptering.validation import validate_transcript
 from app.schemas.chaptering.output import (
     ChapteringCompletedOutput,
@@ -13,12 +17,8 @@ from app.schemas.chaptering.output import (
     ChapteringOutputSummary,
 )
 from app.schemas.chaptering.result import (
-    CHAPTER_SOURCE_RULE_BASED,
-    RULE_BASED_CHAPTERING_MODEL,
-    ChapterCandidate,
     ChapteringResult,
     ChapteringTranscript,
-    ChapteringTranscriptSegment,
 )
 from app.schemas.jobs.chaptering_message import ChapteringJobMessage
 
@@ -30,7 +30,7 @@ def run_chaptering_pipeline(
     *,
     options: ChapteringJobOptions,
 ) -> ChapteringCompletedOutput:
-    """Generate rule-based video chapters from persisted transcript segments."""
+    """Generate video chapters from persisted transcript segments."""
     job_id = str(message.job_id)
     logger.info("Starting chaptering pipeline job_id=%s", job_id)
 
@@ -48,7 +48,8 @@ def run_chaptering_pipeline(
         )
 
     validate_transcript(transcript, message)
-    result = _generate_chapters(transcript, options)
+
+    result = _generate_chapters_for_configured_strategy(transcript, options)
 
     with get_db_session() as session:
         persisted = chaptering_repository.save_chapters(
@@ -64,67 +65,14 @@ def run_chaptering_pipeline(
     return _completed_output(persisted, options=options)
 
 
-def _generate_chapters(
+def _generate_chapters_for_configured_strategy(
     transcript: ChapteringTranscript,
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
-    media_duration = _media_duration(transcript)
-    boundaries = select_boundaries(
-        transcript.segments,
-        media_duration=media_duration,
-        min_duration=options.min_chapter_duration,
-        target_duration=options.target_chapter_duration,
-        max_chapters=options.max_chapters,
-    )
-    chapters: list[ChapterCandidate] = []
+    if settings.chaptering_pipeline_strategy == "rule_based":
+        return generate_rule_based_chapters(transcript, options)
 
-    for index, start_time in enumerate(boundaries, start=1):
-        end_time = boundaries[index] if index < len(boundaries) else media_duration
-        chapter_segments = _segments_in_range(transcript.segments, start_time, end_time)
-        text = chapter_text(chapter_segments)
-        chapters.append(
-            ChapterCandidate(
-                chapter_index=index,
-                start_time=start_time,
-                end_time=end_time,
-                title=chapter_title(text, index),
-                summary=chapter_summary(text),
-                text=text,
-                score=score_boundary(
-                    transcript.segments,
-                    start_time=start_time,
-                    previous_start=boundaries[index - 2] if index > 1 else 0.0,
-                    target_duration=options.target_chapter_duration,
-                ),
-            )
-        )
-
-    return ChapteringResult(
-        transcript_id=transcript.id,
-        transcript_version=transcript.version,
-        source=CHAPTER_SOURCE_RULE_BASED,
-        model=RULE_BASED_CHAPTERING_MODEL,
-        chapters=chapters,
-    )
-
-
-def _media_duration(transcript: ChapteringTranscript) -> float:
-    if transcript.media_duration is not None and transcript.media_duration > 0:
-        return transcript.media_duration
-
-    return max(segment.end_time for segment in transcript.segments)
-
-
-def _segments_in_range(
-    segments: list[ChapteringTranscriptSegment],
-    start_time: float,
-    end_time: float,
-) -> list[ChapteringTranscriptSegment]:
-    return [
-        segment
-        for segment in segments
-        if segment.end_time > start_time and segment.start_time < end_time
-    ]
+    return generate_candidate_chapters(transcript, options)
 
 
 def _completed_output(
