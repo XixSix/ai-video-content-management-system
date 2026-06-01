@@ -1,11 +1,14 @@
 from app.core.config import Settings, get_settings
 from app.provider_contracts.asr import AsrPort
+from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.providers.asr.faster_whisper_adapter import FasterWhisperAsr
 from app.providers.asr.noop_asr import NoopAsr
 from app.providers.audio.noop_normalizer import NoopAudioNormalizer
+from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.source_separation.noop_demucs import NoopDemucsSourceSeparator
 from app.providers.vad.noop_vad import NoopVad
+from app.workflows.chaptering.workflow import ChapteringWorkflow
 from app.workflows.transcription.workflow import TranscriptionWorkflow
 
 
@@ -21,6 +24,19 @@ def build_transcription_workflow(
         diarizer=NoopDiarization(),
         asr=_build_asr(settings),
     )
+
+
+def build_chaptering_workflow(
+    settings: Settings | None = None,
+) -> ChapteringWorkflow:
+    return ChapteringWorkflow(
+        embedding=build_chaptering_embedding_provider(settings or get_settings())
+    )
+
+
+def build_chaptering_embedding_provider(settings: Settings) -> TextEmbeddingPort:
+    _ = settings
+    return NoopTextEmbeddingProvider()
 
 
 def _build_asr(settings: Settings) -> AsrPort:
