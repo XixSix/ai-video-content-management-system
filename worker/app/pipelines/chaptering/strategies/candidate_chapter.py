@@ -1,6 +1,8 @@
 from app.core.config import settings
+from app.services.ai_service import ai_service_client
 from app.pipelines.chaptering.candidates import generate_boundary_candidates
 from app.pipelines.chaptering.selection import select_boundaries
+from app.pipelines.chaptering.semantic import score_context_windows
 from app.pipelines.chaptering.strategies.common import (
     build_chaptering_result,
     media_duration,
@@ -36,6 +38,11 @@ def generate_candidate_chapters(
         candidates,
         context_duration=settings.chaptering_context_window_seconds,
     )
+    semantic_shift_scores_by_time = score_context_windows(
+        windows,
+        embedding_client=ai_service_client,
+        request_id_prefix=f"chaptering:{transcript.id}:{transcript.version}",
+    )
     boundaries = select_boundaries(
         transcript.segments,
         media_duration=duration,
@@ -44,4 +51,10 @@ def generate_candidate_chapters(
         max_chapters=options.max_chapters,
         candidate_times=[window.candidate_time for window in windows],
     )
-    return build_chaptering_result(transcript, options, duration, boundaries)
+    return build_chaptering_result(
+        transcript,
+        options,
+        duration,
+        boundaries,
+        semantic_shift_scores_by_time=semantic_shift_scores_by_time,
+    )

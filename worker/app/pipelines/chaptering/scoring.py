@@ -33,6 +33,7 @@ def score_boundary(
     start_time: float,
     previous_start: float,
     target_duration: float,
+    semantic_shift: float = 0.0,
 ) -> ChapterBoundaryScore:
     """Score a deterministic chapter boundary candidate.
 
@@ -44,8 +45,8 @@ def score_boundary(
 
     Returns:
         Boundary score metadata. ``score`` and ``boundary_score`` are the
-        weighted final score. ``semantic_shift_score`` is currently ``0`` and is
-        reserved for the embedding-based phase.
+        weighted final score. ``semantic_shift_score`` records an optional
+        embedding signal without blending it into the fallback formula yet.
 
     Notes:
         The fallback score combines how close the candidate is to
@@ -84,7 +85,7 @@ def score_boundary(
         boundary_score=round(boundary_score, 4),
         pause_score=round(pause_score, 4),
         discourse_marker_score=discourse_score,
-        semantic_shift_score=0.0,
+        semantic_shift_score=round(_clamp(semantic_shift), 4),
         duration_score=round(duration_score, 4),
     )
 
@@ -156,5 +157,4 @@ def previous_segment_before(
 
 
 def _clamp(value: float) -> float:
-    "Keep number inside valid score rage (0.0, 1.0)"
     return max(0.0, min(value, 1.0))
