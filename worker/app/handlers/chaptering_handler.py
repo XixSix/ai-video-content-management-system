@@ -36,8 +36,7 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
     )
 
     with get_db_session() as session:
-        job = jobs_repository.find_processing_job(session, job_id)
-        _guard_job(message, job)
+        job = _guard_job(message, jobs_repository.find_processing_job(session, job_id))
         _guard_retry_budget(job)
 
     if _should_skip_job(job):
@@ -49,10 +48,11 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
     if not queued_job:
         # Another worker may have claimed the job between validation and update.
         with get_db_session() as session:
-            current_job = jobs_repository.find_processing_job(session, job_id)
-            _guard_job(message, current_job)
+            current_job = _guard_job(
+                message, jobs_repository.find_processing_job(session, job_id)
+            )
 
-        if current_job and current_job.status in {
+        if current_job.status in {
             JobStatus.GENERATING_CHAPTERS,
             JobStatus.QUEUED,
             JobStatus.COMPLETED,
@@ -133,7 +133,9 @@ def increment_chaptering_job_attempt(job_id: str) -> int | None:
     return job.attempt_count
 
 
-def _guard_job(message: ChapteringJobMessage, job: ProcessingJobRow | None) -> None:
+def _guard_job(
+    message: ChapteringJobMessage, job: ProcessingJobRow | None
+) -> ProcessingJobRow:
     """Reject jobs that are missing, mismatched, failed, or the wrong type."""
     if not job:
         raise TerminalChapteringJobError("Processing job was not found")
@@ -153,6 +155,8 @@ def _guard_job(message: ChapteringJobMessage, job: ProcessingJobRow | None) -> N
 
     if job.status == JobStatus.FAILED:
         raise TerminalChapteringJobError("Processing job is already failed")
+
+    return job
 
 
 def _guard_retry_budget(job: ProcessingJobRow) -> None:

@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import text
+from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
 
 from app.schemas.transcript.result import TranscriptResult
@@ -206,7 +207,7 @@ def save_transcript(
     )
 
 
-def _summary_from_row(row: object) -> PersistedTranscriptSummary:
+def _summary_from_row(row: RowMapping) -> PersistedTranscriptSummary:
     """Map a SQLAlchemy result row into a transcript summary."""
     return PersistedTranscriptSummary(
         id=UUID(str(row["id"])),

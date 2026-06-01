@@ -22,8 +22,8 @@ class TranscriptJobResultMessage(BaseModel):
 
     type: Literal["transcript.job.result"] = "transcript.job.result"
     version: Literal[1] = 1
-    job_id: UUID = Field(alias="jobId")
-    media_id: UUID = Field(alias="mediaId")
-    user_id: UUID = Field(alias="userId")
+    job_id: UUID = Field(validation_alias="jobId", serialization_alias="jobId")
+    media_id: UUID = Field(validation_alias="mediaId", serialization_alias="mediaId")
+    user_id: UUID = Field(validation_alias="userId", serialization_alias="userId")
     status: JobStatus
     skipped: bool
