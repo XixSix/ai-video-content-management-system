@@ -157,7 +157,7 @@ def test_rule_based_strategy_uses_raw_segment_start_candidates(monkeypatch) -> N
 
 
 def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> None:
-    captured: dict[str, list[float]] = {}
+    captured: dict[str, object] = {}
     windows_called = False
     units = [
         _unit(1, start_time=0.0, end_time=30.0),
@@ -182,7 +182,10 @@ def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> N
         windows_called = True
         assert units_arg == units
         assert [candidate.time for candidate in candidates_arg] == [50.0, 100.0]
-        assert context_duration == candidate_chapter.settings.chaptering_context_window_seconds
+        assert (
+            context_duration
+            == candidate_chapter.settings.chaptering_context_window_seconds
+        )
         return [
             ChapterBoundaryContextWindow(
                 candidate_time=candidate.time,
@@ -194,6 +197,23 @@ def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> N
             for candidate in candidates_arg
         ]
 
+    def score_context_windows(windows, *, embedding_client, request_id_prefix):
+        captured["semantic_windows"] = windows
+        captured["embedding_client"] = embedding_client
+        captured["request_id_prefix"] = request_id_prefix
+        return {50.0: 0.75, 100.0: 0.25}
+
+    def build_chaptering_result(
+        transcript,
+        options,
+        duration,
+        boundaries,
+        *,
+        semantic_shift_scores_by_time=None,
+    ):
+        captured["semantic_shift_scores_by_time"] = semantic_shift_scores_by_time
+        return _result(transcript)
+
     monkeypatch.setattr(
         candidate_chapter,
         "build_chapter_units",
@@ -204,11 +224,14 @@ def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> N
         "build_context_windows",
         build_context_windows,
     )
+    monkeypatch.setattr(
+        candidate_chapter, "score_context_windows", score_context_windows
+    )
     monkeypatch.setattr(candidate_chapter, "select_boundaries", select_boundaries)
     monkeypatch.setattr(
         candidate_chapter,
         "build_chaptering_result",
-        lambda transcript, options, duration, boundaries: _result(transcript),
+        build_chaptering_result,
     )
 
     candidate_chapter.generate_candidate_chapters(
@@ -222,3 +245,7 @@ def test_candidate_strategy_uses_chapter_unit_start_candidates(monkeypatch) -> N
 
     assert windows_called is True
     assert captured["candidate_times"] == [50.0, 100.0]
+    assert captured["semantic_shift_scores_by_time"] == {50.0: 0.75, 100.0: 0.25}
+    assert captured["request_id_prefix"] == (
+        "chaptering:00000000-0000-4000-8000-000000000101:1"
+    )

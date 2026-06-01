@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from app.pipelines.chaptering.scoring import score_boundary
 from app.pipelines.chaptering.titles import chapter_summary, chapter_text, chapter_title
 from app.schemas.chaptering.output import ChapteringJobOptions
@@ -23,8 +25,11 @@ def build_chaptering_result(
     options: ChapteringJobOptions,
     duration: float,
     boundaries: list[float],
+    *,
+    semantic_shift_scores_by_time: Mapping[float, float] | None = None,
 ) -> ChapteringResult:
     chapters: list[ChapterCandidate] = []
+    semantic_scores = semantic_shift_scores_by_time or {}
 
     for index, start_time in enumerate(boundaries, start=1):
         end_time = boundaries[index] if index < len(boundaries) else duration
@@ -43,6 +48,7 @@ def build_chaptering_result(
                     start_time=start_time,
                     previous_start=boundaries[index - 2] if index > 1 else 0.0,
                     target_duration=options.target_chapter_duration,
+                    semantic_shift=semantic_scores.get(start_time, 0.0),
                 ),
             )
         )

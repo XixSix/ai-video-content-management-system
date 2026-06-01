@@ -1,4 +1,6 @@
+import math
 import re
+from collections.abc import Sequence
 
 from app.schemas.chaptering.result import (
     ChapterBoundaryScore,
@@ -31,6 +33,7 @@ def score_boundary(
     start_time: float,
     previous_start: float,
     target_duration: float,
+    semantic_shift: float = 0.0,
 ) -> ChapterBoundaryScore:
     """Score a deterministic chapter boundary candidate.
 
@@ -42,8 +45,8 @@ def score_boundary(
 
     Returns:
         Boundary score metadata. ``score`` and ``boundary_score`` are the
-        weighted final score. ``semantic_shift_score`` is currently ``0`` and is
-        reserved for the embedding-based phase.
+        weighted final score. ``semantic_shift_score`` records an optional
+        embedding signal without blending it into the fallback formula yet.
 
     Notes:
         The fallback score combines how close the candidate is to
@@ -82,9 +85,50 @@ def score_boundary(
         boundary_score=round(boundary_score, 4),
         pause_score=round(pause_score, 4),
         discourse_marker_score=discourse_score,
-        semantic_shift_score=0.0,
+        semantic_shift_score=round(_clamp(semantic_shift), 4),
         duration_score=round(duration_score, 4),
     )
+
+
+def cosine_similarity(
+    left_embedding: Sequence[float],
+    right_embedding: Sequence[float],
+) -> float | None:
+    """Return cosine similarity for two embeddings, or ``None`` if invalid."""
+    if not left_embedding or len(left_embedding) != len(right_embedding):
+        return None
+
+    dot_product = 0.0
+    left_norm_squared = 0.0
+    right_norm_squared = 0.0
+
+    for left_value, right_value in zip(left_embedding, right_embedding):
+        if not math.isfinite(left_value) or not math.isfinite(right_value):
+            return None
+
+        dot_product += left_value * right_value
+        left_norm_squared += left_value * left_value
+        right_norm_squared += right_value * right_value
+
+    if left_norm_squared <= 0.0 or right_norm_squared <= 0.0:
+        return None
+
+    similarity = dot_product / (
+        math.sqrt(left_norm_squared) * math.sqrt(right_norm_squared)
+    )
+    return max(-1.0, min(similarity, 1.0))
+
+
+def semantic_shift_score(
+    left_embedding: Sequence[float],
+    right_embedding: Sequence[float],
+) -> float:
+    """Return normalized semantic shift score from left and right embeddings."""
+    similarity = cosine_similarity(left_embedding, right_embedding)
+    if similarity is None:
+        return 0.0
+
+    return _clamp(1.0 - similarity)
 
 
 def starts_with_transition_marker(text: str) -> bool:
