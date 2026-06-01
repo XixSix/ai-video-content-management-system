@@ -13,8 +13,8 @@ def build_embed_texts_request(
     *,
     request_id: str,
     texts: list[str],
-) -> chaptering_pb2.EmbedTextsRequest:
-    return chaptering_pb2.EmbedTextsRequest(
+) -> chaptering_pb2.EmbedTextsRequest:  # type: ignore
+    return chaptering_pb2.EmbedTextsRequest(  # type: ignore
         request_id=request_id,
         texts=texts,
     )
@@ -23,7 +23,7 @@ def build_embed_texts_request(
 def map_embed_texts_response(
     *,
     request_id: str,
-    response: chaptering_pb2.EmbedTextsResponse,
+    response: chaptering_pb2.EmbedTextsResponse,  # type: ignore
 ) -> ChapteringEmbeddingResult:
     if response.request_id != request_id:
         raise ValueError("ai-service response request_id does not match request")

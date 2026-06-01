@@ -110,14 +110,33 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
 
     monkeypatch.setattr(transcript_handler, "get_db_session", _session)
     monkeypatch.setattr(transcript_pipeline, "get_db_session", _session)
-    monkeypatch.setattr(transcript_handler.settings, "storage_dir", tmp_path / "storage")
-    monkeypatch.setattr(transcript_handler.jobs_repository, "find_processing_job", lambda session, job_id: _job())
-    monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_queued_from_pending", lambda session, job_id: _job(JobStatus.QUEUED))
+    monkeypatch.setattr(
+        transcript_handler.settings, "storage_dir", tmp_path / "storage"
+    )
+    monkeypatch.setattr(
+        transcript_handler.jobs_repository,
+        "find_processing_job",
+        lambda session, job_id: _job(),
+    )
+    monkeypatch.setattr(
+        transcript_handler.jobs_repository,
+        "mark_job_queued_from_pending",
+        lambda session, job_id: _job(JobStatus.QUEUED),
+    )
 
-    def mark_completed(session: object, job_id: str, *, output: dict[str, object]) -> None:
+    def mark_completed(
+        session: object, job_id: str, *, output: dict[str, object]
+    ) -> None:
         calls["completed_output"] = output
 
-    def mark_step(session: object, job_id: str, *, status: JobStatus, progress: int, current_step: str) -> None:
+    def mark_step(
+        session: object,
+        job_id: str,
+        *,
+        status: JobStatus,
+        progress: int,
+        current_step: str,
+    ) -> None:
         calls["steps"].append((status, progress, current_step))
 
     def download_file(s3_key: str, destination_path: Path) -> Path:
@@ -131,7 +150,9 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
         output_path.write_bytes(b"wav")
         return output_path
 
-    def save_transcript(session: object, *, job_id: str, media_id: str, result: object) -> PersistedTranscriptSummary:
+    def save_transcript(
+        session: object, *, job_id: str, media_id: str, result: object
+    ) -> PersistedTranscriptSummary:
         calls["saved"] += 1
         return _summary()
 
@@ -143,7 +164,10 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
     ) -> TranscriptResult:
         calls["called_ai_service"] += 1
         assert request_id == str(JOB_ID)
-        assert audio_path == tmp_path / "storage" / "transcripts" / str(JOB_ID) / "audio.wav"
+        assert (
+            audio_path
+            == tmp_path / "storage" / "transcripts" / str(JOB_ID) / "audio.wav"
+        )
         return TranscriptResult(
             language="en",
             source="IMPORTED",
@@ -164,14 +188,32 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
             word_count=2,
         )
 
-    monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_completed", mark_completed)
+    monkeypatch.setattr(
+        transcript_handler.jobs_repository, "mark_job_completed", mark_completed
+    )
     monkeypatch.setattr(transcript_handler.jobs_repository, "mark_job_step", mark_step)
-    monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: None)
-    monkeypatch.setattr(transcript_pipeline.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: None)
-    monkeypatch.setattr(transcript_pipeline.transcript_repository, "save_transcript", save_transcript)
+    monkeypatch.setattr(
+        transcript_handler.transcript_repository,
+        "find_transcript_by_job_id",
+        lambda session, job_id: None,
+    )
+    monkeypatch.setattr(
+        transcript_pipeline.transcript_repository,
+        "find_transcript_by_job_id",
+        lambda session, job_id: None,
+    )
+    monkeypatch.setattr(
+        transcript_pipeline.transcript_repository, "save_transcript", save_transcript
+    )
     monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio)
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "validate_audio", lambda audio_path: _audio(tmp_path))
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio
+    )
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service,
+        "validate_audio",
+        lambda audio_path: _audio(tmp_path),
+    )
     monkeypatch.setattr(transcript_pipeline.ai_service_client, "transcribe", transcribe)
 
     return calls
@@ -203,7 +245,10 @@ def test_process_transcript_job_happy_path_returns_contract(
     ]
     assert calls["completed_output"]["type"] == "transcript.completed"
     assert calls["completed_output"]["transcript"]["source"] == "IMPORTED"
-    assert calls["completed_output"]["transcript"]["model"] == "ai-service-mock-transcriber-v1"
+    assert (
+        calls["completed_output"]["transcript"]["model"]
+        == "ai-service-mock-transcriber-v1"
+    )
     assert "mock" not in calls["completed_output"]
     storage_workspace = tmp_path / "storage" / "transcripts" / str(JOB_ID)
     assert (storage_workspace / "source.mp4").read_bytes() == b"video"
@@ -215,7 +260,11 @@ def test_process_transcript_job_checks_existing_before_download(
     tmp_path: Path,
 ) -> None:
     calls = _patch_common(monkeypatch, tmp_path)
-    monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: _summary())
+    monkeypatch.setattr(
+        transcript_handler.transcript_repository,
+        "find_transcript_by_job_id",
+        lambda session, job_id: _summary(),
+    )
 
     result = transcript_handler.process_transcript_job(_message())
 
@@ -239,7 +288,11 @@ def test_process_transcript_job_skips_non_pending_with_result_contract(
         "find_processing_job",
         lambda session, job_id: _job(JobStatus.TRANSCRIBING),
     )
-    monkeypatch.setattr(transcript_handler.transcript_repository, "find_transcript_by_job_id", lambda session, job_id: None)
+    monkeypatch.setattr(
+        transcript_handler.transcript_repository,
+        "find_transcript_by_job_id",
+        lambda session, job_id: None,
+    )
 
     result = transcript_handler.process_transcript_job(_message())
 
@@ -251,13 +304,17 @@ def test_process_transcript_job_skips_non_pending_with_result_contract(
     assert "wordCount" not in result
 
 
-def test_source_not_found_is_terminal(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_source_not_found_is_terminal(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     _patch_common(monkeypatch, tmp_path)
 
     def raise_not_found(s3_key: str, destination_path: Path) -> Path:
         raise S3SourceObjectNotFoundError("not found")
 
-    monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", raise_not_found)
+    monkeypatch.setattr(
+        transcript_pipeline.s3_service, "download_file", raise_not_found
+    )
 
     with pytest.raises(transcript_handler.TerminalTranscriptJobError) as error:
         transcript_handler.process_transcript_job(_message())
@@ -265,25 +322,33 @@ def test_source_not_found_is_terminal(monkeypatch: pytest.MonkeyPatch, tmp_path:
     assert error.value.error_code == "SOURCE_OBJECT_NOT_FOUND"
 
 
-def test_s3_transient_failure_bubbles_for_retry(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_s3_transient_failure_bubbles_for_retry(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     _patch_common(monkeypatch, tmp_path)
 
     def raise_retryable(s3_key: str, destination_path: Path) -> Path:
         raise S3ServiceError("temporary")
 
-    monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", raise_retryable)
+    monkeypatch.setattr(
+        transcript_pipeline.s3_service, "download_file", raise_retryable
+    )
 
     with pytest.raises(S3ServiceError):
         transcript_handler.process_transcript_job(_message())
 
 
-def test_audio_sanity_failure_is_terminal(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_audio_sanity_failure_is_terminal(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     _patch_common(monkeypatch, tmp_path)
 
     def raise_audio_error(audio_path: Path) -> AudioSanityResult:
         raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")
 
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "validate_audio", raise_audio_error)
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service, "validate_audio", raise_audio_error
+    )
 
     with pytest.raises(transcript_handler.TerminalTranscriptJobError) as error:
         transcript_handler.process_transcript_job(_message())

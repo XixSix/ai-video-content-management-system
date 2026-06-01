@@ -60,9 +60,7 @@ def _units_before_candidate(
 ) -> list[ChapterUnit]:
     """Return units before the candidate that overlap the left context window."""
     return [
-        unit
-        for unit in units[:candidate_unit_index]
-        if unit.end_time > earliest_start
+        unit for unit in units[:candidate_unit_index] if unit.end_time > earliest_start
     ]
 
 
@@ -74,9 +72,7 @@ def _units_after_candidate(
 ) -> list[ChapterUnit]:
     """Return units from the candidate that overlap the right context window."""
     return [
-        unit
-        for unit in units[candidate_unit_index:]
-        if unit.start_time < latest_end
+        unit for unit in units[candidate_unit_index:] if unit.start_time < latest_end
     ]
 
 

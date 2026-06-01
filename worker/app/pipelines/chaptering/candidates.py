@@ -58,8 +58,7 @@ def _is_valid_candidate_time(
     min_chapter_duration: float,
 ) -> bool:
     return (
-        time >= min_chapter_duration
-        and media_duration - time >= min_chapter_duration
+        time >= min_chapter_duration and media_duration - time >= min_chapter_duration
     )
 
 

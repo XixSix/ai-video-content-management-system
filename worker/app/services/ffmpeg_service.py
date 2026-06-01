@@ -97,7 +97,10 @@ class FFmpegService:
     ) -> AudioSanityResult:
         """Validate extracted audio metadata and reject unusable audio files."""
         if not audio_path.exists() or audio_path.stat().st_size == 0:
-            raise AudioSanityError("AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty")
+            raise AudioSanityError(
+                "AUDIO_EXTRACTION_EMPTY_OUTPUT",
+                "Extracted audio file is missing or empty",
+            )
 
         metadata = self.probe_audio(audio_path)
         silence_ratio = self.detect_silence_ratio(audio_path, metadata.duration_seconds)
@@ -111,7 +114,9 @@ class FFmpegService:
             silence_threshold=silence_threshold,
         )
 
-    def detect_silence_ratio(self, audio_path: Path, duration_seconds: float | None) -> float:
+    def detect_silence_ratio(
+        self, audio_path: Path, duration_seconds: float | None
+    ) -> float:
         """Estimate how much of an audio file is silence using ffmpeg silencedetect."""
         if duration_seconds is None or duration_seconds <= 0:
             return 0.0
@@ -143,12 +148,18 @@ class FFmpegService:
                 timeout=self.timeout_seconds,
             )
         except FileNotFoundError as error:
-            raise FFmpegServiceError(f"FFmpeg binary not found: {command[0]}") from error
+            raise FFmpegServiceError(
+                f"FFmpeg binary not found: {command[0]}"
+            ) from error
         except subprocess.TimeoutExpired as error:
-            raise FFmpegServiceError(f"Command timed out: {_command_name(command)}") from error
+            raise FFmpegServiceError(
+                f"Command timed out: {_command_name(command)}"
+            ) from error
         except subprocess.CalledProcessError as error:
             message = error.stderr.strip() or error.stdout.strip() or str(error)
-            raise FFmpegServiceError(f"Command failed: {_command_name(command)}: {message}") from error
+            raise FFmpegServiceError(
+                f"Command failed: {_command_name(command)}: {message}"
+            ) from error
 
 
 def _first_stream(payload: dict[str, Any]) -> dict[str, Any]:
@@ -185,7 +196,9 @@ def parse_silence_ratio(stderr: str, duration_seconds: float) -> float:
     if duration_seconds <= 0:
         return 0.0
 
-    durations = [float(match) for match in re.findall(r"silence_duration:\s*([0-9.]+)", stderr)]
+    durations = [
+        float(match) for match in re.findall(r"silence_duration:\s*([0-9.]+)", stderr)
+    ]
     total_silence = sum(durations)
 
     return min(1.0, max(0.0, total_silence / duration_seconds))
@@ -202,10 +215,14 @@ def validate_audio_sanity(
 ) -> AudioSanityResult:
     """Validate audio extraction output against worker transcription requirements."""
     if not audio_path.exists() or audio_path.stat().st_size == 0:
-        raise AudioSanityError("AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty")
+        raise AudioSanityError(
+            "AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty"
+        )
 
     if metadata.duration_seconds is None or metadata.duration_seconds <= 0:
-        raise AudioSanityError("AUDIO_INVALID_DURATION", "Extracted audio duration is missing or invalid")
+        raise AudioSanityError(
+            "AUDIO_INVALID_DURATION", "Extracted audio duration is missing or invalid"
+        )
 
     if metadata.sample_rate is None or metadata.sample_rate != expected_sample_rate:
         raise AudioSanityError(
@@ -214,7 +231,10 @@ def validate_audio_sanity(
         )
 
     if metadata.channels is None or metadata.channels != expected_channels:
-        raise AudioSanityError("AUDIO_INVALID_CHANNELS", f"Expected {expected_channels} channel(s), got {metadata.channels}")
+        raise AudioSanityError(
+            "AUDIO_INVALID_CHANNELS",
+            f"Expected {expected_channels} channel(s), got {metadata.channels}",
+        )
 
     if silence_ratio > silence_threshold:
         raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")

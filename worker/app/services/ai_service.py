@@ -59,7 +59,11 @@ class AIServiceClient:
             audio_path=audio_path,
             options=options,
         )
-        logger.info("Calling ai-service transcription request_id=%s target=%s", request_id, self.target)
+        logger.info(
+            "Calling ai-service transcription request_id=%s target=%s",
+            request_id,
+            self.target,
+        )
 
         try:
             with grpc.insecure_channel(self.target) as channel:
@@ -80,7 +84,9 @@ class AIServiceClient:
                     error_code=f"AI_SERVICE_{error.code().name}",
                 ) from error
 
-            logger.exception("ai-service retryable gRPC error request_id=%s", request_id)
+            logger.exception(
+                "ai-service retryable gRPC error request_id=%s", request_id
+            )
             raise
 
         logger.info("ai-service transcription completed request_id=%s", request_id)
@@ -90,7 +96,11 @@ class AIServiceClient:
                 response=response,
             )
         except ValueError as error:
-            logger.warning("ai-service returned invalid response request_id=%s error=%s", request_id, error)
+            logger.warning(
+                "ai-service returned invalid response request_id=%s error=%s",
+                request_id,
+                error,
+            )
             raise AIServiceTerminalError(
                 str(error),
                 error_code="AI_SERVICE_INVALID_RESPONSE",
@@ -135,7 +145,9 @@ class AIServiceClient:
             )
             raise
 
-        logger.info("ai-service chaptering embeddings completed request_id=%s", request_id)
+        logger.info(
+            "ai-service chaptering embeddings completed request_id=%s", request_id
+        )
         try:
             return map_embed_texts_response(
                 request_id=request_id,

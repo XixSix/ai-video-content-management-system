@@ -162,14 +162,20 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         return _summary()
 
     monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio)
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "validate_audio", validate_audio)
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio
+    )
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service, "validate_audio", validate_audio
+    )
     monkeypatch.setattr(
         transcript_pipeline.ai_service_client,
         "transcribe",
         transcribe,
     )
-    monkeypatch.setattr(transcript_pipeline.transcript_repository, "save_transcript", save_transcript)
+    monkeypatch.setattr(
+        transcript_pipeline.transcript_repository, "save_transcript", save_transcript
+    )
 
     output = transcript_pipeline.run_transcript_pipeline(_message(), options=_options())
 
@@ -179,8 +185,12 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         "called_ai_service": 1,
         "saved": 1,
     }
-    assert (storage_dir / "transcripts" / str(JOB_ID) / "source.mp4").read_bytes() == b"video"
-    assert (storage_dir / "transcripts" / str(JOB_ID) / "audio.wav").read_bytes() == b"wav"
+    assert (
+        storage_dir / "transcripts" / str(JOB_ID) / "source.mp4"
+    ).read_bytes() == b"video"
+    assert (
+        storage_dir / "transcripts" / str(JOB_ID) / "audio.wav"
+    ).read_bytes() == b"wav"
     assert output.transcript.id == TRANSCRIPT_ID
     assert output.transcript.segment_count == 2
     assert output.audio.duration_seconds == 12.5
@@ -192,12 +202,16 @@ def test_run_transcript_pipeline_maps_missing_source_to_terminal_error(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    monkeypatch.setattr(transcript_pipeline.settings, "storage_dir", tmp_path / "storage")
+    monkeypatch.setattr(
+        transcript_pipeline.settings, "storage_dir", tmp_path / "storage"
+    )
 
     def raise_not_found(s3_key: str, destination_path: Path) -> Path:
         raise S3SourceObjectNotFoundError("not found")
 
-    monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", raise_not_found)
+    monkeypatch.setattr(
+        transcript_pipeline.s3_service, "download_file", raise_not_found
+    )
 
     with pytest.raises(transcript_pipeline.TerminalTranscriptPipelineError) as error:
         transcript_pipeline.run_transcript_pipeline(_message(), options=_options())
@@ -209,7 +223,9 @@ def test_run_transcript_pipeline_maps_audio_sanity_to_terminal_error(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    monkeypatch.setattr(transcript_pipeline.settings, "storage_dir", tmp_path / "storage")
+    monkeypatch.setattr(
+        transcript_pipeline.settings, "storage_dir", tmp_path / "storage"
+    )
 
     def download_file(s3_key: str, destination_path: Path) -> Path:
         destination_path.parent.mkdir(parents=True, exist_ok=True)
@@ -224,8 +240,12 @@ def test_run_transcript_pipeline_maps_audio_sanity_to_terminal_error(
         raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")
 
     monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio)
-    monkeypatch.setattr(transcript_pipeline.ffmpeg_service, "validate_audio", raise_audio_error)
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio
+    )
+    monkeypatch.setattr(
+        transcript_pipeline.ffmpeg_service, "validate_audio", raise_audio_error
+    )
 
     with pytest.raises(transcript_pipeline.TerminalTranscriptPipelineError) as error:
         transcript_pipeline.run_transcript_pipeline(_message(), options=_options())

@@ -4,7 +4,10 @@ import pytest
 from pydantic import ValidationError
 
 from app.schemas.db.processsing_job import JobStatus
-from app.schemas.jobs.transcript_message import TranscriptJobMessage, TranscriptJobResultMessage
+from app.schemas.jobs.transcript_message import (
+    TranscriptJobMessage,
+    TranscriptJobResultMessage,
+)
 from app.schemas.transcript.output import (
     TranscriptArtifactsOutput,
     TranscriptAudioOutput,
@@ -45,8 +48,12 @@ def test_result_message_has_stable_shape_for_completed_and_skipped() -> None:
         "status": JobStatus.COMPLETED,
     }
 
-    completed = TranscriptJobResultMessage(skipped=False, **base).model_dump(mode="json", by_alias=True)
-    skipped = TranscriptJobResultMessage(skipped=True, **base).model_dump(mode="json", by_alias=True)
+    completed = TranscriptJobResultMessage(skipped=False, **base).model_dump(
+        mode="json", by_alias=True
+    )
+    skipped = TranscriptJobResultMessage(skipped=True, **base).model_dump(
+        mode="json", by_alias=True
+    )
 
     assert completed.keys() == skipped.keys()
     assert completed["type"] == "transcript.job.result"

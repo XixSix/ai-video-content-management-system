@@ -37,17 +37,27 @@ def handle_chaptering_job(
         message = ChapteringJobMessage.model_validate(kwargs)
         return process_chaptering_job(message)
     except ValidationError as error:
-        logger.exception("Invalid chaptering task payload job_id=%s", job_id or "unknown")
+        logger.exception(
+            "Invalid chaptering task payload job_id=%s", job_id or "unknown"
+        )
         if job_id is not None:
-            record_chaptering_job_failure(job_id, f"Invalid chaptering task payload: {error}")
+            record_chaptering_job_failure(
+                job_id, f"Invalid chaptering task payload: {error}"
+            )
         raise
     except TerminalChapteringJobError as error:
-        logger.warning("Terminal chaptering job failure job_id=%s error=%s", job_id or "unknown", error)
+        logger.warning(
+            "Terminal chaptering job failure job_id=%s error=%s",
+            job_id or "unknown",
+            error,
+        )
         if job_id is not None:
             record_chaptering_job_failure(job_id, str(error))
         raise
     except Exception as error:
-        logger.exception("Retryable chaptering job failure job_id=%s", job_id or "unknown")
+        logger.exception(
+            "Retryable chaptering job failure job_id=%s", job_id or "unknown"
+        )
         if job_id is None:
             raise
 
@@ -71,6 +81,8 @@ def handle_chaptering_job(
             )
             raise self.retry(exc=error)
         except MaxRetriesExceededError:
-            logger.exception("Celery max retries exceeded for chaptering job job_id=%s", job_id)
+            logger.exception(
+                "Celery max retries exceeded for chaptering job job_id=%s", job_id
+            )
             record_chaptering_job_failure(job_id, str(error))
             raise

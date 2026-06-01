@@ -24,6 +24,8 @@ units = build_chapter_units(
 
 print(f"segments={len(transcript.segments)} units={len(units)}")
 for unit in units[:30]:
-    print(f"{unit.unit_id} {unit.start_time:.2f}-{unit.end_time:.2f} segments={len(unit.segment_ids)}")
+    print(
+        f"{unit.unit_id} {unit.start_time:.2f}-{unit.end_time:.2f} segments={len(unit.segment_ids)}"
+    )
     print(unit.text[:240])
     print()
