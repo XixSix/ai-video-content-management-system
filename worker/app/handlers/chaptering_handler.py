@@ -4,10 +4,7 @@ from typing import Any
 from app.core.config import settings
 from app.db import jobs_repository, chaptering_repository
 from app.db.client import get_db_session
-from app.pipelines.chaptering.pipeline import (
-    TerminalChapteringPipelineError,
-    run_chaptering_pipeline,
-)
+from app.pipelines.chaptering.pipeline import run_chaptering_pipeline
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.chaptering_message import (
     ChapteringJobMessage,
@@ -31,6 +28,7 @@ class TerminalChapteringJobError(Exception):
 def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
     """Claim and validate a chaptering job before delegating pipeline work."""
     job_id = str(message.job_id)
+
     logger.info(
         "Processing chaptering job job_id=%s media_id=%s", job_id, message.media_id
     )
@@ -74,15 +72,7 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
 
     _mark_processing_started(job_id)
 
-    try:
-        output = run_chaptering_pipeline(message, options=options)
-    except TerminalChapteringPipelineError as error:
-        logger.warning(
-            "Chaptering pipeline terminal failure job_id=%s error=%s", job_id, error
-        )
-        raise TerminalChapteringJobError(
-            str(error), error_code=error.error_code
-        ) from error
+    output = run_chaptering_pipeline(message, options=options)
 
     _mark_completed(job_id, output)
 

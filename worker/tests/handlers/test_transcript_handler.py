@@ -316,7 +316,7 @@ def test_source_not_found_is_terminal(
         transcript_pipeline.s3_service, "download_file", raise_not_found
     )
 
-    with pytest.raises(transcript_handler.TerminalTranscriptJobError) as error:
+    with pytest.raises(transcript_pipeline.TerminalTranscriptPipelineError) as error:
         transcript_handler.process_transcript_job(_message())
 
     assert error.value.error_code == "SOURCE_OBJECT_NOT_FOUND"
@@ -350,7 +350,7 @@ def test_audio_sanity_failure_is_terminal(
         transcript_pipeline.ffmpeg_service, "validate_audio", raise_audio_error
     )
 
-    with pytest.raises(transcript_handler.TerminalTranscriptJobError) as error:
+    with pytest.raises(transcript_pipeline.TerminalTranscriptPipelineError) as error:
         transcript_handler.process_transcript_job(_message())
 
     assert error.value.error_code == "AUDIO_NO_SPEECH_DETECTED"

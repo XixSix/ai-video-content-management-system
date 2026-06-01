@@ -13,6 +13,7 @@ from app.handlers.transcript_handler import (
     process_transcript_job,
     record_transcript_job_failure,
 )
+from app.pipelines.transcript.pipeline import TerminalTranscriptPipelineError
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ def handle_transcript_job(
                 job_id, f"Invalid transcript task payload: {error}"
             )
         raise
-    except TerminalTranscriptJobError as error:
+    except (TerminalTranscriptJobError, TerminalTranscriptPipelineError) as error:
         logger.warning(
             "Terminal transcript job failure job_id=%s error=%s",
             job_id or "unknown",

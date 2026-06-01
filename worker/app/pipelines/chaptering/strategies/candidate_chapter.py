@@ -1,3 +1,5 @@
+import logging
+
 from app.core.config import settings
 from app.services.ai_service import ai_service_client
 from app.pipelines.chaptering.candidates import generate_boundary_candidates
@@ -15,16 +17,38 @@ from app.schemas.chaptering.result import (
     ChapteringTranscript,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def generate_candidate_chapters(
     transcript: ChapteringTranscript,
     options: ChapteringJobOptions,
 ) -> ChapteringResult:
     duration = media_duration(transcript)
+    logger.info(
+        "Starting candidate chaptering transcript_id=%s transcript_version=%s "
+        "segments=%s media_duration=%.2f min_duration=%.2f target_duration=%.2f "
+        "max_chapters=%s",
+        transcript.id,
+        transcript.version,
+        len(transcript.segments),
+        duration,
+        options.min_chapter_duration,
+        options.target_chapter_duration,
+        options.max_chapters,
+    )
     units = build_chapter_units(
         transcript.segments,
         max_unit_duration=settings.chaptering_max_unit_duration_seconds,
         pause_boundary_seconds=settings.chaptering_pause_boundary_seconds,
+    )
+    logger.info(
+        "Chaptering units built transcript_id=%s units=%s max_unit_duration=%.2f "
+        "pause_boundary_seconds=%.2f",
+        transcript.id,
+        len(units),
+        settings.chaptering_max_unit_duration_seconds,
+        settings.chaptering_pause_boundary_seconds,
     )
     candidates = generate_boundary_candidates(
         units,
@@ -38,10 +62,31 @@ def generate_candidate_chapters(
         candidates,
         context_duration=settings.chaptering_context_window_seconds,
     )
+    logger.info(
+        "Chaptering context windows built transcript_id=%s candidates=%s "
+        "windows=%s context_duration=%.2f",
+        transcript.id,
+        len(candidates),
+        len(windows),
+        settings.chaptering_context_window_seconds,
+    )
+    # logger.info(
+    #     "Calling ai-service for chaptering embeddings transcript_id=%s windows=%s "
+    #     "note=%s",
+    #     transcript.id,
+    #     len(windows),
+    #     "embeddings score candidate boundaries but do not change source from RULE_BASED",
+    # )
     semantic_shift_scores_by_time = score_context_windows(
         windows,
         embedding_client=ai_service_client,
         request_id_prefix=f"chaptering:{transcript.id}:{transcript.version}",
+    )
+    logger.info(
+        "Chaptering semantic scores generated transcript_id=%s windows=%s scores=%s",
+        transcript.id,
+        len(windows),
+        len(semantic_shift_scores_by_time),
     )
     boundaries = select_boundaries(
         transcript.segments,
@@ -51,10 +96,31 @@ def generate_candidate_chapters(
         max_chapters=options.max_chapters,
         candidate_times=[window.candidate_time for window in windows],
     )
-    return build_chaptering_result(
+    logger.info(
+        "Chaptering boundaries selected transcript_id=%s boundary_count=%s "
+        "boundaries=%s",
+        transcript.id,
+        len(boundaries),
+        _format_times(boundaries),
+    )
+    result = build_chaptering_result(
         transcript,
         options,
         duration,
         boundaries,
         semantic_shift_scores_by_time=semantic_shift_scores_by_time,
     )
+    logger.info(
+        "Candidate chaptering output transcript_id=%s source=%s model=%s chapters=%s "
+        "semantic_scores_attached=%s",
+        transcript.id,
+        result.source,
+        result.model,
+        len(result.chapters),
+        bool(semantic_shift_scores_by_time),
+    )
+    return result
+
+
+def _format_times(times: list[float]) -> list[float]:
+    return [round(time, 2) for time in times]

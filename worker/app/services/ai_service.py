@@ -59,11 +59,11 @@ class AIServiceClient:
             audio_path=audio_path,
             options=options,
         )
-        logger.info(
-            "Calling ai-service transcription request_id=%s target=%s",
-            request_id,
-            self.target,
-        )
+        # logger.info(
+        #     "Calling ai-service transcription request_id=%s target=%s",
+        #     request_id,
+        #     self.target,
+        # )
 
         try:
             with grpc.insecure_channel(self.target) as channel:
@@ -114,11 +114,11 @@ class AIServiceClient:
     ) -> ChapteringEmbeddingResult:
         """Call ai-service for text embeddings and validate the response."""
         request = build_embed_texts_request(request_id=request_id, texts=texts)
-        logger.info(
-            "Calling ai-service chaptering embeddings request_id=%s target=%s",
-            request_id,
-            self.target,
-        )
+        # logger.info(
+        #     "Calling ai-service chaptering embeddings request_id=%s target=%s",
+        #     request_id,
+        #     self.target,
+        # )
 
         try:
             with grpc.insecure_channel(self.target) as channel:
@@ -145,9 +145,9 @@ class AIServiceClient:
             )
             raise
 
-        logger.info(
-            "ai-service chaptering embeddings completed request_id=%s", request_id
-        )
+        # logger.info(
+        #     "ai-service chaptering embeddings completed request_id=%s", request_id
+        # )
         try:
             return map_embed_texts_response(
                 request_id=request_id,

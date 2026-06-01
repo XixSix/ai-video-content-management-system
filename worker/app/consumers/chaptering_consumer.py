@@ -13,6 +13,7 @@ from app.handlers.chaptering_handler import (
     process_chaptering_job,
     record_chaptering_job_failure,
 )
+from app.pipelines.chaptering.errors import TerminalChapteringPipelineError
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ def handle_chaptering_job(
                 job_id, f"Invalid chaptering task payload: {error}"
             )
         raise
-    except TerminalChapteringJobError as error:
+    except (TerminalChapteringJobError, TerminalChapteringPipelineError) as error:
         logger.warning(
             "Terminal chaptering job failure job_id=%s error=%s",
             job_id or "unknown",

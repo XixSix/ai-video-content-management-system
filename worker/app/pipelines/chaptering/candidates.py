@@ -1,4 +1,8 @@
+import logging
+
 from app.pipelines.chaptering.schemas import ChapterBoundaryCandidate, ChapterUnit
+
+logger = logging.getLogger(__name__)
 
 
 def generate_boundary_candidates(
@@ -17,9 +21,17 @@ def generate_boundary_candidates(
     for later semantic scoring.
     """
     if len(units) < 2 or media_duration <= 0 or max_chapters <= 1:
+        logger.info(
+            "Chaptering candidate generation skipped units=%s media_duration=%.2f "
+            "max_chapters=%s",
+            len(units),
+            media_duration,
+            max_chapters,
+        )
         return []
 
     candidates: list[ChapterBoundaryCandidate] = []
+    raw_candidate_count = len(units) - 1
 
     # Loop all units except the first one
     for unit_index, unit in enumerate(units[1:], start=1):
@@ -32,9 +44,32 @@ def generate_boundary_candidates(
 
     max_candidates = max(1, max_chapters * density_multiplier)
     if len(candidates) <= max_candidates:
+        logger.info(
+            "Chaptering candidate generation units=%s raw_candidates=%s "
+            "valid_candidates=%s max_candidates=%s retained_candidates=%s "
+            "downsampled=%s",
+            len(units),
+            raw_candidate_count,
+            len(candidates),
+            max_candidates,
+            len(candidates),
+            False,
+        )
         return candidates
 
-    return _downsample_evenly(candidates, max_candidates)
+    retained_candidates = _downsample_evenly(candidates, max_candidates)
+    logger.info(
+        "Chaptering candidate generation units=%s raw_candidates=%s "
+        "valid_candidates=%s max_candidates=%s retained_candidates=%s "
+        "downsampled=%s",
+        len(units),
+        raw_candidate_count,
+        len(candidates),
+        max_candidates,
+        len(retained_candidates),
+        True,
+    )
+    return retained_candidates
 
 
 def _candidate_from_unit(

@@ -4,10 +4,7 @@ from typing import Any
 from app.core.config import settings
 from app.db import jobs_repository, transcript_repository
 from app.db.client import get_db_session
-from app.pipelines.transcript.pipeline import (
-    TerminalTranscriptPipelineError,
-    run_transcript_pipeline,
-)
+from app.pipelines.transcript.pipeline import run_transcript_pipeline
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.transcript_message import (
     TranscriptJobMessage,
@@ -33,6 +30,7 @@ class TerminalTranscriptJobError(Exception):
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     """Claim and validate a transcript job before delegating pipeline work."""
     job_id = str(message.job_id)
+
     logger.info(
         "Processing transcript job job_id=%s media_id=%s", job_id, message.media_id
     )
@@ -77,15 +75,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
 
     _mark_processing_started(job_id)
 
-    try:
-        output = run_transcript_pipeline(message, options=options)
-    except TerminalTranscriptPipelineError as error:
-        logger.warning(
-            "Transcript pipeline terminal failure job_id=%s error=%s", job_id, error
-        )
-        raise TerminalTranscriptJobError(
-            str(error), error_code=error.error_code
-        ) from error
+    output = run_transcript_pipeline(message, options=options)
 
     _mark_completed(job_id, output)
 
