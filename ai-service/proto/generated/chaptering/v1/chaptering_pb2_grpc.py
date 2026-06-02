@@ -34,17 +34,17 @@ class ChapteringServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.EmbedTexts = channel.unary_unary(
-                '/chaptering.v1.ChapteringService/EmbedTexts',
-                request_serializer=chaptering_dot_v1_dot_chaptering__pb2.EmbedTextsRequest.SerializeToString,
-                response_deserializer=chaptering_dot_v1_dot_chaptering__pb2.EmbedTextsResponse.FromString,
+        self.GenerateChapters = channel.unary_unary(
+                '/chaptering.v1.ChapteringService/GenerateChapters',
+                request_serializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersRequest.SerializeToString,
+                response_deserializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersResponse.FromString,
                 _registered_method=True)
 
 
 class ChapteringServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def EmbedTexts(self, request, context):
+    def GenerateChapters(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,10 +53,10 @@ class ChapteringServiceServicer(object):
 
 def add_ChapteringServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'EmbedTexts': grpc.unary_unary_rpc_method_handler(
-                    servicer.EmbedTexts,
-                    request_deserializer=chaptering_dot_v1_dot_chaptering__pb2.EmbedTextsRequest.FromString,
-                    response_serializer=chaptering_dot_v1_dot_chaptering__pb2.EmbedTextsResponse.SerializeToString,
+            'GenerateChapters': grpc.unary_unary_rpc_method_handler(
+                    servicer.GenerateChapters,
+                    request_deserializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersRequest.FromString,
+                    response_serializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -70,7 +70,7 @@ class ChapteringService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def EmbedTexts(request,
+    def GenerateChapters(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +83,9 @@ class ChapteringService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/chaptering.v1.ChapteringService/EmbedTexts',
-            chaptering_dot_v1_dot_chaptering__pb2.EmbedTextsRequest.SerializeToString,
-            chaptering_dot_v1_dot_chaptering__pb2.EmbedTextsResponse.FromString,
+            '/chaptering.v1.ChapteringService/GenerateChapters',
+            chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersRequest.SerializeToString,
+            chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersResponse.FromString,
             options,
             channel_credentials,
             insecure,
