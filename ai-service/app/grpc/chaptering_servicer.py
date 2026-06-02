@@ -11,7 +11,6 @@ from app.schemas.chaptering import (
     ChapteringOptions,
     ChapteringTranscriptSegment,
 )
-from app.workflows.chaptering.errors import ChapterGenerationInputError
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 
 ensure_proto_generated_on_path()
@@ -34,11 +33,7 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
         self._validate_request(request, context)
         workflow_request = self._map_request(request)
 
-        try:
-            result = self._workflow.execute(workflow_request)
-        except ChapterGenerationInputError as error:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(error))
-
+        result = self._workflow.execute(workflow_request)
         return self._map_response(result)
 
     def _validate_request(
@@ -54,17 +49,35 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
         if not request.segments:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, "segments are required")
 
+        if request.media_duration_seconds <= 0:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "media_duration_seconds must be greater than 0",
+            )
+
+        previous_start = -1.0
         for index, segment in enumerate(request.segments):
             if segment.start_seconds >= segment.end_seconds:
                 context.abort(
                     grpc.StatusCode.INVALID_ARGUMENT,
                     f"segments[{index}] must have start_seconds < end_seconds",
                 )
+            if segment.start_seconds < previous_start:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    "segments must be sorted by timestamp",
+                )
+            if segment.end_seconds > request.media_duration_seconds + 1.0:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    f"segments[{index}] exceeds media_duration_seconds",
+                )
             if not segment.text.strip():
                 context.abort(
                     grpc.StatusCode.INVALID_ARGUMENT,
                     f"segments[{index}].text is required",
                 )
+            previous_start = segment.start_seconds
 
         if request.options.max_chapters <= 0:
             context.abort(
@@ -79,11 +92,7 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
         return ChapterGenerationRequest(
             request_id=request.request_id.strip(),
             language=request.language.strip() or None,
-            media_duration_seconds=(
-                request.media_duration_seconds
-                if request.media_duration_seconds > 0
-                else None
-            ),
+            media_duration_seconds=request.media_duration_seconds,
             segments=[
                 ChapteringTranscriptSegment(
                     segment_id=segment.segment_id.strip(),

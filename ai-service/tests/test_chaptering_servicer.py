@@ -62,6 +62,7 @@ def _generate_request(request_id: str = "job-1") -> chaptering_pb2.GenerateChapt
 
 def _pipeline_config() -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
+        strategy="candidate",
         model_name="rule-based-chaptering-v1",
         max_unit_duration_seconds=30.0,
         pause_boundary_seconds=1.0,
@@ -108,6 +109,47 @@ def test_generate_chapters_rejects_missing_segments() -> None:
 def test_generate_chapters_rejects_invalid_segment_timestamps() -> None:
     request = _generate_request()
     request.segments[0].end_seconds = 0
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_rejects_invalid_media_duration() -> None:
+    request = _generate_request()
+    request.media_duration_seconds = 0
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_rejects_unsorted_segments() -> None:
+    request = _generate_request()
+    request.segments[0].start_seconds = 10
+    request.segments[0].end_seconds = 20
+    request.segments.extend(
+        [
+            chaptering_pb2.TranscriptSegment(
+                segment_id="seg-2",
+                start_seconds=5,
+                end_seconds=15,
+                text="Earlier segment.",
+            )
+        ]
+    )
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_rejects_segment_beyond_media_duration() -> None:
+    request = _generate_request()
+    request.segments[0].end_seconds = 122
 
     with pytest.raises(AbortError) as error:
         ChapteringServicer().GenerateChapters(request, _context())

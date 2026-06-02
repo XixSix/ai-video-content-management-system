@@ -1,2 +1,2 @@
-class ChapterGenerationInputError(Exception):
-    """Raised when chapter generation input cannot produce valid chapters."""
+class UnsupportedChapteringStrategyError(Exception):
+    """Raised when a chaptering strategy is not supported."""

@@ -70,6 +70,7 @@ class CandidateRetentionConfig:
 class ChapteringPipelineConfig:
     """Store deterministic chaptering workflow tuning values."""
 
+    strategy: str
     model_name: str
     max_unit_duration_seconds: float
     pause_boundary_seconds: float

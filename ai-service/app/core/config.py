@@ -37,6 +37,10 @@ class Settings(BaseSettings):
         alias="ASR_MODEL_STORAGE_PATH",
     )
     asr_local_files_only: bool = Field(default=False, alias="ASR_LOCAL_FILES_ONLY")
+    chaptering_strategy: Literal["rule-based", "candidate"] = Field(
+        default="candidate",
+        alias="CHAPTERING_STRATEGY",
+    )
     chaptering_model_name: str = Field(
         default="rule-based-chaptering-v1",
         alias="CHAPTERING_MODEL_NAME",

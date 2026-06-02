@@ -49,6 +49,7 @@ def build_chaptering_embedding_provider(settings: Settings) -> TextEmbeddingPort
 
 def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
+        strategy=settings.chaptering_strategy,
         model_name=settings.chaptering_model_name,
         max_unit_duration_seconds=settings.chaptering_max_unit_duration_seconds,
         pause_boundary_seconds=settings.chaptering_pause_boundary_seconds,
