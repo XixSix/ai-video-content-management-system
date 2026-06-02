@@ -1,29 +1,12 @@
 import math
-import re
 from collections.abc import Sequence
 
+from app.pipelines.chaptering.transition_markers import transition_marker_score
 from app.schemas.chaptering.result import (
     ChapterBoundaryScore,
     ChapteringTranscriptSegment,
 )
 
-TRANSITION_MARKERS = (
-    "so the next part",
-    "next part",
-    "next topic",
-    "moving on",
-    "now let's talk about",
-    "first",
-    "firstly",
-    "next",
-    "now",
-    "finally",
-    "in summary",
-    "to summarize",
-    "to conclude",
-    "let's move on",
-    "another important point",
-)
 LONG_PAUSE_SECONDS = 1.2
 
 
@@ -71,9 +54,7 @@ def score_boundary(
         else 0.0
     )
     pause_score = _clamp(pause / 3.0) if pause >= LONG_PAUSE_SECONDS else 0.0
-    discourse_score = (
-        1.0 if segment and starts_with_transition_marker(segment.text) else 0.0
-    )
+    discourse_score = transition_marker_score(segment.text) if segment else 0.0
     duration = start_time - previous_start
     duration_score = 1.0 - _clamp(abs(duration - target_duration) / target_duration)
     boundary_score = (
@@ -129,12 +110,6 @@ def semantic_shift_score(
         return 0.0
 
     return _clamp(1.0 - similarity)
-
-
-def starts_with_transition_marker(text: str) -> bool:
-    """Return whether text starts with a known chapter transition phrase."""
-    normalized = re.sub(r"\s+", " ", text.strip().lower())
-    return any(normalized.startswith(marker) for marker in TRANSITION_MARKERS)
 
 
 def segment_at_or_after(

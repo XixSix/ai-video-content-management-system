@@ -140,7 +140,7 @@ def test_score_boundary_candidates_attaches_cheap_scores() -> None:
 
     assert scored[0].time == 63.0
     assert scored[0].cheap_score > 0.0
-    assert scored[0].discourse_marker_score == 1.0
+    assert scored[0].discourse_marker_score == 0.9
     assert scored[0].pause_score == 1.0
 
 

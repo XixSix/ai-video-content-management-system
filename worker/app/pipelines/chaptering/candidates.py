@@ -10,7 +10,7 @@ from app.pipelines.chaptering.schemas import (
     ChapterBoundaryCandidate,
     ChapterUnit,
 )
-from app.pipelines.chaptering.scoring import starts_with_transition_marker
+from app.pipelines.chaptering.transition_markers import transition_marker_score
 
 logger = logging.getLogger(__name__)
 
@@ -211,9 +211,7 @@ def _score_candidate(
         context_seconds=config.context_seconds,
     )
 
-    discourse_marker_score = (
-        1.0 if starts_with_transition_marker(current_unit.clean_text) else 0.0
-    )
+    discourse_marker_score = transition_marker_score(current_unit.clean_text)
     pause_score = _pause_score(
         current_unit.start_time - previous_unit.end_time,
         long_pause_seconds=config.long_pause_seconds,
