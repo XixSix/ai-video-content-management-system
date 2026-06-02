@@ -1630,7 +1630,11 @@ export const VideoChapterScalarFieldEnum = {
   pauseScore: 'pauseScore',
   discourseMarkerScore: 'discourseMarkerScore',
   semanticShiftScore: 'semanticShiftScore',
+  lexicalShiftScore: 'lexicalShiftScore',
+  valleyDepthScore: 'valleyDepthScore',
+  boundaryQualityScore: 'boundaryQualityScore',
   durationScore: 'durationScore',
+  llmConfidenceScore: 'llmConfidenceScore',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

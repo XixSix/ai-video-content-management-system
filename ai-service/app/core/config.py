@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, PositiveInt, field_validator
+from pydantic import Field, PositiveFloat, PositiveInt, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 AI_SERVICE_DIR = Path(__file__).resolve().parents[2]
@@ -37,6 +37,85 @@ class Settings(BaseSettings):
         alias="ASR_MODEL_STORAGE_PATH",
     )
     asr_local_files_only: bool = Field(default=False, alias="ASR_LOCAL_FILES_ONLY")
+    chaptering_strategy: Literal["rule-based", "candidate"] = Field(
+        default="candidate",
+        alias="CHAPTERING_STRATEGY",
+    )
+    chaptering_model_name: str = Field(
+        default="rule-based-chaptering-v1",
+        alias="CHAPTERING_MODEL_NAME",
+    )
+    chaptering_max_unit_duration_seconds: PositiveFloat = Field(
+        default=30.0,
+        alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",
+    )
+    chaptering_pause_boundary_seconds: PositiveFloat = Field(
+        default=1.0,
+        alias="CHAPTERING_PAUSE_BOUNDARY_SECONDS",
+    )
+    chaptering_context_window_seconds: PositiveFloat = Field(
+        default=90.0,
+        alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",
+    )
+    chaptering_candidate_score_context_seconds: PositiveFloat = Field(
+        default=90.0,
+        alias="CHAPTERING_CANDIDATE_SCORE_CONTEXT_SECONDS",
+    )
+    chaptering_candidate_long_pause_seconds: PositiveFloat = Field(
+        default=1.0,
+        alias="CHAPTERING_CANDIDATE_LONG_PAUSE_SECONDS",
+    )
+    chaptering_candidate_max_pause_score_seconds: PositiveFloat = Field(
+        default=5.0,
+        alias="CHAPTERING_CANDIDATE_MAX_PAUSE_SCORE_SECONDS",
+    )
+    chaptering_candidate_min_context_text_chars: PositiveInt = Field(
+        default=120,
+        alias="CHAPTERING_CANDIDATE_MIN_CONTEXT_TEXT_CHARS",
+    )
+    chaptering_candidate_discourse_marker_weight: float = Field(
+        default=0.30,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_DISCOURSE_MARKER_WEIGHT",
+    )
+    chaptering_candidate_pause_weight: float = Field(
+        default=0.25,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_PAUSE_WEIGHT",
+    )
+    chaptering_candidate_lexical_shift_weight: float = Field(
+        default=0.20,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_LEXICAL_SHIFT_WEIGHT",
+    )
+    chaptering_candidate_boundary_quality_weight: float = Field(
+        default=0.15,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_BOUNDARY_QUALITY_WEIGHT",
+    )
+    chaptering_candidate_duration_sanity_weight: float = Field(
+        default=0.10,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_DURATION_SANITY_WEIGHT",
+    )
+    chaptering_embedding_candidate_min_limit: PositiveInt = Field(
+        default=12,
+        alias="CHAPTERING_EMBEDDING_CANDIDATE_MIN_LIMIT",
+    )
+    chaptering_embedding_candidate_max_limit: PositiveInt = Field(
+        default=40,
+        alias="CHAPTERING_EMBEDDING_CANDIDATE_MAX_LIMIT",
+    )
+    chaptering_embedding_candidate_multiplier: PositiveInt = Field(
+        default=4,
+        alias="CHAPTERING_EMBEDDING_CANDIDATE_MULTIPLIER",
+    )
+    chaptering_candidate_top_score_fraction: float = Field(
+        default=0.60,
+        ge=0.0,
+        le=1.0,
+        alias="CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION",
+    )
 
     @property
     def bind_address(self) -> str:

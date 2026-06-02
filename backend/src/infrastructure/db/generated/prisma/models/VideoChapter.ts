@@ -36,7 +36,11 @@ export type VideoChapterAvgAggregateOutputType = {
   pauseScore: number | null
   discourseMarkerScore: number | null
   semanticShiftScore: number | null
+  lexicalShiftScore: number | null
+  valleyDepthScore: number | null
+  boundaryQualityScore: number | null
   durationScore: number | null
+  llmConfidenceScore: number | null
 }
 
 export type VideoChapterSumAggregateOutputType = {
@@ -49,7 +53,11 @@ export type VideoChapterSumAggregateOutputType = {
   pauseScore: number | null
   discourseMarkerScore: number | null
   semanticShiftScore: number | null
+  lexicalShiftScore: number | null
+  valleyDepthScore: number | null
+  boundaryQualityScore: number | null
   durationScore: number | null
+  llmConfidenceScore: number | null
 }
 
 export type VideoChapterMinAggregateOutputType = {
@@ -69,7 +77,11 @@ export type VideoChapterMinAggregateOutputType = {
   pauseScore: number | null
   discourseMarkerScore: number | null
   semanticShiftScore: number | null
+  lexicalShiftScore: number | null
+  valleyDepthScore: number | null
+  boundaryQualityScore: number | null
   durationScore: number | null
+  llmConfidenceScore: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -91,7 +103,11 @@ export type VideoChapterMaxAggregateOutputType = {
   pauseScore: number | null
   discourseMarkerScore: number | null
   semanticShiftScore: number | null
+  lexicalShiftScore: number | null
+  valleyDepthScore: number | null
+  boundaryQualityScore: number | null
   durationScore: number | null
+  llmConfidenceScore: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -113,7 +129,11 @@ export type VideoChapterCountAggregateOutputType = {
   pauseScore: number
   discourseMarkerScore: number
   semanticShiftScore: number
+  lexicalShiftScore: number
+  valleyDepthScore: number
+  boundaryQualityScore: number
   durationScore: number
+  llmConfidenceScore: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -130,7 +150,11 @@ export type VideoChapterAvgAggregateInputType = {
   pauseScore?: true
   discourseMarkerScore?: true
   semanticShiftScore?: true
+  lexicalShiftScore?: true
+  valleyDepthScore?: true
+  boundaryQualityScore?: true
   durationScore?: true
+  llmConfidenceScore?: true
 }
 
 export type VideoChapterSumAggregateInputType = {
@@ -143,7 +167,11 @@ export type VideoChapterSumAggregateInputType = {
   pauseScore?: true
   discourseMarkerScore?: true
   semanticShiftScore?: true
+  lexicalShiftScore?: true
+  valleyDepthScore?: true
+  boundaryQualityScore?: true
   durationScore?: true
+  llmConfidenceScore?: true
 }
 
 export type VideoChapterMinAggregateInputType = {
@@ -163,7 +191,11 @@ export type VideoChapterMinAggregateInputType = {
   pauseScore?: true
   discourseMarkerScore?: true
   semanticShiftScore?: true
+  lexicalShiftScore?: true
+  valleyDepthScore?: true
+  boundaryQualityScore?: true
   durationScore?: true
+  llmConfidenceScore?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -185,7 +217,11 @@ export type VideoChapterMaxAggregateInputType = {
   pauseScore?: true
   discourseMarkerScore?: true
   semanticShiftScore?: true
+  lexicalShiftScore?: true
+  valleyDepthScore?: true
+  boundaryQualityScore?: true
   durationScore?: true
+  llmConfidenceScore?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -207,7 +243,11 @@ export type VideoChapterCountAggregateInputType = {
   pauseScore?: true
   discourseMarkerScore?: true
   semanticShiftScore?: true
+  lexicalShiftScore?: true
+  valleyDepthScore?: true
+  boundaryQualityScore?: true
   durationScore?: true
+  llmConfidenceScore?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -316,7 +356,11 @@ export type VideoChapterGroupByOutputType = {
   pauseScore: number | null
   discourseMarkerScore: number | null
   semanticShiftScore: number | null
+  lexicalShiftScore: number | null
+  valleyDepthScore: number | null
+  boundaryQualityScore: number | null
   durationScore: number | null
+  llmConfidenceScore: number | null
   createdAt: Date
   updatedAt: Date
   _count: VideoChapterCountAggregateOutputType | null
@@ -361,7 +405,11 @@ export type VideoChapterWhereInput = {
   pauseScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   discourseMarkerScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   semanticShiftScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  lexicalShiftScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  valleyDepthScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  boundaryQualityScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   durationScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  llmConfidenceScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   createdAt?: Prisma.DateTimeFilter<"VideoChapter"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VideoChapter"> | Date | string
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
@@ -389,7 +437,11 @@ export type VideoChapterOrderByWithRelationInput = {
   pauseScore?: Prisma.SortOrderInput | Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrderInput | Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
   durationScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   media?: Prisma.MediaOrderByWithRelationInput
@@ -421,7 +473,11 @@ export type VideoChapterWhereUniqueInput = Prisma.AtLeast<{
   pauseScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   discourseMarkerScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   semanticShiftScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  lexicalShiftScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  valleyDepthScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  boundaryQualityScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   durationScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  llmConfidenceScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   createdAt?: Prisma.DateTimeFilter<"VideoChapter"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VideoChapter"> | Date | string
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
@@ -449,7 +505,11 @@ export type VideoChapterOrderByWithAggregationInput = {
   pauseScore?: Prisma.SortOrderInput | Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrderInput | Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
   durationScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VideoChapterCountOrderByAggregateInput
@@ -479,7 +539,11 @@ export type VideoChapterScalarWhereWithAggregatesInput = {
   pauseScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
   discourseMarkerScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
   semanticShiftScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
+  lexicalShiftScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
+  valleyDepthScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
+  boundaryQualityScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
   durationScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
+  llmConfidenceScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"VideoChapter"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"VideoChapter"> | Date | string
 }
@@ -498,7 +562,11 @@ export type VideoChapterCreateInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
@@ -526,7 +594,11 @@ export type VideoChapterUncheckedCreateInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
@@ -548,7 +620,11 @@ export type VideoChapterUpdateInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -576,7 +652,11 @@ export type VideoChapterUncheckedUpdateInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
@@ -601,7 +681,11 @@ export type VideoChapterCreateManyInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -620,7 +704,11 @@ export type VideoChapterUpdateManyMutationInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -642,7 +730,11 @@ export type VideoChapterUncheckedUpdateManyInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -679,7 +771,11 @@ export type VideoChapterCountOrderByAggregateInput = {
   pauseScore?: Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrder
   durationScore?: Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -694,7 +790,11 @@ export type VideoChapterAvgOrderByAggregateInput = {
   pauseScore?: Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrder
   durationScore?: Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrder
 }
 
 export type VideoChapterMaxOrderByAggregateInput = {
@@ -714,7 +814,11 @@ export type VideoChapterMaxOrderByAggregateInput = {
   pauseScore?: Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrder
   durationScore?: Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -736,7 +840,11 @@ export type VideoChapterMinOrderByAggregateInput = {
   pauseScore?: Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrder
   durationScore?: Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -751,7 +859,11 @@ export type VideoChapterSumOrderByAggregateInput = {
   pauseScore?: Prisma.SortOrder
   discourseMarkerScore?: Prisma.SortOrder
   semanticShiftScore?: Prisma.SortOrder
+  lexicalShiftScore?: Prisma.SortOrder
+  valleyDepthScore?: Prisma.SortOrder
+  boundaryQualityScore?: Prisma.SortOrder
   durationScore?: Prisma.SortOrder
+  llmConfidenceScore?: Prisma.SortOrder
 }
 
 export type VideoChapterNullableScalarRelationFilter = {
@@ -951,7 +1063,11 @@ export type VideoChapterCreateWithoutMediaInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   transcript: Prisma.TranscriptCreateNestedOneWithoutVideoChaptersInput
@@ -977,7 +1093,11 @@ export type VideoChapterUncheckedCreateWithoutMediaInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
@@ -1031,7 +1151,11 @@ export type VideoChapterScalarWhereInput = {
   pauseScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   discourseMarkerScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   semanticShiftScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  lexicalShiftScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  valleyDepthScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  boundaryQualityScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   durationScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
+  llmConfidenceScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   createdAt?: Prisma.DateTimeFilter<"VideoChapter"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VideoChapter"> | Date | string
 }
@@ -1050,7 +1174,11 @@ export type VideoChapterCreateWithoutJobInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
@@ -1076,7 +1204,11 @@ export type VideoChapterUncheckedCreateWithoutJobInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
@@ -1124,7 +1256,11 @@ export type VideoChapterCreateWithoutTranscriptInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
@@ -1150,7 +1286,11 @@ export type VideoChapterUncheckedCreateWithoutTranscriptInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
@@ -1198,7 +1338,11 @@ export type VideoChapterCreateWithoutClipCandidatesInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
@@ -1225,7 +1369,11 @@ export type VideoChapterUncheckedCreateWithoutClipCandidatesInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
@@ -1262,7 +1410,11 @@ export type VideoChapterUpdateWithoutClipCandidatesInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -1289,7 +1441,11 @@ export type VideoChapterUncheckedUpdateWithoutClipCandidatesInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
@@ -1310,7 +1466,11 @@ export type VideoChapterCreateWithoutShortClipsInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
@@ -1337,7 +1497,11 @@ export type VideoChapterUncheckedCreateWithoutShortClipsInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
@@ -1374,7 +1538,11 @@ export type VideoChapterUpdateWithoutShortClipsInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -1401,7 +1569,11 @@ export type VideoChapterUncheckedUpdateWithoutShortClipsInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
@@ -1422,7 +1594,11 @@ export type VideoChapterCreateWithoutGeneratedAssetsInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
@@ -1449,7 +1625,11 @@ export type VideoChapterUncheckedCreateWithoutGeneratedAssetsInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
@@ -1486,7 +1666,11 @@ export type VideoChapterUpdateWithoutGeneratedAssetsInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -1513,7 +1697,11 @@ export type VideoChapterUncheckedUpdateWithoutGeneratedAssetsInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
@@ -1536,7 +1724,11 @@ export type VideoChapterCreateManyMediaInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1555,7 +1747,11 @@ export type VideoChapterUpdateWithoutMediaInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -1581,7 +1777,11 @@ export type VideoChapterUncheckedUpdateWithoutMediaInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
@@ -1605,7 +1805,11 @@ export type VideoChapterUncheckedUpdateManyWithoutMediaInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1626,7 +1830,11 @@ export type VideoChapterCreateManyJobInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1645,7 +1853,11 @@ export type VideoChapterUpdateWithoutJobInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -1671,7 +1883,11 @@ export type VideoChapterUncheckedUpdateWithoutJobInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
@@ -1695,7 +1911,11 @@ export type VideoChapterUncheckedUpdateManyWithoutJobInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1716,7 +1936,11 @@ export type VideoChapterCreateManyTranscriptInput = {
   pauseScore?: number | null
   discourseMarkerScore?: number | null
   semanticShiftScore?: number | null
+  lexicalShiftScore?: number | null
+  valleyDepthScore?: number | null
+  boundaryQualityScore?: number | null
   durationScore?: number | null
+  llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1735,7 +1959,11 @@ export type VideoChapterUpdateWithoutTranscriptInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
@@ -1761,7 +1989,11 @@ export type VideoChapterUncheckedUpdateWithoutTranscriptInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
@@ -1785,7 +2017,11 @@ export type VideoChapterUncheckedUpdateManyWithoutTranscriptInput = {
   pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1856,7 +2092,11 @@ export type VideoChapterSelect<ExtArgs extends runtime.Types.Extensions.Internal
   pauseScore?: boolean
   discourseMarkerScore?: boolean
   semanticShiftScore?: boolean
+  lexicalShiftScore?: boolean
+  valleyDepthScore?: boolean
+  boundaryQualityScore?: boolean
   durationScore?: boolean
+  llmConfidenceScore?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -1885,7 +2125,11 @@ export type VideoChapterSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   pauseScore?: boolean
   discourseMarkerScore?: boolean
   semanticShiftScore?: boolean
+  lexicalShiftScore?: boolean
+  valleyDepthScore?: boolean
+  boundaryQualityScore?: boolean
   durationScore?: boolean
+  llmConfidenceScore?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -1910,7 +2154,11 @@ export type VideoChapterSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   pauseScore?: boolean
   discourseMarkerScore?: boolean
   semanticShiftScore?: boolean
+  lexicalShiftScore?: boolean
+  valleyDepthScore?: boolean
+  boundaryQualityScore?: boolean
   durationScore?: boolean
+  llmConfidenceScore?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -1935,12 +2183,16 @@ export type VideoChapterSelectScalar = {
   pauseScore?: boolean
   discourseMarkerScore?: boolean
   semanticShiftScore?: boolean
+  lexicalShiftScore?: boolean
+  valleyDepthScore?: boolean
+  boundaryQualityScore?: boolean
   durationScore?: boolean
+  llmConfidenceScore?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VideoChapterOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "transcriptId" | "jobId" | "chapterIndex" | "startTime" | "endTime" | "title" | "summary" | "transcriptVersion" | "source" | "score" | "boundaryScore" | "pauseScore" | "discourseMarkerScore" | "semanticShiftScore" | "durationScore" | "createdAt" | "updatedAt", ExtArgs["result"]["videoChapter"]>
+export type VideoChapterOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "transcriptId" | "jobId" | "chapterIndex" | "startTime" | "endTime" | "title" | "summary" | "transcriptVersion" | "source" | "score" | "boundaryScore" | "pauseScore" | "discourseMarkerScore" | "semanticShiftScore" | "lexicalShiftScore" | "valleyDepthScore" | "boundaryQualityScore" | "durationScore" | "llmConfidenceScore" | "createdAt" | "updatedAt", ExtArgs["result"]["videoChapter"]>
 export type VideoChapterInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
@@ -1988,7 +2240,11 @@ export type $VideoChapterPayload<ExtArgs extends runtime.Types.Extensions.Intern
     pauseScore: number | null
     discourseMarkerScore: number | null
     semanticShiftScore: number | null
+    lexicalShiftScore: number | null
+    valleyDepthScore: number | null
+    boundaryQualityScore: number | null
     durationScore: number | null
+    llmConfidenceScore: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["videoChapter"]>
@@ -2436,7 +2692,11 @@ export interface VideoChapterFieldRefs {
   readonly pauseScore: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly discourseMarkerScore: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly semanticShiftScore: Prisma.FieldRef<"VideoChapter", 'Float'>
+  readonly lexicalShiftScore: Prisma.FieldRef<"VideoChapter", 'Float'>
+  readonly valleyDepthScore: Prisma.FieldRef<"VideoChapter", 'Float'>
+  readonly boundaryQualityScore: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly durationScore: Prisma.FieldRef<"VideoChapter", 'Float'>
+  readonly llmConfidenceScore: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly createdAt: Prisma.FieldRef<"VideoChapter", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"VideoChapter", 'DateTime'>
 }

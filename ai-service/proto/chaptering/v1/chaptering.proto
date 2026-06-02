@@ -3,22 +3,70 @@ syntax = "proto3";
 package chaptering.v1;
 
 service ChapteringService {
-  rpc EmbedTexts(EmbedTextsRequest) returns (EmbedTextsResponse);
+  rpc GenerateChapters(GenerateChaptersRequest) returns (GenerateChaptersResponse);
 }
 
-message EmbedTextsRequest {
+message GenerateChaptersRequest {
   string request_id = 1;
-  repeated string texts = 2;
+  string language = 5;
+  double media_duration_seconds = 6;
+  repeated TranscriptSegment segments = 7;
+  ChapteringOptions options = 8;
 }
 
-message EmbedTextsResponse {
+message ChapteringOptions {
+  double min_chapter_duration_seconds = 1;
+  double target_chapter_duration_seconds = 2;
+  double max_chapter_duration_seconds = 3;
+  int32 max_chapters = 4;
+  bool use_embeddings = 5;
+  bool use_llm = 6;
+}
+
+message TranscriptSegment {
+  string segment_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string text = 4;
+  string clean_text = 5;
+  string speaker_label = 6;
+  float confidence = 7;
+}
+
+message GenerateChaptersResponse {
   string request_id = 1;
-  repeated TextEmbedding embeddings = 2;
-  string model = 3;
-  int32 dimension = 4;
+  string language = 4;
+  string model = 5;
+  ChapterSource source = 6;
+  repeated GeneratedChapter chapters = 7;
 }
 
-message TextEmbedding {
+enum ChapterSource {
+  CHAPTER_SOURCE_UNSPECIFIED = 0;
+  CHAPTER_SOURCE_RULE_BASED = 1;
+  CHAPTER_SOURCE_LLM = 2;
+}
+
+message GeneratedChapter {
   int32 index = 1;
-  repeated float values = 2;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string title = 4;
+  string summary = 5;
+  double score = 7;
+  BoundaryScores scores = 8;
+}
+
+
+message BoundaryScores {
+  double score = 1;
+  double boundary_score = 2;
+  double semantic_shift_score = 3;
+  double lexical_shift_score = 4;
+  double valley_depth_score = 5;
+  double discourse_marker_score = 6;
+  double pause_score = 7;
+  double duration_score = 8;
+  double boundary_quality_score = 9;
+  double llm_confidence_score = 10;
 }

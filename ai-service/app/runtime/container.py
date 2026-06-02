@@ -8,6 +8,11 @@ from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.source_separation.noop_demucs import NoopDemucsSourceSeparator
 from app.providers.vad.noop_vad import NoopVad
+from app.workflows.chaptering.schemas import (
+    CandidateRetentionConfig,
+    CandidateScoringConfig,
+    ChapteringPipelineConfig,
+)
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 from app.workflows.transcription.workflow import TranscriptionWorkflow
 
@@ -29,14 +34,52 @@ def build_transcription_workflow(
 def build_chaptering_workflow(
     settings: Settings | None = None,
 ) -> ChapteringWorkflow:
+    settings = settings or get_settings()
+
     return ChapteringWorkflow(
-        embedding=build_chaptering_embedding_provider(settings or get_settings())
+        embedding=build_chaptering_embedding_provider(settings),
+        config=_build_chaptering_pipeline_config(settings),
     )
 
 
 def build_chaptering_embedding_provider(settings: Settings) -> TextEmbeddingPort:
     _ = settings
     return NoopTextEmbeddingProvider()
+
+
+def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineConfig:
+    return ChapteringPipelineConfig(
+        strategy=settings.chaptering_strategy,
+        model_name=settings.chaptering_model_name,
+        max_unit_duration_seconds=settings.chaptering_max_unit_duration_seconds,
+        pause_boundary_seconds=settings.chaptering_pause_boundary_seconds,
+        context_window_seconds=settings.chaptering_context_window_seconds,
+        scoring=CandidateScoringConfig(
+            context_seconds=settings.chaptering_candidate_score_context_seconds,
+            long_pause_seconds=settings.chaptering_candidate_long_pause_seconds,
+            max_pause_score_seconds=(
+                settings.chaptering_candidate_max_pause_score_seconds
+            ),
+            min_context_text_chars=settings.chaptering_candidate_min_context_text_chars,
+            discourse_marker_weight=(
+                settings.chaptering_candidate_discourse_marker_weight
+            ),
+            pause_weight=settings.chaptering_candidate_pause_weight,
+            lexical_shift_weight=settings.chaptering_candidate_lexical_shift_weight,
+            boundary_quality_weight=(
+                settings.chaptering_candidate_boundary_quality_weight
+            ),
+            duration_sanity_weight=(
+                settings.chaptering_candidate_duration_sanity_weight
+            ),
+        ),
+        retention=CandidateRetentionConfig(
+            min_limit=settings.chaptering_embedding_candidate_min_limit,
+            max_limit=settings.chaptering_embedding_candidate_max_limit,
+            multiplier=settings.chaptering_embedding_candidate_multiplier,
+            top_score_fraction=settings.chaptering_candidate_top_score_fraction,
+        ),
+    )
 
 
 def _build_asr(settings: Settings) -> AsrPort:
