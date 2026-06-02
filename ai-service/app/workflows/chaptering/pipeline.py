@@ -12,9 +12,8 @@ from app.workflows.chaptering.candidates import (
 )
 from app.workflows.chaptering.errors import ChapterGenerationInputError
 from app.workflows.chaptering.schemas import (
-    CandidateRetentionConfig,
-    CandidateScoringConfig,
     ChapterBoundaryCandidate,
+    ChapteringPipelineConfig,
 )
 from app.workflows.chaptering.scoring import score_boundary
 from app.workflows.chaptering.selection import select_boundaries
@@ -23,16 +22,11 @@ from app.workflows.chaptering.titles import chapter_summary, chapter_text, chapt
 from app.workflows.chaptering.units import build_chapter_units
 from app.workflows.chaptering.windows import build_context_windows
 
-RULE_BASED_CHAPTERING_MODEL = "rule-based-chaptering-v1"
-MAX_UNIT_DURATION_SECONDS = 30.0
-PAUSE_BOUNDARY_SECONDS = 1.2
-CONTEXT_WINDOW_SECONDS = 90.0
-
-
 def run_chapter_generation_pipeline(
     *,
     request: ChapterGenerationRequest,
     embedding: TextEmbeddingPort,
+    config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
     """Generate deterministic chapters from transcript segments.
 
@@ -48,8 +42,8 @@ def run_chapter_generation_pipeline(
 
     units = build_chapter_units(
         request.segments,
-        max_unit_duration=MAX_UNIT_DURATION_SECONDS,
-        pause_boundary_seconds=PAUSE_BOUNDARY_SECONDS,
+        max_unit_duration=config.max_unit_duration_seconds,
+        pause_boundary_seconds=config.pause_boundary_seconds,
     )
     raw_candidates = generate_boundary_candidates(
         units,
@@ -61,18 +55,18 @@ def run_chapter_generation_pipeline(
         raw_candidates,
         media_duration=duration,
         min_chapter_duration=options.min_chapter_duration_seconds,
-        config=CandidateScoringConfig(),
+        config=config.scoring,
     )
     retained_candidates = retain_candidates_for_embedding(
         scored_candidates,
         media_duration=duration,
         target_chapter_duration=options.target_chapter_duration_seconds,
-        config=CandidateRetentionConfig(),
+        config=config.retention,
     )
     windows = build_context_windows(
         units,
         retained_candidates,
-        context_duration=CONTEXT_WINDOW_SECONDS,
+        context_duration=config.context_window_seconds,
     )
     semantic_shift_scores_by_time = (
         score_context_windows(windows, embedding=embedding)
@@ -95,7 +89,7 @@ def run_chapter_generation_pipeline(
     return ChapterGenerationResult(
         request_id=request.request_id,
         language=request.language,
-        model=RULE_BASED_CHAPTERING_MODEL,
+        model=config.model_name,
         source="RULE_BASED",
         chapters=_build_chapters(
             request,

@@ -12,6 +12,11 @@ from app.schemas.chaptering import (
     ChapteringOptions,
     ChapteringTranscriptSegment,
 )
+from app.workflows.chaptering.schemas import (
+    CandidateRetentionConfig,
+    CandidateScoringConfig,
+    ChapteringPipelineConfig,
+)
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 from chaptering.v1 import chaptering_pb2
 
@@ -51,6 +56,32 @@ def _generate_request(request_id: str = "job-1") -> chaptering_pb2.GenerateChapt
             max_chapter_duration_seconds=120,
             max_chapters=3,
             use_embeddings=True,
+        ),
+    )
+
+
+def _pipeline_config() -> ChapteringPipelineConfig:
+    return ChapteringPipelineConfig(
+        model_name="rule-based-chaptering-v1",
+        max_unit_duration_seconds=30.0,
+        pause_boundary_seconds=1.0,
+        context_window_seconds=90.0,
+        scoring=CandidateScoringConfig(
+            context_seconds=90.0,
+            long_pause_seconds=1.0,
+            max_pause_score_seconds=5.0,
+            min_context_text_chars=120,
+            discourse_marker_weight=0.30,
+            pause_weight=0.25,
+            lexical_shift_weight=0.20,
+            boundary_quality_weight=0.15,
+            duration_sanity_weight=0.10,
+        ),
+        retention=CandidateRetentionConfig(
+            min_limit=12,
+            max_limit=40,
+            multiplier=4,
+            top_score_fraction=0.60,
         ),
     )
 
@@ -97,7 +128,10 @@ def test_generate_chapters_returns_fallback_chapter() -> None:
 
 
 def test_chaptering_workflow_generates_chapters() -> None:
-    workflow = ChapteringWorkflow(embedding=NoopTextEmbeddingProvider())
+    workflow = ChapteringWorkflow(
+        embedding=NoopTextEmbeddingProvider(),
+        config=_pipeline_config(),
+    )
 
     result = workflow.execute(
         ChapterGenerationRequest(

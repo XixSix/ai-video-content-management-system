@@ -45,22 +45,34 @@ class ChapterBoundaryContextWindow:
 class CandidateScoringConfig:
     """Store cheap candidate scoring tuning values."""
 
-    context_seconds: float = 90.0
-    long_pause_seconds: float = 1.20
-    max_pause_score_seconds: float = 5.0
-    min_context_text_chars: int = 120
-    discourse_marker_weight: float = 0.30
-    pause_weight: float = 0.25
-    lexical_shift_weight: float = 0.20
-    boundary_quality_weight: float = 0.15
-    duration_sanity_weight: float = 0.10
+    context_seconds: float
+    long_pause_seconds: float
+    max_pause_score_seconds: float
+    min_context_text_chars: int
+    discourse_marker_weight: float
+    pause_weight: float
+    lexical_shift_weight: float
+    boundary_quality_weight: float
+    duration_sanity_weight: float
 
 
 @dataclass(frozen=True)
 class CandidateRetentionConfig:
     """Store candidate retention tuning values for embedding cost control."""
 
-    min_limit: int = 12
-    max_limit: int = 40
-    multiplier: int = 4
-    top_score_fraction: float = 0.60
+    min_limit: int
+    max_limit: int
+    multiplier: int
+    top_score_fraction: float
+
+
+@dataclass(frozen=True)
+class ChapteringPipelineConfig:
+    """Store deterministic chaptering workflow tuning values."""
+
+    model_name: str
+    max_unit_duration_seconds: float
+    pause_boundary_seconds: float
+    context_window_seconds: float
+    scoring: CandidateScoringConfig
+    retention: CandidateRetentionConfig
