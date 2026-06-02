@@ -1,9 +1,6 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
-from app.schemas.chaptering_embedding import (
-    ChapteringEmbeddingRequest,
-    ChapteringEmbeddingResult,
-)
-from app.workflows.chaptering.pipeline import run_chaptering_embedding_pipeline
+from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
+from app.workflows.chaptering.pipeline import run_chapter_generation_pipeline
 
 
 class ChapteringWorkflow:
@@ -16,9 +13,9 @@ class ChapteringWorkflow:
 
     def execute(
         self,
-        request: ChapteringEmbeddingRequest,
-    ) -> ChapteringEmbeddingResult:
-        return run_chaptering_embedding_pipeline(
+        request: ChapterGenerationRequest,
+    ) -> ChapterGenerationResult:
+        return run_chapter_generation_pipeline(
             request=request,
             embedding=self._embedding,
         )

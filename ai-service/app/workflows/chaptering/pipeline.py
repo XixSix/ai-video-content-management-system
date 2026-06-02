@@ -1,24 +1,14 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
-from app.schemas.chaptering_embedding import (
-    ChapteringEmbeddingRequest,
-    ChapteringEmbeddingResult,
-    TextEmbeddingResult,
-)
+from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
+from app.workflows.chaptering.errors import ChapterGenerationNotImplementedError
 
 
-def run_chaptering_embedding_pipeline(
+def run_chapter_generation_pipeline(
     *,
-    request: ChapteringEmbeddingRequest,
+    request: ChapterGenerationRequest,
     embedding: TextEmbeddingPort,
-) -> ChapteringEmbeddingResult:
-    embeddings = embedding.embed_texts(request.texts)
-
-    return ChapteringEmbeddingResult(
-        request_id=request.request_id,
-        model=embedding.model_name,
-        dimension=embedding.dimension,
-        embeddings=[
-            TextEmbeddingResult(index=index, values=values)
-            for index, values in enumerate(embeddings)
-        ],
+) -> ChapterGenerationResult:
+    _ = request, embedding
+    raise ChapterGenerationNotImplementedError(
+        "chapter generation pipeline is not implemented yet"
     )

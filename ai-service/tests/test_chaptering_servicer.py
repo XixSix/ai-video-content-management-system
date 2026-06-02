@@ -6,11 +6,13 @@ import grpc
 import pytest
 
 from app.grpc.chaptering_servicer import ChapteringServicer
-from app.providers.chaptering.noop_embedding import (
-    NOOP_EMBEDDING_DIMENSION,
-    NoopTextEmbeddingProvider,
+from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.schemas.chaptering import (
+    ChapterGenerationRequest,
+    ChapteringOptions,
+    ChapteringTranscriptSegment,
 )
-from app.schemas.chaptering_embedding import ChapteringEmbeddingRequest
+from app.workflows.chaptering.errors import ChapterGenerationNotImplementedError
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 from chaptering.v1 import chaptering_pb2
 
@@ -84,19 +86,30 @@ def test_generate_chapters_is_unimplemented_until_workflow_is_wired() -> None:
     assert error.value.code == grpc.StatusCode.UNIMPLEMENTED
 
 
-def test_chaptering_workflow_returns_noop_embeddings() -> None:
+def test_chaptering_workflow_defines_generate_chapters_entrypoint() -> None:
     workflow = ChapteringWorkflow(embedding=NoopTextEmbeddingProvider())
 
-    result = workflow.execute(
-        ChapteringEmbeddingRequest(
-            request_id="job-1",
-            texts=["Topic introduction"],
+    with pytest.raises(ChapterGenerationNotImplementedError):
+        workflow.execute(
+            ChapterGenerationRequest(
+                request_id="job-1",
+                language="en",
+                media_duration_seconds=120,
+                segments=[
+                    ChapteringTranscriptSegment(
+                        segment_id="seg-1",
+                        start_seconds=0,
+                        end_seconds=10,
+                        text="Topic introduction.",
+                    )
+                ],
+                options=ChapteringOptions(
+                    min_chapter_duration_seconds=60,
+                    target_chapter_duration_seconds=180,
+                    max_chapter_duration_seconds=180,
+                    max_chapters=3,
+                    use_embeddings=True,
+                    use_llm=False,
+                ),
+            )
         )
-    )
-
-    assert result.request_id == "job-1"
-    assert result.model == ""
-    assert result.dimension == NOOP_EMBEDDING_DIMENSION
-    assert len(result.embeddings) == 1
-    assert result.embeddings[0].index == 0
-    assert len(result.embeddings[0].values) == NOOP_EMBEDDING_DIMENSION
