@@ -292,6 +292,12 @@ def _pause_score(
 
 
 def _lexical_shift_score(left_text: str, right_text: str) -> float:
+    """Return cheap lexical shift using Jaccard distance over token sets.
+
+    This intentionally ignores token frequency and term importance for now.
+    A later upgrade can replace it with TF-IDF vectors plus cosine distance
+    to better downweight common words and emphasize topic-specific terms.
+    """
     left_tokens = set(TOKEN_RE.findall(left_text.lower()))
     right_tokens = set(TOKEN_RE.findall(right_text.lower()))
     if not left_tokens or not right_tokens:
