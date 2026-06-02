@@ -94,7 +94,9 @@ def test_map_response_rejects_empty_segments() -> None:
     )
 
     with pytest.raises(ValueError, match="did not include transcript segments"):
-        ai_transcription_mapper.map_transcribe_response(request_id="job-1", response=response)
+        ai_transcription_mapper.map_transcribe_response(
+            request_id="job-1", response=response
+        )
 
 
 class FakeRpcError(grpc.RpcError):
@@ -144,7 +146,9 @@ class RespondingStub:
 
 def test_client_maps_terminal_grpc_error(monkeypatch: pytest.MonkeyPatch) -> None:
     grpc_error = FakeRpcError(grpc.StatusCode.NOT_FOUND)
-    monkeypatch.setattr(ai_service.grpc, "insecure_channel", lambda target: FakeChannel())
+    monkeypatch.setattr(
+        ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
+    )
     monkeypatch.setattr(
         ai_service.transcription_pb2_grpc,
         "TranscriptionServiceStub",
@@ -161,8 +165,12 @@ def test_client_maps_terminal_grpc_error(monkeypatch: pytest.MonkeyPatch) -> Non
     assert error.value.error_code == "AI_SERVICE_NOT_FOUND"
 
 
-def test_client_maps_invalid_response_to_terminal_error(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(ai_service.grpc, "insecure_channel", lambda target: FakeChannel())
+def test_client_maps_invalid_response_to_terminal_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
+    )
     monkeypatch.setattr(
         ai_service.transcription_pb2_grpc,
         "TranscriptionServiceStub",
@@ -181,7 +189,9 @@ def test_client_maps_invalid_response_to_terminal_error(monkeypatch: pytest.Monk
 
 def test_client_bubbles_retryable_grpc_error(monkeypatch: pytest.MonkeyPatch) -> None:
     grpc_error = FakeRpcError(grpc.StatusCode.UNAVAILABLE)
-    monkeypatch.setattr(ai_service.grpc, "insecure_channel", lambda target: FakeChannel())
+    monkeypatch.setattr(
+        ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
+    )
     monkeypatch.setattr(
         ai_service.transcription_pb2_grpc,
         "TranscriptionServiceStub",

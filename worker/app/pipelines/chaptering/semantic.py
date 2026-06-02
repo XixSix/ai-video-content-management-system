@@ -13,6 +13,7 @@ class EmbeddingClient(Protocol):
         texts: list[str],
     ) -> ChapteringEmbeddingResult:
         """Return embeddings for texts in their original request order."""
+        ...
 
 
 def score_context_windows(

@@ -19,13 +19,13 @@ def build_transcribe_request(
     request_id: str,
     audio_path: Path,
     options: TranscriptJobOptions,
-) -> transcription_pb2.TranscribeRequest:
-    return transcription_pb2.TranscribeRequest(
+) -> transcription_pb2.TranscribeRequest:  # type: ignore
+    return transcription_pb2.TranscribeRequest(  # type: ignore
         request_id=request_id,
         local_path=str(audio_path),
         filename=audio_path.name,
         content_type="audio/wav",
-        options=transcription_pb2.TranscriptionOptions(
+        options=transcription_pb2.TranscriptionOptions(  # type: ignore
             language=options.language,
             enable_vad=options.use_vad,
             enable_diarization=options.use_diarization,
@@ -37,7 +37,7 @@ def build_transcribe_request(
 def map_transcribe_response(
     *,
     request_id: str,
-    response: transcription_pb2.TranscribeResponse,
+    response: transcription_pb2.TranscribeResponse,  # type: ignore
 ) -> TranscriptResult:
     if response.request_id != request_id:
         raise ValueError("ai-service response request_id does not match request")

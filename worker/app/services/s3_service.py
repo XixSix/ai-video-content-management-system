@@ -45,13 +45,19 @@ class S3Service:
                     f"{S3SourceObjectNotFoundError.error_code}: s3://{self.bucket}/{object_key} was not found"
                 ) from error
 
-            raise S3ServiceError(f"Failed to download s3://{self.bucket}/{object_key}") from error
+            raise S3ServiceError(
+                f"Failed to download s3://{self.bucket}/{object_key}"
+            ) from error
         except BotoCoreError as error:
-            raise S3ServiceError(f"Failed to download s3://{self.bucket}/{object_key}") from error
+            raise S3ServiceError(
+                f"Failed to download s3://{self.bucket}/{object_key}"
+            ) from error
 
         return destination_path
 
-    def download_to_tmp(self, object_key: str, *, tmp_dir: Path = settings.tmp_dir) -> Path:
+    def download_to_tmp(
+        self, object_key: str, *, tmp_dir: Path = settings.tmp_dir
+    ) -> Path:
         """Download an object into the worker temporary directory."""
         filename = Path(object_key).name
 
@@ -60,17 +66,23 @@ class S3Service:
 
         return self.download_file(object_key, tmp_dir / filename)
 
-    def upload_file(self, source_path: Path, object_key: str, *, content_type: str | None = None) -> str:
+    def upload_file(
+        self, source_path: Path, object_key: str, *, content_type: str | None = None
+    ) -> str:
         """Upload a local file and return the stored object key."""
         extra_args = {"ContentType": content_type} if content_type else None
 
         try:
             if extra_args:
-                self.client.upload_file(str(source_path), self.bucket, object_key, ExtraArgs=extra_args)
+                self.client.upload_file(
+                    str(source_path), self.bucket, object_key, ExtraArgs=extra_args
+                )
             else:
                 self.client.upload_file(str(source_path), self.bucket, object_key)
         except (BotoCoreError, ClientError) as error:
-            raise S3ServiceError(f"Failed to upload {source_path} to s3://{self.bucket}/{object_key}") from error
+            raise S3ServiceError(
+                f"Failed to upload {source_path} to s3://{self.bucket}/{object_key}"
+            ) from error
 
         return object_key
 
@@ -80,14 +92,20 @@ class S3Service:
             self.client.head_object(Bucket=self.bucket, Key=object_key)
             return True
         except ClientError as error:
-            status_code = error.response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+            status_code = error.response.get("ResponseMetadata", {}).get(
+                "HTTPStatusCode"
+            )
 
             if status_code == 404:
                 return False
 
-            raise S3ServiceError(f"Failed to check s3://{self.bucket}/{object_key}") from error
+            raise S3ServiceError(
+                f"Failed to check s3://{self.bucket}/{object_key}"
+            ) from error
         except BotoCoreError as error:
-            raise S3ServiceError(f"Failed to check s3://{self.bucket}/{object_key}") from error
+            raise S3ServiceError(
+                f"Failed to check s3://{self.bucket}/{object_key}"
+            ) from error
 
 
 def _is_not_found_error(error: ClientError) -> bool:

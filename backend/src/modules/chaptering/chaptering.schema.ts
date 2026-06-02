@@ -6,8 +6,8 @@ export const mediaChapterParamsSchema = z.strictObject({
 
 export const generateChaptersSchema = z
   .strictObject({
-    minChapterDuration: z.number().min(60).max(600).default(180),
-    targetChapterDuration: z.number().min(300).max(1800).default(300),
+    minChapterDuration: z.number().min(30).max(600).default(180),
+    targetChapterDuration: z.number().min(30).max(1800).default(300),
     maxChapters: z.number().int().min(3).max(20).default(5),
     useLlm: z.boolean().default(false),
     useEmbeddings: z.boolean().default(false)

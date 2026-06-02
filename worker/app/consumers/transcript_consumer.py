@@ -13,6 +13,7 @@ from app.handlers.transcript_handler import (
     process_transcript_job,
     record_transcript_job_failure,
 )
+from app.pipelines.transcript.pipeline import TerminalTranscriptPipelineError
 
 logger = logging.getLogger(__name__)
 
@@ -37,17 +38,27 @@ def handle_transcript_job(
         message = TranscriptJobMessage.model_validate(kwargs)
         return process_transcript_job(message)
     except ValidationError as error:
-        logger.exception("Invalid transcript task payload job_id=%s", job_id or "unknown")
+        logger.exception(
+            "Invalid transcript task payload job_id=%s", job_id or "unknown"
+        )
         if job_id is not None:
-            record_transcript_job_failure(job_id, f"Invalid transcript task payload: {error}")
+            record_transcript_job_failure(
+                job_id, f"Invalid transcript task payload: {error}"
+            )
         raise
-    except TerminalTranscriptJobError as error:
-        logger.warning("Terminal transcript job failure job_id=%s error=%s", job_id or "unknown", error)
+    except (TerminalTranscriptJobError, TerminalTranscriptPipelineError) as error:
+        logger.warning(
+            "Terminal transcript job failure job_id=%s error=%s",
+            job_id or "unknown",
+            error,
+        )
         if job_id is not None:
             record_transcript_job_failure(job_id, str(error))
         raise
     except Exception as error:
-        logger.exception("Retryable transcript job failure job_id=%s", job_id or "unknown")
+        logger.exception(
+            "Retryable transcript job failure job_id=%s", job_id or "unknown"
+        )
         if job_id is None:
             raise
 
@@ -71,6 +82,8 @@ def handle_transcript_job(
             )
             raise self.retry(exc=error)
         except MaxRetriesExceededError:
-            logger.exception("Celery max retries exceeded for transcript job job_id=%s", job_id)
+            logger.exception(
+                "Celery max retries exceeded for transcript job job_id=%s", job_id
+            )
             record_transcript_job_failure(job_id, str(error))
             raise

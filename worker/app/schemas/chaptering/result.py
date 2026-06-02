@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from typing import Literal
 from uuid import UUID
 
 
+type ChapterSource = Literal["RULE_BASED", "LLM", "USER_EDITED"]
 CHAPTER_SOURCE_RULE_BASED = "RULE_BASED"
 RULE_BASED_CHAPTERING_MODEL = "rule-based-chaptering-v1"
 
@@ -50,6 +52,6 @@ class ChapterCandidate:
 class ChapteringResult:
     transcript_id: UUID
     transcript_version: int
-    source: str
+    source: ChapterSource
     model: str
     chapters: list[ChapterCandidate]

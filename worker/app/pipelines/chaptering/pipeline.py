@@ -50,6 +50,14 @@ def run_chaptering_pipeline(
     validate_transcript(transcript, message)
 
     result = _generate_chapters_for_configured_strategy(transcript, options)
+    logger.info(
+        "Chaptering pipeline generated result job_id=%s source=%s model=%s "
+        "chapter_count=%s",
+        job_id,
+        result.source,
+        result.model,
+        len(result.chapters),
+    )
 
     with get_db_session() as session:
         persisted = chaptering_repository.save_chapters(
@@ -61,6 +69,15 @@ def run_chaptering_pipeline(
             chapters=result.chapters,
             source=result.source,
         )
+    logger.info(
+        "Chaptering pipeline persisted result job_id=%s transcript_id=%s "
+        "transcript_version=%s chapter_count=%s model=%s",
+        job_id,
+        persisted.transcript_id,
+        persisted.transcript_version,
+        len(persisted.chapters),
+        persisted.model,
+    )
 
     return _completed_output(persisted, options=options)
 

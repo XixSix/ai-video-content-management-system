@@ -52,4 +52,5 @@ class PlaceholderTranscriptionService:
             word_count=count_words(full_text),
         )
 
+
 placeholder_transcription_service = PlaceholderTranscriptionService()

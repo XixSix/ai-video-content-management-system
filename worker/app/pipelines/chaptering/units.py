@@ -24,7 +24,7 @@ def build_chapter_units(
     for segment in segments:
         if not segment.text.strip():
             continue
-        
+
         # Check if long pause
         if current and _starts_after_long_pause(
             current[-1],

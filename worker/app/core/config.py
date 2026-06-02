@@ -2,13 +2,13 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import AmqpDsn, BaseModel, Field, PositiveFloat, PositiveInt
+from pydantic import AmqpDsn, Field, PositiveFloat, PositiveInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 WORKER_DIR = Path(__file__).resolve().parents[2]
 
 
-class _DatabaseSettings(BaseModel):
+class _DatabaseSettings:
     database_url: str = Field(alias="DATABASE_URL")
     database_pool_size: PositiveInt = Field(default=5, alias="DATABASE_POOL_SIZE")
     database_max_overflow: int = Field(default=5, ge=0, alias="DATABASE_MAX_OVERFLOW")
@@ -18,7 +18,7 @@ class _DatabaseSettings(BaseModel):
     )
 
 
-class _CeleryAppSettings(BaseModel):
+class _CeleryAppSettings:
     rabbitmq_url: AmqpDsn = Field(alias="RABBITMQ_URL")
     transcript_queue_name: str = Field(
         default="transcript_queue",
@@ -64,7 +64,7 @@ class _CeleryAppSettings(BaseModel):
     )
 
 
-class _StorageSettings(BaseModel):
+class _StorageSettings:
     s3_endpoint: str = Field(alias="S3_ENDPOINT")
     s3_public_endpoint: str = Field(
         default="http://localhost:9000",
@@ -82,7 +82,7 @@ class _StorageSettings(BaseModel):
     )
 
 
-class _FfmpegSettings(BaseModel):
+class _FfmpegSettings:
     ffmpeg_binary: str = Field(default="ffmpeg", alias="FFMPEG_BINARY")
     ffprobe_binary: str = Field(default="ffprobe", alias="FFPROBE_BINARY")
     ffmpeg_timeout_seconds: PositiveInt = Field(
@@ -92,7 +92,7 @@ class _FfmpegSettings(BaseModel):
     audio_channels: PositiveInt = Field(default=1, alias="AUDIO_CHANNELS")
 
 
-class _AiServiceGrpcSettings(BaseModel):
+class _AiServiceGrpcSettings:
     ai_service_grpc_target: str = Field(
         default="localhost:50051",
         alias="AI_SERVICE_GRPC_TARGET",
@@ -103,7 +103,7 @@ class _AiServiceGrpcSettings(BaseModel):
     )
 
 
-class _ChapteringPipelineSettings(BaseModel):
+class _ChapteringPipelineSettings:
     chaptering_pipeline_strategy: Literal["candidate", "rule_based"] = Field(
         default="candidate",
         alias="CHAPTERING_PIPELINE_STRATEGY",
@@ -116,17 +116,72 @@ class _ChapteringPipelineSettings(BaseModel):
         default=1.2,
         alias="CHAPTERING_PAUSE_BOUNDARY_SECONDS",
     )
-    chaptering_candidate_density_multiplier: PositiveInt = Field(
-        default=4,
-        alias="CHAPTERING_CANDIDATE_DENSITY_MULTIPLIER",
-    )
     chaptering_context_window_seconds: PositiveFloat = Field(
         default=90.0,
         alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",
     )
+    chaptering_candidate_score_context_seconds: PositiveFloat = Field(
+        default=60.0,
+        alias="CHAPTERING_CANDIDATE_SCORE_CONTEXT_SECONDS",
+    )
+    chaptering_candidate_long_pause_seconds: PositiveFloat = Field(
+        default=1.2,
+        alias="CHAPTERING_CANDIDATE_LONG_PAUSE_SECONDS",
+    )
+    chaptering_candidate_max_pause_score_seconds: PositiveFloat = Field(
+        default=3.0,
+        alias="CHAPTERING_CANDIDATE_MAX_PAUSE_SCORE_SECONDS",
+    )
+    chaptering_candidate_min_context_text_chars: PositiveInt = Field(
+        default=120,
+        alias="CHAPTERING_CANDIDATE_MIN_CONTEXT_TEXT_CHARS",
+    )
+    chaptering_embedding_candidate_min_limit: PositiveInt = Field(
+        default=80,
+        alias="CHAPTERING_EMBEDDING_CANDIDATE_MIN_LIMIT",
+    )
+    chaptering_embedding_candidate_max_limit: PositiveInt = Field(
+        default=150,
+        alias="CHAPTERING_EMBEDDING_CANDIDATE_MAX_LIMIT",
+    )
+    chaptering_embedding_candidate_multiplier: PositiveInt = Field(
+        default=10,
+        alias="CHAPTERING_EMBEDDING_CANDIDATE_MULTIPLIER",
+    )
+    chaptering_candidate_top_score_fraction: float = Field(
+        default=0.70,
+        gt=0.0,
+        le=1.0,
+        alias="CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION",
+    )
+    chaptering_candidate_discourse_marker_weight: float = Field(
+        default=0.30,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_DISCOURSE_MARKER_WEIGHT",
+    )
+    chaptering_candidate_pause_weight: float = Field(
+        default=0.25,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_PAUSE_WEIGHT",
+    )
+    chaptering_candidate_lexical_shift_weight: float = Field(
+        default=0.20,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_LEXICAL_SHIFT_WEIGHT",
+    )
+    chaptering_candidate_boundary_quality_weight: float = Field(
+        default=0.15,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_BOUNDARY_QUALITY_WEIGHT",
+    )
+    chaptering_candidate_duration_sanity_weight: float = Field(
+        default=0.10,
+        ge=0.0,
+        alias="CHAPTERING_CANDIDATE_DURATION_SANITY_WEIGHT",
+    )
 
 
-class _LoggingSettings(BaseModel):
+class _LoggingSettings:
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
 
@@ -149,7 +204,7 @@ class Settings(
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # pyright: ignore[reportCallIssue]
 
 
 settings = get_settings()

@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 from app.core.celery_app import celery_app
 from app.core.config import settings
-from app.core.logger import configure_logging
+from app.core.logging import configure_logging
 
 logger = logging.getLogger(__name__)
 

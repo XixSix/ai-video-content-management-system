@@ -4,10 +4,7 @@ from typing import Any
 from app.core.config import settings
 from app.db import jobs_repository, transcript_repository
 from app.db.client import get_db_session
-from app.pipelines.transcript.pipeline import (
-    TerminalTranscriptPipelineError,
-    run_transcript_pipeline,
-)
+from app.pipelines.transcript.pipeline import run_transcript_pipeline
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.transcript_message import (
     TranscriptJobMessage,
@@ -33,11 +30,13 @@ class TerminalTranscriptJobError(Exception):
 def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     """Claim and validate a transcript job before delegating pipeline work."""
     job_id = str(message.job_id)
-    logger.info("Processing transcript job job_id=%s media_id=%s", job_id, message.media_id)
+
+    logger.info(
+        "Processing transcript job job_id=%s media_id=%s", job_id, message.media_id
+    )
 
     with get_db_session() as session:
-        job = jobs_repository.find_processing_job(session, job_id)
-        _guard_job(message, job)
+        job = _guard_job(message, jobs_repository.find_processing_job(session, job_id))
         _guard_retry_budget(job)
 
     if _should_skip_job(job):
@@ -49,10 +48,11 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
     if not queued_job:
         # Another worker may have claimed the job between validation and update.
         with get_db_session() as session:
-            current_job = jobs_repository.find_processing_job(session, job_id)
-            _guard_job(message, current_job)
+            current_job = _guard_job(
+                message, jobs_repository.find_processing_job(session, job_id)
+            )
 
-        if current_job and current_job.status in {
+        if current_job.status in {
             JobStatus.EXTRACTING_AUDIO,
             JobStatus.TRANSCRIBING,
             JobStatus.QUEUED,
@@ -75,13 +75,7 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
 
     _mark_processing_started(job_id)
 
-    try:
-        output = run_transcript_pipeline(message, options=options)
-    except TerminalTranscriptPipelineError as error:
-        logger.warning("Transcript pipeline terminal failure job_id=%s error=%s", job_id, error)
-        raise TerminalTranscriptJobError(
-            str(error), error_code=error.error_code
-        ) from error
+    output = run_transcript_pipeline(message, options=options)
 
     _mark_completed(job_id, output)
 
@@ -132,7 +126,9 @@ def increment_transcript_job_attempt(job_id: str) -> int | None:
     return job.attempt_count
 
 
-def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> None:
+def _guard_job(
+    message: TranscriptJobMessage, job: ProcessingJobRow | None
+) -> ProcessingJobRow:
     """Reject jobs that are missing, mismatched, failed, or the wrong type."""
     if not job:
         raise TerminalTranscriptJobError("Processing job was not found")
@@ -152,6 +148,8 @@ def _guard_job(message: TranscriptJobMessage, job: ProcessingJobRow | None) -> N
 
     if job.status == JobStatus.FAILED:
         raise TerminalTranscriptJobError("Processing job is already failed")
+
+    return job
 
 
 def _guard_retry_budget(job: ProcessingJobRow) -> None:

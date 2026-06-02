@@ -13,7 +13,9 @@ MEDIA_ID = "00000000-0000-4000-8000-000000000002"
 
 
 class FakeResult:
-    def __init__(self, row: dict[str, object] | list[dict[str, object]] | None = None) -> None:
+    def __init__(
+        self, row: dict[str, object] | list[dict[str, object]] | None = None
+    ) -> None:
         self.row = row
 
     def mappings(self) -> "FakeResult":
@@ -36,7 +38,9 @@ class FakeResult:
 
 
 class FakeSession:
-    def __init__(self, rows: list[dict[str, object] | list[dict[str, object]] | None]) -> None:
+    def __init__(
+        self, rows: list[dict[str, object] | list[dict[str, object]] | None]
+    ) -> None:
         self.rows = rows
         self.params: list[dict[str, object]] = []
 

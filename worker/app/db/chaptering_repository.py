@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from typing import cast
 from uuid import UUID, uuid4
 
+from sqlalchemy.engine import RowMapping
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.schemas.chaptering.result import (
     ChapterCandidate,
+    ChapterSource,
     ChapteringTranscript,
     ChapteringTranscriptSegment,
 )
@@ -24,7 +27,7 @@ class PersistedChapterSummary:
     title: str
     summary: str | None
     transcript_version: int
-    source: str
+    source: ChapterSource
     score: float | None
     boundary_score: float | None
     pause_score: float | None
@@ -139,7 +142,7 @@ def save_chapters(
     transcript_id: str,
     transcript_version: int,
     chapters: list[ChapterCandidate],
-    source: str,
+    source: ChapterSource,
 ) -> PersistedChapteringSummary:
     """Replace transcript chapters with the current generated chapter set."""
     now = datetime.now(UTC)
@@ -234,7 +237,7 @@ def _find_chapter_rows(
     session: Session,
     where_sql: str,
     params: dict[str, str],
-) -> list[object]:
+) -> list[RowMapping]:
     return list(
         session.execute(
             text(
@@ -269,7 +272,7 @@ def _find_chapter_rows(
     )
 
 
-def _chapter_from_row(row: object) -> PersistedChapterSummary:
+def _chapter_from_row(row: RowMapping) -> PersistedChapterSummary:
     return PersistedChapterSummary(
         id=UUID(str(row["id"])),
         media_id=UUID(str(row["media_id"])),
@@ -281,7 +284,7 @@ def _chapter_from_row(row: object) -> PersistedChapterSummary:
         title=row["title"],
         summary=row["summary"],
         transcript_version=row["transcript_version"],
-        source=row["source"],
+        source=_parse_chapter_source(row["source"]),
         score=row["score"],
         boundary_score=row["boundary_score"],
         pause_score=row["pause_score"],
@@ -289,3 +292,10 @@ def _chapter_from_row(row: object) -> PersistedChapterSummary:
         semantic_shift_score=row["semantic_shift_score"],
         duration_score=row["duration_score"],
     )
+
+
+def _parse_chapter_source(source: object) -> ChapterSource:
+    if source in {"RULE_BASED", "LLM", "USER_EDITED"}:
+        return cast(ChapterSource, source)
+
+    raise ValueError(f"Unknown chapter source: {source}")

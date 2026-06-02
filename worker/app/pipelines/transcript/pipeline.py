@@ -37,7 +37,9 @@ def run_transcript_pipeline(
     """Run transcript media processing and return the completed output payload."""
     job_id = str(message.job_id)
     workspace = _workspace_for_job(job_id)
-    logger.info("Starting transcript pipeline job_id=%s workspace=%s", job_id, workspace)
+    logger.info(
+        "Starting transcript pipeline job_id=%s workspace=%s", job_id, workspace
+    )
 
     try:
         source_path = _download_source(message.s3_key, workspace)
@@ -73,7 +75,9 @@ def run_transcript_pipeline(
             error_code=error.error_code,
         ) from error
     except AIServiceTerminalError as error:
-        logger.warning("AI service rejected transcript job_id=%s error=%s", job_id, error)
+        logger.warning(
+            "AI service rejected transcript job_id=%s error=%s", job_id, error
+        )
         raise TerminalTranscriptPipelineError(
             str(error),
             error_code=error.error_code,
