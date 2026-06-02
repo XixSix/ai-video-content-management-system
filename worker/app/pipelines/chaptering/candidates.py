@@ -10,23 +10,23 @@ def generate_boundary_candidates(
     *,
     media_duration: float,
     min_chapter_duration: float,
-    max_chapters: int,
-    density_multiplier: int,
 ) -> list[ChapterBoundaryCandidate]:
     """Create candidate chapter starts from sentence-like unit boundaries.
 
     Candidate times come only from ``ChapterUnit.start_time`` values after the
-    first unit. The generator filters starts that would create an invalid first
-    or final chapter, then keeps a bounded but evenly distributed candidate set
-    for later semantic scoring.
+    first unit. The generator only filters starts that would create an invalid
+    first or final chapter, then returns every hard-valid candidate for later
+    cheap scoring and semantic retention.
+
+    Notes:
+        This phase does not cap candidates, downsample evenly, use target
+        chapter duration, call embeddings, or select final chapter starts.
     """
-    if len(units) < 2 or media_duration <= 0 or max_chapters <= 1:
+    if len(units) < 2 or media_duration <= 0:
         logger.info(
-            "Chaptering candidate generation skipped units=%s media_duration=%.2f "
-            "max_chapters=%s",
+            "Chaptering candidate generation skipped units=%s media_duration=%.2f",
             len(units),
             media_duration,
-            max_chapters,
         )
         return []
 
@@ -42,34 +42,18 @@ def generate_boundary_candidates(
         ):
             candidates.append(_candidate_from_unit(units, unit_index))
 
-    max_candidates = max(1, max_chapters * density_multiplier)
-    if len(candidates) <= max_candidates:
-        logger.info(
-            "Chaptering candidate generation units=%s raw_candidates=%s "
-            "valid_candidates=%s max_candidates=%s retained_candidates=%s "
-            "downsampled=%s",
-            len(units),
-            raw_candidate_count,
-            len(candidates),
-            max_candidates,
-            len(candidates),
-            False,
-        )
-        return candidates
-
-    retained_candidates = _downsample_evenly(candidates, max_candidates)
     logger.info(
         "Chaptering candidate generation units=%s raw_candidates=%s "
-        "valid_candidates=%s max_candidates=%s retained_candidates=%s "
+        "invalid_candidates=%s valid_candidates=%s retained_candidates=%s "
         "downsampled=%s",
         len(units),
         raw_candidate_count,
+        raw_candidate_count - len(candidates),
         len(candidates),
-        max_candidates,
-        len(retained_candidates),
-        True,
+        len(candidates),
+        False,
     )
-    return retained_candidates
+    return candidates
 
 
 def _candidate_from_unit(
@@ -95,23 +79,3 @@ def _is_valid_candidate_time(
     return (
         time >= min_chapter_duration and media_duration - time >= min_chapter_duration
     )
-
-
-def _downsample_evenly(
-    candidates: list[ChapterBoundaryCandidate],
-    max_candidates: int,
-) -> list[ChapterBoundaryCandidate]:
-    """Keep candidates spread across the full timeline when density is high."""
-    if max_candidates == 1:
-        return [candidates[0]]
-
-    last_index = len(candidates) - 1
-    selected_indexes = {
-        round(index * last_index / (max_candidates - 1))
-        for index in range(max_candidates)
-    }
-    return [
-        candidate
-        for index, candidate in enumerate(candidates)
-        if index in selected_indexes
-    ]

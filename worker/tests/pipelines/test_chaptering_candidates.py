@@ -3,8 +3,6 @@ from uuid import UUID
 from app.pipelines.chaptering.candidates import generate_boundary_candidates
 from app.pipelines.chaptering.schemas import ChapterUnit
 
-CANDIDATE_DENSITY_MULTIPLIER = 4
-
 
 def _unit(index: int, *, start_time: float, end_time: float) -> ChapterUnit:
     return ChapterUnit(
@@ -28,8 +26,6 @@ def test_generate_boundary_candidates_uses_unit_starts_after_first_unit() -> Non
         units,
         media_duration=180.0,
         min_chapter_duration=45.0,
-        max_chapters=4,
-        density_multiplier=CANDIDATE_DENSITY_MULTIPLIER,
     )
 
     assert [candidate.time for candidate in candidates] == [50.0, 100.0]
@@ -50,14 +46,12 @@ def test_generate_boundary_candidates_filters_invalid_chapter_lengths() -> None:
         units,
         media_duration=200.0,
         min_chapter_duration=60.0,
-        max_chapters=4,
-        density_multiplier=CANDIDATE_DENSITY_MULTIPLIER,
     )
 
     assert [candidate.time for candidate in candidates] == [80.0]
 
 
-def test_generate_boundary_candidates_downsamples_evenly() -> None:
+def test_generate_boundary_candidates_keeps_all_hard_valid_candidates() -> None:
     units = [
         _unit(index, start_time=float(index * 10), end_time=float(index * 10 + 5))
         for index in range(20)
@@ -67,10 +61,8 @@ def test_generate_boundary_candidates_downsamples_evenly() -> None:
         units,
         media_duration=220.0,
         min_chapter_duration=10.0,
-        max_chapters=3,
-        density_multiplier=2,
     )
 
-    assert len(candidates) == 6
+    assert len(candidates) == 19
     assert candidates[0].time == 10.0
     assert candidates[-1].time == 190.0

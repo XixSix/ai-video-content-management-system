@@ -54,8 +54,6 @@ def generate_candidate_chapters(
         units,
         media_duration=duration,
         min_chapter_duration=options.min_chapter_duration,
-        max_chapters=options.max_chapters,
-        density_multiplier=settings.chaptering_candidate_density_multiplier,
     )
     windows = build_context_windows(
         units,
