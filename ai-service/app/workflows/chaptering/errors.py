@@ -1,2 +1,2 @@
-class ChapterGenerationNotImplementedError(Exception):
-    """Raised when chapter generation is requested before the workflow is wired."""
+class ChapterGenerationInputError(Exception):
+    """Raised when chapter generation input cannot produce valid chapters."""

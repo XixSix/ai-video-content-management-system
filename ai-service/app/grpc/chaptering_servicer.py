@@ -11,7 +11,7 @@ from app.schemas.chaptering import (
     ChapteringOptions,
     ChapteringTranscriptSegment,
 )
-from app.workflows.chaptering.errors import ChapterGenerationNotImplementedError
+from app.workflows.chaptering.errors import ChapterGenerationInputError
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 
 ensure_proto_generated_on_path()
@@ -36,8 +36,8 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
 
         try:
             result = self._workflow.execute(workflow_request)
-        except ChapterGenerationNotImplementedError as error:
-            context.abort(grpc.StatusCode.UNIMPLEMENTED, str(error))
+        except ChapterGenerationInputError as error:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(error))
 
         return self._map_response(result)
 
