@@ -214,14 +214,14 @@ model Media {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  processingJobs  ProcessingJob[]
-  transcripts     Transcript[]
+  processingJobs     ProcessingJob[]
+  transcripts        Transcript[]
   transcriptSegments TranscriptSegment[]
-  videoChapters   VideoChapter[]
-  clipCandidates  ClipCandidate[]
-  shortClips      ShortClip[]
-  generatedAssets GeneratedAsset[]
-  publishTasks    PublishTask[]
+  videoChapters      VideoChapter[]
+  clipCandidates     ClipCandidate[]
+  shortClips         ShortClip[]
+  generatedAssets    GeneratedAsset[]
+  publishTasks       PublishTask[]
 
   @@unique([s3Bucket, s3Key])
   @@index([userId])
@@ -288,8 +288,8 @@ model Transcript {
   speechDensity          Float? @map("speech_density")
   wordCount              Int?   @map("word_count")
 
-  isEdited Boolean @default(false) @map("is_edited")
-  version  Int     @default(1)
+  isEdited          Boolean   @default(false) @map("is_edited")
+  version           Int       @default(1)
   fullTextUpdatedAt DateTime? @map("full_text_updated_at")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -347,7 +347,7 @@ model VideoChapter {
   startTime    Float @map("start_time")
   endTime      Float @map("end_time")
 
-  title   String @db.VarChar(255)
+  title   String  @db.VarChar(255)
   summary String? @db.Text
 
   transcriptVersion Int @map("transcript_version")
@@ -359,13 +359,17 @@ model VideoChapter {
   pauseScore           Float? @map("pause_score")
   discourseMarkerScore Float? @map("discourse_marker_score")
   semanticShiftScore   Float? @map("semantic_shift_score")
+  lexicalShiftScore    Float? @map("lexical_shift_score")
+  valleyDepthScore     Float? @map("valley_depth_score")
+  boundaryQualityScore Float? @map("boundary_quality_score")
   durationScore        Float? @map("duration_score")
+  llmConfidenceScore   Float? @map("llm_confidence_score")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  transcript Transcript    @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  transcript Transcript     @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
   job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
 
   clipCandidates  ClipCandidate[]
@@ -417,8 +421,8 @@ model ClipCandidate {
   createdAt DateTime @default(now()) @map("created_at")
 
   media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  transcript Transcript    @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
-  chapter    VideoChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  transcript Transcript     @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
   job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
 
   shortClips ShortClip[]
@@ -483,15 +487,15 @@ model ShortClip {
 }
 
 model GeneratedAsset {
-  id     String @id @default(uuid()) @db.Uuid
-  userId String @map("user_id") @db.Uuid
+  id      String @id @default(uuid()) @db.Uuid
+  userId  String @map("user_id") @db.Uuid
   mediaId String @map("media_id") @db.Uuid
 
   transcriptId String? @map("transcript_id") @db.Uuid
   chapterId    String? @map("chapter_id") @db.Uuid
 
-  assetType AssetType @map("asset_type")
-  transcriptVersion Int? @map("transcript_version")
+  assetType         AssetType @map("asset_type")
+  transcriptVersion Int?      @map("transcript_version")
 
   s3Bucket String  @map("s3_bucket") @db.VarChar(255)
   s3Key    String  @map("s3_key") @db.Text
@@ -552,9 +556,9 @@ model PlatformAccount {
   accountName    String? @map("account_name") @db.VarChar(255)
   platformUserId String? @map("platform_user_id") @db.VarChar(255)
 
-  accessTokenEncrypted  String? @map("access_token_encrypted") @db.Text
-  refreshTokenEncrypted String? @map("refresh_token_encrypted") @db.Text
-  tokenLast4            String? @map("token_last4") @db.VarChar(10)
+  accessTokenEncrypted  String?   @map("access_token_encrypted") @db.Text
+  refreshTokenEncrypted String?   @map("refresh_token_encrypted") @db.Text
+  tokenLast4            String?   @map("token_last4") @db.VarChar(10)
   expiresAt             DateTime? @map("expires_at")
 
   status PlatformAccountStatus @default(CONNECTED)
