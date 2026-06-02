@@ -2,7 +2,15 @@ import logging
 
 from app.core.config import settings
 from app.services.ai_service import ai_service_client
-from app.pipelines.chaptering.candidates import generate_boundary_candidates
+from app.pipelines.chaptering.candidates import (
+    generate_boundary_candidates,
+    retain_candidates_for_embedding,
+    score_boundary_candidates,
+)
+from app.pipelines.chaptering.schemas import (
+    CandidateRetentionConfig,
+    CandidateScoringConfig,
+)
 from app.pipelines.chaptering.selection import select_boundaries
 from app.pipelines.chaptering.semantic import score_context_windows
 from app.pipelines.chaptering.strategies.common import (
@@ -50,10 +58,23 @@ def generate_candidate_chapters(
         settings.chaptering_max_unit_duration_seconds,
         settings.chaptering_pause_boundary_seconds,
     )
-    candidates = generate_boundary_candidates(
+    raw_candidates = generate_boundary_candidates(
         units,
         media_duration=duration,
         min_chapter_duration=options.min_chapter_duration,
+    )
+    scored_candidates = score_boundary_candidates(
+        units,
+        raw_candidates,
+        media_duration=duration,
+        min_chapter_duration=options.min_chapter_duration,
+        config=_candidate_scoring_config(),
+    )
+    candidates = retain_candidates_for_embedding(
+        scored_candidates,
+        media_duration=duration,
+        target_chapter_duration=options.target_chapter_duration,
+        config=_candidate_retention_config(),
     )
     windows = build_context_windows(
         units,
@@ -122,3 +143,26 @@ def generate_candidate_chapters(
 
 def _format_times(times: list[float]) -> list[float]:
     return [round(time, 2) for time in times]
+
+
+def _candidate_scoring_config() -> CandidateScoringConfig:
+    return CandidateScoringConfig(
+        context_seconds=settings.chaptering_candidate_score_context_seconds,
+        long_pause_seconds=settings.chaptering_candidate_long_pause_seconds,
+        max_pause_score_seconds=settings.chaptering_candidate_max_pause_score_seconds,
+        min_context_text_chars=settings.chaptering_candidate_min_context_text_chars,
+        discourse_marker_weight=settings.chaptering_candidate_discourse_marker_weight,
+        pause_weight=settings.chaptering_candidate_pause_weight,
+        lexical_shift_weight=settings.chaptering_candidate_lexical_shift_weight,
+        boundary_quality_weight=settings.chaptering_candidate_boundary_quality_weight,
+        duration_sanity_weight=settings.chaptering_candidate_duration_sanity_weight,
+    )
+
+
+def _candidate_retention_config() -> CandidateRetentionConfig:
+    return CandidateRetentionConfig(
+        min_limit=settings.chaptering_embedding_candidate_min_limit,
+        max_limit=settings.chaptering_embedding_candidate_max_limit,
+        multiplier=settings.chaptering_embedding_candidate_multiplier,
+        top_score_fraction=settings.chaptering_candidate_top_score_fraction,
+    )
