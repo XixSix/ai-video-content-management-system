@@ -1,5 +1,7 @@
 # pyright: reportAttributeAccessIssue=false
 
+from typing import cast
+
 import grpc
 import pytest
 
@@ -25,25 +27,61 @@ class FakeContext:
         raise AbortError(code, details)
 
 
-def test_embed_texts_returns_noop_embeddings() -> None:
-    request = chaptering_pb2.EmbedTextsRequest(
-        request_id=" job-1 ",
-        texts=["Topic introduction", "Next topic"],
+def _context() -> grpc.ServicerContext:
+    return cast(grpc.ServicerContext, FakeContext())
+
+
+def _generate_request(request_id: str = "job-1") -> chaptering_pb2.GenerateChaptersRequest:
+    return chaptering_pb2.GenerateChaptersRequest(
+        request_id=request_id,
+        language="en",
+        media_duration_seconds=120,
+        segments=[
+            chaptering_pb2.TranscriptSegment(
+                segment_id="seg-1",
+                start_seconds=0,
+                end_seconds=10,
+                text="Topic introduction.",
+            )
+        ],
+        options=chaptering_pb2.ChapteringOptions(max_chapters=3),
     )
 
-    response = ChapteringServicer().EmbedTexts(request, FakeContext())
-    repeated_response = ChapteringServicer().EmbedTexts(request, FakeContext())
 
-    assert response.request_id == "job-1"
-    assert response.model == ""
-    assert response.dimension == NOOP_EMBEDDING_DIMENSION
-    assert [embedding.index for embedding in response.embeddings] == [0, 1]
-    assert [len(embedding.values) for embedding in response.embeddings] == [
-        NOOP_EMBEDDING_DIMENSION,
-        NOOP_EMBEDDING_DIMENSION,
-    ]
-    assert response.embeddings[0].values == repeated_response.embeddings[0].values
-    assert response.embeddings[0].values != response.embeddings[1].values
+def test_generate_chapters_rejects_missing_request_id() -> None:
+    request = _generate_request(request_id="")
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_rejects_missing_segments() -> None:
+    request = _generate_request()
+    request.ClearField("segments")
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_rejects_invalid_segment_timestamps() -> None:
+    request = _generate_request()
+    request.segments[0].end_seconds = 0
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_is_unimplemented_until_workflow_is_wired() -> None:
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(_generate_request(), _context())
+
+    assert error.value.code == grpc.StatusCode.UNIMPLEMENTED
 
 
 def test_chaptering_workflow_returns_noop_embeddings() -> None:
@@ -62,12 +100,3 @@ def test_chaptering_workflow_returns_noop_embeddings() -> None:
     assert len(result.embeddings) == 1
     assert result.embeddings[0].index == 0
     assert len(result.embeddings[0].values) == NOOP_EMBEDDING_DIMENSION
-
-
-def test_embed_texts_rejects_missing_request_id() -> None:
-    request = chaptering_pb2.EmbedTextsRequest(request_id="", texts=["Topic"])
-
-    with pytest.raises(AbortError) as error:
-        ChapteringServicer().EmbedTexts(request, FakeContext())
-
-    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
