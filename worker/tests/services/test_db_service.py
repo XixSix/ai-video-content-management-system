@@ -168,6 +168,7 @@ def test_save_chapters_persists_boundary_scores() -> None:
         transcript_version=2,
         chapters=[chapter],
         source="RULE_BASED",
+        model="ai-service-chaptering-v1",
     )
 
     insert_params = session.params[1]
@@ -177,4 +178,5 @@ def test_save_chapters_persists_boundary_scores() -> None:
     assert insert_params["discourse_marker_score"] == 1.0
     assert insert_params["semantic_shift_score"] == 0.0
     assert insert_params["duration_score"] == 0.8
+    assert summary.model == "ai-service-chaptering-v1"
     assert summary.chapters[0].score == 0.91

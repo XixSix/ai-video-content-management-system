@@ -6,7 +6,13 @@ import pytest
 from app.schemas.transcript.output import TranscriptJobOptions
 from app.services import ai_service
 from app.services.ai_service import AIServiceTerminalError
-from app.utils import ai_transcription_mapper
+from app.schemas.chaptering.output import ChapteringJobOptions
+from app.schemas.chaptering.result import (
+    ChapteringTranscript,
+    ChapteringTranscriptSegment,
+)
+from app.utils import ai_chaptering_mapper, ai_transcription_mapper
+from chaptering.v1 import chaptering_pb2
 from transcription.v1 import transcription_pb2
 
 
@@ -204,3 +210,179 @@ def test_client_bubbles_retryable_grpc_error(monkeypatch: pytest.MonkeyPatch) ->
             audio_path=Path("audio.wav"),
             options=_options(),
         )
+
+
+def _chaptering_options() -> ChapteringJobOptions:
+    return ChapteringJobOptions.model_validate(
+        {
+            "minChapterDuration": 60,
+            "targetChapterDuration": 120,
+            "maxChapters": 3,
+            "useLlm": True,
+            "useEmbeddings": True,
+        }
+    )
+
+
+def _chaptering_transcript() -> ChapteringTranscript:
+    return ChapteringTranscript(
+        id="00000000-0000-4000-8000-000000000004",
+        media_id="00000000-0000-4000-8000-000000000002",
+        language="en",
+        version=2,
+        media_duration=240.0,
+        segments=[
+            ChapteringTranscriptSegment(
+                id="00000000-0000-4000-8000-000000000006",
+                start_time=0.0,
+                end_time=120.0,
+                text="Topic introduction",
+                clean_text="Topic introduction",
+            )
+        ],
+    )
+
+
+def _chaptering_response(
+    request_id: str = "job-1",
+) -> chaptering_pb2.GenerateChaptersResponse:
+    return chaptering_pb2.GenerateChaptersResponse(
+        request_id=request_id,
+        language="en",
+        model="ai-service-chaptering-v1",
+        source=chaptering_pb2.CHAPTER_SOURCE_LLM,
+        chapters=[
+            chaptering_pb2.GeneratedChapter(
+                index=1,
+                start_seconds=0.0,
+                end_seconds=240.0,
+                title="Introduction",
+                summary="The speaker introduces the topic.",
+                score=0.9,
+                scores=chaptering_pb2.BoundaryScores(
+                    score=0.9,
+                    boundary_score=0.8,
+                    pause_score=0.1,
+                    discourse_marker_score=0.2,
+                    semantic_shift_score=0.3,
+                    duration_score=0.7,
+                ),
+            )
+        ],
+    )
+
+
+def test_build_generate_chapters_request_maps_transcript_and_options() -> None:
+    request = ai_chaptering_mapper.build_generate_chapters_request(
+        request_id="job-1",
+        transcript=_chaptering_transcript(),
+        options=_chaptering_options(),
+    )
+
+    assert request.request_id == "job-1"
+    assert request.language == "en"
+    assert request.media_duration_seconds == 240.0
+    assert request.segments[0].segment_id == "00000000-0000-4000-8000-000000000006"
+    assert request.options.min_chapter_duration_seconds == 60
+    assert request.options.target_chapter_duration_seconds == 120
+    assert request.options.max_chapter_duration_seconds == 240
+    assert request.options.max_chapters == 3
+    assert request.options.use_embeddings is True
+    assert request.options.use_llm is True
+
+
+def test_map_generate_chapters_response_returns_result() -> None:
+    result = ai_chaptering_mapper.map_generate_chapters_response(
+        request_id="job-1",
+        transcript=_chaptering_transcript(),
+        response=_chaptering_response(),
+    )
+
+    assert result.source == "LLM"
+    assert result.model == "ai-service-chaptering-v1"
+    assert result.transcript_version == 2
+    assert len(result.chapters) == 1
+    assert result.chapters[0].title == "Introduction"
+    assert result.chapters[0].score.semantic_shift_score == 0.3
+
+
+def test_map_generate_chapters_response_rejects_mismatched_request_id() -> None:
+    with pytest.raises(ValueError, match="request_id does not match"):
+        ai_chaptering_mapper.map_generate_chapters_response(
+            request_id="job-1",
+            transcript=_chaptering_transcript(),
+            response=_chaptering_response(request_id="other-job"),
+        )
+
+
+class ChapteringRaisingStub:
+    def __init__(self, error: grpc.RpcError) -> None:
+        self.error = error
+
+    def GenerateChapters(
+        self,
+        request: chaptering_pb2.GenerateChaptersRequest,
+        *,
+        timeout: int,
+    ) -> chaptering_pb2.GenerateChaptersResponse:
+        raise self.error
+
+
+class ChapteringRespondingStub:
+    def __init__(self, response: chaptering_pb2.GenerateChaptersResponse) -> None:
+        self.response = response
+
+    def GenerateChapters(
+        self,
+        request: chaptering_pb2.GenerateChaptersRequest,
+        *,
+        timeout: int,
+    ) -> chaptering_pb2.GenerateChaptersResponse:
+        return self.response
+
+
+def test_client_generate_chapters_maps_terminal_grpc_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    grpc_error = FakeRpcError(grpc.StatusCode.INVALID_ARGUMENT)
+    monkeypatch.setattr(
+        ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
+    )
+    monkeypatch.setattr(
+        ai_service.chaptering_pb2_grpc,
+        "ChapteringServiceStub",
+        lambda channel: ChapteringRaisingStub(grpc_error),
+    )
+
+    with pytest.raises(AIServiceTerminalError) as error:
+        ai_service.AIServiceClient(target="unused").generate_chapters(
+            request_id="job-1",
+            transcript=_chaptering_transcript(),
+            options=_chaptering_options(),
+        )
+
+    assert error.value.error_code == "AI_SERVICE_INVALID_ARGUMENT"
+
+
+def test_client_generate_chapters_maps_invalid_response_to_terminal_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
+    )
+    monkeypatch.setattr(
+        ai_service.chaptering_pb2_grpc,
+        "ChapteringServiceStub",
+        lambda channel: ChapteringRespondingStub(
+            _chaptering_response(request_id="other-job")
+        ),
+    )
+
+    with pytest.raises(AIServiceTerminalError) as error:
+        ai_service.AIServiceClient(target="unused").generate_chapters(
+            request_id="job-1",
+            transcript=_chaptering_transcript(),
+            options=_chaptering_options(),
+        )
+
+    assert error.value.error_code == "AI_SERVICE_INVALID_RESPONSE"

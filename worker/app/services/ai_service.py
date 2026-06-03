@@ -5,12 +5,13 @@ import grpc
 
 from app.core.config import settings
 from app.proto_path import ensure_proto_generated_on_path
-from app.schemas.chaptering.embedding import ChapteringEmbeddingResult
+from app.schemas.chaptering.output import ChapteringJobOptions
+from app.schemas.chaptering.result import ChapteringResult, ChapteringTranscript
 from app.schemas.transcript.output import TranscriptJobOptions
 from app.schemas.transcript.result import TranscriptResult
 from app.utils.ai_chaptering_mapper import (
-    build_embed_texts_request,
-    map_embed_texts_response,
+    build_generate_chapters_request,
+    map_generate_chapters_response,
 )
 from app.utils.ai_transcription_mapper import (
     build_transcribe_request,
@@ -59,11 +60,6 @@ class AIServiceClient:
             audio_path=audio_path,
             options=options,
         )
-        # logger.info(
-        #     "Calling ai-service transcription request_id=%s target=%s",
-        #     request_id,
-        #     self.target,
-        # )
 
         try:
             with grpc.insecure_channel(self.target) as channel:
@@ -106,24 +102,23 @@ class AIServiceClient:
                 error_code="AI_SERVICE_INVALID_RESPONSE",
             ) from error
 
-    def embed_texts(
+    def generate_chapters(
         self,
         *,
         request_id: str,
-        texts: list[str],
-    ) -> ChapteringEmbeddingResult:
-        """Call ai-service for text embeddings and validate the response."""
-        request = build_embed_texts_request(request_id=request_id, texts=texts)
-        # logger.info(
-        #     "Calling ai-service chaptering embeddings request_id=%s target=%s",
-        #     request_id,
-        #     self.target,
-        # )
+        transcript: ChapteringTranscript,
+        options: ChapteringJobOptions,
+    ) -> ChapteringResult:
+        request = build_generate_chapters_request(
+            request_id=request_id,
+            transcript=transcript,
+            options=options,
+        )
 
         try:
             with grpc.insecure_channel(self.target) as channel:
                 stub = chaptering_pb2_grpc.ChapteringServiceStub(channel)
-                response = stub.EmbedTexts(
+                response = stub.GenerateChapters(
                     request,
                     timeout=self.timeout_seconds,
                 )
@@ -135,7 +130,7 @@ class AIServiceClient:
                     error.code().name,
                 )
                 raise AIServiceTerminalError(
-                    error.details() or "ai-service rejected embedding request",
+                    error.details() or "ai-service rejected chaptering request",
                     error_code=f"AI_SERVICE_{error.code().name}",
                 ) from error
 
@@ -145,17 +140,16 @@ class AIServiceClient:
             )
             raise
 
-        # logger.info(
-        #     "ai-service chaptering embeddings completed request_id=%s", request_id
-        # )
+        logger.info("ai-service chaptering completed request_id=%s", request_id)
         try:
-            return map_embed_texts_response(
+            return map_generate_chapters_response(
                 request_id=request_id,
+                transcript=transcript,
                 response=response,
             )
         except ValueError as error:
             logger.warning(
-                "ai-service returned invalid chaptering embedding response "
+                "ai-service returned invalid chaptering response "
                 "request_id=%s error=%s",
                 request_id,
                 error,
