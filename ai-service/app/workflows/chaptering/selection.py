@@ -1,5 +1,53 @@
 from app.schemas.chaptering import ChapteringTranscriptSegment
 from app.workflows.chaptering.scoring import score_boundary
+from app.workflows.chaptering.schemas import ChapterBoundaryCandidate
+
+
+def select_boundaries_from_candidates(
+    candidates: list[ChapterBoundaryCandidate],
+    *,
+    media_duration: float,
+    min_duration: float,
+    target_duration: float,
+    max_duration: float,
+    max_chapters: int,
+) -> list[float]:
+    """Select valid chapter starts from ranked boundary candidates.
+
+    Selection never creates new boundary times. It repeatedly picks the
+    highest-scoring candidate that fits the chapter duration constraints and
+    would not leave a too-short final chapter.
+    """
+    boundaries = [0.0]
+    sorted_candidates = sorted(candidates, key=lambda candidate: candidate.time)
+
+    while len(boundaries) < max_chapters:
+        previous = boundaries[-1]
+        eligible_candidates = [
+            candidate
+            for candidate in sorted_candidates
+            if _is_valid_next_boundary(
+                candidate.time,
+                previous=previous,
+                media_duration=media_duration,
+                min_duration=min_duration,
+                max_duration=max_duration,
+            )
+        ]
+        if not eligible_candidates:
+            break
+
+        target = previous + target_duration
+        best_candidate = max(
+            eligible_candidates,
+            key=lambda candidate: (
+                candidate.candidate_score,
+                -abs(candidate.time - target),
+            ),
+        )
+        boundaries.append(best_candidate.time)
+
+    return boundaries
 
 
 def select_boundaries(
@@ -55,3 +103,19 @@ def select_boundaries(
         boundaries.append(best_time)
 
     return boundaries
+
+
+def _is_valid_next_boundary(
+    time: float,
+    *,
+    previous: float,
+    media_duration: float,
+    min_duration: float,
+    max_duration: float,
+) -> bool:
+    duration = time - previous
+    return (
+        duration >= min_duration
+        and duration <= max_duration
+        and media_duration - time >= min_duration
+    )

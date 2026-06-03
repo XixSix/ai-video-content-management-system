@@ -23,6 +23,8 @@ class ChapterBoundaryCandidate:
     previous_unit_ids: list[str]
     next_unit_ids: list[str]
     cheap_score: float = 0.0
+    candidate_score: float = 0.0
+    semantic_shift_score: float = 0.0
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
     lexical_shift_score: float = 0.0

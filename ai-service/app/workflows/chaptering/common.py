@@ -80,8 +80,11 @@ def merge_candidate_scores(
     if candidate is None:
         return base_scores
 
+    score = candidate.candidate_score or base_scores.score
     return base_scores.model_copy(
         update={
+            "score": score,
+            "semantic_shift_score": candidate.semantic_shift_score,
             "lexical_shift_score": candidate.lexical_shift_score,
             "valley_depth_score": candidate.valley_depth_score,
             "boundary_quality_score": candidate.boundary_quality_score,
