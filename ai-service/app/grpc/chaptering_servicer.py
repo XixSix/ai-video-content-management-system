@@ -10,6 +10,7 @@ from app.schemas.chaptering import (
     ChapterGenerationResult,
     ChapteringOptions,
     ChapteringTranscriptSegment,
+    ChapteringTranscriptWord,
 )
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 
@@ -77,6 +78,7 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
                     grpc.StatusCode.INVALID_ARGUMENT,
                     f"segments[{index}].text is required",
                 )
+            self._validate_segment_words(segment, index, request, context)
             previous_start = segment.start_seconds
 
         if request.options.max_chapters <= 0:
@@ -102,6 +104,17 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
                     clean_text=segment.clean_text.strip() or None,
                     speaker_label=segment.speaker_label.strip() or None,
                     confidence=segment.confidence,
+                    words=[
+                        ChapteringTranscriptWord(
+                            word_id=word.word_id.strip(),
+                            segment_id=word.segment_id.strip() or None,
+                            start_seconds=word.start_seconds,
+                            end_seconds=word.end_seconds,
+                            text=word.text.strip(),
+                            confidence=word.confidence,
+                        )
+                        for word in segment.words
+                    ],
                 )
                 for segment in request.segments
             ],
@@ -120,6 +133,69 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
                 use_llm=request.options.use_llm,
             ),
         )
+
+    def _validate_segment_words(
+        self,
+        segment: chaptering_pb2.TranscriptSegment,
+        segment_index: int,
+        request: chaptering_pb2.GenerateChaptersRequest,
+        context: grpc.ServicerContext,
+    ) -> None:
+        previous_start = -1.0
+        segment_id = segment.segment_id.strip()
+
+        for word_index, word in enumerate(segment.words):
+            if word.start_seconds >= word.end_seconds:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    (
+                        f"segments[{segment_index}].words[{word_index}] must have "
+                        "start_seconds < end_seconds"
+                    ),
+                )
+            if word.start_seconds < previous_start:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    f"segments[{segment_index}].words must be sorted by timestamp",
+                )
+            if word.end_seconds > request.media_duration_seconds + 1.0:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    (
+                        f"segments[{segment_index}].words[{word_index}] exceeds "
+                        "media_duration_seconds"
+                    ),
+                )
+            if word.start_seconds < segment.start_seconds - 1.0:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    (
+                        f"segments[{segment_index}].words[{word_index}] starts "
+                        "before the segment"
+                    ),
+                )
+            if word.end_seconds > segment.end_seconds + 1.0:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    (
+                        f"segments[{segment_index}].words[{word_index}] ends "
+                        "after the segment"
+                    ),
+                )
+            if not word.text.strip():
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    f"segments[{segment_index}].words[{word_index}].text is required",
+                )
+            if word.segment_id.strip() and word.segment_id.strip() != segment_id:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    (
+                        f"segments[{segment_index}].words[{word_index}].segment_id "
+                        "must match parent segment_id"
+                    ),
+                )
+            previous_start = word.start_seconds
 
     def _map_response(
         self,

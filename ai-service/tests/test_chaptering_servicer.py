@@ -9,8 +9,10 @@ from app.grpc.chaptering_servicer import ChapteringServicer
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
+    ChapterGenerationResult,
     ChapteringOptions,
     ChapteringTranscriptSegment,
+    GeneratedChapter,
 )
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
@@ -35,6 +37,28 @@ class FakeContext:
 
 def _context() -> grpc.ServicerContext:
     return cast(grpc.ServicerContext, FakeContext())
+
+
+class CapturingWorkflow:
+    def __init__(self) -> None:
+        self.request: ChapterGenerationRequest | None = None
+
+    def execute(self, request: ChapterGenerationRequest) -> ChapterGenerationResult:
+        self.request = request
+        return ChapterGenerationResult(
+            request_id=request.request_id,
+            language=request.language,
+            model="segment-chaptering-v1",
+            source="RULE_BASED",
+            chapters=[
+                GeneratedChapter(
+                    index=1,
+                    start_seconds=0,
+                    end_seconds=request.media_duration_seconds or 0,
+                    title="Captured",
+                )
+            ],
+        )
 
 
 def _generate_request(
@@ -162,6 +186,66 @@ def test_generate_chapters_rejects_segment_beyond_media_duration() -> None:
         ChapteringServicer().GenerateChapters(request, _context())
 
     assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_rejects_invalid_word_timestamps() -> None:
+    request = _generate_request()
+    request.segments[0].words.extend(
+        [
+            chaptering_pb2.TranscriptWord(
+                word_id="word-1",
+                segment_id="seg-1",
+                start_seconds=2,
+                end_seconds=1,
+                text="Topic",
+            )
+        ]
+    )
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_maps_word_timestamps_to_workflow_request() -> None:
+    request = _generate_request()
+    request.segments[0].words.extend(
+        [
+            chaptering_pb2.TranscriptWord(
+                word_id="word-1",
+                segment_id="seg-1",
+                start_seconds=0,
+                end_seconds=0.5,
+                text="Topic",
+                confidence=0.9,
+            ),
+            chaptering_pb2.TranscriptWord(
+                word_id="word-2",
+                segment_id="seg-1",
+                start_seconds=0.5,
+                end_seconds=1.0,
+                text="introduction",
+                confidence=0.8,
+            ),
+        ]
+    )
+    workflow = CapturingWorkflow()
+
+    ChapteringServicer(workflow=cast(ChapteringWorkflow, workflow)).GenerateChapters(
+        request,
+        _context(),
+    )
+
+    assert workflow.request is not None
+    words = workflow.request.segments[0].words
+    assert len(words) == 2
+    assert words[0].word_id == "word-1"
+    assert words[0].segment_id == "seg-1"
+    assert words[0].start_seconds == 0
+    assert words[0].end_seconds == 0.5
+    assert words[0].text == "Topic"
+    assert words[0].confidence == pytest.approx(0.9)
 
 
 def test_generate_chapters_returns_fallback_chapter() -> None:
