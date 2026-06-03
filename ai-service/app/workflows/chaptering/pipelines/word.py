@@ -1,37 +1,41 @@
+from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
-from app.workflows.chaptering.common import build_chapters, media_duration
+from app.workflows.chaptering.pipelines.segment import run_segment_pipeline
+from app.workflows.chaptering.pipelines.shared import run_units_pipeline
 from app.workflows.chaptering.schemas import ChapteringPipelineConfig
-from app.workflows.chaptering.selection import select_boundaries
+from app.workflows.chaptering.word_units import (
+    build_word_chapter_units,
+    has_usable_word_timestamps,
+)
 
 
 def run_word_pipeline(
     *,
     request: ChapterGenerationRequest,
+    embedding: TextEmbeddingPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
-    """Generate chapters through the current word-strategy placeholder.
+    """Generate chapters from word-timestamped transcript units.
 
-    The word-timestamp implementation is not wired yet, so this runner preserves
-    the existing deterministic fallback logic for now.
+    The strategy builds units at real word timestamp boundaries. If the request
+    does not include usable word timestamps, it falls back to the segment
+    strategy so chapter generation remains available for segment-only inputs.
     """
-    duration = media_duration(request)
-    options = request.options
-    boundaries = select_boundaries(
-        request.segments,
-        media_duration=duration,
-        min_duration=options.min_chapter_duration_seconds,
-        target_duration=options.target_chapter_duration_seconds,
-        max_chapters=options.max_chapters,
-    )
+    if not has_usable_word_timestamps(request.segments):
+        return run_segment_pipeline(request=request, embedding=embedding, config=config)
 
-    return ChapterGenerationResult(
-        request_id=request.request_id,
-        language=request.language,
-        model=config.model_name,
-        source="RULE_BASED",
-        chapters=build_chapters(
-            request,
-            duration=duration,
-            boundaries=boundaries,
-        ),
+    units = build_word_chapter_units(
+        request.segments,
+        max_unit_duration=config.max_unit_duration_seconds,
+        pause_boundary_seconds=config.pause_boundary_seconds,
+        target_unit_duration=config.target_unit_duration_seconds,
+        target_unit_words=config.target_unit_words,
+        max_unit_words=config.max_unit_words,
+        max_unit_chars=config.max_unit_chars,
+    )
+    return run_units_pipeline(
+        request=request,
+        units=units,
+        embedding=embedding,
+        config=config,
     )

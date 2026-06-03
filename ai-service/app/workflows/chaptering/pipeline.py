@@ -37,7 +37,4 @@ def run_chapter_generation_pipeline(
     """Run the selected chaptering strategy."""
     pipeline = select_chaptering_pipeline(chaptering_strategy)
 
-    if chaptering_strategy == CHAPTERING_STRATEGY_WORD:
-        return pipeline(request=request, config=config)
-
     return pipeline(request=request, embedding=embedding, config=config)

@@ -12,6 +12,7 @@ from app.schemas.chaptering import (
     ChapterGenerationResult,
     ChapteringOptions,
     ChapteringTranscriptSegment,
+    ChapteringTranscriptWord,
     GeneratedChapter,
 )
 from app.workflows.chaptering.schemas import (
@@ -86,9 +87,9 @@ def _generate_request(
     )
 
 
-def _pipeline_config() -> ChapteringPipelineConfig:
+def _pipeline_config(strategy: str = "segment") -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
-        strategy="segment",
+        strategy=strategy,
         model_name="segment-chaptering-v1",
         target_unit_duration_seconds=20.0,
         max_unit_duration_seconds=30.0,
@@ -277,6 +278,57 @@ def test_chaptering_workflow_generates_chapters() -> None:
                     start_seconds=0,
                     end_seconds=10,
                     text="Topic introduction.",
+                )
+            ],
+            options=ChapteringOptions(
+                min_chapter_duration_seconds=30,
+                target_chapter_duration_seconds=60,
+                max_chapter_duration_seconds=60,
+                max_chapters=3,
+                use_embeddings=True,
+                use_llm=False,
+            ),
+        )
+    )
+
+    assert result.request_id == "job-1"
+    assert len(result.chapters) == 1
+    assert result.chapters[0].title == "Topic introduction."
+
+
+def test_chaptering_workflow_generates_chapters_from_word_strategy() -> None:
+    workflow = ChapteringWorkflow(
+        embedding=NoopTextEmbeddingProvider(),
+        config=_pipeline_config(strategy="word"),
+    )
+
+    result = workflow.execute(
+        ChapterGenerationRequest(
+            request_id="job-1",
+            language="en",
+            media_duration_seconds=120,
+            segments=[
+                ChapteringTranscriptSegment(
+                    segment_id="seg-1",
+                    start_seconds=0,
+                    end_seconds=10,
+                    text="Topic introduction.",
+                    words=[
+                        ChapteringTranscriptWord(
+                            word_id="word-1",
+                            segment_id="seg-1",
+                            start_seconds=0,
+                            end_seconds=0.5,
+                            text="Topic",
+                        ),
+                        ChapteringTranscriptWord(
+                            word_id="word-2",
+                            segment_id="seg-1",
+                            start_seconds=0.5,
+                            end_seconds=1.0,
+                            text="introduction.",
+                        ),
+                    ],
                 )
             ],
             options=ChapteringOptions(
