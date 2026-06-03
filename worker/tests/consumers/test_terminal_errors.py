@@ -3,7 +3,6 @@ from uuid import UUID
 import pytest
 
 from app.consumers import chaptering_consumer, transcript_consumer
-from app.pipelines.chaptering.errors import TerminalChapteringPipelineError
 from app.pipelines.transcript.pipeline import TerminalTranscriptPipelineError
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
@@ -47,13 +46,13 @@ def test_transcript_consumer_records_pipeline_terminal_failure(
     assert failures == [(str(JOB_ID), "SOURCE_OBJECT_NOT_FOUND: Source media missing")]
 
 
-def test_chaptering_consumer_records_pipeline_terminal_failure(
+def test_chaptering_consumer_records_job_terminal_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     failures: list[tuple[str, str]] = []
 
     def process_job(message: object) -> dict[str, object]:
-        raise TerminalChapteringPipelineError(
+        raise chaptering_consumer.TerminalChapteringJobError(
             "Transcript is empty", error_code="TRANSCRIPT_EMPTY"
         )
 
@@ -70,7 +69,7 @@ def test_chaptering_consumer_records_pipeline_terminal_failure(
         lambda job_id: pytest.fail("terminal failures should not be retried"),
     )
 
-    with pytest.raises(TerminalChapteringPipelineError):
+    with pytest.raises(chaptering_consumer.TerminalChapteringJobError):
         chaptering_consumer.handle_chaptering_job.run(
             jobId=str(JOB_ID),
             mediaId=str(MEDIA_ID),

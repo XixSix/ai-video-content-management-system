@@ -6,34 +6,29 @@ from app.workflows.chaptering.candidates import (
     score_boundary_candidates,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
-from app.workflows.chaptering.schemas import ChapteringPipelineConfig
+from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConfig
 from app.workflows.chaptering.selection import select_boundaries
 from app.workflows.chaptering.semantic import score_context_windows
-from app.workflows.chaptering.units import build_chapter_units
 from app.workflows.chaptering.windows import build_context_windows
 
 
-def run_candidate_pipeline(
+def run_units_pipeline(
     *,
     request: ChapterGenerationRequest,
+    units: list[ChapterUnit],
     embedding: TextEmbeddingPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
-    """Generate chapters through unit, candidate, and context-window scoring.
+    """Generate chapters from prebuilt timeline units.
 
-    This strategy builds stable transcript units, creates hard-valid boundary
-    candidates, keeps a bounded candidate set, optionally scores left/right
-    context windows with embeddings, then selects final starts under chapter
-    duration constraints. It does not call an LLM or persist data.
+    Segment and word strategies only differ in how they create `ChapterUnit`
+    values. Candidate generation, cheap scoring, embedding scoring, boundary
+    selection, and chapter construction stay shared so both strategies evolve
+    through the same downstream behavior.
     """
     duration = media_duration(request)
     options = request.options
 
-    units = build_chapter_units(
-        request.segments,
-        max_unit_duration=config.max_unit_duration_seconds,
-        pause_boundary_seconds=config.pause_boundary_seconds,
-    )
     raw_candidates = generate_boundary_candidates(
         units,
         media_duration=duration,

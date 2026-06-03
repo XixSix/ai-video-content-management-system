@@ -2,19 +2,20 @@ import logging
 from typing import Any
 
 from app.core.config import settings
-from app.db import jobs_repository, chaptering_repository
+from app.db import chaptering_repository, jobs_repository
 from app.db.client import get_db_session
-from app.pipelines.chaptering.pipeline import run_chaptering_pipeline
-from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
-from app.schemas.jobs.chaptering_message import (
-    ChapteringJobMessage,
-    ChapteringJobResultMessage,
-)
 from app.schemas.chaptering.output import (
     ChapteringCompletedOutput,
     ChapteringJobOptions,
     ChapteringOutputSummary,
 )
+from app.schemas.chaptering.result import ChapteringTranscript
+from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
+from app.schemas.jobs.chaptering_message import (
+    ChapteringJobMessage,
+    ChapteringJobResultMessage,
+)
+from app.services.ai_service import AIServiceTerminalError, ai_service_client
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class TerminalChapteringJobError(Exception):
 
 
 def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
-    """Claim and validate a chaptering job before delegating pipeline work."""
+    """Claim and validate a chaptering job before delegating AI work."""
     job_id = str(message.job_id)
 
     logger.info(
@@ -72,7 +73,7 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
 
     _mark_processing_started(job_id)
 
-    output = run_chaptering_pipeline(message, options=options)
+    output = _generate_chapters_with_ai_service(message, options=options)
 
     _mark_completed(job_id, output)
 
@@ -81,6 +82,121 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
         status=JobStatus.COMPLETED,
         skipped=False,
     )
+
+
+def _generate_chapters_with_ai_service(
+    message: ChapteringJobMessage,
+    *,
+    options: ChapteringJobOptions,
+) -> ChapteringCompletedOutput:
+    job_id = str(message.job_id)
+    transcript = _load_transcript(message)
+    _validate_transcript_for_ai_service(transcript, message)
+
+    try:
+        result = ai_service_client.generate_chapters(
+            request_id=job_id,
+            transcript=transcript,
+            options=options,
+        )
+    except AIServiceTerminalError as error:
+        raise TerminalChapteringJobError(str(error)) from error
+
+    logger.info(
+        "ai-service generated chapters job_id=%s source=%s model=%s chapter_count=%s",
+        job_id,
+        result.source,
+        result.model,
+        len(result.chapters),
+    )
+
+    with get_db_session() as session:
+        persisted = chaptering_repository.save_chapters(
+            session,
+            job_id=job_id,
+            media_id=str(message.media_id),
+            transcript_id=str(message.transcript_id),
+            transcript_version=message.transcript_version,
+            chapters=result.chapters,
+            source=result.source,
+            model=result.model,
+        )
+
+    logger.info(
+        "Persisted ai-service chaptering result job_id=%s transcript_id=%s "
+        "transcript_version=%s chapter_count=%s model=%s",
+        job_id,
+        persisted.transcript_id,
+        persisted.transcript_version,
+        len(persisted.chapters),
+        persisted.model,
+    )
+
+    return _completed_output(persisted, options=options)
+
+
+def _load_transcript(message: ChapteringJobMessage) -> ChapteringTranscript:
+    with get_db_session() as session:
+        transcript = chaptering_repository.load_transcript_for_chaptering(
+            session,
+            transcript_id=str(message.transcript_id),
+            media_id=str(message.media_id),
+        )
+
+    if transcript is None:
+        raise TerminalChapteringJobError(
+            "Transcript was not found for chaptering",
+            error_code="TRANSCRIPT_NOT_FOUND",
+        )
+
+    return transcript
+
+
+def _validate_transcript_for_ai_service(
+    transcript: ChapteringTranscript,
+    message: ChapteringJobMessage,
+) -> None:
+    if transcript.version != message.transcript_version:
+        raise TerminalChapteringJobError(
+            "Transcript version does not match chaptering job",
+            error_code="TRANSCRIPT_VERSION_MISMATCH",
+        )
+
+    if transcript.media_duration is None or transcript.media_duration <= 0:
+        raise TerminalChapteringJobError(
+            "Media duration is required for chaptering",
+            error_code="MEDIA_DURATION_INVALID",
+        )
+
+    if not transcript.segments:
+        raise TerminalChapteringJobError(
+            "Transcript has no timestamped segments",
+            error_code="TRANSCRIPT_EMPTY",
+        )
+
+    previous_start = -1.0
+    for index, segment in enumerate(transcript.segments):
+        if segment.start_time >= segment.end_time:
+            raise TerminalChapteringJobError(
+                f"Transcript segment {index} has invalid timestamps",
+                error_code="TRANSCRIPT_SEGMENT_INVALID",
+            )
+        if segment.start_time < previous_start:
+            raise TerminalChapteringJobError(
+                "Transcript segments are not sorted",
+                error_code="TRANSCRIPT_SEGMENTS_UNSORTED",
+            )
+        if segment.end_time > transcript.media_duration + 1.0:
+            raise TerminalChapteringJobError(
+                f"Transcript segment {index} exceeds media duration",
+                error_code="TRANSCRIPT_SEGMENT_OUT_OF_RANGE",
+            )
+        if not segment.text.strip():
+            raise TerminalChapteringJobError(
+                f"Transcript segment {index} text is empty",
+                error_code="TRANSCRIPT_SEGMENT_EMPTY",
+            )
+        previous_start = segment.start_time
 
 
 def _mark_processing_started(job_id: str) -> None:

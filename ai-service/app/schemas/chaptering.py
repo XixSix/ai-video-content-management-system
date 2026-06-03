@@ -17,6 +17,17 @@ class ChapteringOptions(BaseModel):
     use_llm: bool
 
 
+class ChapteringTranscriptWord(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    word_id: str
+    segment_id: str | None = None
+    start_seconds: float
+    end_seconds: float
+    text: str
+    confidence: float | None = None
+
+
 class ChapteringTranscriptSegment(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -27,6 +38,7 @@ class ChapteringTranscriptSegment(BaseModel):
     clean_text: str | None = None
     speaker_label: str | None = None
     confidence: float | None = None
+    words: list[ChapteringTranscriptWord] = Field(default_factory=list)
 
 
 class ChapterGenerationRequest(BaseModel):

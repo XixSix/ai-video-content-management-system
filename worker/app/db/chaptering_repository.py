@@ -14,6 +14,8 @@ from app.schemas.chaptering.result import (
     ChapteringTranscriptSegment,
 )
 
+CHAPTERING_MODEL_FALLBACK = "ai-service-chaptering-v1"
+
 
 @dataclass(frozen=True)
 class PersistedChapterSummary:
@@ -129,7 +131,7 @@ def find_chaptering_by_job_id(
     return PersistedChapteringSummary(
         transcript_id=chapters[0].transcript_id,
         transcript_version=chapters[0].transcript_version,
-        model="rule-based-chaptering-v1",
+        model=CHAPTERING_MODEL_FALLBACK,
         chapters=chapters,
     )
 
@@ -143,6 +145,7 @@ def save_chapters(
     transcript_version: int,
     chapters: list[ChapterCandidate],
     source: ChapterSource,
+    model: str,
 ) -> PersistedChapteringSummary:
     """Replace transcript chapters with the current generated chapter set."""
     now = datetime.now(UTC)
@@ -228,7 +231,7 @@ def save_chapters(
     return PersistedChapteringSummary(
         transcript_id=UUID(transcript_id),
         transcript_version=transcript_version,
-        model="rule-based-chaptering-v1",
+        model=model,
         chapters=persisted,
     )
 

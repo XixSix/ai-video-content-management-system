@@ -31,6 +31,16 @@ message TranscriptSegment {
   string clean_text = 5;
   string speaker_label = 6;
   float confidence = 7;
+  repeated TranscriptWord words = 8;
+}
+
+message TranscriptWord {
+  string word_id = 1;
+  string segment_id = 2;
+  double start_seconds = 3;
+  double end_seconds = 4;
+  string text = 5;
+  float confidence = 6;
 }
 
 message GenerateChaptersResponse {

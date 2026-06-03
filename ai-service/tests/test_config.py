@@ -16,10 +16,15 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("ASR_CPU_THREADS", "2")
     monkeypatch.setenv("ASR_NUM_WORKERS", "1")
     monkeypatch.setenv("ASR_LOCAL_FILES_ONLY", "true")
-    monkeypatch.setenv("CHAPTERING_STRATEGY", "rule-based")
+    monkeypatch.setenv("CHAPTERING_STRATEGY", "word")
     monkeypatch.setenv("CHAPTERING_MODEL_NAME", "chaptering-v1")
+    monkeypatch.setenv("CHAPTERING_TARGET_UNIT_DURATION_SECONDS", "18")
     monkeypatch.setenv("CHAPTERING_MAX_UNIT_DURATION_SECONDS", "25")
+    monkeypatch.setenv("CHAPTERING_TARGET_UNIT_WORDS", "70")
+    monkeypatch.setenv("CHAPTERING_MAX_UNIT_WORDS", "140")
+    monkeypatch.setenv("CHAPTERING_MAX_UNIT_CHARS", "900")
     monkeypatch.setenv("CHAPTERING_PAUSE_BOUNDARY_SECONDS", "1")
+    monkeypatch.setenv("CHAPTERING_PUNCTUATION_POOR_THRESHOLD", "0.25")
     monkeypatch.setenv("CHAPTERING_CONTEXT_WINDOW_SECONDS", "100")
     monkeypatch.setenv("CHAPTERING_CANDIDATE_SCORE_CONTEXT_SECONDS", "45")
     monkeypatch.setenv("CHAPTERING_CANDIDATE_LONG_PAUSE_SECONDS", "2")
@@ -49,10 +54,15 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.asr_cpu_threads == 2
     assert settings.asr_num_workers == 1
     assert settings.asr_local_files_only is True
-    assert settings.chaptering_strategy == "rule-based"
+    assert settings.chaptering_strategy == "word"
     assert settings.chaptering_model_name == "chaptering-v1"
+    assert settings.chaptering_target_unit_duration_seconds == 18
     assert settings.chaptering_max_unit_duration_seconds == 25
+    assert settings.chaptering_target_unit_words == 70
+    assert settings.chaptering_max_unit_words == 140
+    assert settings.chaptering_max_unit_chars == 900
     assert settings.chaptering_pause_boundary_seconds == 1
+    assert settings.chaptering_punctuation_poor_threshold == 0.25
     assert settings.chaptering_context_window_seconds == 100
     assert settings.chaptering_candidate_score_context_seconds == 45
     assert settings.chaptering_candidate_long_pause_seconds == 2

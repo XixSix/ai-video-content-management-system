@@ -9,8 +9,11 @@ from app.grpc.chaptering_servicer import ChapteringServicer
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
+    ChapterGenerationResult,
     ChapteringOptions,
     ChapteringTranscriptSegment,
+    ChapteringTranscriptWord,
+    GeneratedChapter,
 )
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
@@ -37,7 +40,31 @@ def _context() -> grpc.ServicerContext:
     return cast(grpc.ServicerContext, FakeContext())
 
 
-def _generate_request(request_id: str = "job-1") -> chaptering_pb2.GenerateChaptersRequest:
+class CapturingWorkflow:
+    def __init__(self) -> None:
+        self.request: ChapterGenerationRequest | None = None
+
+    def execute(self, request: ChapterGenerationRequest) -> ChapterGenerationResult:
+        self.request = request
+        return ChapterGenerationResult(
+            request_id=request.request_id,
+            language=request.language,
+            model="segment-chaptering-v1",
+            source="RULE_BASED",
+            chapters=[
+                GeneratedChapter(
+                    index=1,
+                    start_seconds=0,
+                    end_seconds=request.media_duration_seconds or 0,
+                    title="Captured",
+                )
+            ],
+        )
+
+
+def _generate_request(
+    request_id: str = "job-1",
+) -> chaptering_pb2.GenerateChaptersRequest:
     return chaptering_pb2.GenerateChaptersRequest(
         request_id=request_id,
         language="en",
@@ -60,12 +87,17 @@ def _generate_request(request_id: str = "job-1") -> chaptering_pb2.GenerateChapt
     )
 
 
-def _pipeline_config() -> ChapteringPipelineConfig:
+def _pipeline_config(strategy: str = "segment") -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
-        strategy="candidate",
-        model_name="rule-based-chaptering-v1",
+        strategy=strategy,
+        model_name="segment-chaptering-v1",
+        target_unit_duration_seconds=20.0,
         max_unit_duration_seconds=30.0,
+        target_unit_words=80,
+        max_unit_words=160,
+        max_unit_chars=1200,
         pause_boundary_seconds=1.0,
+        punctuation_poor_threshold=0.15,
         context_window_seconds=90.0,
         scoring=CandidateScoringConfig(
             context_seconds=90.0,
@@ -157,12 +189,72 @@ def test_generate_chapters_rejects_segment_beyond_media_duration() -> None:
     assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
 
 
+def test_generate_chapters_rejects_invalid_word_timestamps() -> None:
+    request = _generate_request()
+    request.segments[0].words.extend(
+        [
+            chaptering_pb2.TranscriptWord(
+                word_id="word-1",
+                segment_id="seg-1",
+                start_seconds=2,
+                end_seconds=1,
+                text="Topic",
+            )
+        ]
+    )
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_generate_chapters_maps_word_timestamps_to_workflow_request() -> None:
+    request = _generate_request()
+    request.segments[0].words.extend(
+        [
+            chaptering_pb2.TranscriptWord(
+                word_id="word-1",
+                segment_id="seg-1",
+                start_seconds=0,
+                end_seconds=0.5,
+                text="Topic",
+                confidence=0.9,
+            ),
+            chaptering_pb2.TranscriptWord(
+                word_id="word-2",
+                segment_id="seg-1",
+                start_seconds=0.5,
+                end_seconds=1.0,
+                text="introduction",
+                confidence=0.8,
+            ),
+        ]
+    )
+    workflow = CapturingWorkflow()
+
+    ChapteringServicer(workflow=cast(ChapteringWorkflow, workflow)).GenerateChapters(
+        request,
+        _context(),
+    )
+
+    assert workflow.request is not None
+    words = workflow.request.segments[0].words
+    assert len(words) == 2
+    assert words[0].word_id == "word-1"
+    assert words[0].segment_id == "seg-1"
+    assert words[0].start_seconds == 0
+    assert words[0].end_seconds == 0.5
+    assert words[0].text == "Topic"
+    assert words[0].confidence == pytest.approx(0.9)
+
+
 def test_generate_chapters_returns_fallback_chapter() -> None:
     response = ChapteringServicer().GenerateChapters(_generate_request(), _context())
 
     assert response.request_id == "job-1"
     assert response.source == chaptering_pb2.CHAPTER_SOURCE_RULE_BASED
-    assert response.model == "rule-based-chaptering-v1"
+    assert response.model == "segment-chaptering-v1"
     assert len(response.chapters) == 1
     assert response.chapters[0].start_seconds == 0
     assert response.chapters[0].end_seconds == 120
@@ -186,6 +278,57 @@ def test_chaptering_workflow_generates_chapters() -> None:
                     start_seconds=0,
                     end_seconds=10,
                     text="Topic introduction.",
+                )
+            ],
+            options=ChapteringOptions(
+                min_chapter_duration_seconds=30,
+                target_chapter_duration_seconds=60,
+                max_chapter_duration_seconds=60,
+                max_chapters=3,
+                use_embeddings=True,
+                use_llm=False,
+            ),
+        )
+    )
+
+    assert result.request_id == "job-1"
+    assert len(result.chapters) == 1
+    assert result.chapters[0].title == "Topic introduction."
+
+
+def test_chaptering_workflow_generates_chapters_from_word_strategy() -> None:
+    workflow = ChapteringWorkflow(
+        embedding=NoopTextEmbeddingProvider(),
+        config=_pipeline_config(strategy="word"),
+    )
+
+    result = workflow.execute(
+        ChapterGenerationRequest(
+            request_id="job-1",
+            language="en",
+            media_duration_seconds=120,
+            segments=[
+                ChapteringTranscriptSegment(
+                    segment_id="seg-1",
+                    start_seconds=0,
+                    end_seconds=10,
+                    text="Topic introduction.",
+                    words=[
+                        ChapteringTranscriptWord(
+                            word_id="word-1",
+                            segment_id="seg-1",
+                            start_seconds=0,
+                            end_seconds=0.5,
+                            text="Topic",
+                        ),
+                        ChapteringTranscriptWord(
+                            word_id="word-2",
+                            segment_id="seg-1",
+                            start_seconds=0.5,
+                            end_seconds=1.0,
+                            text="introduction.",
+                        ),
+                    ],
                 )
             ],
             options=ChapteringOptions(

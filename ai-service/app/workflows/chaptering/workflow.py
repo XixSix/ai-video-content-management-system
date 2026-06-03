@@ -1,8 +1,8 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.pipeline import (
-    CHAPTERING_STRATEGY_CANDIDATE,
-    CHAPTERING_STRATEGY_RULE_BASED,
+    CHAPTERING_STRATEGY_SEGMENT,
+    CHAPTERING_STRATEGY_WORD,
     run_chapter_generation_pipeline,
 )
 from app.workflows.chaptering.schemas import ChapteringPipelineConfig
@@ -31,7 +31,7 @@ class ChapteringWorkflow:
         )
 
     def _get_chaptering_strategy(self) -> str:
-        if self._config.strategy == CHAPTERING_STRATEGY_RULE_BASED:
-            return CHAPTERING_STRATEGY_RULE_BASED
+        if self._config.strategy == CHAPTERING_STRATEGY_WORD:
+            return CHAPTERING_STRATEGY_WORD
 
-        return CHAPTERING_STRATEGY_CANDIDATE
+        return CHAPTERING_STRATEGY_SEGMENT

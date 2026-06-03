@@ -37,21 +37,43 @@ class Settings(BaseSettings):
         alias="ASR_MODEL_STORAGE_PATH",
     )
     asr_local_files_only: bool = Field(default=False, alias="ASR_LOCAL_FILES_ONLY")
-    chaptering_strategy: Literal["rule-based", "candidate"] = Field(
-        default="candidate",
+    chaptering_strategy: Literal["segment", "word"] = Field(
+        default="segment",
         alias="CHAPTERING_STRATEGY",
     )
     chaptering_model_name: str = Field(
-        default="rule-based-chaptering-v1",
+        default="segment-chaptering-v1",
         alias="CHAPTERING_MODEL_NAME",
+    )
+    chaptering_target_unit_duration_seconds: PositiveFloat = Field(
+        default=20.0,
+        alias="CHAPTERING_TARGET_UNIT_DURATION_SECONDS",
     )
     chaptering_max_unit_duration_seconds: PositiveFloat = Field(
         default=30.0,
         alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",
     )
+    chaptering_target_unit_words: PositiveInt = Field(
+        default=80,
+        alias="CHAPTERING_TARGET_UNIT_WORDS",
+    )
+    chaptering_max_unit_words: PositiveInt = Field(
+        default=160,
+        alias="CHAPTERING_MAX_UNIT_WORDS",
+    )
+    chaptering_max_unit_chars: PositiveInt = Field(
+        default=1200,
+        alias="CHAPTERING_MAX_UNIT_CHARS",
+    )
     chaptering_pause_boundary_seconds: PositiveFloat = Field(
         default=1.0,
         alias="CHAPTERING_PAUSE_BOUNDARY_SECONDS",
+    )
+    chaptering_punctuation_poor_threshold: float = Field(
+        default=0.15,
+        ge=0.0,
+        le=1.0,
+        alias="CHAPTERING_PUNCTUATION_POOR_THRESHOLD",
     )
     chaptering_context_window_seconds: PositiveFloat = Field(
         default=90.0,
