@@ -28,9 +28,11 @@ def _word(
     start: float,
     end: float,
     text: str,
+    *,
+    word_id: str | None = None,
 ) -> ChapteringTranscriptWord:
     return ChapteringTranscriptWord(
-        word_id=f"word-{index}",
+        word_id=word_id if word_id is not None else f"word-{index}",
         segment_id=segment_id,
         start_seconds=start,
         end_seconds=end,
@@ -137,4 +139,21 @@ def test_build_word_chapter_units_preserves_ordered_segment_ids() -> None:
 def test_has_usable_word_timestamps_rejects_segment_only_input() -> None:
     assert not has_usable_word_timestamps(
         [_segment(1, 0, 2, "segment without word timestamps")]
+    )
+
+
+def test_has_usable_word_timestamps_rejects_words_without_identity() -> None:
+    assert not has_usable_word_timestamps(
+        [
+            _segment(
+                1,
+                0,
+                2,
+                "words without identity",
+                words=[
+                    _word(1, "", 0, 0.5, "missing-segment"),
+                    _word(2, "seg-1", 0.5, 1.0, "missing-word", word_id=""),
+                ],
+            )
+        ]
     )
