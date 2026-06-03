@@ -14,7 +14,7 @@ from app.workflows.chaptering.word_units import (
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inspect word timeline units.")
-    parser.add_argument("transcript_json", type=Path)
+    parser.add_argument("transcript_json", type=Path, nargs="+")
     parser.add_argument("--target-duration", type=float, default=12.0)
     parser.add_argument("--max-duration", type=float, default=20.0)
     parser.add_argument("--target-words", type=int, default=40)
@@ -22,13 +22,32 @@ def main() -> None:
     parser.add_argument("--max-chars", type=int, default=1200)
     parser.add_argument("--pause", type=float, default=1.0)
     parser.add_argument(
+        "--output-dir",
+        type=Path,
+        help="Write one inspect result file per transcript instead of printing.",
+    )
+    parser.add_argument(
         "--synthesize-ids",
         action="store_true",
         help="Create missing segment/word ids at the debug script boundary.",
     )
     args = parser.parse_args()
 
-    payload = json.loads(args.transcript_json.read_text(encoding="utf-8"))
+    if args.output_dir:
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+
+    for transcript_json in args.transcript_json:
+        output = _inspect_transcript(transcript_json, args)
+        if args.output_dir:
+            output_path = args.output_dir / f"{transcript_json.stem}_word_units.txt"
+            output_path.write_text(output, encoding="utf-8")
+            print(f"wrote {output_path}")
+        else:
+            print(output, end="")
+
+
+def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
+    payload = json.loads(transcript_json.read_text(encoding="utf-8"))
     segments = _load_segments(payload, synthesize_ids=args.synthesize_ids)
     units = build_word_chapter_units(
         segments,
@@ -41,21 +60,56 @@ def main() -> None:
     )
 
     input_word_count = sum(len(segment.words) for segment in segments)
-    print(f"segments: {len(segments)}")
-    print(f"words: {input_word_count}")
-    print(f"usable_word_timestamps: {has_usable_word_timestamps(segments)}")
-    print(f"units: {len(units)}")
-    print()
+    lines = [
+        f"source: {transcript_json}",
+        f"video_id: {payload.get('video_id', '')}",
+        f"language: {payload.get('language', '')}",
+        f"media_duration: {payload.get('duration', '')}",
+        "strategy: word",
+        "config:",
+        f"  target_duration: {args.target_duration}",
+        f"  max_duration: {args.max_duration}",
+        f"  target_words: {args.target_words}",
+        f"  max_words: {args.max_words}",
+        f"  max_chars: {args.max_chars}",
+        f"  pause: {args.pause}",
+        f"  synthesize_ids: {args.synthesize_ids}",
+        "summary:",
+        f"  segments: {len(segments)}",
+        f"  words: {input_word_count}",
+        f"  usable_word_timestamps: {has_usable_word_timestamps(segments)}",
+        f"  units: {len(units)}",
+        *_duration_summary_lines(units),
+        "",
+    ]
 
     for unit in units:
         duration = unit.end_time - unit.start_time
-        print(
+        lines.append(
             f"{unit.unit_id} "
             f"{unit.start_time:.2f}-{unit.end_time:.2f}s "
             f"({duration:.2f}s, segments={','.join(unit.segment_ids)})"
         )
-        print(f"  {unit.text}")
-        print()
+        lines.append(f"  {unit.text}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def _duration_summary_lines(units: list) -> list[str]:
+    if not units:
+        return [
+            "  unit_duration_min: 0.00",
+            "  unit_duration_avg: 0.00",
+            "  unit_duration_max: 0.00",
+        ]
+
+    durations = [unit.end_time - unit.start_time for unit in units]
+    return [
+        f"  unit_duration_min: {min(durations):.2f}",
+        f"  unit_duration_avg: {sum(durations) / len(durations):.2f}",
+        f"  unit_duration_max: {max(durations):.2f}",
+    ]
 
 
 def _load_segments(
@@ -64,9 +118,10 @@ def _load_segments(
     synthesize_ids: bool,
 ) -> list[ChapteringTranscriptSegment]:
     """Map common transcript JSON shapes into chaptering segment DTOs."""
-    raw_segments = payload.get("segments") or payload.get("transcript", {}).get(
-        "segments"
-    )
+    raw_segments = payload.get("segments")
+    if raw_segments is None:
+        raw_segments = payload.get("transcript", {}).get("segments")
+
     if not isinstance(raw_segments, list):
         raise SystemExit("Transcript JSON must contain a segments list.")
 
