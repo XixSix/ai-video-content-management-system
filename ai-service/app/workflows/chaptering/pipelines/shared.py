@@ -1,11 +1,13 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.candidates import (
-    generate_boundary_candidates,
     retain_candidates_for_embedding,
-    score_boundary_candidates,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
+from app.workflows.chaptering.gap_scoring import (
+    gap_scores_to_candidates,
+    score_unit_gaps,
+)
 from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConfig
 from app.workflows.chaptering.selection import select_boundaries
 from app.workflows.chaptering.semantic import score_context_windows
@@ -29,18 +31,13 @@ def run_units_pipeline(
     duration = media_duration(request)
     options = request.options
 
-    raw_candidates = generate_boundary_candidates(
+    gap_scores = score_unit_gaps(
         units,
-        media_duration=duration,
-        min_chapter_duration=options.min_chapter_duration_seconds,
-    )
-    scored_candidates = score_boundary_candidates(
-        units,
-        raw_candidates,
         media_duration=duration,
         min_chapter_duration=options.min_chapter_duration_seconds,
         config=config.scoring,
     )
+    scored_candidates = gap_scores_to_candidates(gap_scores)
     retained_candidates = retain_candidates_for_embedding(
         scored_candidates,
         media_duration=duration,

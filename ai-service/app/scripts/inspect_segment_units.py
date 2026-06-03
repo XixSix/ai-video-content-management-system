@@ -12,12 +12,12 @@ from app.workflows.chaptering.segment_units import build_segment_chapter_units
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inspect segment timeline units.")
     parser.add_argument("transcript_json", type=Path)
-    parser.add_argument("--target-duration", type=float, default=30.0)
-    parser.add_argument("--max-duration", type=float, default=60.0)
-    parser.add_argument("--target-words", type=int, default=80)
-    parser.add_argument("--max-words", type=int, default=160)
+    parser.add_argument("--target-duration", type=float, default=12.0)
+    parser.add_argument("--max-duration", type=float, default=20.0)
+    parser.add_argument("--target-words", type=int, default=40)
+    parser.add_argument("--max-words", type=int, default=80)
     parser.add_argument("--max-chars", type=int, default=1200)
-    parser.add_argument("--pause", type=float, default=2.0)
+    parser.add_argument("--pause", type=float, default=1.0)
     parser.add_argument("--punctuation-poor-threshold", type=float, default=0.15)
     parser.add_argument(
         "--synthesize-ids",

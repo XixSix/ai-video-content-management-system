@@ -46,19 +46,19 @@ class Settings(BaseSettings):
         alias="CHAPTERING_MODEL_NAME",
     )
     chaptering_target_unit_duration_seconds: PositiveFloat = Field(
-        default=20.0,
+        default=12.0,
         alias="CHAPTERING_TARGET_UNIT_DURATION_SECONDS",
     )
     chaptering_max_unit_duration_seconds: PositiveFloat = Field(
-        default=30.0,
+        default=20.0,
         alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",
     )
     chaptering_target_unit_words: PositiveInt = Field(
-        default=80,
+        default=40,
         alias="CHAPTERING_TARGET_UNIT_WORDS",
     )
     chaptering_max_unit_words: PositiveInt = Field(
-        default=160,
+        default=80,
         alias="CHAPTERING_MAX_UNIT_WORDS",
     )
     chaptering_max_unit_chars: PositiveInt = Field(

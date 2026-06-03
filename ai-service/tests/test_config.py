@@ -4,6 +4,15 @@ from pydantic import ValidationError
 from app.core.config import Settings
 
 
+def test_settings_use_chaptering_defaults() -> None:
+    settings = Settings(_env_file=None)
+
+    assert settings.chaptering_target_unit_duration_seconds == 12
+    assert settings.chaptering_max_unit_duration_seconds == 20
+    assert settings.chaptering_target_unit_words == 40
+    assert settings.chaptering_max_unit_words == 80
+
+
 def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("AI_SERVICE_HOST", "127.0.0.1")
     monkeypatch.setenv("AI_SERVICE_PORT", "50052")

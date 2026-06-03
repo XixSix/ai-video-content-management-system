@@ -15,12 +15,12 @@ from app.workflows.chaptering.word_units import (
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inspect word timeline units.")
     parser.add_argument("transcript_json", type=Path)
-    parser.add_argument("--target-duration", type=float, default=30.0)
-    parser.add_argument("--max-duration", type=float, default=60.0)
-    parser.add_argument("--target-words", type=int, default=80)
-    parser.add_argument("--max-words", type=int, default=160)
+    parser.add_argument("--target-duration", type=float, default=12.0)
+    parser.add_argument("--max-duration", type=float, default=20.0)
+    parser.add_argument("--target-words", type=int, default=40)
+    parser.add_argument("--max-words", type=int, default=80)
     parser.add_argument("--max-chars", type=int, default=1200)
-    parser.add_argument("--pause", type=float, default=2.0)
+    parser.add_argument("--pause", type=float, default=1.0)
     parser.add_argument(
         "--synthesize-ids",
         action="store_true",
@@ -88,9 +88,7 @@ def _load_segment(
 
     words = [
         _load_word(raw_word, segment_id, word_index, synthesize_ids=synthesize_ids)
-        for word_index, raw_word in enumerate(
-            raw_segment.get("words") or [], start=1
-        )
+        for word_index, raw_word in enumerate(raw_segment.get("words") or [], start=1)
     ]
     return ChapteringTranscriptSegment(
         segment_id=segment_id,
