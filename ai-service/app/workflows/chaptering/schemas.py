@@ -72,8 +72,13 @@ class ChapteringPipelineConfig:
 
     strategy: str
     model_name: str
+    target_unit_duration_seconds: float
     max_unit_duration_seconds: float
+    target_unit_words: int
+    max_unit_words: int
+    max_unit_chars: int
     pause_boundary_seconds: float
+    punctuation_poor_threshold: float
     context_window_seconds: float
     scoring: CandidateScoringConfig
     retention: CandidateRetentionConfig

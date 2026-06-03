@@ -37,7 +37,9 @@ def _context() -> grpc.ServicerContext:
     return cast(grpc.ServicerContext, FakeContext())
 
 
-def _generate_request(request_id: str = "job-1") -> chaptering_pb2.GenerateChaptersRequest:
+def _generate_request(
+    request_id: str = "job-1",
+) -> chaptering_pb2.GenerateChaptersRequest:
     return chaptering_pb2.GenerateChaptersRequest(
         request_id=request_id,
         language="en",
@@ -64,8 +66,13 @@ def _pipeline_config() -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
         strategy="candidate",
         model_name="rule-based-chaptering-v1",
+        target_unit_duration_seconds=20.0,
         max_unit_duration_seconds=30.0,
+        target_unit_words=80,
+        max_unit_words=160,
+        max_unit_chars=1200,
         pause_boundary_seconds=1.0,
+        punctuation_poor_threshold=0.15,
         context_window_seconds=90.0,
         scoring=CandidateScoringConfig(
             context_seconds=90.0,

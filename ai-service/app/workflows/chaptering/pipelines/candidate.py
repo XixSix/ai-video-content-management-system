@@ -33,6 +33,11 @@ def run_candidate_pipeline(
         request.segments,
         max_unit_duration=config.max_unit_duration_seconds,
         pause_boundary_seconds=config.pause_boundary_seconds,
+        target_unit_duration=config.target_unit_duration_seconds,
+        target_unit_words=config.target_unit_words,
+        max_unit_words=config.max_unit_words,
+        max_unit_chars=config.max_unit_chars,
+        punctuation_poor_threshold=config.punctuation_poor_threshold,
     )
     raw_candidates = generate_boundary_candidates(
         units,

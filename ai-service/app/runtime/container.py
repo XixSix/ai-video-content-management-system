@@ -51,8 +51,13 @@ def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineC
     return ChapteringPipelineConfig(
         strategy=settings.chaptering_strategy,
         model_name=settings.chaptering_model_name,
+        target_unit_duration_seconds=(settings.chaptering_target_unit_duration_seconds),
         max_unit_duration_seconds=settings.chaptering_max_unit_duration_seconds,
+        target_unit_words=settings.chaptering_target_unit_words,
+        max_unit_words=settings.chaptering_max_unit_words,
+        max_unit_chars=settings.chaptering_max_unit_chars,
         pause_boundary_seconds=settings.chaptering_pause_boundary_seconds,
+        punctuation_poor_threshold=settings.chaptering_punctuation_poor_threshold,
         context_window_seconds=settings.chaptering_context_window_seconds,
         scoring=CandidateScoringConfig(
             context_seconds=settings.chaptering_candidate_score_context_seconds,
