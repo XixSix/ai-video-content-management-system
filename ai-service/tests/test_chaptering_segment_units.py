@@ -1,5 +1,5 @@
 from app.schemas.chaptering import ChapteringTranscriptSegment
-from app.workflows.chaptering.units import build_chapter_units
+from app.workflows.chaptering.segment_units import build_segment_chapter_units
 
 
 def _segment(
@@ -19,8 +19,8 @@ def _segment(
     )
 
 
-def test_build_chapter_units_merges_split_sentence_until_punctuation() -> None:
-    units = build_chapter_units(
+def test_build_segment_chapter_units_merges_split_sentence_until_punctuation() -> None:
+    units = build_segment_chapter_units(
         [
             _segment(1, 0, 4, "Today we talk about"),
             _segment(2, 4, 8, "how to make better videos."),
@@ -40,8 +40,8 @@ def test_build_chapter_units_merges_split_sentence_until_punctuation() -> None:
     assert units[0].text == "Today we talk about how to make better videos."
 
 
-def test_build_chapter_units_breaks_on_long_pause() -> None:
-    units = build_chapter_units(
+def test_build_segment_chapter_units_breaks_on_long_pause() -> None:
+    units = build_segment_chapter_units(
         [
             _segment(1, 0, 6, "The setup continues without punctuation"),
             _segment(2, 9, 14, "The next idea starts here"),
@@ -58,8 +58,8 @@ def test_build_chapter_units_breaks_on_long_pause() -> None:
     assert units[1].start_time == 9
 
 
-def test_build_chapter_units_creates_pseudo_sentences_without_punctuation() -> None:
-    units = build_chapter_units(
+def test_build_segment_chapter_units_creates_pseudo_sentences_without_punctuation() -> None:
+    units = build_segment_chapter_units(
         [
             _segment(1, 0, 10, "today we talk about hooks"),
             _segment(2, 10, 20, "then we remove the dead space"),
@@ -77,8 +77,8 @@ def test_build_chapter_units_creates_pseudo_sentences_without_punctuation() -> N
     assert units[0].end_time == 20
 
 
-def test_build_chapter_units_uses_word_budget_as_soft_boundary() -> None:
-    units = build_chapter_units(
+def test_build_segment_chapter_units_uses_word_budget_as_soft_boundary() -> None:
+    units = build_segment_chapter_units(
         [
             _segment(1, 0, 5, "one two three four"),
             _segment(2, 5, 10, "five six seven eight"),
@@ -95,8 +95,8 @@ def test_build_chapter_units_uses_word_budget_as_soft_boundary() -> None:
     assert [unit.segment_ids for unit in units] == [["seg-1"], ["seg-2", "seg-3"]]
 
 
-def test_build_chapter_units_preserves_single_overlong_segment() -> None:
-    units = build_chapter_units(
+def test_build_segment_chapter_units_preserves_single_overlong_segment() -> None:
+    units = build_segment_chapter_units(
         [
             _segment(
                 1,
@@ -119,8 +119,8 @@ def test_build_chapter_units_preserves_single_overlong_segment() -> None:
     assert units[0].segment_ids == ["seg-1"]
 
 
-def test_build_chapter_units_uses_clean_text_fallback_per_segment() -> None:
-    units = build_chapter_units(
+def test_build_segment_chapter_units_uses_clean_text_fallback_per_segment() -> None:
+    units = build_segment_chapter_units(
         [
             _segment(1, 0, 4, " noisy text ", clean_text="clean text"),
             _segment(2, 4, 8, "second sentence."),

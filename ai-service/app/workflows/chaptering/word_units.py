@@ -5,7 +5,7 @@ from nltk.tokenize.punkt import PunktSentenceTokenizer
 
 from app.schemas.chaptering import ChapteringTranscriptSegment, ChapteringTranscriptWord
 from app.workflows.chaptering.schemas import ChapterUnit
-from app.workflows.chaptering.units import SENTENCE_END_RE
+from app.workflows.chaptering.segment_units import SENTENCE_END_RE
 
 
 @dataclass(frozen=True)

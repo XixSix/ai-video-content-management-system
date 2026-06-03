@@ -7,7 +7,7 @@ SENTENCE_END_RE = re.compile(r"[.!?。！？…]['\")\]]*$")
 WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
 
 
-def build_chapter_units(
+def build_segment_chapter_units(
     segments: list[ChapteringTranscriptSegment],
     *,
     max_unit_duration: float,
