@@ -34,10 +34,32 @@ def test_build_segment_chapter_units_merges_split_sentence_until_punctuation() -
         max_unit_chars=1200,
     )
 
-    assert [unit.segment_ids for unit in units] == [["seg-1", "seg-2"], ["seg-3"]]
+    assert [unit.segment_ids for unit in units] == [["seg-1", "seg-2", "seg-3"]]
     assert units[0].start_time == 0
-    assert units[0].end_time == 8
-    assert units[0].text == "Today we talk about how to make better videos."
+    assert units[0].end_time == 12
+    assert units[0].text == (
+        "Today we talk about how to make better videos. Now we move on."
+    )
+
+
+def test_build_segment_chapter_units_does_not_split_tiny_sentences() -> None:
+    units = build_segment_chapter_units(
+        [
+            _segment(1, 0, 2, "Yes."),
+            _segment(2, 2, 4, "I understand."),
+            _segment(3, 4, 6, "Okay."),
+            _segment(4, 6, 8, "Let's continue."),
+        ],
+        max_unit_duration=30,
+        pause_boundary_seconds=2,
+        target_unit_duration=10,
+        target_unit_words=80,
+        max_unit_words=160,
+        max_unit_chars=1200,
+    )
+
+    assert [unit.segment_ids for unit in units] == [["seg-1", "seg-2", "seg-3", "seg-4"]]
+    assert units[0].text == "Yes. I understand. Okay. Let's continue."
 
 
 def test_build_segment_chapter_units_breaks_on_long_pause() -> None:

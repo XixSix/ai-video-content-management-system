@@ -12,10 +12,10 @@ def build_segment_chapter_units(
     *,
     max_unit_duration: float,
     pause_boundary_seconds: float,
-    target_unit_duration: float | None = None,
-    target_unit_words: int | None = None,
-    max_unit_words: int | None = None,
-    max_unit_chars: int | None = None,
+    target_unit_duration: float,
+    target_unit_words: int,
+    max_unit_words: int,
+    max_unit_chars: int,
     punctuation_poor_threshold: float = 0.15,
 ) -> list[ChapterUnit]:
     """Merge ASR segments into stable sentence-like timeline units.
@@ -39,7 +39,6 @@ def build_segment_chapter_units(
         non_empty_segments,
         threshold=punctuation_poor_threshold,
     )
-    target_duration = target_unit_duration or max_unit_duration
 
     for segment in non_empty_segments:
         if current and _starts_after_long_pause(
@@ -65,7 +64,7 @@ def build_segment_chapter_units(
         if _should_flush_after_append(
             current,
             punctuation_poor=punctuation_poor,
-            target_unit_duration=target_duration,
+            target_unit_duration=target_unit_duration,
             target_unit_words=target_unit_words,
             max_unit_duration=max_unit_duration,
             max_unit_words=max_unit_words,
@@ -85,26 +84,31 @@ def _should_flush_after_append(
     *,
     punctuation_poor: bool,
     target_unit_duration: float,
-    target_unit_words: int | None,
+    target_unit_words: int,
     max_unit_duration: float,
-    max_unit_words: int | None,
-    max_unit_chars: int | None,
+    max_unit_words: int,
+    max_unit_chars: int,
 ) -> bool:
     """Return true when the current buffer should become a timeline unit."""
     text = _join_text(segments)
     duration = segments[-1].end_seconds - segments[0].start_seconds
     word_count = _word_count(text)
 
-    if _has_sentence_end(text):
-        return True
-
     if duration >= max_unit_duration:
         return True
 
-    if max_unit_words is not None and word_count >= max_unit_words:
+    if max_unit_words and word_count >= max_unit_words:
         return True
 
-    if max_unit_chars is not None and len(text) >= max_unit_chars:
+    if max_unit_chars and len(text) >= max_unit_chars:
+        return True
+
+    if _has_sentence_end(text) and _is_near_target(
+        duration=duration,
+        word_count=word_count,
+        target_unit_duration=target_unit_duration,
+        target_unit_words=target_unit_words,
+    ):
         return True
 
     if not punctuation_poor:
@@ -113,7 +117,24 @@ def _should_flush_after_append(
     if duration >= target_unit_duration:
         return True
 
-    return target_unit_words is not None and word_count >= target_unit_words
+    return bool(target_unit_words and word_count >= target_unit_words)
+
+
+def _is_near_target(
+    *,
+    duration: float,
+    word_count: int,
+    target_unit_duration: float,
+    target_unit_words: int,
+) -> bool:
+    """Return true when a sentence end is close enough to target budgets."""
+    if duration >= target_unit_duration * 0.7:
+        return True
+
+    if target_unit_words and word_count >= target_unit_words * 0.7:
+        return True
+
+    return False
 
 
 def _would_exceed_max_budget(
@@ -121,8 +142,8 @@ def _would_exceed_max_budget(
     next_segment: ChapteringTranscriptSegment,
     *,
     max_unit_duration: float,
-    max_unit_words: int | None,
-    max_unit_chars: int | None,
+    max_unit_words: int,
+    max_unit_chars: int,
 ) -> bool:
     """Return true when adding the next segment would exceed max budgets."""
     candidate = [*segments, next_segment]
@@ -132,10 +153,10 @@ def _would_exceed_max_budget(
     if duration > max_unit_duration:
         return True
 
-    if max_unit_words is not None and _word_count(text) > max_unit_words:
+    if max_unit_words and _word_count(text) > max_unit_words:
         return True
 
-    return max_unit_chars is not None and len(text) > max_unit_chars
+    return bool(max_unit_chars and len(text) > max_unit_chars)
 
 
 def _starts_after_long_pause(
