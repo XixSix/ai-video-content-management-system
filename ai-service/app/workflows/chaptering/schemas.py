@@ -26,6 +26,7 @@ class ChapterBoundaryCandidate:
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
     lexical_shift_score: float = 0.0
+    valley_depth_score: float = 0.0
     boundary_quality_score: float = 0.0
     duration_sanity_score: float = 0.0
 
@@ -46,6 +47,7 @@ class ChapterGapScore:
     lexical_cohesion_score: float = 0.0
     lexical_shift_score: float = 0.0
     semantic_shift_score: float = 0.0
+    valley_depth_score: float = 0.0
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
     boundary_quality_score: float = 0.0
@@ -90,6 +92,15 @@ class CandidateRetentionConfig:
 
 
 @dataclass(frozen=True)
+class ValleyDetectionConfig:
+    """Store TextTiling-style valley detection tuning values."""
+
+    smoothing_radius: int
+    peak_window: int
+    min_valley_depth: float
+
+
+@dataclass(frozen=True)
 class ChapteringPipelineConfig:
     """Store deterministic chaptering workflow tuning values."""
 
@@ -104,4 +115,5 @@ class ChapteringPipelineConfig:
     punctuation_poor_threshold: float
     context_window_seconds: float
     scoring: CandidateScoringConfig
+    valley: ValleyDetectionConfig
     retention: CandidateRetentionConfig

@@ -15,6 +15,7 @@ from app.workflows.chaptering.schemas import (
     CandidateScoringConfig,
     ChapterUnit,
     ChapteringPipelineConfig,
+    ValleyDetectionConfig,
 )
 
 
@@ -144,6 +145,86 @@ def test_units_pipeline_uses_scored_gap_candidate_times_without_embeddings() -> 
     assert result.chapters[1].scores.semantic_shift_score == 0.0
 
 
+def test_units_pipeline_attaches_valley_depth_to_selected_boundary() -> None:
+    units = [
+        _unit(1, 0, 20, "database schema prisma users database queries"),
+        _unit(2, 20, 40, "database relations prisma tables users queries"),
+        _unit(3, 40, 60, "camera lighting lenses exposure framing shots"),
+        _unit(4, 60, 80, "camera composition lenses lighting exposure scene"),
+    ]
+    request = ChapterGenerationRequest(
+        request_id="chaptering-job-2",
+        language="en",
+        media_duration_seconds=90,
+        segments=[
+            _segment(1, 0, 20, units[0].text),
+            _segment(2, 20, 40, units[1].text),
+            _segment(3, 40, 60, units[2].text),
+            _segment(4, 60, 80, units[3].text),
+        ],
+        options=ChapteringOptions(
+            min_chapter_duration_seconds=10,
+            target_chapter_duration_seconds=40,
+            max_chapter_duration_seconds=80,
+            max_chapters=3,
+            use_embeddings=False,
+            use_llm=False,
+        ),
+    )
+
+    result = run_units_pipeline(
+        request=request,
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        config=_pipeline_config(context_seconds=20),
+    )
+
+    assert [chapter.start_seconds for chapter in result.chapters] == [0, 40]
+    assert result.chapters[1].scores is not None
+    assert result.chapters[1].scores.valley_depth_score is not None
+    assert result.chapters[1].scores.valley_depth_score > 0
+
+
+def test_units_pipeline_falls_back_to_all_gap_candidates_when_no_valleys_pass() -> None:
+    units = [
+        _unit(1, 0, 20, "database schema prisma users database queries"),
+        _unit(2, 20, 40, "database relations prisma tables users queries"),
+        _unit(3, 40, 60, "camera lighting lenses exposure framing shots"),
+        _unit(4, 60, 80, "camera composition lenses lighting exposure scene"),
+    ]
+    request = ChapterGenerationRequest(
+        request_id="chaptering-job-3",
+        language="en",
+        media_duration_seconds=90,
+        segments=[
+            _segment(1, 0, 20, units[0].text),
+            _segment(2, 20, 40, units[1].text),
+            _segment(3, 40, 60, units[2].text),
+            _segment(4, 60, 80, units[3].text),
+        ],
+        options=ChapteringOptions(
+            min_chapter_duration_seconds=10,
+            target_chapter_duration_seconds=40,
+            max_chapter_duration_seconds=80,
+            max_chapters=3,
+            use_embeddings=False,
+            use_llm=False,
+        ),
+    )
+
+    result = run_units_pipeline(
+        request=request,
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        config=_pipeline_config(context_seconds=20, min_valley_depth=1.1),
+    )
+
+    starts = [chapter.start_seconds for chapter in result.chapters]
+    assert starts[0] == 0
+    assert len(starts) > 1
+    assert set(starts[1:]).issubset({unit.start_time for unit in units[1:]})
+
+
 def _scoring_config(
     *,
     context_seconds: float = 90,
@@ -162,7 +243,11 @@ def _scoring_config(
     )
 
 
-def _pipeline_config() -> ChapteringPipelineConfig:
+def _pipeline_config(
+    *,
+    context_seconds: float = 90,
+    min_valley_depth: float = 0.18,
+) -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
         strategy="segment",
         model_name="segment-chaptering-v1",
@@ -174,7 +259,12 @@ def _pipeline_config() -> ChapteringPipelineConfig:
         pause_boundary_seconds=1.0,
         punctuation_poor_threshold=0.15,
         context_window_seconds=90.0,
-        scoring=_scoring_config(context_seconds=90),
+        scoring=_scoring_config(context_seconds=context_seconds),
+        valley=ValleyDetectionConfig(
+            smoothing_radius=0,
+            peak_window=2,
+            min_valley_depth=min_valley_depth,
+        ),
         retention=CandidateRetentionConfig(
             min_limit=12,
             max_limit=40,

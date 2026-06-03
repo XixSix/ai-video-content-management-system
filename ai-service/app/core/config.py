@@ -138,6 +138,20 @@ class Settings(BaseSettings):
         le=1.0,
         alias="CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION",
     )
+    chaptering_valley_smoothing_radius: int = Field(
+        default=1,
+        ge=0,
+        alias="CHAPTERING_VALLEY_SMOOTHING_RADIUS",
+    )
+    chaptering_valley_peak_window: PositiveInt = Field(
+        default=2,
+        alias="CHAPTERING_VALLEY_PEAK_WINDOW",
+    )
+    chaptering_valley_min_depth: float = Field(
+        default=0.18,
+        ge=0.0,
+        alias="CHAPTERING_VALLEY_MIN_DEPTH",
+    )
 
     @property
     def bind_address(self) -> str:

@@ -11,6 +11,9 @@ def test_settings_use_chaptering_defaults() -> None:
     assert settings.chaptering_max_unit_duration_seconds == 20
     assert settings.chaptering_target_unit_words == 40
     assert settings.chaptering_max_unit_words == 80
+    assert settings.chaptering_valley_smoothing_radius == 1
+    assert settings.chaptering_valley_peak_window == 2
+    assert settings.chaptering_valley_min_depth == 0.18
 
 
 def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -48,6 +51,9 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("CHAPTERING_EMBEDDING_CANDIDATE_MAX_LIMIT", "120")
     monkeypatch.setenv("CHAPTERING_EMBEDDING_CANDIDATE_MULTIPLIER", "3")
     monkeypatch.setenv("CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION", "0.5")
+    monkeypatch.setenv("CHAPTERING_VALLEY_SMOOTHING_RADIUS", "2")
+    monkeypatch.setenv("CHAPTERING_VALLEY_PEAK_WINDOW", "4")
+    monkeypatch.setenv("CHAPTERING_VALLEY_MIN_DEPTH", "0.3")
 
     settings = Settings(_env_file=None)
 
@@ -86,6 +92,9 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.chaptering_embedding_candidate_max_limit == 120
     assert settings.chaptering_embedding_candidate_multiplier == 3
     assert settings.chaptering_candidate_top_score_fraction == 0.5
+    assert settings.chaptering_valley_smoothing_radius == 2
+    assert settings.chaptering_valley_peak_window == 4
+    assert settings.chaptering_valley_min_depth == 0.3
 
 
 def test_settings_reject_invalid_port(monkeypatch: pytest.MonkeyPatch) -> None:

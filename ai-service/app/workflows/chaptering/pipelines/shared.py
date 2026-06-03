@@ -11,6 +11,7 @@ from app.workflows.chaptering.gap_scoring import (
 from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConfig
 from app.workflows.chaptering.selection import select_boundaries
 from app.workflows.chaptering.semantic import score_context_windows
+from app.workflows.chaptering.valleys import detect_valley_candidates
 from app.workflows.chaptering.windows import build_context_windows
 
 
@@ -37,7 +38,13 @@ def run_units_pipeline(
         min_chapter_duration=options.min_chapter_duration_seconds,
         config=config.scoring,
     )
-    scored_candidates = gap_scores_to_candidates(gap_scores)
+    valley_gap_scores = detect_valley_candidates(
+        gap_scores,
+        min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
+        config=config.valley,
+    )
+    candidate_gap_scores = valley_gap_scores or gap_scores
+    scored_candidates = gap_scores_to_candidates(candidate_gap_scores)
     retained_candidates = retain_candidates_for_embedding(
         scored_candidates,
         media_duration=duration,
