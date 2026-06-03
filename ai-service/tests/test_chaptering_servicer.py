@@ -64,8 +64,8 @@ def _generate_request(
 
 def _pipeline_config() -> ChapteringPipelineConfig:
     return ChapteringPipelineConfig(
-        strategy="candidate",
-        model_name="rule-based-chaptering-v1",
+        strategy="segment",
+        model_name="segment-chaptering-v1",
         target_unit_duration_seconds=20.0,
         max_unit_duration_seconds=30.0,
         target_unit_words=80,
@@ -169,7 +169,7 @@ def test_generate_chapters_returns_fallback_chapter() -> None:
 
     assert response.request_id == "job-1"
     assert response.source == chaptering_pb2.CHAPTER_SOURCE_RULE_BASED
-    assert response.model == "rule-based-chaptering-v1"
+    assert response.model == "segment-chaptering-v1"
     assert len(response.chapters) == 1
     assert response.chapters[0].start_seconds == 0
     assert response.chapters[0].end_seconds == 120

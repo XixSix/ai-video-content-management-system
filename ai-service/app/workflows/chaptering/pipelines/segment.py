@@ -13,13 +13,13 @@ from app.workflows.chaptering.units import build_chapter_units
 from app.workflows.chaptering.windows import build_context_windows
 
 
-def run_candidate_pipeline(
+def run_segment_pipeline(
     *,
     request: ChapterGenerationRequest,
     embedding: TextEmbeddingPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
-    """Generate chapters through unit, candidate, and context-window scoring.
+    """Generate chapters from segment-timestamped transcript units.
 
     This strategy builds stable transcript units, creates hard-valid boundary
     candidates, keeps a bounded candidate set, optionally scores left/right

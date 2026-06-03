@@ -4,16 +4,15 @@ from app.workflows.chaptering.schemas import ChapteringPipelineConfig
 from app.workflows.chaptering.selection import select_boundaries
 
 
-def run_rule_based_pipeline(
+def run_word_pipeline(
     *,
     request: ChapterGenerationRequest,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
-    """Generate chapters from raw transcript boundaries without candidates.
+    """Generate chapters through the current word-strategy placeholder.
 
-    This strategy is the deterministic fallback. It uses transcript segment
-    starts directly as possible boundaries and does not build units, score
-    candidate windows, call embeddings, or call an LLM.
+    The word-timestamp implementation is not wired yet, so this runner preserves
+    the existing deterministic fallback logic for now.
     """
     duration = media_duration(request)
     options = request.options

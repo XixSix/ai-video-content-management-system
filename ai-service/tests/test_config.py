@@ -16,7 +16,7 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("ASR_CPU_THREADS", "2")
     monkeypatch.setenv("ASR_NUM_WORKERS", "1")
     monkeypatch.setenv("ASR_LOCAL_FILES_ONLY", "true")
-    monkeypatch.setenv("CHAPTERING_STRATEGY", "rule-based")
+    monkeypatch.setenv("CHAPTERING_STRATEGY", "word")
     monkeypatch.setenv("CHAPTERING_MODEL_NAME", "chaptering-v1")
     monkeypatch.setenv("CHAPTERING_TARGET_UNIT_DURATION_SECONDS", "18")
     monkeypatch.setenv("CHAPTERING_MAX_UNIT_DURATION_SECONDS", "25")
@@ -54,7 +54,7 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.asr_cpu_threads == 2
     assert settings.asr_num_workers == 1
     assert settings.asr_local_files_only is True
-    assert settings.chaptering_strategy == "rule-based"
+    assert settings.chaptering_strategy == "word"
     assert settings.chaptering_model_name == "chaptering-v1"
     assert settings.chaptering_target_unit_duration_seconds == 18
     assert settings.chaptering_max_unit_duration_seconds == 25
