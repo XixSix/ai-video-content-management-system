@@ -1,7 +1,8 @@
-from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.provider_contracts.chapter_boundary_evaluation import (
     ChapterBoundaryEvaluationPort,
 )
+from app.provider_contracts.chapter_title import ChapterTitleProviderPort
+from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
 from app.workflows.chaptering.candidates import (
@@ -18,6 +19,7 @@ from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConf
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 from app.workflows.chaptering.semantic import score_context_windows
 from app.workflows.chaptering.scores.valleys import detect_valley_candidates
+from app.workflows.chaptering.title_generation import apply_generated_titles
 from app.workflows.chaptering.unit_repair import repair_micro_units
 from app.workflows.chaptering.windows import build_context_windows
 
@@ -28,6 +30,7 @@ def run_units_pipeline(
     units: list[ChapterUnit],
     embedding: TextEmbeddingPort,
     boundary_evaluator: ChapterBoundaryEvaluationPort,
+    title_provider: ChapterTitleProviderPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
     """Generate chapters from prebuilt timeline units.
@@ -107,17 +110,25 @@ def run_units_pipeline(
         max_chapters=options.max_chapters,
     )
     candidates_by_time = {candidate.time: candidate for candidate in ranked_candidates}
+    chapters = build_chapters(
+        request,
+        duration=duration,
+        boundaries=boundaries,
+        semantic_shift_scores_by_time=semantic_shift_scores_by_time,
+        candidates_by_time=candidates_by_time,
+    )
+    titles_applied = False
+    if options.use_llm:
+        chapters, titles_applied = apply_generated_titles(
+            chapters,
+            request,
+            provider=title_provider,
+        )
 
     return ChapterGenerationResult(
         request_id=request.request_id,
         language=request.language,
         model=config.model_name,
-        source="LLM" if llm_applied else "RULE_BASED",
-        chapters=build_chapters(
-            request,
-            duration=duration,
-            boundaries=boundaries,
-            semantic_shift_scores_by_time=semantic_shift_scores_by_time,
-            candidates_by_time=candidates_by_time,
-        ),
+        source="LLM" if llm_applied or titles_applied else "RULE_BASED",
+        chapters=chapters,
     )

@@ -10,6 +10,7 @@ from app.providers.chaptering.noop_boundary_evaluation import (
     NoopChapterBoundaryEvaluationProvider,
 )
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.noop_title import NoopChapterTitleProvider
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
     ChapterGenerationResult,
@@ -281,6 +282,7 @@ def test_chaptering_workflow_generates_chapters() -> None:
     workflow = ChapteringWorkflow(
         embedding=NoopTextEmbeddingProvider(),
         boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=_pipeline_config(),
     )
 
@@ -317,6 +319,7 @@ def test_chaptering_workflow_generates_chapters_from_word_strategy() -> None:
     workflow = ChapteringWorkflow(
         embedding=NoopTextEmbeddingProvider(),
         boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=_pipeline_config(strategy="word"),
     )
 

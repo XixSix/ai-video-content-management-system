@@ -89,6 +89,26 @@ class BoundaryEvaluation:
 
 
 @dataclass(frozen=True)
+class ChapterTitleInput:
+    """Store transcript text for generating one chapter title and summary."""
+
+    chapter_index: int
+    start_time: float
+    end_time: float
+    language: str | None
+    text: str
+
+
+@dataclass(frozen=True)
+class ChapterTitleResult:
+    """Store one generated title/summary result before validation."""
+
+    chapter_index: int
+    title: str
+    summary: str | None = None
+
+
+@dataclass(frozen=True)
 class ChapterGapScore:
     """Store Phase 3 topic-cohesion scores for one gap between timeline units."""
 

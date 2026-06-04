@@ -1,6 +1,7 @@
 from app.provider_contracts.chapter_boundary_evaluation import (
     ChapterBoundaryEvaluationPort,
 )
+from app.provider_contracts.chapter_title import ChapterTitleProviderPort
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.pipeline import (
@@ -17,10 +18,12 @@ class ChapteringWorkflow:
         *,
         embedding: TextEmbeddingPort,
         boundary_evaluator: ChapterBoundaryEvaluationPort,
+        title_provider: ChapterTitleProviderPort,
         config: ChapteringPipelineConfig,
     ) -> None:
         self._embedding = embedding
         self._boundary_evaluator = boundary_evaluator
+        self._title_provider = title_provider
         self._config = config
 
     def execute(
@@ -33,6 +36,7 @@ class ChapteringWorkflow:
             request=request,
             embedding=self._embedding,
             boundary_evaluator=self._boundary_evaluator,
+            title_provider=self._title_provider,
             config=self._config,
         )
 

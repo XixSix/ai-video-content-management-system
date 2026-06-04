@@ -2,6 +2,7 @@ from app.core.config import Settings, get_settings
 from app.provider_contracts.chapter_boundary_evaluation import (
     ChapterBoundaryEvaluationPort,
 )
+from app.provider_contracts.chapter_title import ChapterTitleProviderPort
 from app.provider_contracts.asr import AsrPort
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.providers.asr.faster_whisper_adapter import FasterWhisperAsr
@@ -11,6 +12,7 @@ from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.providers.chaptering.noop_boundary_evaluation import (
     NoopChapterBoundaryEvaluationProvider,
 )
+from app.providers.chaptering.noop_title import NoopChapterTitleProvider
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.source_separation.noop_demucs import NoopDemucsSourceSeparator
 from app.providers.vad.noop_vad import NoopVad
@@ -47,6 +49,7 @@ def build_chaptering_workflow(
     return ChapteringWorkflow(
         embedding=build_chaptering_embedding_provider(settings),
         boundary_evaluator=build_chaptering_boundary_evaluation_provider(settings),
+        title_provider=build_chaptering_title_provider(settings),
         config=_build_chaptering_pipeline_config(settings),
     )
 
@@ -61,6 +64,11 @@ def build_chaptering_boundary_evaluation_provider(
 ) -> ChapterBoundaryEvaluationPort:
     _ = settings
     return NoopChapterBoundaryEvaluationProvider()
+
+
+def build_chaptering_title_provider(settings: Settings) -> ChapterTitleProviderPort:
+    _ = settings
+    return NoopChapterTitleProvider()
 
 
 def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineConfig:
