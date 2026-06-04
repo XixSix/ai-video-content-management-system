@@ -2,17 +2,13 @@ import math
 import re
 from collections import Counter
 
-import nltk
-from nltk.tokenize import TreebankWordTokenizer, word_tokenize
+from nltk.tag import pos_tag
+from nltk.tokenize import word_tokenize
 
 from app.workflows.chaptering.scores.common import clamp_score
 
 CONTENT_POS_PREFIXES = ("NN", "VB", "JJ")
 TOKEN_RE = re.compile(r"[a-z0-9]+(?:'[a-z0-9]+)?")
-
-_FALLBACK_TOKENIZER = TreebankWordTokenizer()
-_PUNKT_AVAILABLE: bool | None = None
-_POS_TAGGER_AVAILABLE: bool | None = None
 
 
 def lexical_cohesion_score(left_text: str, right_text: str) -> float:
@@ -40,48 +36,17 @@ def lexical_shift_score(left_text: str, right_text: str) -> float:
 
 
 def _content_word_counts(text: str) -> Counter[str]:
-    tokens = [
-        token.lower() for token in _tokenize(text) if TOKEN_RE.fullmatch(token.lower())
-    ]
-    if not tokens:
+    raw_tokens = word_tokenize(text)
+    if not raw_tokens:
         return Counter()
 
-    tagged_tokens = _pos_tag(tokens)
-    if tagged_tokens is None:
-        return Counter(tokens)
+    tagged_tokens = pos_tag(raw_tokens)
+    content_words: list[str] = []
+    for token, tag in tagged_tokens:
+        normalized_token = token.lower()
+        if tag.startswith(CONTENT_POS_PREFIXES) and TOKEN_RE.fullmatch(
+            normalized_token
+        ):
+            content_words.append(normalized_token)
 
-    return Counter(
-        token for token, tag in tagged_tokens if tag.startswith(CONTENT_POS_PREFIXES)
-    )
-
-
-def _tokenize(text: str) -> list[str]:
-    global _PUNKT_AVAILABLE
-
-    if _PUNKT_AVAILABLE is False:
-        return _FALLBACK_TOKENIZER.tokenize(text)
-
-    try:
-        tokens = word_tokenize(text)
-    except LookupError:
-        _PUNKT_AVAILABLE = False
-        return _FALLBACK_TOKENIZER.tokenize(text)
-
-    _PUNKT_AVAILABLE = True
-    return tokens
-
-
-def _pos_tag(tokens: list[str]) -> list[tuple[str, str]] | None:
-    global _POS_TAGGER_AVAILABLE
-
-    if _POS_TAGGER_AVAILABLE is False:
-        return None
-
-    try:
-        tagged_tokens = nltk.pos_tag(tokens)
-    except LookupError:
-        _POS_TAGGER_AVAILABLE = False
-        return None
-
-    _POS_TAGGER_AVAILABLE = True
-    return tagged_tokens
+    return Counter(content_words)

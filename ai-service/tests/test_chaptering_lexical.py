@@ -4,8 +4,6 @@ from app.workflows.chaptering.scores import lexical
 
 
 def test_lexical_cohesion_prefers_nltk_word_tokenize(monkeypatch) -> None:
-    monkeypatch.setattr(lexical, "_PUNKT_AVAILABLE", None)
-    monkeypatch.setattr(lexical, "_POS_TAGGER_AVAILABLE", None)
     tokenized_texts: list[str] = []
 
     def fake_word_tokenize(text: str) -> list[str]:
@@ -16,7 +14,7 @@ def test_lexical_cohesion_prefers_nltk_word_tokenize(monkeypatch) -> None:
         return [(token, "NN") for token in tokens]
 
     monkeypatch.setattr(lexical, "word_tokenize", fake_word_tokenize)
-    monkeypatch.setattr(lexical.nltk, "pos_tag", fake_pos_tag)
+    monkeypatch.setattr(lexical, "pos_tag", fake_pos_tag)
 
     score = lexical.lexical_cohesion_score("video upload", "video chapter")
 
@@ -25,22 +23,24 @@ def test_lexical_cohesion_prefers_nltk_word_tokenize(monkeypatch) -> None:
 
 
 def test_lexical_cohesion_uses_nltk_pos_tags_for_content_words(monkeypatch) -> None:
-    monkeypatch.setattr(lexical, "_PUNKT_AVAILABLE", False)
-    monkeypatch.setattr(lexical, "_POS_TAGGER_AVAILABLE", None)
+    def fake_word_tokenize(text: str) -> list[str]:
+        return text.replace(".", " .").split()
 
     def fake_pos_tag(tokens: list[str]) -> list[tuple[str, str]]:
         tags = {
-            "the": "DT",
+            "The": "DT",
             "platform": "NN",
             "uploads": "VBZ",
             "quickly": "RB",
-            "a": "DT",
+            ".": ".",
+            "A": "DT",
             "camera": "NN",
             "slowly": "RB",
         }
         return [(token, tags[token]) for token in tokens]
 
-    monkeypatch.setattr(lexical.nltk, "pos_tag", fake_pos_tag)
+    monkeypatch.setattr(lexical, "word_tokenize", fake_word_tokenize)
+    monkeypatch.setattr(lexical, "pos_tag", fake_pos_tag)
 
     score = lexical.lexical_cohesion_score(
         "The platform uploads quickly.",
@@ -50,20 +50,30 @@ def test_lexical_cohesion_uses_nltk_pos_tags_for_content_words(monkeypatch) -> N
     assert score == pytest.approx(0.5)
 
 
-def test_lexical_cohesion_falls_back_when_nltk_tagger_data_is_missing(
+def test_lexical_cohesion_requires_nltk_tagger_data(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(lexical, "_PUNKT_AVAILABLE", False)
-    monkeypatch.setattr(lexical, "_POS_TAGGER_AVAILABLE", None)
+    def fake_word_tokenize(text: str) -> list[str]:
+        return text.replace(".", "").split()
 
     def missing_pos_tagger(tokens: list[str]) -> list[tuple[str, str]]:
         raise LookupError
 
-    monkeypatch.setattr(lexical.nltk, "pos_tag", missing_pos_tagger)
+    monkeypatch.setattr(lexical, "word_tokenize", fake_word_tokenize)
+    monkeypatch.setattr(lexical, "pos_tag", missing_pos_tagger)
 
-    score = lexical.lexical_cohesion_score(
-        "The platform uploads quickly.",
-        "A camera uploads slowly.",
-    )
+    with pytest.raises(LookupError):
+        lexical.lexical_cohesion_score(
+            "The platform uploads quickly.",
+            "A camera uploads slowly.",
+        )
 
-    assert score == pytest.approx(0.25)
+
+def test_lexical_cohesion_requires_nltk_tokenizer_data(monkeypatch) -> None:
+    def missing_word_tokenize(text: str) -> list[str]:
+        raise LookupError
+
+    monkeypatch.setattr(lexical, "word_tokenize", missing_word_tokenize)
+
+    with pytest.raises(LookupError):
+        lexical.lexical_cohesion_score("video upload", "video chapter")

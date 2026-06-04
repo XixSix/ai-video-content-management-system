@@ -1,3 +1,14 @@
+"""Detect chapter boundary valleys from a lexical cohesion curve.
+
+Flow:
+    1. Read each gap's `lexical_cohesion_score` as a timeline curve.
+    2. Smooth the curve with a moving average to reduce noisy local spikes.
+    3. Treat points lower than both direct neighbors as candidate valleys.
+    4. Score each valley by how far it drops from nearby left/right peaks.
+    5. Keep valleys above the configured minimum depth.
+    6. Suppress nearby valleys so one topic shift produces one candidate.
+"""
+
 from dataclasses import replace
 
 from app.workflows.chaptering.schemas import (
@@ -12,11 +23,24 @@ def detect_valley_candidates(
     min_candidate_distance_seconds: float,
     config: ValleyDetectionConfig,
 ) -> list[ChapterGapScore]:
-    """Detect TextTiling-style local valleys from scored transcript gaps.
+    """Detect TextTiling-style topic-shift valleys.
 
-    The detector smooths the lexical cohesion curve, finds local minima with
-    enough left/right peak context, computes valley depth, and deduplicates
-    nearby valleys without changing the original gap timestamps.
+    Flow:
+        1. Return no candidates when fewer than three gaps are available,
+           because a valley needs left, current, and right points.
+        2. Build a lexical cohesion curve from the scored gaps and smooth it
+           using `config.smoothing_radius`.
+        3. Find local minima: points whose smoothed cohesion is lower than
+           both direct neighbors.
+        4. Attach `valley_depth_score` by comparing each local minimum with
+           nearby peaks inside `config.peak_window`.
+        5. Drop valleys below `config.min_valley_depth`.
+        6. Keep the strongest valley when multiple candidates are closer than
+           `min_candidate_distance_seconds`.
+
+    Notes:
+        This step does not invent or move boundary timestamps. Returned gaps
+        keep the original transcript gap time and only add valley strength.
     """
     if len(gap_scores) < 3:
         return []
