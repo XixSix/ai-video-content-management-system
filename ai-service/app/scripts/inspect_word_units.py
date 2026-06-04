@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Any
 
 from app.schemas.chaptering import ChapteringTranscriptSegment, ChapteringTranscriptWord
-from app.workflows.chaptering.schemas import ChapterUnit
+from app.workflows.chaptering.schemas import ChapterUnit, UnitRepairConfig
+from app.workflows.chaptering.unit_repair import repair_micro_units
 from app.workflows.chaptering.word_units import (
     build_word_chapter_units,
     has_usable_word_timestamps,
@@ -43,6 +44,15 @@ def main() -> None:
     parser.add_argument("--long-gap", type=float, default=5.0)
     parser.add_argument("--issue-context", type=int, default=2)
     parser.add_argument("--max-issue-contexts", type=int, default=12)
+    parser.add_argument(
+        "--repair",
+        action="store_true",
+        help="Inspect units after the shared post-build micro-unit repair pass.",
+    )
+    parser.add_argument("--repair-short-duration", type=float, default=4.0)
+    parser.add_argument("--repair-min-words", type=int, default=8)
+    parser.add_argument("--repair-fragment-max-words", type=int, default=2)
+    parser.add_argument("--repair-sparse-duration", type=float, default=6.0)
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -80,6 +90,20 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
         max_unit_words=args.max_words,
         max_unit_chars=args.max_chars,
     )
+    if args.repair:
+        units = repair_micro_units(
+            units,
+            max_unit_duration=args.max_duration,
+            max_unit_words=args.max_words,
+            max_unit_chars=args.max_chars,
+            config=UnitRepairConfig(
+                short_duration_seconds=args.repair_short_duration,
+                min_words=args.repair_min_words,
+                fragment_max_words=args.repair_fragment_max_words,
+                sparse_duration_seconds=args.repair_sparse_duration,
+            ),
+        )
+
     rows = _inspect_units(
         units,
         short_duration=args.short_duration,
@@ -109,6 +133,11 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
         f"- short_words: `{args.short_words}`",
         f"- long_gap: `{args.long_gap}`",
         f"- synthesize_ids: `{args.synthesize_ids}`",
+        f"- repair: `{args.repair}`",
+        f"- repair_short_duration: `{args.repair_short_duration}`",
+        f"- repair_min_words: `{args.repair_min_words}`",
+        f"- repair_fragment_max_words: `{args.repair_fragment_max_words}`",
+        f"- repair_sparse_duration: `{args.repair_sparse_duration}`",
         "",
         "## Summary",
         "",

@@ -360,6 +360,9 @@ def _chapter_lines(chapters: list) -> list[str]:
             f"lexical=`{scores.lexical_shift_score}` valley=`{scores.valley_depth_score}` "
             f"pause=`{scores.pause_score}` quality=`{scores.boundary_quality_score}`"
         )
+        lines.append(f"  - title: {_compact_text(chapter.title, limit=140)}")
+        if chapter.summary:
+            lines.append(f"  - summary: {_compact_text(chapter.summary, limit=220)}")
 
     return [*lines, ""]
 

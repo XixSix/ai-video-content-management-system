@@ -4,6 +4,29 @@ from app.workflows.chaptering.schemas import ChapterUnit, UnitRepairConfig
 
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")
 TERMINAL_PUNCTUATION = (".", "!", "?")
+CONTINUATION_GAP_SECONDS = 0.05
+TRANSITION_OPENER_RE = re.compile(
+    r"^(?:"
+    r"at(?:\s+number)?|"
+    r"now|"
+    r"so\s+those\s+are\s+all|"
+    r"mobile\s+apps|"
+    r"let'?s\s+talk|"
+    r"and\s+number|"
+    r"number|"
+    r"first|"
+    r"second|"
+    r"third|"
+    r"finally|"
+    r"and\s+finally"
+    r")\b",
+    re.IGNORECASE,
+)
+BACKCHANNEL_RE = re.compile(
+    r"^(?:ok(?:ay)?|yes|yeah|yep|no|nope|right|sure|correct|exactly|thanks?)"
+    r"[\s.!?,]*$",
+    re.IGNORECASE,
+)
 
 
 def repair_micro_units(
@@ -82,11 +105,29 @@ def _repair_direction(
     if not can_merge_previous and not can_merge_next:
         return None
 
+    if _looks_like_transition_opener(unit):
+        if can_merge_next:
+            return "forward"
+        if can_merge_previous:
+            return "backward"
+
+    if _looks_like_previous_sentence_continuation(units, index):
+        if can_merge_previous:
+            return "backward"
+        if can_merge_next:
+            return "forward"
+
     if _looks_like_leading_fragment(unit):
         if can_merge_next:
             return "forward"
         if can_merge_previous:
             return "backward"
+
+    if _looks_like_backchannel(unit):
+        if can_merge_previous:
+            return "backward"
+        if can_merge_next:
+            return "forward"
 
     if _has_terminal_punctuation(unit):
         if can_merge_previous:
@@ -120,6 +161,37 @@ def _looks_like_leading_fragment(unit: ChapterUnit) -> bool:
     """Return true for short fragments that should usually prefix the next unit."""
     text = unit.text.strip()
     return bool(text) and not text.endswith(TERMINAL_PUNCTUATION)
+
+
+def _looks_like_transition_opener(unit: ChapterUnit) -> bool:
+    """Return true for short transition markers that should prefix following text."""
+    return bool(TRANSITION_OPENER_RE.match(_normalize_text(unit.text)))
+
+
+def _looks_like_previous_sentence_continuation(
+    units: list[ChapterUnit],
+    index: int,
+) -> bool:
+    """Return true when a fragment continues an unfinished previous sentence."""
+    if index <= 0:
+        return False
+
+    unit = units[index]
+    previous = units[index - 1]
+    text = unit.text.lstrip()
+    if not text:
+        return False
+
+    return (
+        not _has_terminal_punctuation(previous)
+        and _gap_between(previous, unit) <= CONTINUATION_GAP_SECONDS
+        and text[0].islower()
+    )
+
+
+def _looks_like_backchannel(unit: ChapterUnit) -> bool:
+    """Return true for standalone acknowledgements with low topic signal."""
+    return bool(BACKCHANNEL_RE.match(_normalize_text(unit.text)))
 
 
 def _can_merge_units(
