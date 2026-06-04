@@ -1,5 +1,5 @@
 from app.schemas.chaptering import ChapteringTranscriptSegment
-from app.workflows.chaptering.scoring import score_boundary
+from app.workflows.chaptering.scores.scoring import score_boundary
 from app.workflows.chaptering.schemas import ChapterBoundaryCandidate
 
 

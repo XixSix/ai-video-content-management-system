@@ -1,6 +1,6 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.workflows.chaptering.schemas import ChapterBoundaryContextWindow
-from app.workflows.chaptering.scoring import semantic_shift_score
+from app.workflows.chaptering.scores.scoring import semantic_shift_score
 
 
 def score_context_windows(

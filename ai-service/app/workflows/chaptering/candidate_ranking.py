@@ -1,6 +1,7 @@
 import math
 from dataclasses import replace
 
+from app.workflows.chaptering.scores.common import clamp_score
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     ChapterBoundaryCandidate,
@@ -45,7 +46,7 @@ def _score_candidate(
     candidate: ChapterBoundaryCandidate,
     semantic_shift_scores_by_time: dict[float, float],
 ) -> ChapterBoundaryCandidate:
-    semantic_shift_score = _clamp(
+    semantic_shift_score = clamp_score(
         semantic_shift_scores_by_time.get(candidate.time, 0.0)
     )
     candidate_score = (
@@ -60,7 +61,7 @@ def _score_candidate(
     return replace(
         candidate,
         semantic_shift_score=round(semantic_shift_score, 4),
-        candidate_score=round(_clamp(candidate_score), 4),
+        candidate_score=round(clamp_score(candidate_score), 4),
     )
 
 
@@ -158,8 +159,3 @@ def _downsample_evenly(
         for index, candidate in enumerate(candidates)
         if index in selected_indexes
     ]
-
-
-def _clamp(value: float) -> float:
-    """Clamp a numeric score to the 0-1 range."""
-    return max(0.0, min(value, 1.0))

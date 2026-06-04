@@ -1,20 +1,28 @@
 import logging
 import math
-import re
 from collections.abc import Iterable
 from dataclasses import replace
 
+from app.workflows.chaptering.scores.common import clamp_score
+from app.workflows.chaptering.scores.lexical import (
+    lexical_shift_score as calculate_lexical_shift_score,
+)
+from app.workflows.chaptering.scores.quality import (
+    boundary_quality_score as calculate_boundary_quality_score,
+)
+from app.workflows.chaptering.scores.temporal import (
+    duration_sanity_score as calculate_duration_sanity_score,
+    pause_score as calculate_pause_score,
+)
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
     ChapterBoundaryCandidate,
     ChapterUnit,
 )
-from app.workflows.chaptering.transition_markers import transition_marker_score
+from app.workflows.chaptering.scores.transition_markers import transition_marker_score
 
 logger = logging.getLogger(__name__)
-
-TOKEN_RE = re.compile(r"[a-z0-9']+")
 
 
 def generate_boundary_candidates(
@@ -158,18 +166,18 @@ def _score_candidate(
     )
 
     discourse_marker_score = transition_marker_score(current_unit.clean_text)
-    pause_score = _pause_score(
+    pause_score = calculate_pause_score(
         current_unit.start_time - previous_unit.end_time,
         long_pause_seconds=config.long_pause_seconds,
         max_pause_score_seconds=config.max_pause_score_seconds,
     )
-    lexical_shift_score = _lexical_shift_score(left_text, right_text)
-    boundary_quality_score = _boundary_quality_score(
+    lexical_shift_score = calculate_lexical_shift_score(left_text, right_text)
+    boundary_quality_score = calculate_boundary_quality_score(
         left_text,
         right_text,
         min_context_text_chars=config.min_context_text_chars,
     )
-    duration_sanity_score = _duration_sanity_score(
+    duration_sanity_score = calculate_duration_sanity_score(
         candidate.time,
         media_duration=media_duration,
         min_chapter_duration=min_chapter_duration,
@@ -184,7 +192,7 @@ def _score_candidate(
 
     return replace(
         candidate,
-        cheap_score=round(_clamp(cheap_score), 4),
+        cheap_score=round(clamp_score(cheap_score), 4),
         discourse_marker_score=round(discourse_marker_score, 4),
         pause_score=round(pause_score, 4),
         lexical_shift_score=round(lexical_shift_score, 4),
@@ -223,55 +231,6 @@ def _join_unit_text(units: Iterable[ChapterUnit]) -> str:
     return " ".join(
         unit.clean_text or unit.text for unit in units if (unit.clean_text or unit.text)
     ).strip()
-
-
-def _pause_score(
-    pause_seconds: float,
-    *,
-    long_pause_seconds: float,
-    max_pause_score_seconds: float,
-) -> float:
-    if pause_seconds < long_pause_seconds:
-        return 0.0
-
-    return _clamp(pause_seconds / max_pause_score_seconds)
-
-
-def _lexical_shift_score(left_text: str, right_text: str) -> float:
-    """Return cheap lexical shift using Jaccard distance over token sets."""
-    left_tokens = set(TOKEN_RE.findall(left_text.lower()))
-    right_tokens = set(TOKEN_RE.findall(right_text.lower()))
-    if not left_tokens or not right_tokens:
-        return 0.0
-
-    overlap = len(left_tokens & right_tokens)
-    union = len(left_tokens | right_tokens)
-    return _clamp(1.0 - overlap / union)
-
-
-def _boundary_quality_score(
-    left_text: str,
-    right_text: str,
-    *,
-    min_context_text_chars: int,
-) -> float:
-    if min_context_text_chars <= 0:
-        return 0.0
-
-    return _clamp(min(len(left_text), len(right_text)) / min_context_text_chars)
-
-
-def _duration_sanity_score(
-    time: float,
-    *,
-    media_duration: float,
-    min_chapter_duration: float,
-) -> float:
-    if min_chapter_duration <= 0:
-        return 0.0
-
-    available_margin = min(time, media_duration - time)
-    return _clamp(available_margin / (min_chapter_duration * 2))
 
 
 def _embedding_candidate_limit(
@@ -316,7 +275,3 @@ def _downsample_evenly(
         for index, candidate in enumerate(candidates)
         if index in selected_indexes
     ]
-
-
-def _clamp(value: float) -> float:
-    return max(0.0, min(value, 1.0))

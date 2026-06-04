@@ -5,14 +5,14 @@ from app.workflows.chaptering.candidates import (
     retain_candidates_for_embedding,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
-from app.workflows.chaptering.gap_scoring import (
+from app.workflows.chaptering.scores.gap_scoring import (
     gap_scores_to_candidates,
     score_unit_gaps,
 )
 from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConfig
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 from app.workflows.chaptering.semantic import score_context_windows
-from app.workflows.chaptering.valleys import detect_valley_candidates
+from app.workflows.chaptering.scores.valleys import detect_valley_candidates
 from app.workflows.chaptering.windows import build_context_windows
 
 

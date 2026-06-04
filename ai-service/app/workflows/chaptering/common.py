@@ -4,7 +4,7 @@ from app.schemas.chaptering import (
     GeneratedChapter,
 )
 from app.workflows.chaptering.schemas import ChapterBoundaryCandidate
-from app.workflows.chaptering.scoring import score_boundary
+from app.workflows.chaptering.scores.scoring import score_boundary
 from app.workflows.chaptering.titles import chapter_summary, chapter_text, chapter_title
 
 

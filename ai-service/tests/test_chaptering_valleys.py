@@ -1,5 +1,5 @@
 from app.workflows.chaptering.schemas import ChapterGapScore, ValleyDetectionConfig
-from app.workflows.chaptering.valleys import detect_valley_candidates
+from app.workflows.chaptering.scores.valleys import detect_valley_candidates
 
 
 def test_strong_cohesion_drop_creates_valley_candidate() -> None:

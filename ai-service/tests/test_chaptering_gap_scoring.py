@@ -4,7 +4,7 @@ from app.schemas.chaptering import (
     ChapteringOptions,
     ChapteringTranscriptSegment,
 )
-from app.workflows.chaptering.gap_scoring import (
+from app.workflows.chaptering.scores.gap_scoring import (
     attach_semantic_shift_scores,
     gap_scores_to_candidates,
     score_unit_gaps,
