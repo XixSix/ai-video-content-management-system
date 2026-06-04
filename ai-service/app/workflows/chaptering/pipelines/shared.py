@@ -14,6 +14,7 @@ from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConf
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 from app.workflows.chaptering.semantic import score_context_windows
 from app.workflows.chaptering.scores.valleys import detect_valley_candidates
+from app.workflows.chaptering.unit_repair import repair_micro_units
 from app.workflows.chaptering.windows import build_context_windows
 
 
@@ -33,6 +34,13 @@ def run_units_pipeline(
     """
     duration = media_duration(request)
     options = request.options
+    units = repair_micro_units(
+        units,
+        max_unit_duration=config.max_unit_duration_seconds,
+        max_unit_words=config.max_unit_words,
+        max_unit_chars=config.max_unit_chars,
+        config=config.unit_repair,
+    )
 
     gap_scores = score_unit_gaps(
         units,

@@ -19,6 +19,7 @@ from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
     ChapteringPipelineConfig,
+    UnitRepairConfig,
     ValleyDetectionConfig,
 )
 from app.workflows.chaptering.workflow import ChapteringWorkflow
@@ -121,6 +122,12 @@ def _pipeline_config(strategy: str = "segment") -> ChapteringPipelineConfig:
             max_limit=40,
             multiplier=4,
             top_score_fraction=0.60,
+        ),
+        unit_repair=UnitRepairConfig(
+            short_duration_seconds=4.0,
+            min_words=8,
+            fragment_max_words=2,
+            sparse_duration_seconds=6.0,
         ),
     )
 
