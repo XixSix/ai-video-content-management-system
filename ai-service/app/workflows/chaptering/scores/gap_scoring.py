@@ -13,8 +13,8 @@ from app.workflows.chaptering.scores.temporal import (
 )
 from app.workflows.chaptering.schemas import (
     CandidateScoringConfig,
-    ChapterBoundaryCandidate,
-    ChapterBoundaryContextWindow,
+    ChapterCandidate,
+    ChapterContextWindow,
     ChapterGapScore,
     ChapterUnit,
 )
@@ -82,10 +82,10 @@ def attach_semantic_shift_scores(
 
 def gap_scores_to_candidates(
     gap_scores: list[ChapterGapScore],
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Convert Phase 3 scores into existing downstream boundary candidates."""
     return [
-        ChapterBoundaryCandidate(
+        ChapterCandidate(
             time=gap_score.time,
             unit_index=gap_score.unit_index,
             unit_id=gap_score.unit_id,
@@ -172,10 +172,10 @@ def _context_window_for_gap(
     units: list[ChapterUnit],
     *,
     context_seconds: float,
-) -> ChapterBoundaryContextWindow:
+) -> ChapterContextWindow:
     """Build one context window for a gap candidate."""
     candidate_time = units[gap_unit_index].start_time
-    candidate = ChapterBoundaryCandidate(
+    candidate = ChapterCandidate(
         time=candidate_time,
         unit_index=gap_unit_index,
         unit_id=units[gap_unit_index].unit_id,
@@ -190,7 +190,7 @@ def _context_window_for_gap(
     if windows:
         return windows[0]
 
-    return ChapterBoundaryContextWindow(
+    return ChapterContextWindow(
         candidate_time=candidate_time,
         left_text="",
         right_text="",

@@ -1,7 +1,7 @@
 from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
-    ChapterBoundaryCandidate,
+    ChapterCandidate,
 )
 
 
@@ -91,8 +91,8 @@ def _candidate(
     marker: float = 0.0,
     pause: float = 0.0,
     duration: float = 0.0,
-) -> ChapterBoundaryCandidate:
-    return ChapterBoundaryCandidate(
+) -> ChapterCandidate:
+    return ChapterCandidate(
         time=time,
         unit_index=int(time),
         unit_id=f"unit_{int(time):04d}",

@@ -3,7 +3,7 @@ from app.schemas.chaptering import (
     ChapterGenerationRequest,
     GeneratedChapter,
 )
-from app.workflows.chaptering.schemas import ChapterBoundaryCandidate
+from app.workflows.chaptering.schemas import ChapterCandidate
 from app.workflows.chaptering.scores.scoring import score_boundary
 from app.workflows.chaptering.titles import chapter_summary, chapter_text, chapter_title
 
@@ -25,7 +25,7 @@ def build_chapters(
     duration: float,
     boundaries: list[float],
     semantic_shift_scores_by_time: dict[float, float] | None = None,
-    candidates_by_time: dict[float, ChapterBoundaryCandidate] | None = None,
+    candidates_by_time: dict[float, ChapterCandidate] | None = None,
 ) -> list[GeneratedChapter]:
     """Build chapter DTOs and attach deterministic score metadata."""
     chapters: list[GeneratedChapter] = []
@@ -74,7 +74,7 @@ def segments_in_range(
 
 def merge_candidate_scores(
     base_scores: ChapterBoundaryScores,
-    candidate: ChapterBoundaryCandidate | None,
+    candidate: ChapterCandidate | None,
 ) -> ChapterBoundaryScores:
     """Combine final boundary scores with cheap candidate metadata."""
     if candidate is None:

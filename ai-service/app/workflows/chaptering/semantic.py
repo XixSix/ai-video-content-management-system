@@ -1,10 +1,10 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
-from app.workflows.chaptering.schemas import ChapterBoundaryContextWindow
+from app.workflows.chaptering.schemas import ChapterContextWindow
 from app.workflows.chaptering.scores.scoring import semantic_shift_score
 
 
 def score_context_windows(
-    windows: list[ChapterBoundaryContextWindow],
+    windows: list[ChapterContextWindow],
     *,
     embedding: TextEmbeddingPort,
 ) -> dict[float, float]:

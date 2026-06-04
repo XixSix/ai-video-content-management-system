@@ -17,7 +17,7 @@ from app.workflows.chaptering.scores.temporal import (
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
-    ChapterBoundaryCandidate,
+    ChapterCandidate,
     ChapterUnit,
 )
 from app.workflows.chaptering.scores.transition_markers import transition_marker_score
@@ -30,7 +30,7 @@ def generate_boundary_candidates(
     *,
     media_duration: float,
     min_chapter_duration: float,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Create candidate chapter starts from real unit boundaries.
 
     The generator only rejects boundaries that would violate hard duration
@@ -39,7 +39,7 @@ def generate_boundary_candidates(
     if len(units) < 2 or media_duration <= 0:
         return []
 
-    candidates: list[ChapterBoundaryCandidate] = []
+    candidates: list[ChapterCandidate] = []
     for unit_index, unit in enumerate(units[1:], start=1):
         if _is_valid_candidate_time(
             unit.start_time,
@@ -53,12 +53,12 @@ def generate_boundary_candidates(
 
 def score_boundary_candidates(
     units: list[ChapterUnit],
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     media_duration: float,
     min_chapter_duration: float,
     config: CandidateScoringConfig,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Attach cheap local transcript scores to every hard-valid candidate."""
     return [
         _score_candidate(
@@ -73,12 +73,12 @@ def score_boundary_candidates(
 
 
 def retain_candidates_for_embedding(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     media_duration: float,
     target_chapter_duration: float,
     config: CandidateRetentionConfig,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Keep a bounded candidate set for embedding and final selection.
 
     Retention keeps top cheap-score candidates and fills the remaining budget
@@ -122,9 +122,9 @@ def retain_candidates_for_embedding(
 def _candidate_from_unit(
     units: list[ChapterUnit],
     unit_index: int,
-) -> ChapterBoundaryCandidate:
+) -> ChapterCandidate:
     unit = units[unit_index]
-    return ChapterBoundaryCandidate(
+    return ChapterCandidate(
         time=unit.start_time,
         unit_index=unit_index,
         unit_id=unit.unit_id,
@@ -146,12 +146,12 @@ def _is_valid_candidate_time(
 
 def _score_candidate(
     units: list[ChapterUnit],
-    candidate: ChapterBoundaryCandidate,
+    candidate: ChapterCandidate,
     *,
     media_duration: float,
     min_chapter_duration: float,
     config: CandidateScoringConfig,
-) -> ChapterBoundaryCandidate:
+) -> ChapterCandidate:
     previous_unit = units[candidate.unit_index - 1]
     current_unit = units[candidate.unit_index]
     left_text = _context_text_before_candidate(
@@ -255,9 +255,9 @@ def _embedding_candidate_limit(
 
 
 def _downsample_evenly(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     max_candidates: int,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Keep candidates spread across the full timeline when density is high."""
     if max_candidates <= 0:
         return []

@@ -4,18 +4,18 @@ from dataclasses import replace
 from app.workflows.chaptering.scores.common import clamp_score
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
-    ChapterBoundaryCandidate,
+    ChapterCandidate,
 )
 
 
 def rank_boundary_candidates(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     semantic_shift_scores_by_time: dict[float, float],
     max_chapters: int,
     min_candidate_distance_seconds: float,
     config: CandidateRetentionConfig,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Score, dedupe, and retain final deterministic boundary candidates.
 
     The ranking step folds optional semantic shift into retained candidates,
@@ -43,9 +43,9 @@ def rank_boundary_candidates(
 
 
 def _score_candidate(
-    candidate: ChapterBoundaryCandidate,
+    candidate: ChapterCandidate,
     semantic_shift_scores_by_time: dict[float, float],
-) -> ChapterBoundaryCandidate:
+) -> ChapterCandidate:
     semantic_shift_score = clamp_score(
         semantic_shift_scores_by_time.get(candidate.time, 0.0)
     )
@@ -66,15 +66,15 @@ def _score_candidate(
 
 
 def _suppress_nearby_candidates(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     min_candidate_distance_seconds: float,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Keep the strongest candidate from each nearby boundary cluster."""
     if min_candidate_distance_seconds <= 0:
         return sorted(candidates, key=lambda candidate: candidate.time)
 
-    selected: list[ChapterBoundaryCandidate] = []
+    selected: list[ChapterCandidate] = []
     for candidate in sorted(
         candidates,
         key=lambda item: (-item.candidate_score, item.time),
@@ -92,11 +92,11 @@ def _suppress_nearby_candidates(
 
 
 def _retain_ranked_candidates(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     max_chapters: int,
     config: CandidateRetentionConfig,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Preserve top final-score candidates plus broad timeline coverage."""
     if not candidates:
         return []
@@ -139,9 +139,9 @@ def _candidate_limit(
 
 
 def _downsample_evenly(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     max_candidates: int,
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Keep candidates spread across the full timeline when density is high."""
     if max_candidates <= 0:
         return []

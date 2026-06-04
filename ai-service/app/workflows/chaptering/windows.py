@@ -1,22 +1,22 @@
 from app.workflows.chaptering.schemas import (
-    ChapterBoundaryCandidate,
-    ChapterBoundaryContextWindow,
+    ChapterCandidate,
+    ChapterContextWindow,
     ChapterUnit,
 )
 
 
 def build_context_windows(
     units: list[ChapterUnit],
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     context_duration: float,
-) -> list[ChapterBoundaryContextWindow]:
+) -> list[ChapterContextWindow]:
     """Build two-sided transcript context around candidate boundaries.
 
     Candidates without both left and right context are skipped because semantic
     comparison needs meaningful text on each side of the boundary.
     """
-    windows: list[ChapterBoundaryContextWindow] = []
+    windows: list[ChapterContextWindow] = []
 
     for candidate in candidates:
         left_units = _units_before_candidate(
@@ -33,7 +33,7 @@ def build_context_windows(
             continue
 
         windows.append(
-            ChapterBoundaryContextWindow(
+            ChapterContextWindow(
                 candidate_time=candidate.time,
                 left_text=_join_unit_text(left_units),
                 right_text=_join_unit_text(right_units),
