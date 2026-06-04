@@ -103,6 +103,16 @@ class ValleyDetectionConfig:
 
 
 @dataclass(frozen=True)
+class UnitRepairConfig:
+    """Store post-build timeline unit repair thresholds."""
+
+    short_duration_seconds: float
+    min_words: int
+    fragment_max_words: int
+    sparse_duration_seconds: float
+
+
+@dataclass(frozen=True)
 class ChapteringPipelineConfig:
     """Store deterministic chaptering workflow tuning values."""
 
@@ -119,3 +129,4 @@ class ChapteringPipelineConfig:
     scoring: CandidateScoringConfig
     valley: ValleyDetectionConfig
     retention: CandidateRetentionConfig
+    unit_repair: UnitRepairConfig

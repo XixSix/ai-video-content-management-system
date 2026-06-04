@@ -75,6 +75,22 @@ class Settings(BaseSettings):
         le=1.0,
         alias="CHAPTERING_PUNCTUATION_POOR_THRESHOLD",
     )
+    chaptering_unit_repair_short_duration_seconds: PositiveFloat = Field(
+        default=4.0,
+        alias="CHAPTERING_UNIT_REPAIR_SHORT_DURATION_SECONDS",
+    )
+    chaptering_unit_repair_min_words: PositiveInt = Field(
+        default=8,
+        alias="CHAPTERING_UNIT_REPAIR_MIN_WORDS",
+    )
+    chaptering_unit_repair_fragment_max_words: PositiveInt = Field(
+        default=2,
+        alias="CHAPTERING_UNIT_REPAIR_FRAGMENT_MAX_WORDS",
+    )
+    chaptering_unit_repair_sparse_duration_seconds: PositiveFloat = Field(
+        default=6.0,
+        alias="CHAPTERING_UNIT_REPAIR_SPARSE_DURATION_SECONDS",
+    )
     chaptering_context_window_seconds: PositiveFloat = Field(
         default=90.0,
         alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",

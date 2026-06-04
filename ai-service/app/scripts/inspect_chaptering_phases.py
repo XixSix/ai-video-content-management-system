@@ -28,12 +28,14 @@ from app.workflows.chaptering.schemas import (
     ChapterCandidate,
     ChapterUnit,
     ChapteringPipelineConfig,
+    UnitRepairConfig,
     ValleyDetectionConfig,
 )
 from app.workflows.chaptering.segment_units import build_segment_chapter_units
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 from app.workflows.chaptering.semantic import score_context_windows
 from app.workflows.chaptering.scores.valleys import detect_valley_candidates
+from app.workflows.chaptering.unit_repair import repair_micro_units
 from app.workflows.chaptering.windows import build_context_windows
 from app.workflows.chaptering.word_units import (
     build_word_chapter_units,
@@ -108,7 +110,14 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     duration = _media_duration(payload, segments)
     config = _pipeline_config(args, strategy=strategy)
     request = _request(payload, segments, duration=duration, args=args)
-    units = _build_units(segments, strategy=strategy, config=config)
+    raw_units = _build_units(segments, strategy=strategy, config=config)
+    units = repair_micro_units(
+        raw_units,
+        max_unit_duration=config.max_unit_duration_seconds,
+        max_unit_words=config.max_unit_words,
+        max_unit_chars=config.max_unit_chars,
+        config=config.unit_repair,
+    )
 
     gap_scores = score_unit_gaps(
         units,
@@ -488,6 +497,12 @@ def _pipeline_config(
             max_limit=args.retention_max_limit,
             multiplier=args.retention_multiplier,
             top_score_fraction=args.retention_top_score_fraction,
+        ),
+        unit_repair=UnitRepairConfig(
+            short_duration_seconds=4.0,
+            min_words=8,
+            fragment_max_words=2,
+            sparse_duration_seconds=6.0,
         ),
     )
 
