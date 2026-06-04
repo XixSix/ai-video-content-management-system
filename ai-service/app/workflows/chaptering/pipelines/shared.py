@@ -6,6 +6,7 @@ from app.workflows.chaptering.candidates import (
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
 from app.workflows.chaptering.scores.gap_scoring import (
+    attach_semantic_shift_scores,
     gap_scores_to_candidates,
     score_unit_gaps,
 )
@@ -39,6 +40,18 @@ def run_units_pipeline(
         min_chapter_duration=options.min_chapter_duration_seconds,
         config=config.scoring,
     )
+    all_gap_candidates = gap_scores_to_candidates(gap_scores)
+    all_gap_windows = build_context_windows(
+        units,
+        all_gap_candidates,
+        context_duration=config.context_window_seconds,
+    )
+    semantic_shift_scores_by_time = (
+        score_context_windows(all_gap_windows, embedding=embedding)
+        if options.use_embeddings and all_gap_windows
+        else {}
+    )
+    gap_scores = attach_semantic_shift_scores(gap_scores, semantic_shift_scores_by_time)
     valley_gap_scores = detect_valley_candidates(
         gap_scores,
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
@@ -51,16 +64,6 @@ def run_units_pipeline(
         media_duration=duration,
         target_chapter_duration=options.target_chapter_duration_seconds,
         config=config.retention,
-    )
-    windows = build_context_windows(
-        units,
-        retained_candidates,
-        context_duration=config.context_window_seconds,
-    )
-    semantic_shift_scores_by_time = (
-        score_context_windows(windows, embedding=embedding)
-        if options.use_embeddings and windows
-        else {}
     )
     ranked_candidates = rank_boundary_candidates(
         retained_candidates,

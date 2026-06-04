@@ -1,4 +1,3 @@
-import math
 import re
 from collections import Counter
 
@@ -6,6 +5,7 @@ from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
 
 from app.workflows.chaptering.scores.common import clamp_score
+from app.workflows.chaptering.scores.scoring import cosine_similarity
 
 CONTENT_POS_PREFIXES = ("NN", "VB", "JJ")
 TOKEN_RE = re.compile(r"[a-z0-9]+(?:'[a-z0-9]+)?")
@@ -18,16 +18,15 @@ def lexical_cohesion_score(left_text: str, right_text: str) -> float:
     if not left_counts or not right_counts:
         return 0.0
 
-    shared_tokens = left_counts.keys() & right_counts.keys()
-    dot_product = sum(
-        left_counts[token] * right_counts[token] for token in shared_tokens
+    vocabulary = sorted(left_counts.keys() | right_counts.keys())
+    similarity = cosine_similarity(
+        [left_counts[token] for token in vocabulary],
+        [right_counts[token] for token in vocabulary],
     )
-    left_norm = math.sqrt(sum(count * count for count in left_counts.values()))
-    right_norm = math.sqrt(sum(count * count for count in right_counts.values()))
-    if left_norm <= 0.0 or right_norm <= 0.0:
+    if similarity is None:
         return 0.0
 
-    return clamp_score(dot_product / (left_norm * right_norm))
+    return clamp_score(similarity)
 
 
 def lexical_shift_score(left_text: str, right_text: str) -> float:

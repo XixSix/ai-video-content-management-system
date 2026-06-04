@@ -19,6 +19,23 @@ def test_strong_cohesion_drop_creates_valley_candidate() -> None:
     assert valleys[0].valley_depth_score > 0.9
 
 
+def test_semantic_shift_can_create_valley_when_lexical_curve_is_flat() -> None:
+    valleys = detect_valley_candidates(
+        [
+            _gap(1, 10, 0.80, semantic_shift=0.05),
+            _gap(2, 20, 0.80, semantic_shift=0.10),
+            _gap(3, 30, 0.80, semantic_shift=0.90),
+            _gap(4, 40, 0.80, semantic_shift=0.10),
+            _gap(5, 50, 0.80, semantic_shift=0.05),
+        ],
+        min_candidate_distance_seconds=10,
+        config=_config(smoothing_radius=0, min_valley_depth=0.3),
+    )
+
+    assert [valley.time for valley in valleys] == [30]
+    assert valleys[0].valley_depth_score > 0.7
+
+
 def test_small_noisy_dip_is_ignored_after_smoothing() -> None:
     valleys = detect_valley_candidates(
         [
@@ -97,7 +114,13 @@ def _config(
     )
 
 
-def _gap(index: int, time: float, lexical_cohesion: float) -> ChapterGapScore:
+def _gap(
+    index: int,
+    time: float,
+    lexical_cohesion: float,
+    *,
+    semantic_shift: float = 0.0,
+) -> ChapterGapScore:
     return ChapterGapScore(
         time=time,
         unit_index=index,
@@ -110,4 +133,5 @@ def _gap(index: int, time: float, lexical_cohesion: float) -> ChapterGapScore:
         right_unit_ids=[f"unit_{index + 1:04d}"],
         lexical_cohesion_score=lexical_cohesion,
         lexical_shift_score=1 - lexical_cohesion,
+        semantic_shift_score=semantic_shift,
     )

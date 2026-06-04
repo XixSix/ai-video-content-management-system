@@ -1,16 +1,18 @@
-"""Detect chapter boundary valleys from a lexical cohesion curve.
+"""Detect chapter boundary valleys from a cohesion curve.
 
 Flow:
-    1. Read each gap's `lexical_cohesion_score` as a timeline curve.
-    2. Smooth the curve with a moving average to reduce noisy local spikes.
-    3. Treat points lower than both direct neighbors as candidate valleys.
-    4. Score each valley by how far it drops from nearby left/right peaks.
-    5. Keep valleys above the configured minimum depth.
-    6. Suppress nearby valleys so one topic shift produces one candidate.
+    1. Read each gap's lexical cohesion score.
+    2. Fold in semantic cohesion when embedding shift scores are available.
+    3. Smooth the resulting curve with a moving average to reduce noisy spikes.
+    4. Treat points lower than both direct neighbors as candidate valleys.
+    5. Score each valley by how far it drops from nearby left/right peaks.
+    6. Keep valleys above the configured minimum depth.
+    7. Suppress nearby valleys so one topic shift produces one candidate.
 """
 
 from dataclasses import replace
 
+from app.workflows.chaptering.scores.common import clamp_score
 from app.workflows.chaptering.schemas import (
     ChapterGapScore,
     ValleyDetectionConfig,
@@ -28,14 +30,16 @@ def detect_valley_candidates(
     Flow:
         1. Return no candidates when fewer than three gaps are available,
            because a valley needs left, current, and right points.
-        2. Build a lexical cohesion curve from the scored gaps and smooth it
-           using `config.smoothing_radius`.
-        3. Find local minima: points whose smoothed cohesion is lower than
+        2. Build a cohesion curve from scored gaps. Lexical cohesion is always
+           present; semantic cohesion is added as `1 - semantic_shift_score`
+           when embedding scores are available.
+        3. Smooth the cohesion curve using `config.smoothing_radius`.
+        4. Find local minima: points whose smoothed cohesion is lower than
            both direct neighbors.
-        4. Attach `valley_depth_score` by comparing each local minimum with
+        5. Attach `valley_depth_score` by comparing each local minimum with
            nearby peaks inside `config.peak_window`.
-        5. Drop valleys below `config.min_valley_depth`.
-        6. Keep the strongest valley when multiple candidates are closer than
+        6. Drop valleys below `config.min_valley_depth`.
+        7. Keep the strongest valley when multiple candidates are closer than
            `min_candidate_distance_seconds`.
 
     Notes:
@@ -46,8 +50,7 @@ def detect_valley_candidates(
         return []
 
     smoothed = _smooth_values(
-        [gap_score.lexical_cohesion_score for gap_score in gap_scores],
-        radius=config.smoothing_radius,
+        _cohesion_curve(gap_scores), radius=config.smoothing_radius
     )
     valleys = [
         _with_valley_depth(gap_scores, index, smoothed, peak_window=config.peak_window)
@@ -64,6 +67,24 @@ def detect_valley_candidates(
         strong_valleys,
         min_candidate_distance_seconds=min_candidate_distance_seconds,
     )
+
+
+def _cohesion_curve(gap_scores: list[ChapterGapScore]) -> list[float]:
+    """Return lexical-only or lexical-semantic cohesion for valley detection."""
+    has_semantic_scores = any(
+        gap_score.semantic_shift_score > 0.0 for gap_score in gap_scores
+    )
+    if not has_semantic_scores:
+        return [gap_score.lexical_cohesion_score for gap_score in gap_scores]
+
+    return [
+        (
+            gap_score.lexical_cohesion_score
+            + clamp_score(1.0 - gap_score.semantic_shift_score)
+        )
+        / 2
+        for gap_score in gap_scores
+    ]
 
 
 def _smooth_values(values: list[float], *, radius: int) -> list[float]:

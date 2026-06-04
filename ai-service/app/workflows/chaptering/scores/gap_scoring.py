@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from dataclasses import replace
 
 from app.workflows.chaptering.scores.common import clamp_score
@@ -15,10 +14,12 @@ from app.workflows.chaptering.scores.temporal import (
 from app.workflows.chaptering.schemas import (
     CandidateScoringConfig,
     ChapterBoundaryCandidate,
+    ChapterBoundaryContextWindow,
     ChapterGapScore,
     ChapterUnit,
 )
 from app.workflows.chaptering.scores.transition_markers import transition_marker_score
+from app.workflows.chaptering.windows import build_context_windows
 
 
 def score_unit_gaps(
@@ -112,18 +113,13 @@ def _score_gap(
 ) -> ChapterGapScore:
     previous_unit = units[unit_index - 1]
     current_unit = units[unit_index]
-    left_units = _context_units_before_gap(
-        units,
+    context_window = _context_window_for_gap(
         unit_index,
+        units,
         context_seconds=config.context_seconds,
     )
-    right_units = _context_units_after_gap(
-        units,
-        unit_index,
-        context_seconds=config.context_seconds,
-    )
-    left_text = _join_unit_text(left_units)
-    right_text = _join_unit_text(right_units)
+    left_text = context_window.left_text
+    right_text = context_window.right_text
 
     lexical_cohesion_score = calculate_lexical_cohesion_score(left_text, right_text)
     lexical_shift_score = clamp_score(1.0 - lexical_cohesion_score)
@@ -159,8 +155,8 @@ def _score_gap(
         next_unit_ids=[current_unit.unit_id],
         left_text=left_text,
         right_text=right_text,
-        left_unit_ids=[unit.unit_id for unit in left_units],
-        right_unit_ids=[unit.unit_id for unit in right_units],
+        left_unit_ids=context_window.left_unit_ids,
+        right_unit_ids=context_window.right_unit_ids,
         lexical_cohesion_score=round(lexical_cohesion_score, 4),
         lexical_shift_score=round(lexical_shift_score, 4),
         discourse_marker_score=round(discourse_marker_score, 4),
@@ -171,35 +167,36 @@ def _score_gap(
     )
 
 
-def _context_units_before_gap(
-    units: list[ChapterUnit],
+def _context_window_for_gap(
     gap_unit_index: int,
+    units: list[ChapterUnit],
     *,
     context_seconds: float,
-) -> list[ChapterUnit]:
-    """Return units before the gap that overlap the left context window."""
+) -> ChapterBoundaryContextWindow:
+    """Build one context window for a gap candidate."""
     candidate_time = units[gap_unit_index].start_time
-    earliest_start = candidate_time - context_seconds
-    return [unit for unit in units[:gap_unit_index] if unit.end_time > earliest_start]
+    candidate = ChapterBoundaryCandidate(
+        time=candidate_time,
+        unit_index=gap_unit_index,
+        unit_id=units[gap_unit_index].unit_id,
+        previous_unit_ids=[units[gap_unit_index - 1].unit_id],
+        next_unit_ids=[units[gap_unit_index].unit_id],
+    )
+    windows = build_context_windows(
+        units,
+        [candidate],
+        context_duration=context_seconds,
+    )
+    if windows:
+        return windows[0]
 
-
-def _context_units_after_gap(
-    units: list[ChapterUnit],
-    gap_unit_index: int,
-    *,
-    context_seconds: float,
-) -> list[ChapterUnit]:
-    """Return units from the gap that overlap the right context window."""
-    candidate_time = units[gap_unit_index].start_time
-    latest_end = candidate_time + context_seconds
-    return [unit for unit in units[gap_unit_index:] if unit.start_time < latest_end]
-
-
-def _join_unit_text(units: Iterable[ChapterUnit]) -> str:
-    """Join preferred unit text into one scoring context."""
-    return " ".join(
-        unit.clean_text or unit.text for unit in units if (unit.clean_text or unit.text)
-    ).strip()
+    return ChapterBoundaryContextWindow(
+        candidate_time=candidate_time,
+        left_text="",
+        right_text="",
+        left_unit_ids=[],
+        right_unit_ids=[],
+    )
 
 
 def _is_hard_valid_gap(
