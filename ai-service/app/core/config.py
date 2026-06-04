@@ -46,19 +46,19 @@ class Settings(BaseSettings):
         alias="CHAPTERING_MODEL_NAME",
     )
     chaptering_target_unit_duration_seconds: PositiveFloat = Field(
-        default=20.0,
+        default=12.0,
         alias="CHAPTERING_TARGET_UNIT_DURATION_SECONDS",
     )
     chaptering_max_unit_duration_seconds: PositiveFloat = Field(
-        default=30.0,
+        default=20.0,
         alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",
     )
     chaptering_target_unit_words: PositiveInt = Field(
-        default=80,
+        default=40,
         alias="CHAPTERING_TARGET_UNIT_WORDS",
     )
     chaptering_max_unit_words: PositiveInt = Field(
-        default=160,
+        default=80,
         alias="CHAPTERING_MAX_UNIT_WORDS",
     )
     chaptering_max_unit_chars: PositiveInt = Field(
@@ -137,6 +137,20 @@ class Settings(BaseSettings):
         ge=0.0,
         le=1.0,
         alias="CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION",
+    )
+    chaptering_valley_smoothing_radius: int = Field(
+        default=1,
+        ge=0,
+        alias="CHAPTERING_VALLEY_SMOOTHING_RADIUS",
+    )
+    chaptering_valley_peak_window: PositiveInt = Field(
+        default=2,
+        alias="CHAPTERING_VALLEY_PEAK_WINDOW",
+    )
+    chaptering_valley_min_depth: float = Field(
+        default=0.18,
+        ge=0.0,
+        alias="CHAPTERING_VALLEY_MIN_DEPTH",
     )
 
     @property

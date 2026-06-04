@@ -10,7 +10,10 @@ from app.workflows.chaptering.titles import chapter_summary, chapter_text, chapt
 
 def media_duration(request: ChapterGenerationRequest) -> float:
     """Return supplied media duration or infer it from the last segment end."""
-    if request.media_duration_seconds is not None and request.media_duration_seconds > 0:
+    if (
+        request.media_duration_seconds is not None
+        and request.media_duration_seconds > 0
+    ):
         return request.media_duration_seconds
 
     return max(segment.end_seconds for segment in request.segments)
@@ -77,9 +80,13 @@ def merge_candidate_scores(
     if candidate is None:
         return base_scores
 
+    score = candidate.candidate_score or base_scores.score
     return base_scores.model_copy(
         update={
+            "score": score,
+            "semantic_shift_score": candidate.semantic_shift_score,
             "lexical_shift_score": candidate.lexical_shift_score,
+            "valley_depth_score": candidate.valley_depth_score,
             "boundary_quality_score": candidate.boundary_quality_score,
         }
     )

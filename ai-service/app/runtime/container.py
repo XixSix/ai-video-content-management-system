@@ -12,6 +12,7 @@ from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
     ChapteringPipelineConfig,
+    ValleyDetectionConfig,
 )
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 from app.workflows.transcription.workflow import TranscriptionWorkflow
@@ -77,6 +78,11 @@ def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineC
             duration_sanity_weight=(
                 settings.chaptering_candidate_duration_sanity_weight
             ),
+        ),
+        valley=ValleyDetectionConfig(
+            smoothing_radius=settings.chaptering_valley_smoothing_radius,
+            peak_window=settings.chaptering_valley_peak_window,
+            min_valley_depth=settings.chaptering_valley_min_depth,
         ),
         retention=CandidateRetentionConfig(
             min_limit=settings.chaptering_embedding_candidate_min_limit,

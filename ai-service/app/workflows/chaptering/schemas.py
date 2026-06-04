@@ -23,11 +23,38 @@ class ChapterBoundaryCandidate:
     previous_unit_ids: list[str]
     next_unit_ids: list[str]
     cheap_score: float = 0.0
+    candidate_score: float = 0.0
+    semantic_shift_score: float = 0.0
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
     lexical_shift_score: float = 0.0
+    valley_depth_score: float = 0.0
     boundary_quality_score: float = 0.0
     duration_sanity_score: float = 0.0
+
+
+@dataclass(frozen=True)
+class ChapterGapScore:
+    """Store Phase 3 topic-cohesion scores for one gap between timeline units."""
+
+    time: float
+    unit_index: int
+    unit_id: str
+    previous_unit_ids: list[str]
+    next_unit_ids: list[str]
+    left_text: str
+    right_text: str
+    left_unit_ids: list[str]
+    right_unit_ids: list[str]
+    lexical_cohesion_score: float = 0.0
+    lexical_shift_score: float = 0.0
+    semantic_shift_score: float = 0.0
+    valley_depth_score: float = 0.0
+    discourse_marker_score: float = 0.0
+    pause_score: float = 0.0
+    boundary_quality_score: float = 0.0
+    duration_sanity_score: float = 0.0
+    combined_score: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -67,6 +94,15 @@ class CandidateRetentionConfig:
 
 
 @dataclass(frozen=True)
+class ValleyDetectionConfig:
+    """Store TextTiling-style valley detection tuning values."""
+
+    smoothing_radius: int
+    peak_window: int
+    min_valley_depth: float
+
+
+@dataclass(frozen=True)
 class ChapteringPipelineConfig:
     """Store deterministic chaptering workflow tuning values."""
 
@@ -81,4 +117,5 @@ class ChapteringPipelineConfig:
     punctuation_poor_threshold: float
     context_window_seconds: float
     scoring: CandidateScoringConfig
+    valley: ValleyDetectionConfig
     retention: CandidateRetentionConfig

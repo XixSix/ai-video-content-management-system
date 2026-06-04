@@ -19,6 +19,7 @@ from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
     ChapteringPipelineConfig,
+    ValleyDetectionConfig,
 )
 from app.workflows.chaptering.workflow import ChapteringWorkflow
 from chaptering.v1 import chaptering_pb2
@@ -109,6 +110,11 @@ def _pipeline_config(strategy: str = "segment") -> ChapteringPipelineConfig:
             lexical_shift_weight=0.20,
             boundary_quality_weight=0.15,
             duration_sanity_weight=0.10,
+        ),
+        valley=ValleyDetectionConfig(
+            smoothing_radius=1,
+            peak_window=2,
+            min_valley_depth=0.18,
         ),
         retention=CandidateRetentionConfig(
             min_limit=12,

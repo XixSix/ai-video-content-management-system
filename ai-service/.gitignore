@@ -3,3 +3,5 @@ __pycache__/
 *.py[cod]
 .env
 models/
+storage/
+build_unit_result/
