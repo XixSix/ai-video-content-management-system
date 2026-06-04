@@ -6,6 +6,10 @@ from pathlib import Path
 from typing import Any, Literal
 
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.noop_boundary_evaluation import (
+    NoopChapterBoundaryEvaluationProvider,
+)
+from app.providers.chaptering.noop_title import NoopChapterTitleProvider
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
     ChapteringOptions,
@@ -180,6 +184,8 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
         request=request,
         units=units,
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=config,
     )
 
@@ -360,6 +366,9 @@ def _chapter_lines(chapters: list) -> list[str]:
             f"lexical=`{scores.lexical_shift_score}` valley=`{scores.valley_depth_score}` "
             f"pause=`{scores.pause_score}` quality=`{scores.boundary_quality_score}`"
         )
+        lines.append(f"  - title: {_compact_text(chapter.title, limit=140)}")
+        if chapter.summary:
+            lines.append(f"  - summary: {_compact_text(chapter.summary, limit=220)}")
 
     return [*lines, ""]
 

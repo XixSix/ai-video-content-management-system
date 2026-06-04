@@ -1,4 +1,8 @@
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.noop_boundary_evaluation import (
+    NoopChapterBoundaryEvaluationProvider,
+)
+from app.providers.chaptering.noop_title import NoopChapterTitleProvider
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
     ChapteringOptions,
@@ -11,8 +15,12 @@ from app.workflows.chaptering.scores.gap_scoring import (
 )
 from app.workflows.chaptering.pipelines.shared import run_units_pipeline
 from app.workflows.chaptering.schemas import (
+    BoundaryEvaluation,
+    BoundaryEvaluationInput,
     CandidateRetentionConfig,
     CandidateScoringConfig,
+    ChapterTitleInput,
+    ChapterTitleResult,
     ChapterUnit,
     ChapteringPipelineConfig,
     UnitRepairConfig,
@@ -135,6 +143,8 @@ def test_units_pipeline_uses_scored_gap_candidate_times_without_embeddings() -> 
         request=request,
         units=units,
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=_pipeline_config(),
     )
 
@@ -177,6 +187,8 @@ def test_units_pipeline_attaches_valley_depth_to_selected_boundary() -> None:
         request=request,
         units=units,
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=_pipeline_config(context_seconds=20),
     )
 
@@ -221,6 +233,8 @@ def test_units_pipeline_detects_valley_after_embedding_semantic_scores() -> None
         embedding=_SequencedSemanticShiftEmbeddingProvider(
             shift_by_call=[0.0, 1.0, 0.0, 0.0]
         ),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=_pipeline_config(context_seconds=20),
     )
 
@@ -261,6 +275,8 @@ def test_units_pipeline_falls_back_to_all_gap_candidates_when_no_valleys_pass() 
         request=request,
         units=units,
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
         config=_pipeline_config(context_seconds=20, min_valley_depth=1.1),
     )
 
@@ -268,6 +284,185 @@ def test_units_pipeline_falls_back_to_all_gap_candidates_when_no_valleys_pass() 
     assert starts[0] == 0
     assert len(starts) > 1
     assert set(starts[1:]).issubset({unit.start_time for unit in units[1:]})
+
+
+def test_units_pipeline_uses_llm_evaluation_to_boost_candidate_selection() -> None:
+    units = [
+        _unit(1, 0, 20, "same topic words repeat"),
+        _unit(2, 20, 40, "same topic words repeat"),
+        _unit(3, 40, 60, "same topic words repeat"),
+        _unit(4, 60, 80, "same topic words repeat"),
+    ]
+
+    result = run_units_pipeline(
+        request=_pipeline_request(
+            units,
+            request_id="chaptering-job-llm-boost",
+            use_llm=True,
+        ),
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=_FakeBoundaryEvaluationProvider(
+            [
+                BoundaryEvaluation(
+                    candidate_time=20,
+                    is_chapter_boundary=True,
+                    confidence=1.0,
+                    transition_intent="CHANGE_TOPIC",
+                    reason="Important shift.",
+                )
+            ]
+        ),
+        title_provider=NoopChapterTitleProvider(),
+        config=_pipeline_config(context_seconds=20),
+    )
+
+    starts = [chapter.start_seconds for chapter in result.chapters]
+    assert result.source == "LLM"
+    assert starts[1] == 20
+    assert result.chapters[1].scores.llm_confidence_score == 1.0
+
+
+def test_units_pipeline_uses_llm_evaluation_to_suppress_false_candidate() -> None:
+    units = [
+        _unit(1, 0, 20, "introductory overview before marker"),
+        _unit(2, 20, 40, "Next topic marker but still same content"),
+        _unit(3, 40, 60, "different section with enough context"),
+        _unit(4, 60, 80, "different section continues"),
+    ]
+
+    result = run_units_pipeline(
+        request=_pipeline_request(
+            units,
+            request_id="chaptering-job-llm-suppress",
+            use_llm=True,
+        ),
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=_FakeBoundaryEvaluationProvider(
+            [
+                BoundaryEvaluation(
+                    candidate_time=40,
+                    is_chapter_boundary=False,
+                    confidence=1.0,
+                    transition_intent="CONTINUE_TOPIC",
+                    reason="Marker is not a real chapter boundary.",
+                )
+            ]
+        ),
+        title_provider=NoopChapterTitleProvider(),
+        config=_pipeline_config(context_seconds=20, min_valley_depth=1.1),
+    )
+
+    starts = [chapter.start_seconds for chapter in result.chapters]
+    assert result.source == "LLM"
+    assert starts[1] != 40
+
+
+def test_units_pipeline_falls_back_when_llm_evaluation_provider_fails() -> None:
+    units = [
+        _unit(1, 0, 20, "same topic words repeat"),
+        _unit(2, 20, 40, "same topic words repeat"),
+        _unit(3, 40, 60, "same topic words repeat"),
+        _unit(4, 60, 80, "same topic words repeat"),
+    ]
+
+    result = run_units_pipeline(
+        request=_pipeline_request(
+            units,
+            request_id="chaptering-job-llm-fallback",
+            use_llm=True,
+        ),
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=_FailingBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
+        config=_pipeline_config(context_seconds=20),
+    )
+
+    assert result.source == "RULE_BASED"
+    assert all(
+        chapter.scores.llm_confidence_score in (None, 0.0)
+        for chapter in result.chapters
+    )
+
+
+def test_units_pipeline_applies_llm_titles_without_changing_boundaries() -> None:
+    units = [
+        _unit(1, 0, 20, "upload media and validate source files"),
+        _unit(2, 20, 40, "transcript jobs and segment storage"),
+        _unit(3, 40, 60, "chapter boundary scoring and ranking"),
+        _unit(4, 60, 80, "clip publishing and platform export"),
+    ]
+
+    baseline = run_units_pipeline(
+        request=_pipeline_request(
+            units,
+            request_id="chaptering-job-title-baseline",
+            use_llm=False,
+        ),
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=NoopChapterTitleProvider(),
+        config=_pipeline_config(context_seconds=20),
+    )
+    result = run_units_pipeline(
+        request=_pipeline_request(
+            units,
+            request_id="chaptering-job-title-llm",
+            use_llm=True,
+        ),
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=_FakeChapterTitleProvider(
+            [
+                ChapterTitleResult(
+                    chapter_index=1,
+                    title="Media Upload Setup",
+                    summary="Prepare uploaded media for downstream AI work.",
+                )
+            ]
+        ),
+        config=_pipeline_config(context_seconds=20),
+    )
+
+    assert result.source == "LLM"
+    assert [chapter.start_seconds for chapter in result.chapters] == [
+        chapter.start_seconds for chapter in baseline.chapters
+    ]
+    assert result.chapters[0].title == "Media Upload Setup"
+    assert (
+        result.chapters[0].summary == "Prepare uploaded media for downstream AI work."
+    )
+
+
+def test_units_pipeline_ignores_invalid_llm_titles() -> None:
+    units = [
+        _unit(1, 0, 20, "upload media and validate source files"),
+        _unit(2, 20, 40, "transcript jobs and segment storage"),
+        _unit(3, 40, 60, "chapter boundary scoring and ranking"),
+        _unit(4, 60, 80, "clip publishing and platform export"),
+    ]
+
+    result = run_units_pipeline(
+        request=_pipeline_request(
+            units,
+            request_id="chaptering-job-title-invalid",
+            use_llm=True,
+        ),
+        units=units,
+        embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
+        title_provider=_FakeChapterTitleProvider(
+            [ChapterTitleResult(chapter_index=999, title="Invalid")]
+        ),
+        config=_pipeline_config(context_seconds=20),
+    )
+
+    assert result.source == "RULE_BASED"
+    assert result.chapters[0].title != "Invalid"
 
 
 def _scoring_config(
@@ -350,6 +545,31 @@ def _segment(
     )
 
 
+def _pipeline_request(
+    units: list[ChapterUnit],
+    *,
+    request_id: str,
+    use_llm: bool,
+) -> ChapterGenerationRequest:
+    return ChapterGenerationRequest(
+        request_id=request_id,
+        language="en",
+        media_duration_seconds=90,
+        segments=[
+            _segment(index, unit.start_time, unit.end_time, unit.text)
+            for index, unit in enumerate(units, start=1)
+        ],
+        options=ChapteringOptions(
+            min_chapter_duration_seconds=10,
+            target_chapter_duration_seconds=40,
+            max_chapter_duration_seconds=80,
+            max_chapters=3,
+            use_embeddings=False,
+            use_llm=use_llm,
+        ),
+    )
+
+
 class _SequencedSemanticShiftEmbeddingProvider:
     def __init__(self, *, shift_by_call: list[float]) -> None:
         self._shift_by_call = shift_by_call
@@ -370,3 +590,38 @@ class _SequencedSemanticShiftEmbeddingProvider:
             return [[1.0, 0.0], [0.0, 1.0]]
 
         return [[1.0, 0.0], [1.0, 0.0]]
+
+
+class _FakeBoundaryEvaluationProvider:
+    def __init__(self, evaluations: list[BoundaryEvaluation]) -> None:
+        self.inputs: list[BoundaryEvaluationInput] = []
+        self._evaluations = evaluations
+
+    def evaluate_boundaries(
+        self,
+        inputs: list[BoundaryEvaluationInput],
+    ) -> list[BoundaryEvaluation]:
+        self.inputs = inputs
+        return self._evaluations
+
+
+class _FailingBoundaryEvaluationProvider:
+    def evaluate_boundaries(
+        self,
+        inputs: list[BoundaryEvaluationInput],
+    ) -> list[BoundaryEvaluation]:
+        _ = inputs
+        raise RuntimeError("provider failed")
+
+
+class _FakeChapterTitleProvider:
+    def __init__(self, results: list[ChapterTitleResult]) -> None:
+        self.inputs: list[ChapterTitleInput] = []
+        self._results = results
+
+    def generate_titles(
+        self,
+        inputs: list[ChapterTitleInput],
+    ) -> list[ChapterTitleResult]:
+        self.inputs = inputs
+        return self._results

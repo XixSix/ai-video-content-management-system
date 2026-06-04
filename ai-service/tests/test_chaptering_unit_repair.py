@@ -43,6 +43,47 @@ def test_repair_micro_units_merges_leading_fragment_forward() -> None:
     assert units[1].segment_ids == ["seg-2", "seg-3"]
 
 
+def test_repair_micro_units_merges_lowercase_continuation_backward() -> None:
+    units = repair_micro_units(
+        [
+            _unit(1, 0, 9.4, "previous sentence starts but does not finish"),
+            _unit(2, 9.4, 11.8, "this one completes it"),
+            _unit(3, 21.6, 30, "next topic starts after a long gap."),
+        ],
+        max_unit_duration=20,
+        max_unit_words=20,
+        max_unit_chars=1200,
+        config=_repair_config(),
+    )
+
+    assert [unit.text for unit in units] == [
+        "previous sentence starts but does not finish this one completes it",
+        "next topic starts after a long gap.",
+    ]
+    assert units[0].segment_ids == ["seg-1", "seg-2"]
+
+
+def test_repair_micro_units_merges_transition_marker_forward() -> None:
+    units = repair_micro_units(
+        [
+            _unit(1, 0, 10, "previous section has enough context."),
+            _unit(2, 10.1, 11.5, "Let's talk downsides. Nope."),
+            _unit(3, 12.6, 19, "the next section explains the downsides."),
+        ],
+        max_unit_duration=20,
+        max_unit_words=20,
+        max_unit_chars=1200,
+        config=_repair_config(),
+    )
+
+    assert [unit.text for unit in units] == [
+        "previous section has enough context.",
+        "Let's talk downsides. Nope. the next section explains the downsides.",
+    ]
+    assert units[1].start_time == 10.1
+    assert units[1].segment_ids == ["seg-2", "seg-3"]
+
+
 def test_repair_micro_units_skips_merge_when_budget_would_be_exceeded() -> None:
     units = repair_micro_units(
         [

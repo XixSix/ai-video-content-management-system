@@ -1,4 +1,29 @@
 from dataclasses import dataclass
+from typing import Literal
+
+TransitionIntent = Literal[
+    "CONTINUE_TOPIC",
+    "DEVELOP_SUBTOPIC",
+    "INTRODUCE_RELATED_TOPIC",
+    "CHANGE_TOPIC",
+    "START_NEW_STEP",
+    "EXAMPLE_OR_DIGRESSION",
+    "RECAP_OR_CONCLUSION",
+    "RETURN_TO_MAIN_TOPIC",
+]
+
+ALLOWED_TRANSITION_INTENTS: frozenset[str] = frozenset(
+    [
+        "CONTINUE_TOPIC",
+        "DEVELOP_SUBTOPIC",
+        "INTRODUCE_RELATED_TOPIC",
+        "CHANGE_TOPIC",
+        "START_NEW_STEP",
+        "EXAMPLE_OR_DIGRESSION",
+        "RECAP_OR_CONCLUSION",
+        "RETURN_TO_MAIN_TOPIC",
+    ]
+)
 
 
 @dataclass(frozen=True)
@@ -31,6 +56,56 @@ class ChapterCandidate:
     valley_depth_score: float = 0.0
     boundary_quality_score: float = 0.0
     duration_sanity_score: float = 0.0
+    llm_confidence_score: float = 0.0
+    llm_is_boundary: bool | None = None
+    transition_intent: str | None = None
+    llm_reason: str | None = None
+
+
+@dataclass(frozen=True)
+class BoundaryEvaluationInput:
+    """Store bounded context and algorithm scores for one LLM boundary review."""
+
+    candidate_time: float
+    left_context: str
+    right_context: str
+    candidate_score: float
+    lexical_shift_score: float
+    semantic_shift_score: float
+    valley_depth_score: float
+    pause_score: float
+    discourse_marker_score: float
+
+
+@dataclass(frozen=True)
+class BoundaryEvaluation:
+    """Store one validated candidate-boundary judgment from an LLM provider."""
+
+    candidate_time: float
+    is_chapter_boundary: bool
+    confidence: float
+    transition_intent: TransitionIntent
+    reason: str
+
+
+@dataclass(frozen=True)
+class ChapterTitleInput:
+    """Store transcript text for generating one chapter title and summary."""
+
+    chapter_index: int
+    start_time: float
+    end_time: float
+    language: str | None
+    text: str
+
+
+@dataclass(frozen=True)
+class ChapterTitleResult:
+    """Store one generated title/summary result before validation."""
+
+    chapter_index: int
+    title: str
+    summary: str | None = None
 
 
 @dataclass(frozen=True)

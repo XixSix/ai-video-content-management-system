@@ -88,5 +88,6 @@ def merge_candidate_scores(
             "lexical_shift_score": candidate.lexical_shift_score,
             "valley_depth_score": candidate.valley_depth_score,
             "boundary_quality_score": candidate.boundary_quality_score,
+            "llm_confidence_score": candidate.llm_confidence_score,
         }
     )

@@ -1,3 +1,7 @@
+from app.provider_contracts.chapter_boundary_evaluation import (
+    ChapterBoundaryEvaluationPort,
+)
+from app.provider_contracts.chapter_title import ChapterTitleProviderPort
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.pipelines.shared import run_units_pipeline
@@ -9,6 +13,8 @@ def run_segment_pipeline(
     *,
     request: ChapterGenerationRequest,
     embedding: TextEmbeddingPort,
+    boundary_evaluator: ChapterBoundaryEvaluationPort,
+    title_provider: ChapterTitleProviderPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
     """Generate chapters from segment-timestamped transcript units.
@@ -32,5 +38,7 @@ def run_segment_pipeline(
         request=request,
         units=units,
         embedding=embedding,
+        boundary_evaluator=boundary_evaluator,
+        title_provider=title_provider,
         config=config,
     )
