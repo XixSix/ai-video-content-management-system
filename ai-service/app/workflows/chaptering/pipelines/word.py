@@ -1,4 +1,7 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
+from app.provider_contracts.chapter_boundary_evaluation import (
+    ChapterBoundaryEvaluationPort,
+)
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.pipelines.segment import run_segment_pipeline
 from app.workflows.chaptering.pipelines.shared import run_units_pipeline
@@ -13,6 +16,7 @@ def run_word_pipeline(
     *,
     request: ChapterGenerationRequest,
     embedding: TextEmbeddingPort,
+    boundary_evaluator: ChapterBoundaryEvaluationPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
     """Generate chapters from word-timestamped transcript units.
@@ -22,7 +26,12 @@ def run_word_pipeline(
     strategy so chapter generation remains available for segment-only inputs.
     """
     if not has_usable_word_timestamps(request.segments):
-        return run_segment_pipeline(request=request, embedding=embedding, config=config)
+        return run_segment_pipeline(
+            request=request,
+            embedding=embedding,
+            boundary_evaluator=boundary_evaluator,
+            config=config,
+        )
 
     units = build_word_chapter_units(
         request.segments,
@@ -37,5 +46,6 @@ def run_word_pipeline(
         request=request,
         units=units,
         embedding=embedding,
+        boundary_evaluator=boundary_evaluator,
         config=config,
     )

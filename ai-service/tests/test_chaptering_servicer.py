@@ -6,6 +6,9 @@ import grpc
 import pytest
 
 from app.grpc.chaptering_servicer import ChapteringServicer
+from app.providers.chaptering.noop_boundary_evaluation import (
+    NoopChapterBoundaryEvaluationProvider,
+)
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
@@ -277,6 +280,7 @@ def test_generate_chapters_returns_fallback_chapter() -> None:
 def test_chaptering_workflow_generates_chapters() -> None:
     workflow = ChapteringWorkflow(
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
         config=_pipeline_config(),
     )
 
@@ -312,6 +316,7 @@ def test_chaptering_workflow_generates_chapters() -> None:
 def test_chaptering_workflow_generates_chapters_from_word_strategy() -> None:
     workflow = ChapteringWorkflow(
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
         config=_pipeline_config(strategy="word"),
     )
 

@@ -6,6 +6,9 @@ from pathlib import Path
 from typing import Any, Literal
 
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.noop_boundary_evaluation import (
+    NoopChapterBoundaryEvaluationProvider,
+)
 from app.schemas.chaptering import (
     ChapterGenerationRequest,
     ChapteringOptions,
@@ -180,6 +183,7 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
         request=request,
         units=units,
         embedding=NoopTextEmbeddingProvider(),
+        boundary_evaluator=NoopChapterBoundaryEvaluationProvider(),
         config=config,
     )
 

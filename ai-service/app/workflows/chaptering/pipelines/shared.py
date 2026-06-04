@@ -1,10 +1,14 @@
 from app.provider_contracts.text_embedding import TextEmbeddingPort
+from app.provider_contracts.chapter_boundary_evaluation import (
+    ChapterBoundaryEvaluationPort,
+)
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
 from app.workflows.chaptering.candidates import (
     retain_candidates_for_embedding,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
+from app.workflows.chaptering.llm_evaluation import apply_boundary_evaluations
 from app.workflows.chaptering.scores.gap_scoring import (
     attach_semantic_shift_scores,
     gap_scores_to_candidates,
@@ -23,6 +27,7 @@ def run_units_pipeline(
     request: ChapterGenerationRequest,
     units: list[ChapterUnit],
     embedding: TextEmbeddingPort,
+    boundary_evaluator: ChapterBoundaryEvaluationPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
     """Generate chapters from prebuilt timeline units.
@@ -80,6 +85,19 @@ def run_units_pipeline(
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
         config=config.retention,
     )
+    llm_applied = False
+    if options.use_llm and ranked_candidates:
+        llm_windows = build_context_windows(
+            units,
+            ranked_candidates,
+            context_duration=config.context_window_seconds,
+        )
+        ranked_candidates, llm_applied = apply_boundary_evaluations(
+            ranked_candidates,
+            llm_windows,
+            provider=boundary_evaluator,
+        )
+
     boundaries = select_boundaries_from_candidates(
         ranked_candidates,
         media_duration=duration,
@@ -94,7 +112,7 @@ def run_units_pipeline(
         request_id=request.request_id,
         language=request.language,
         model=config.model_name,
-        source="RULE_BASED",
+        source="LLM" if llm_applied else "RULE_BASED",
         chapters=build_chapters(
             request,
             duration=duration,

@@ -1,5 +1,8 @@
 from collections.abc import Callable
 
+from app.provider_contracts.chapter_boundary_evaluation import (
+    ChapterBoundaryEvaluationPort,
+)
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.errors import UnsupportedChapteringStrategyError
@@ -32,9 +35,15 @@ def run_chapter_generation_pipeline(
     chaptering_strategy: str,
     request: ChapterGenerationRequest,
     embedding: TextEmbeddingPort,
+    boundary_evaluator: ChapterBoundaryEvaluationPort,
     config: ChapteringPipelineConfig,
 ) -> ChapterGenerationResult:
     """Run the selected chaptering strategy."""
     pipeline = select_chaptering_pipeline(chaptering_strategy)
 
-    return pipeline(request=request, embedding=embedding, config=config)
+    return pipeline(
+        request=request,
+        embedding=embedding,
+        boundary_evaluator=boundary_evaluator,
+        config=config,
+    )
