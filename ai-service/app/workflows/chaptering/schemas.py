@@ -14,7 +14,7 @@ class ChapterUnit:
 
 
 @dataclass(frozen=True)
-class ChapterBoundaryCandidate:
+class ChapterCandidate:
     """Store a possible chapter boundary derived from a unit start."""
 
     time: float
@@ -58,7 +58,7 @@ class ChapterGapScore:
 
 
 @dataclass(frozen=True)
-class ChapterBoundaryContextWindow:
+class ChapterContextWindow:
     """Store left and right text context around a candidate boundary."""
 
     candidate_time: float

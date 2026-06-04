@@ -1,4 +1,4 @@
-from app.workflows.chaptering.schemas import ChapterBoundaryCandidate
+from app.workflows.chaptering.schemas import ChapterCandidate
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 
 
@@ -89,8 +89,8 @@ def test_candidate_selection_respects_max_chapters() -> None:
     assert boundaries == [0, 20]
 
 
-def _candidate(time: float, *, score: float) -> ChapterBoundaryCandidate:
-    return ChapterBoundaryCandidate(
+def _candidate(time: float, *, score: float) -> ChapterCandidate:
+    return ChapterCandidate(
         time=time,
         unit_index=int(time),
         unit_id=f"unit_{int(time):04d}",

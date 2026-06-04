@@ -4,7 +4,7 @@ from app.schemas.chaptering import (
     ChapteringOptions,
     ChapteringTranscriptSegment,
 )
-from app.workflows.chaptering.gap_scoring import (
+from app.workflows.chaptering.scores.gap_scoring import (
     attach_semantic_shift_scores,
     gap_scores_to_candidates,
     score_unit_gaps,
@@ -185,6 +185,50 @@ def test_units_pipeline_attaches_valley_depth_to_selected_boundary() -> None:
     assert result.chapters[1].scores.valley_depth_score > 0
 
 
+def test_units_pipeline_detects_valley_after_embedding_semantic_scores() -> None:
+    units = [
+        _unit(1, 0, 20, "media workflow upload storage metadata"),
+        _unit(2, 20, 40, "media workflow upload storage metadata"),
+        _unit(3, 40, 60, "media workflow upload storage metadata"),
+        _unit(4, 60, 80, "media workflow upload storage metadata"),
+        _unit(5, 80, 100, "media workflow upload storage metadata"),
+    ]
+    request = ChapterGenerationRequest(
+        request_id="chaptering-job-semantic-valley",
+        language="en",
+        media_duration_seconds=110,
+        segments=[
+            _segment(1, 0, 20, units[0].text),
+            _segment(2, 20, 40, units[1].text),
+            _segment(3, 40, 60, units[2].text),
+            _segment(4, 60, 80, units[3].text),
+            _segment(5, 80, 100, units[4].text),
+        ],
+        options=ChapteringOptions(
+            min_chapter_duration_seconds=10,
+            target_chapter_duration_seconds=40,
+            max_chapter_duration_seconds=80,
+            max_chapters=3,
+            use_embeddings=True,
+            use_llm=False,
+        ),
+    )
+
+    result = run_units_pipeline(
+        request=request,
+        units=units,
+        embedding=_SequencedSemanticShiftEmbeddingProvider(
+            shift_by_call=[0.0, 1.0, 0.0, 0.0]
+        ),
+        config=_pipeline_config(context_seconds=20),
+    )
+
+    assert [chapter.start_seconds for chapter in result.chapters] == [0, 40]
+    assert result.chapters[1].scores is not None
+    assert result.chapters[1].scores.semantic_shift_score == 1.0
+    assert result.chapters[1].scores.valley_depth_score > 0
+
+
 def test_units_pipeline_falls_back_to_all_gap_candidates_when_no_valleys_pass() -> None:
     units = [
         _unit(1, 0, 20, "database schema prisma users database queries"),
@@ -297,3 +341,25 @@ def _segment(
         end_seconds=end,
         text=text,
     )
+
+
+class _SequencedSemanticShiftEmbeddingProvider:
+    def __init__(self, *, shift_by_call: list[float]) -> None:
+        self._shift_by_call = shift_by_call
+        self._calls = 0
+
+    @property
+    def model_name(self) -> str:
+        return "test-sequenced-embedding"
+
+    @property
+    def dimension(self) -> int:
+        return 2
+
+    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+        shift = self._shift_by_call[self._calls]
+        self._calls += 1
+        if shift >= 1.0:
+            return [[1.0, 0.0], [0.0, 1.0]]
+
+        return [[1.0, 0.0], [1.0, 0.0]]

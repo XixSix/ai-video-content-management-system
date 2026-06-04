@@ -1,10 +1,10 @@
 from app.schemas.chaptering import ChapteringTranscriptSegment
-from app.workflows.chaptering.scoring import score_boundary
-from app.workflows.chaptering.schemas import ChapterBoundaryCandidate
+from app.workflows.chaptering.scores.scoring import score_boundary
+from app.workflows.chaptering.schemas import ChapterCandidate
 
 
 def select_boundaries_from_candidates(
-    candidates: list[ChapterBoundaryCandidate],
+    candidates: list[ChapterCandidate],
     *,
     media_duration: float,
     min_duration: float,

@@ -5,14 +5,15 @@ from app.workflows.chaptering.candidates import (
     retain_candidates_for_embedding,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
-from app.workflows.chaptering.gap_scoring import (
+from app.workflows.chaptering.scores.gap_scoring import (
+    attach_semantic_shift_scores,
     gap_scores_to_candidates,
     score_unit_gaps,
 )
 from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConfig
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 from app.workflows.chaptering.semantic import score_context_windows
-from app.workflows.chaptering.valleys import detect_valley_candidates
+from app.workflows.chaptering.scores.valleys import detect_valley_candidates
 from app.workflows.chaptering.windows import build_context_windows
 
 
@@ -39,6 +40,18 @@ def run_units_pipeline(
         min_chapter_duration=options.min_chapter_duration_seconds,
         config=config.scoring,
     )
+    all_gap_candidates = gap_scores_to_candidates(gap_scores)
+    all_gap_windows = build_context_windows(
+        units,
+        all_gap_candidates,
+        context_duration=config.context_window_seconds,
+    )
+    semantic_shift_scores_by_time = (
+        score_context_windows(all_gap_windows, embedding=embedding)
+        if options.use_embeddings and all_gap_windows
+        else {}
+    )
+    gap_scores = attach_semantic_shift_scores(gap_scores, semantic_shift_scores_by_time)
     valley_gap_scores = detect_valley_candidates(
         gap_scores,
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
@@ -51,16 +64,6 @@ def run_units_pipeline(
         media_duration=duration,
         target_chapter_duration=options.target_chapter_duration_seconds,
         config=config.retention,
-    )
-    windows = build_context_windows(
-        units,
-        retained_candidates,
-        context_duration=config.context_window_seconds,
-    )
-    semantic_shift_scores_by_time = (
-        score_context_windows(windows, embedding=embedding)
-        if options.use_embeddings and windows
-        else {}
     )
     ranked_candidates = rank_boundary_candidates(
         retained_candidates,

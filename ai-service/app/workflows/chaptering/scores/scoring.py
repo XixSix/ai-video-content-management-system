@@ -2,7 +2,11 @@ import math
 from collections.abc import Sequence
 
 from app.schemas.chaptering import ChapterBoundaryScores, ChapteringTranscriptSegment
-from app.workflows.chaptering.transition_markers import transition_marker_score
+from app.workflows.chaptering.scores.common import clamp_score
+from app.workflows.chaptering.scores.temporal import (
+    pause_score as calculate_pause_score,
+)
+from app.workflows.chaptering.scores.transition_markers import transition_marker_score
 
 LONG_PAUSE_SECONDS = 1.2
 
@@ -38,11 +42,15 @@ def score_boundary(
         if segment and previous_segment
         else 0.0
     )
-    pause_score = _clamp(pause / 3.0) if pause >= LONG_PAUSE_SECONDS else 0.0
+    pause_score = calculate_pause_score(
+        pause,
+        long_pause_seconds=LONG_PAUSE_SECONDS,
+        max_pause_score_seconds=3.0,
+    )
     discourse_score = transition_marker_score(segment.text) if segment else 0.0
     duration = start_time - previous_start
     duration_score = (
-        1.0 - _clamp(abs(duration - target_duration) / target_duration)
+        1.0 - clamp_score(abs(duration - target_duration) / target_duration)
         if target_duration > 0
         else 0.0
     )
@@ -55,7 +63,7 @@ def score_boundary(
         boundary_score=round(boundary_score, 4),
         pause_score=round(pause_score, 4),
         discourse_marker_score=round(discourse_score, 4),
-        semantic_shift_score=round(_clamp(semantic_shift), 4),
+        semantic_shift_score=round(clamp_score(semantic_shift), 4),
         duration_score=round(duration_score, 4),
     )
 
@@ -98,7 +106,7 @@ def semantic_shift_score(
     if similarity is None:
         return 0.0
 
-    return _clamp(1.0 - similarity)
+    return clamp_score(1.0 - similarity)
 
 
 def segment_at_or_after(
@@ -118,8 +126,3 @@ def previous_segment_before(
     """Return the last segment before a boundary time."""
     previous = [segment for segment in segments if segment.start_seconds < start_time]
     return previous[-1] if previous else None
-
-
-def _clamp(value: float) -> float:
-    """Clamp a numeric score to the 0-1 range."""
-    return max(0.0, min(value, 1.0))

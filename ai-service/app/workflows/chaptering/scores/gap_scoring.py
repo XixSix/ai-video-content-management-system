@@ -1,18 +1,25 @@
-import math
-import re
-from collections import Counter
-from collections.abc import Iterable
 from dataclasses import replace
 
+from app.workflows.chaptering.scores.common import clamp_score
+from app.workflows.chaptering.scores.lexical import (
+    lexical_cohesion_score as calculate_lexical_cohesion_score,
+)
+from app.workflows.chaptering.scores.quality import (
+    boundary_quality_score as calculate_boundary_quality_score,
+)
+from app.workflows.chaptering.scores.temporal import (
+    duration_sanity_score as calculate_duration_sanity_score,
+    pause_score as calculate_pause_score,
+)
 from app.workflows.chaptering.schemas import (
     CandidateScoringConfig,
-    ChapterBoundaryCandidate,
+    ChapterCandidate,
+    ChapterContextWindow,
     ChapterGapScore,
     ChapterUnit,
 )
-from app.workflows.chaptering.transition_markers import transition_marker_score
-
-TOKEN_RE = re.compile(r"[a-z0-9']+")
+from app.workflows.chaptering.scores.transition_markers import transition_marker_score
+from app.workflows.chaptering.windows import build_context_windows
 
 
 def score_unit_gaps(
@@ -65,7 +72,7 @@ def attach_semantic_shift_scores(
         replace(
             gap_score,
             semantic_shift_score=round(
-                _clamp(semantic_shift_scores_by_time.get(gap_score.time, 0.0)),
+                clamp_score(semantic_shift_scores_by_time.get(gap_score.time, 0.0)),
                 4,
             ),
         )
@@ -75,10 +82,10 @@ def attach_semantic_shift_scores(
 
 def gap_scores_to_candidates(
     gap_scores: list[ChapterGapScore],
-) -> list[ChapterBoundaryCandidate]:
+) -> list[ChapterCandidate]:
     """Convert Phase 3 scores into existing downstream boundary candidates."""
     return [
-        ChapterBoundaryCandidate(
+        ChapterCandidate(
             time=gap_score.time,
             unit_index=gap_score.unit_index,
             unit_id=gap_score.unit_id,
@@ -106,33 +113,28 @@ def _score_gap(
 ) -> ChapterGapScore:
     previous_unit = units[unit_index - 1]
     current_unit = units[unit_index]
-    left_units = _context_units_before_gap(
-        units,
+    context_window = _context_window_for_gap(
         unit_index,
+        units,
         context_seconds=config.context_seconds,
     )
-    right_units = _context_units_after_gap(
-        units,
-        unit_index,
-        context_seconds=config.context_seconds,
-    )
-    left_text = _join_unit_text(left_units)
-    right_text = _join_unit_text(right_units)
+    left_text = context_window.left_text
+    right_text = context_window.right_text
 
-    lexical_cohesion_score = _lexical_cohesion_score(left_text, right_text)
-    lexical_shift_score = _clamp(1.0 - lexical_cohesion_score)
+    lexical_cohesion_score = calculate_lexical_cohesion_score(left_text, right_text)
+    lexical_shift_score = clamp_score(1.0 - lexical_cohesion_score)
     discourse_marker_score = transition_marker_score(current_unit.clean_text)
-    pause_score = _pause_score(
+    pause_score = calculate_pause_score(
         current_unit.start_time - previous_unit.end_time,
         long_pause_seconds=config.long_pause_seconds,
         max_pause_score_seconds=config.max_pause_score_seconds,
     )
-    boundary_quality_score = _boundary_quality_score(
+    boundary_quality_score = calculate_boundary_quality_score(
         left_text,
         right_text,
         min_context_text_chars=config.min_context_text_chars,
     )
-    duration_sanity_score = _duration_sanity_score(
+    duration_sanity_score = calculate_duration_sanity_score(
         current_unit.start_time,
         media_duration=media_duration,
         min_chapter_duration=min_chapter_duration,
@@ -153,106 +155,48 @@ def _score_gap(
         next_unit_ids=[current_unit.unit_id],
         left_text=left_text,
         right_text=right_text,
-        left_unit_ids=[unit.unit_id for unit in left_units],
-        right_unit_ids=[unit.unit_id for unit in right_units],
+        left_unit_ids=context_window.left_unit_ids,
+        right_unit_ids=context_window.right_unit_ids,
         lexical_cohesion_score=round(lexical_cohesion_score, 4),
         lexical_shift_score=round(lexical_shift_score, 4),
         discourse_marker_score=round(discourse_marker_score, 4),
         pause_score=round(pause_score, 4),
         boundary_quality_score=round(boundary_quality_score, 4),
         duration_sanity_score=round(duration_sanity_score, 4),
-        combined_score=round(_clamp(combined_score), 4),
+        combined_score=round(clamp_score(combined_score), 4),
     )
 
 
-def _context_units_before_gap(
-    units: list[ChapterUnit],
+def _context_window_for_gap(
     gap_unit_index: int,
+    units: list[ChapterUnit],
     *,
     context_seconds: float,
-) -> list[ChapterUnit]:
-    """Return units before the gap that overlap the left context window."""
+) -> ChapterContextWindow:
+    """Build one context window for a gap candidate."""
     candidate_time = units[gap_unit_index].start_time
-    earliest_start = candidate_time - context_seconds
-    return [unit for unit in units[:gap_unit_index] if unit.end_time > earliest_start]
-
-
-def _context_units_after_gap(
-    units: list[ChapterUnit],
-    gap_unit_index: int,
-    *,
-    context_seconds: float,
-) -> list[ChapterUnit]:
-    """Return units from the gap that overlap the right context window."""
-    candidate_time = units[gap_unit_index].start_time
-    latest_end = candidate_time + context_seconds
-    return [unit for unit in units[gap_unit_index:] if unit.start_time < latest_end]
-
-
-def _join_unit_text(units: Iterable[ChapterUnit]) -> str:
-    """Join preferred unit text into one scoring context."""
-    return " ".join(
-        unit.clean_text or unit.text for unit in units if (unit.clean_text or unit.text)
-    ).strip()
-
-
-def _lexical_cohesion_score(left_text: str, right_text: str) -> float:
-    """Return bag-of-words cosine similarity for two context windows."""
-    left_counts = Counter(TOKEN_RE.findall(left_text.lower()))
-    right_counts = Counter(TOKEN_RE.findall(right_text.lower()))
-    if not left_counts or not right_counts:
-        return 0.0
-
-    shared_tokens = left_counts.keys() & right_counts.keys()
-    dot_product = sum(
-        left_counts[token] * right_counts[token] for token in shared_tokens
+    candidate = ChapterCandidate(
+        time=candidate_time,
+        unit_index=gap_unit_index,
+        unit_id=units[gap_unit_index].unit_id,
+        previous_unit_ids=[units[gap_unit_index - 1].unit_id],
+        next_unit_ids=[units[gap_unit_index].unit_id],
     )
-    left_norm = math.sqrt(sum(count * count for count in left_counts.values()))
-    right_norm = math.sqrt(sum(count * count for count in right_counts.values()))
-    if left_norm <= 0.0 or right_norm <= 0.0:
-        return 0.0
+    windows = build_context_windows(
+        units,
+        [candidate],
+        context_duration=context_seconds,
+    )
+    if windows:
+        return windows[0]
 
-    return _clamp(dot_product / (left_norm * right_norm))
-
-
-def _pause_score(
-    pause_seconds: float,
-    *,
-    long_pause_seconds: float,
-    max_pause_score_seconds: float,
-) -> float:
-    """Return normalized pause strength for a gap."""
-    if pause_seconds < long_pause_seconds:
-        return 0.0
-
-    return _clamp(pause_seconds / max_pause_score_seconds)
-
-
-def _boundary_quality_score(
-    left_text: str,
-    right_text: str,
-    *,
-    min_context_text_chars: int,
-) -> float:
-    """Return context sufficiency score for both sides of a gap."""
-    if min_context_text_chars <= 0:
-        return 0.0
-
-    return _clamp(min(len(left_text), len(right_text)) / min_context_text_chars)
-
-
-def _duration_sanity_score(
-    time: float,
-    *,
-    media_duration: float,
-    min_chapter_duration: float,
-) -> float:
-    """Return weak preference for gaps away from media edges."""
-    if min_chapter_duration <= 0:
-        return 0.0
-
-    available_margin = min(time, media_duration - time)
-    return _clamp(available_margin / (min_chapter_duration * 2))
+    return ChapterContextWindow(
+        candidate_time=candidate_time,
+        left_text="",
+        right_text="",
+        left_unit_ids=[],
+        right_unit_ids=[],
+    )
 
 
 def _is_hard_valid_gap(
@@ -265,8 +209,3 @@ def _is_hard_valid_gap(
     return (
         time >= min_chapter_duration and media_duration - time >= min_chapter_duration
     )
-
-
-def _clamp(value: float) -> float:
-    """Clamp a numeric score to the 0-1 range."""
-    return max(0.0, min(value, 1.0))
