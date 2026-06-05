@@ -44,9 +44,7 @@ def run_units_pipeline(
     options = request.options
     units = repair_micro_units(
         units,
-        max_unit_duration=config.max_unit_duration_seconds,
-        max_unit_words=config.max_unit_words,
-        max_unit_chars=config.max_unit_chars,
+        pause_boundary_seconds=config.pause_boundary_seconds,
         config=config.unit_repair,
     )
 

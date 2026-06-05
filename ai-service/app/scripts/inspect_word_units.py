@@ -53,6 +53,7 @@ def main() -> None:
     parser.add_argument("--repair-min-words", type=int, default=8)
     parser.add_argument("--repair-fragment-max-words", type=int, default=2)
     parser.add_argument("--repair-sparse-duration", type=float, default=6.0)
+    parser.add_argument("--repair-continuation-gap", type=float, default=0.05)
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -94,14 +95,13 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     if args.repair:
         units = repair_micro_units(
             units,
-            max_unit_duration=args.max_duration,
-            max_unit_words=args.max_words,
-            max_unit_chars=args.max_chars,
+            pause_boundary_seconds=args.pause,
             config=UnitRepairConfig(
                 short_duration_seconds=args.repair_short_duration,
                 min_words=args.repair_min_words,
                 fragment_max_words=args.repair_fragment_max_words,
                 sparse_duration_seconds=args.repair_sparse_duration,
+                continuation_gap_seconds=args.repair_continuation_gap,
             ),
         )
 

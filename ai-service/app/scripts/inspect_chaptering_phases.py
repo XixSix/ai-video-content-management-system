@@ -82,6 +82,7 @@ def main() -> None:
     parser.add_argument("--retention-max-limit", type=int, default=40)
     parser.add_argument("--retention-multiplier", type=int, default=4)
     parser.add_argument("--retention-top-score-fraction", type=float, default=0.60)
+    parser.add_argument("--repair-continuation-gap", type=float, default=0.05)
     parser.add_argument("--top", type=int, default=20)
     parser.add_argument(
         "--output-dir",
@@ -126,9 +127,7 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     )
     units = repair_micro_units(
         raw_units,
-        max_unit_duration=config.max_unit_duration_seconds,
-        max_unit_words=config.max_unit_words,
-        max_unit_chars=config.max_unit_chars,
+        pause_boundary_seconds=config.pause_boundary_seconds,
         config=config.unit_repair,
     )
 
@@ -522,6 +521,7 @@ def _pipeline_config(
             min_words=8,
             fragment_max_words=2,
             sparse_duration_seconds=6.0,
+            continuation_gap_seconds=args.repair_continuation_gap,
         ),
     )
 

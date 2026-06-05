@@ -2,15 +2,13 @@ import re
 
 from app.workflows.chaptering.schemas import ChapterUnit, UnitRepairConfig
 
-WORD_RE = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")
+
 TERMINAL_PUNCTUATION = (".", "!", "?")
-CONTINUATION_GAP_SECONDS = 0.05
 TRANSITION_OPENER_RE = re.compile(
     r"^(?:"
     r"at(?:\s+number)?|"
     r"now|"
     r"so\s+those\s+are\s+all|"
-    r"mobile\s+apps|"
     r"let'?s\s+talk|"
     r"and\s+number|"
     r"number|"
@@ -32,17 +30,15 @@ BACKCHANNEL_RE = re.compile(
 def repair_micro_units(
     units: list[ChapterUnit],
     *,
-    max_unit_duration: float,
-    max_unit_words: int,
-    max_unit_chars: int,
+    pause_boundary_seconds: float,
     config: UnitRepairConfig,
 ) -> list[ChapterUnit]:
     """Merge tiny post-build units before scoring candidate boundaries.
 
     Timeline builders preserve timestamp boundaries from words or ASR segments.
     This pass only repairs units that are too short or sparse to provide useful
-    boundary evidence, and only when the merged result stays within hard unit
-    budgets.
+    boundary evidence, and only across contiguous timeline gaps so downstream
+    context windows do not lose meaningful pause boundaries.
     """
     repaired = list(units)
     index = 0
@@ -51,9 +47,7 @@ def repair_micro_units(
         direction = _repair_direction(
             repaired,
             index,
-            max_unit_duration=max_unit_duration,
-            max_unit_words=max_unit_words,
-            max_unit_chars=max_unit_chars,
+            pause_boundary_seconds=pause_boundary_seconds,
             config=config,
         )
 
@@ -77,9 +71,7 @@ def _repair_direction(
     units: list[ChapterUnit],
     index: int,
     *,
-    max_unit_duration: float,
-    max_unit_words: int,
-    max_unit_chars: int,
+    pause_boundary_seconds: float,
     config: UnitRepairConfig,
 ) -> str | None:
     """Choose the lowest-risk merge direction for one micro unit."""
@@ -90,16 +82,12 @@ def _repair_direction(
     can_merge_previous = index > 0 and _can_merge_units(
         units[index - 1],
         unit,
-        max_unit_duration=max_unit_duration,
-        max_unit_words=max_unit_words,
-        max_unit_chars=max_unit_chars,
+        pause_boundary_seconds=pause_boundary_seconds,
     )
     can_merge_next = index < len(units) - 1 and _can_merge_units(
         unit,
         units[index + 1],
-        max_unit_duration=max_unit_duration,
-        max_unit_words=max_unit_words,
-        max_unit_chars=max_unit_chars,
+        pause_boundary_seconds=pause_boundary_seconds,
     )
 
     if not can_merge_previous and not can_merge_next:
@@ -108,39 +96,21 @@ def _repair_direction(
     if _looks_like_transition_opener(unit):
         if can_merge_next:
             return "forward"
-        if can_merge_previous:
-            return "backward"
+        return None
 
-    if _looks_like_previous_sentence_continuation(units, index):
-        if can_merge_previous:
-            return "backward"
-        if can_merge_next:
-            return "forward"
+    if _looks_like_previous_sentence_continuation(units, index, config=config):
+        return "backward" if can_merge_previous else None
 
     if _looks_like_leading_fragment(unit):
-        if can_merge_next:
-            return "forward"
-        if can_merge_previous:
-            return "backward"
+        return "forward" if can_merge_next else None
 
     if _looks_like_backchannel(unit):
-        if can_merge_previous:
-            return "backward"
-        if can_merge_next:
-            return "forward"
+        return "backward" if can_merge_previous else None
 
     if _has_terminal_punctuation(unit):
-        if can_merge_previous:
-            return "backward"
-        if can_merge_next:
-            return "forward"
+        return "backward" if can_merge_previous else None
 
-    if can_merge_previous and can_merge_next:
-        previous_gap = _gap_between(units[index - 1], unit)
-        next_gap = _gap_between(unit, units[index + 1])
-        return "backward" if previous_gap <= next_gap else "forward"
-
-    return "backward" if can_merge_previous else "forward"
+    return None
 
 
 def _is_repairable_micro_unit(unit: ChapterUnit, *, config: UnitRepairConfig) -> bool:
@@ -165,12 +135,15 @@ def _looks_like_leading_fragment(unit: ChapterUnit) -> bool:
 
 def _looks_like_transition_opener(unit: ChapterUnit) -> bool:
     """Return true for short transition markers that should prefix following text."""
-    return bool(TRANSITION_OPENER_RE.match(_normalize_text(unit.text)))
+    text = _normalize_text(unit.text)
+    return bool(TRANSITION_OPENER_RE.match(text))
 
 
 def _looks_like_previous_sentence_continuation(
     units: list[ChapterUnit],
     index: int,
+    *,
+    config: UnitRepairConfig,
 ) -> bool:
     """Return true when a fragment continues an unfinished previous sentence."""
     if index <= 0:
@@ -184,34 +157,25 @@ def _looks_like_previous_sentence_continuation(
 
     return (
         not _has_terminal_punctuation(previous)
-        and _gap_between(previous, unit) <= CONTINUATION_GAP_SECONDS
+        and _gap_between(previous, unit) <= config.continuation_gap_seconds
         and text[0].islower()
     )
 
 
 def _looks_like_backchannel(unit: ChapterUnit) -> bool:
     """Return true for standalone acknowledgements with low topic signal."""
-    return bool(BACKCHANNEL_RE.match(_normalize_text(unit.text)))
+    text = _normalize_text(unit.text)
+    return bool(BACKCHANNEL_RE.match(text))
 
 
 def _can_merge_units(
     left: ChapterUnit,
     right: ChapterUnit,
     *,
-    max_unit_duration: float,
-    max_unit_words: int,
-    max_unit_chars: int,
+    pause_boundary_seconds: float,
 ) -> bool:
-    """Return true when a merged unit still fits hard analysis budgets."""
-    text = _normalize_text(f"{left.text} {right.text}")
-
-    if right.end_time - left.start_time > max_unit_duration:
-        return False
-
-    if max_unit_words and len(WORD_RE.findall(text)) > max_unit_words:
-        return False
-
-    return not (max_unit_chars and len(text) > max_unit_chars)
+    """Return true when adjacent units are close enough to preserve pause cues."""
+    return _gap_between(left, right) < pause_boundary_seconds
 
 
 def _merge_units(left: ChapterUnit, right: ChapterUnit) -> ChapterUnit:
@@ -261,7 +225,7 @@ def _unit_duration(unit: ChapterUnit) -> float:
 
 
 def _unit_word_count(unit: ChapterUnit) -> int:
-    return len(WORD_RE.findall(unit.text))
+    return len(re.findall(r"[^\W\d_]+", unit.text))
 
 
 def _gap_between(left: ChapterUnit, right: ChapterUnit) -> float:

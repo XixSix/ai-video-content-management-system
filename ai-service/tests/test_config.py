@@ -15,6 +15,7 @@ def test_settings_use_chaptering_defaults() -> None:
     assert settings.chaptering_unit_repair_min_words == 8
     assert settings.chaptering_unit_repair_fragment_max_words == 2
     assert settings.chaptering_unit_repair_sparse_duration_seconds == 6
+    assert settings.chaptering_unit_repair_continuation_gap_seconds == 0.05
     assert settings.chaptering_valley_smoothing_radius == 1
     assert settings.chaptering_valley_peak_window == 2
     assert settings.chaptering_valley_min_depth == 0.18
@@ -45,6 +46,7 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_MIN_WORDS", "6")
     monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_FRAGMENT_MAX_WORDS", "3")
     monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_SPARSE_DURATION_SECONDS", "5")
+    monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_CONTINUATION_GAP_SECONDS", "0.1")
     monkeypatch.setenv("CHAPTERING_CONTEXT_WINDOW_SECONDS", "100")
     monkeypatch.setenv("CHAPTERING_CANDIDATE_SCORE_CONTEXT_SECONDS", "45")
     monkeypatch.setenv("CHAPTERING_CANDIDATE_LONG_PAUSE_SECONDS", "2")
@@ -90,6 +92,7 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.chaptering_unit_repair_min_words == 6
     assert settings.chaptering_unit_repair_fragment_max_words == 3
     assert settings.chaptering_unit_repair_sparse_duration_seconds == 5
+    assert settings.chaptering_unit_repair_continuation_gap_seconds == 0.1
     assert settings.chaptering_context_window_seconds == 100
     assert settings.chaptering_candidate_score_context_seconds == 45
     assert settings.chaptering_candidate_long_pause_seconds == 2
