@@ -12,7 +12,7 @@ from app.workflows.chaptering.schemas import ChapterUnit, UnitRepairConfig
 from app.workflows.chaptering.unit_repair import repair_micro_units
 from app.workflows.chaptering.word_units import (
     build_word_chapter_units,
-    has_usable_word_timestamps,
+    collect_timeline_words,
 )
 
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")
@@ -81,8 +81,9 @@ def main() -> None:
 def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     payload = json.loads(transcript_json.read_text(encoding="utf-8"))
     segments = _load_segments(payload, synthesize_ids=args.synthesize_ids)
+    timeline_words = collect_timeline_words(segments)
     units = build_word_chapter_units(
-        segments,
+        timeline_words,
         max_unit_duration=args.max_duration,
         pause_boundary_seconds=args.pause,
         target_unit_duration=args.target_duration,
@@ -143,7 +144,7 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
         "",
         f"- segments: `{len(segments)}`",
         f"- words: `{input_word_count}`",
-        f"- usable_word_timestamps: `{has_usable_word_timestamps(segments)}`",
+        f"- usable_word_timestamps: `{bool(timeline_words)}`",
         f"- units: `{len(units)}`",
         *_summary_lines(rows),
         *_bucket_lines(rows),

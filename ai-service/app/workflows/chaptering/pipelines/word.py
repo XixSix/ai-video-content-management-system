@@ -9,7 +9,7 @@ from app.workflows.chaptering.pipelines.shared import run_units_pipeline
 from app.workflows.chaptering.schemas import ChapteringPipelineConfig
 from app.workflows.chaptering.word_units import (
     build_word_chapter_units,
-    has_usable_word_timestamps,
+    collect_timeline_words,
 )
 
 
@@ -27,7 +27,8 @@ def run_word_pipeline(
     does not include usable word timestamps, it falls back to the segment
     strategy so chapter generation remains available for segment-only inputs.
     """
-    if not has_usable_word_timestamps(request.segments):
+    timeline_words = collect_timeline_words(request.segments)
+    if not timeline_words:
         return run_segment_pipeline(
             request=request,
             embedding=embedding,
@@ -37,7 +38,7 @@ def run_word_pipeline(
         )
 
     units = build_word_chapter_units(
-        request.segments,
+        timeline_words,
         max_unit_duration=config.max_unit_duration_seconds,
         pause_boundary_seconds=config.pause_boundary_seconds,
         target_unit_duration=config.target_unit_duration_seconds,

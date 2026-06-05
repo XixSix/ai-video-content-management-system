@@ -1,7 +1,8 @@
 from app.schemas.chaptering import ChapteringTranscriptSegment, ChapteringTranscriptWord
 from app.workflows.chaptering.word_units import (
+    TimelineWord,
     build_word_chapter_units,
-    has_usable_word_timestamps,
+    collect_timeline_words,
 )
 
 
@@ -40,24 +41,32 @@ def _word(
     )
 
 
+def _timeline(
+    segments: list[ChapteringTranscriptSegment],
+) -> list[TimelineWord]:
+    return collect_timeline_words(segments)
+
+
 def test_build_word_chapter_units_groups_words_by_budget() -> None:
     units = build_word_chapter_units(
-        [
-            _segment(
-                1,
-                0,
-                6,
-                "one two three four five six",
-                words=[
-                    _word(1, "seg-1", 0, 0.5, "one"),
-                    _word(2, "seg-1", 0.5, 1.0, "two"),
-                    _word(3, "seg-1", 1.0, 1.5, "three"),
-                    _word(4, "seg-1", 1.5, 2.0, "four"),
-                    _word(5, "seg-1", 2.0, 2.5, "five"),
-                    _word(6, "seg-1", 2.5, 3.0, "six"),
-                ],
-            )
-        ],
+        _timeline(
+            [
+                _segment(
+                    1,
+                    0,
+                    6,
+                    "one two three four five six",
+                    words=[
+                        _word(1, "seg-1", 0, 0.5, "one"),
+                        _word(2, "seg-1", 0.5, 1.0, "two"),
+                        _word(3, "seg-1", 1.0, 1.5, "three"),
+                        _word(4, "seg-1", 1.5, 2.0, "four"),
+                        _word(5, "seg-1", 2.0, 2.5, "five"),
+                        _word(6, "seg-1", 2.5, 3.0, "six"),
+                    ],
+                )
+            ]
+        ),
         max_unit_duration=30,
         pause_boundary_seconds=2,
         target_unit_duration=30,
@@ -74,22 +83,24 @@ def test_build_word_chapter_units_groups_words_by_budget() -> None:
 
 def test_build_word_chapter_units_waits_for_sentence_hint_after_target() -> None:
     units = build_word_chapter_units(
-        [
-            _segment(
-                1,
-                0,
-                6,
-                "one two three four five six.",
-                words=[
-                    _word(1, "seg-1", 0, 0.5, "one"),
-                    _word(2, "seg-1", 0.5, 1.0, "two"),
-                    _word(3, "seg-1", 1.0, 1.5, "three"),
-                    _word(4, "seg-1", 1.5, 2.0, "four"),
-                    _word(5, "seg-1", 2.0, 2.5, "five"),
-                    _word(6, "seg-1", 2.5, 3.0, "six."),
-                ],
-            )
-        ],
+        _timeline(
+            [
+                _segment(
+                    1,
+                    0,
+                    6,
+                    "one two three four five six.",
+                    words=[
+                        _word(1, "seg-1", 0, 0.5, "one"),
+                        _word(2, "seg-1", 0.5, 1.0, "two"),
+                        _word(3, "seg-1", 1.0, 1.5, "three"),
+                        _word(4, "seg-1", 1.5, 2.0, "four"),
+                        _word(5, "seg-1", 2.0, 2.5, "five"),
+                        _word(6, "seg-1", 2.5, 3.0, "six."),
+                    ],
+                )
+            ]
+        ),
         max_unit_duration=30,
         pause_boundary_seconds=2,
         target_unit_duration=30,
@@ -103,24 +114,26 @@ def test_build_word_chapter_units_waits_for_sentence_hint_after_target() -> None
 
 def test_build_word_chapter_units_breaks_on_word_pause() -> None:
     units = build_word_chapter_units(
-        [
-            _segment(
-                1,
-                0,
-                8,
-                "hook setup detail context. next idea detail context",
-                words=[
-                    _word(1, "seg-1", 0, 0.5, "hook"),
-                    _word(2, "seg-1", 0.5, 1.0, "setup"),
-                    _word(3, "seg-1", 1.0, 1.5, "detail"),
-                    _word(4, "seg-1", 1.5, 2.0, "context."),
-                    _word(5, "seg-1", 5.0, 5.5, "next"),
-                    _word(6, "seg-1", 5.5, 6.0, "idea"),
-                    _word(7, "seg-1", 6.0, 6.5, "detail"),
-                    _word(8, "seg-1", 6.5, 7.0, "context"),
-                ],
-            )
-        ],
+        _timeline(
+            [
+                _segment(
+                    1,
+                    0,
+                    8,
+                    "hook setup detail context. next idea detail context",
+                    words=[
+                        _word(1, "seg-1", 0, 0.5, "hook"),
+                        _word(2, "seg-1", 0.5, 1.0, "setup"),
+                        _word(3, "seg-1", 1.0, 1.5, "detail"),
+                        _word(4, "seg-1", 1.5, 2.0, "context."),
+                        _word(5, "seg-1", 5.0, 5.5, "next"),
+                        _word(6, "seg-1", 5.5, 6.0, "idea"),
+                        _word(7, "seg-1", 6.0, 6.5, "detail"),
+                        _word(8, "seg-1", 6.5, 7.0, "context"),
+                    ],
+                )
+            ]
+        ),
         max_unit_duration=30,
         pause_boundary_seconds=2,
         target_unit_duration=30,
@@ -138,21 +151,23 @@ def test_build_word_chapter_units_breaks_on_word_pause() -> None:
 
 def test_build_word_chapter_units_keeps_pause_split_micro_unit() -> None:
     units = build_word_chapter_units(
-        [
-            _segment(
-                1,
-                0,
-                10,
-                "OK. next idea has context",
-                words=[
-                    _word(1, "seg-1", 0, 0.4, "OK."),
-                    _word(2, "seg-1", 6.0, 6.4, "next"),
-                    _word(3, "seg-1", 6.4, 6.8, "idea"),
-                    _word(4, "seg-1", 6.8, 7.2, "has"),
-                    _word(5, "seg-1", 7.2, 7.6, "context"),
-                ],
-            )
-        ],
+        _timeline(
+            [
+                _segment(
+                    1,
+                    0,
+                    10,
+                    "OK. next idea has context",
+                    words=[
+                        _word(1, "seg-1", 0, 0.4, "OK."),
+                        _word(2, "seg-1", 6.0, 6.4, "next"),
+                        _word(3, "seg-1", 6.4, 6.8, "idea"),
+                        _word(4, "seg-1", 6.8, 7.2, "has"),
+                        _word(5, "seg-1", 7.2, 7.6, "context"),
+                    ],
+                )
+            ]
+        ),
         max_unit_duration=30,
         pause_boundary_seconds=1,
         target_unit_duration=30,
@@ -166,22 +181,24 @@ def test_build_word_chapter_units_keeps_pause_split_micro_unit() -> None:
 
 def test_build_word_chapter_units_keeps_final_micro_unit() -> None:
     units = build_word_chapter_units(
-        [
-            _segment(
-                1,
-                0,
-                6,
-                "main topic has enough context Thanks.",
-                words=[
-                    _word(1, "seg-1", 0, 0.5, "main"),
-                    _word(2, "seg-1", 0.5, 1.0, "topic"),
-                    _word(3, "seg-1", 1.0, 1.5, "has"),
-                    _word(4, "seg-1", 1.5, 2.0, "enough"),
-                    _word(5, "seg-1", 2.0, 2.5, "context"),
-                    _word(6, "seg-1", 4.0, 4.4, "Thanks."),
-                ],
-            )
-        ],
+        _timeline(
+            [
+                _segment(
+                    1,
+                    0,
+                    6,
+                    "main topic has enough context Thanks.",
+                    words=[
+                        _word(1, "seg-1", 0, 0.5, "main"),
+                        _word(2, "seg-1", 0.5, 1.0, "topic"),
+                        _word(3, "seg-1", 1.0, 1.5, "has"),
+                        _word(4, "seg-1", 1.5, 2.0, "enough"),
+                        _word(5, "seg-1", 2.0, 2.5, "context"),
+                        _word(6, "seg-1", 4.0, 4.4, "Thanks."),
+                    ],
+                )
+            ]
+        ),
         max_unit_duration=30,
         pause_boundary_seconds=1,
         target_unit_duration=30,
@@ -198,28 +215,30 @@ def test_build_word_chapter_units_keeps_final_micro_unit() -> None:
 
 def test_build_word_chapter_units_preserves_ordered_segment_ids() -> None:
     units = build_word_chapter_units(
-        [
-            _segment(
-                1,
-                0,
-                2,
-                "first part",
-                words=[
-                    _word(1, "seg-1", 0, 0.5, "first"),
-                    _word(2, "seg-1", 0.5, 1.0, "part"),
-                ],
-            ),
-            _segment(
-                2,
-                2,
-                4,
-                "second part",
-                words=[
-                    _word(3, "seg-2", 2.0, 2.5, "second"),
-                    _word(4, "seg-2", 2.5, 3.0, "part"),
-                ],
-            ),
-        ],
+        _timeline(
+            [
+                _segment(
+                    1,
+                    0,
+                    2,
+                    "first part",
+                    words=[
+                        _word(1, "seg-1", 0, 0.5, "first"),
+                        _word(2, "seg-1", 0.5, 1.0, "part"),
+                    ],
+                ),
+                _segment(
+                    2,
+                    2,
+                    4,
+                    "second part",
+                    words=[
+                        _word(3, "seg-2", 2.0, 2.5, "second"),
+                        _word(4, "seg-2", 2.5, 3.0, "part"),
+                    ],
+                ),
+            ]
+        ),
         max_unit_duration=30,
         pause_boundary_seconds=2,
         target_unit_duration=30,
@@ -232,24 +251,58 @@ def test_build_word_chapter_units_preserves_ordered_segment_ids() -> None:
     assert units[0].segment_ids == ["seg-1", "seg-2"]
 
 
-def test_has_usable_word_timestamps_rejects_segment_only_input() -> None:
-    assert not has_usable_word_timestamps(
-        [_segment(1, 0, 2, "segment without word timestamps")]
-    )
-
-
-def test_has_usable_word_timestamps_rejects_words_without_identity() -> None:
-    assert not has_usable_word_timestamps(
+def test_build_word_chapter_units_accepts_precollected_timeline_words() -> None:
+    timeline_words = collect_timeline_words(
         [
             _segment(
                 1,
                 0,
                 2,
-                "words without identity",
+                "one two",
                 words=[
-                    _word(1, "", 0, 0.5, "missing-segment"),
-                    _word(2, "seg-1", 0.5, 1.0, "missing-word", word_id=""),
+                    _word(1, "seg-1", 0, 0.5, "one"),
+                    _word(2, "seg-1", 0.5, 1.0, "two"),
                 ],
             )
         ]
+    )
+
+    units = build_word_chapter_units(
+        timeline_words,
+        max_unit_duration=30,
+        pause_boundary_seconds=2,
+        target_unit_duration=30,
+        target_unit_words=10,
+        max_unit_words=20,
+        max_unit_chars=1200,
+    )
+
+    assert [unit.text for unit in units] == ["one two"]
+    assert units[0].segment_ids == ["seg-1"]
+
+
+def test_collect_timeline_words_rejects_segment_only_input() -> None:
+    assert (
+        collect_timeline_words([_segment(1, 0, 2, "segment without word timestamps")])
+        == []
+    )
+
+
+def test_collect_timeline_words_rejects_words_without_identity() -> None:
+    assert (
+        collect_timeline_words(
+            [
+                _segment(
+                    1,
+                    0,
+                    2,
+                    "words without identity",
+                    words=[
+                        _word(1, "", 0, 0.5, "missing-segment"),
+                        _word(2, "seg-1", 0.5, 1.0, "missing-word", word_id=""),
+                    ],
+                )
+            ]
+        )
+        == []
     )
