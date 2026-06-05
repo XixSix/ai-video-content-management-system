@@ -42,8 +42,9 @@ from app.workflows.chaptering.scores.valleys import detect_valley_candidates
 from app.workflows.chaptering.unit_repair import repair_micro_units
 from app.workflows.chaptering.windows import build_context_windows
 from app.workflows.chaptering.word_units import (
+    TimelineWord,
     build_word_chapter_units,
-    has_usable_word_timestamps,
+    collect_timeline_words,
 )
 
 Strategy = Literal["auto", "word", "segment"]
@@ -81,6 +82,7 @@ def main() -> None:
     parser.add_argument("--retention-max-limit", type=int, default=40)
     parser.add_argument("--retention-multiplier", type=int, default=4)
     parser.add_argument("--retention-top-score-fraction", type=float, default=0.60)
+    parser.add_argument("--repair-continuation-gap", type=float, default=0.05)
     parser.add_argument("--top", type=int, default=20)
     parser.add_argument(
         "--output-dir",
@@ -110,16 +112,22 @@ def main() -> None:
 def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     payload = json.loads(transcript_json.read_text(encoding="utf-8"))
     segments = _load_segments(payload, synthesize_ids=args.synthesize_ids)
-    strategy = _resolve_strategy(args.strategy, segments)
+    timeline_words = (
+        collect_timeline_words(segments) if args.strategy != "segment" else []
+    )
+    strategy = _resolve_strategy(args.strategy, timeline_words)
     duration = _media_duration(payload, segments)
     config = _pipeline_config(args, strategy=strategy)
     request = _request(payload, segments, duration=duration, args=args)
-    raw_units = _build_units(segments, strategy=strategy, config=config)
+    raw_units = _build_units(
+        segments,
+        strategy=strategy,
+        config=config,
+        timeline_words=timeline_words,
+    )
     units = repair_micro_units(
         raw_units,
-        max_unit_duration=config.max_unit_duration_seconds,
-        max_unit_words=config.max_unit_words,
-        max_unit_chars=config.max_unit_chars,
+        pause_boundary_seconds=config.pause_boundary_seconds,
         config=config.unit_repair,
     )
 
@@ -429,12 +437,12 @@ def _candidate_table(candidates: list[ChapterCandidate]) -> str:
 
 def _resolve_strategy(
     strategy: Strategy,
-    segments: list[ChapteringTranscriptSegment],
+    timeline_words: list[TimelineWord],
 ) -> Literal["word", "segment"]:
     if strategy == "segment":
         return "segment"
 
-    if strategy == "word" or has_usable_word_timestamps(segments):
+    if strategy == "word" or timeline_words:
         return "word"
 
     return "segment"
@@ -445,10 +453,11 @@ def _build_units(
     *,
     strategy: str,
     config: ChapteringPipelineConfig,
+    timeline_words: list[TimelineWord],
 ) -> list[ChapterUnit]:
     if strategy == "word":
         return build_word_chapter_units(
-            segments,
+            timeline_words,
             max_unit_duration=config.max_unit_duration_seconds,
             pause_boundary_seconds=config.pause_boundary_seconds,
             target_unit_duration=config.target_unit_duration_seconds,
@@ -512,6 +521,7 @@ def _pipeline_config(
             min_words=8,
             fragment_max_words=2,
             sparse_duration_seconds=6.0,
+            continuation_gap_seconds=args.repair_continuation_gap,
         ),
     )
 

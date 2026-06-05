@@ -91,6 +91,10 @@ class Settings(BaseSettings):
         default=6.0,
         alias="CHAPTERING_UNIT_REPAIR_SPARSE_DURATION_SECONDS",
     )
+    chaptering_unit_repair_continuation_gap_seconds: PositiveFloat = Field(
+        default=0.05,
+        alias="CHAPTERING_UNIT_REPAIR_CONTINUATION_GAP_SECONDS",
+    )
     chaptering_context_window_seconds: PositiveFloat = Field(
         default=90.0,
         alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",

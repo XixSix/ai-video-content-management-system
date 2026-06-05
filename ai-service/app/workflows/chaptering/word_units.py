@@ -20,7 +20,7 @@ class TimelineWord:
 
 
 def build_word_chapter_units(
-    segments: list[ChapteringTranscriptSegment],
+    timeline_words: list[TimelineWord],
     *,
     max_unit_duration: float,
     pause_boundary_seconds: float,
@@ -33,16 +33,14 @@ def build_word_chapter_units(
     """Build timeline units from word-level timestamps.
 
     The word strategy has three steps:
-    1. Normalize valid word timestamps into a flat timeline.
-    2. Run Punkt once over the full word stream to annotate sentence ends.
-    3. Group words into units using sentence hints and timeline budgets.
+    1. Run Punkt once over the full word stream to annotate sentence ends.
+    2. Group words into units using sentence hints and timeline budgets.
 
     Notes:
-        The builder does not interpolate timestamps or invent missing word
-        metadata. If no valid word timestamps are available, callers should fall
-        back to segment-based units.
+        The builder expects callers to pass pre-collected timeline words. It
+        does not interpolate timestamps, invent missing word metadata, or
+        decide segment-pipeline fallback.
     """
-    timeline_words = _collect_timeline_words(segments)
     sentence_words = _annotate_sentence_boundaries(
         timeline_words,
         sentence_tokenizer=sentence_tokenizer or PunktSentenceTokenizer(),
@@ -58,12 +56,7 @@ def build_word_chapter_units(
     )
 
 
-def has_usable_word_timestamps(segments: list[ChapteringTranscriptSegment]) -> bool:
-    """Return true when at least one valid word timestamp can enter the timeline."""
-    return bool(_collect_timeline_words(segments))
-
-
-def _collect_timeline_words(
+def collect_timeline_words(
     segments: list[ChapteringTranscriptSegment],
 ) -> list[TimelineWord]:
     """Collect valid transcript words into a timestamp-sorted timeline.

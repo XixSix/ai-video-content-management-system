@@ -185,6 +185,7 @@ class UnitRepairConfig:
     min_words: int
     fragment_max_words: int
     sparse_duration_seconds: float
+    continuation_gap_seconds: float
 
 
 @dataclass(frozen=True)

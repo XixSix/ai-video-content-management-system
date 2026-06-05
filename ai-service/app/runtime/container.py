@@ -122,6 +122,9 @@ def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineC
             sparse_duration_seconds=(
                 settings.chaptering_unit_repair_sparse_duration_seconds
             ),
+            continuation_gap_seconds=(
+                settings.chaptering_unit_repair_continuation_gap_seconds
+            ),
         ),
     )
 

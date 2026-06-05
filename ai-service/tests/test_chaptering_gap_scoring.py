@@ -516,6 +516,7 @@ def _pipeline_config(
             min_words=8,
             fragment_max_words=2,
             sparse_duration_seconds=6.0,
+            continuation_gap_seconds=0.05,
         ),
     )
 
