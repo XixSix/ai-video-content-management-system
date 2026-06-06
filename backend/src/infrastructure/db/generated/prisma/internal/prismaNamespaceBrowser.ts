@@ -57,6 +57,7 @@ export const ModelName = {
   ProcessingJob: 'ProcessingJob',
   Transcript: 'Transcript',
   TranscriptSegment: 'TranscriptSegment',
+  TranscriptWord: 'TranscriptWord',
   VideoChapter: 'VideoChapter',
   ClipCandidate: 'ClipCandidate',
   ShortClip: 'ShortClip',
@@ -202,6 +203,25 @@ export const TranscriptSegmentScalarFieldEnum = {
 } as const
 
 export type TranscriptSegmentScalarFieldEnum = (typeof TranscriptSegmentScalarFieldEnum)[keyof typeof TranscriptSegmentScalarFieldEnum]
+
+
+export const TranscriptWordScalarFieldEnum = {
+  id: 'id',
+  transcriptId: 'transcriptId',
+  segmentId: 'segmentId',
+  mediaId: 'mediaId',
+  wordIndex: 'wordIndex',
+  segmentWordIndex: 'segmentWordIndex',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  text: 'text',
+  cleanText: 'cleanText',
+  confidence: 'confidence',
+  speakerLabel: 'speakerLabel',
+  createdAt: 'createdAt'
+} as const
+
+export type TranscriptWordScalarFieldEnum = (typeof TranscriptWordScalarFieldEnum)[keyof typeof TranscriptWordScalarFieldEnum]
 
 
 export const VideoChapterScalarFieldEnum = {
