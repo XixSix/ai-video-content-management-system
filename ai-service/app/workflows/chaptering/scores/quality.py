@@ -1,4 +1,5 @@
 from app.workflows.chaptering.scores.common import clamp_score
+from app.workflows.chaptering.scores.normalize import content_char_count
 
 
 def boundary_quality_score(
@@ -11,4 +12,8 @@ def boundary_quality_score(
     if min_context_text_chars <= 0:
         return 0.0
 
-    return clamp_score(min(len(left_text), len(right_text)) / min_context_text_chars)
+    shorter_context_chars = min(
+        content_char_count(left_text),
+        content_char_count(right_text),
+    )
+    return clamp_score(shorter_context_chars / min_context_text_chars)

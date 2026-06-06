@@ -371,6 +371,7 @@ def _chapter_lines(chapters: list) -> list[str]:
         lines.append(
             f"- `{chapter.index}` `{chapter.start_seconds:.2f}-{chapter.end_seconds:.2f}` "
             f"score=`{chapter.score}` semantic=`{scores.semantic_shift_score}` "
+            f"semantic_cohesion=`{scores.semantic_cohesion_score}` "
             f"lexical=`{scores.lexical_shift_score}` valley=`{scores.valley_depth_score}` "
             f"pause=`{scores.pause_score}` quality=`{scores.boundary_quality_score}`"
         )
@@ -396,15 +397,16 @@ def _gap_table(gaps: list[ChapterGapScore]) -> str:
         return "_none_"
 
     rows = [
-        "| time | combined | lexical_cohesion | lexical_shift | semantic_shift | valley | marker | pause | quality | duration | text |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| time | combined | lexical_cohesion | lexical_shift | semantic_shift | semantic_cohesion | valley | marker | pause | quality | duration | text |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for gap in gaps:
         text = _compact_text(gap.right_text or gap.left_text, limit=110)
         rows.append(
             f"| {gap.time:.2f} | {gap.combined_score:.4f} | "
             f"{gap.lexical_cohesion_score:.4f} | {gap.lexical_shift_score:.4f} | "
-            f"{gap.semantic_shift_score:.4f} | {gap.valley_depth_score:.4f} | "
+            f"{gap.semantic_shift_score:.4f} | {gap.semantic_cohesion_score:.4f} | "
+            f"{gap.valley_depth_score:.4f} | "
             f"{gap.discourse_marker_score:.4f} | {gap.pause_score:.4f} | "
             f"{gap.boundary_quality_score:.4f} | {gap.duration_sanity_score:.4f} | "
             f"{text} |"
@@ -418,13 +420,14 @@ def _candidate_table(candidates: list[ChapterCandidate]) -> str:
         return "_none_"
 
     rows = [
-        "| time | candidate | cheap | semantic | lexical | valley | marker | pause | quality | duration |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| time | candidate | cheap | semantic_shift | semantic_cohesion | lexical | valley | marker | pause | quality | duration |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for candidate in candidates:
         rows.append(
             f"| {candidate.time:.2f} | {candidate.candidate_score:.4f} | "
             f"{candidate.cheap_score:.4f} | {candidate.semantic_shift_score:.4f} | "
+            f"{candidate.semantic_cohesion_score:.4f} | "
             f"{candidate.lexical_shift_score:.4f} | "
             f"{candidate.valley_depth_score:.4f} | "
             f"{candidate.discourse_marker_score:.4f} | {candidate.pause_score:.4f} | "

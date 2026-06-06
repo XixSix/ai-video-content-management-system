@@ -57,6 +57,7 @@ class ChapterBoundaryScores(BaseModel):
     score: float | None = None
     boundary_score: float | None = None
     semantic_shift_score: float | None = None
+    semantic_cohesion_score: float | None = None
     lexical_shift_score: float | None = None
     valley_depth_score: float | None = None
     discourse_marker_score: float | None = None

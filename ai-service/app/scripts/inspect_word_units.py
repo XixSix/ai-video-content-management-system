@@ -15,7 +15,7 @@ from app.workflows.chaptering.word_units import (
     collect_timeline_words,
 )
 
-WORD_RE = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")
+WORD_RE = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")  # Debug ASCII words.
 TERMINAL_PUNCTUATION = (".", "!", "?")
 
 
@@ -173,7 +173,7 @@ def _inspect_units(
     rows: list[UnitInspectRow] = []
     for index, unit in enumerate(units):
         duration = unit.end_time - unit.start_time
-        word_count = len(WORD_RE.findall(unit.text))
+        word_count = len(WORD_RE.findall(unit.text))  # Debug word-like count.
         pause_before = (
             unit.start_time - units[index - 1].end_time if index > 0 else None
         )

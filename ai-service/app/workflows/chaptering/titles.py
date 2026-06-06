@@ -1,6 +1,7 @@
 import re
 
 from app.schemas.chaptering import ChapteringTranscriptSegment
+from app.workflows.chaptering.scores.normalize import collapse_whitespace
 
 TITLE_MAX_LENGTH = 80
 SUMMARY_MAX_LENGTH = 180
@@ -15,7 +16,7 @@ def chapter_text(segments: list[ChapteringTranscriptSegment]) -> str:
 
 def chapter_title(text: str, index: int) -> str:
     """Build a stable fallback title from the first meaningful sentence."""
-    cleaned = re.sub(r"\s+", " ", text).strip()
+    cleaned = collapse_whitespace(text)
     if not cleaned:
         return f"Part {index}"
 
@@ -30,7 +31,7 @@ def chapter_title(text: str, index: int) -> str:
 
 def chapter_summary(text: str) -> str | None:
     """Build a deterministic short summary from chapter text."""
-    cleaned = re.sub(r"\s+", " ", text).strip()
+    cleaned = collapse_whitespace(text)
     if not cleaned:
         return None
 

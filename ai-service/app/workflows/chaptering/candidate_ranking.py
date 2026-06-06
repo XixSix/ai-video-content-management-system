@@ -46,8 +46,16 @@ def _score_candidate(
     candidate: ChapterCandidate,
     semantic_shift_scores_by_time: dict[float, float],
 ) -> ChapterCandidate:
-    semantic_shift_score = clamp_score(
-        semantic_shift_scores_by_time.get(candidate.time, 0.0)
+    semantic_scores_available = candidate.time in semantic_shift_scores_by_time
+    semantic_shift_score = (
+        clamp_score(semantic_shift_scores_by_time.get(candidate.time, 0.0))
+        if semantic_scores_available
+        else candidate.semantic_shift_score
+    )
+    semantic_cohesion_score = (
+        clamp_score(1.0 - semantic_shift_score)
+        if semantic_scores_available
+        else candidate.semantic_cohesion_score
     )
     candidate_score = (
         0.35 * candidate.valley_depth_score
@@ -61,6 +69,7 @@ def _score_candidate(
     return replace(
         candidate,
         semantic_shift_score=round(semantic_shift_score, 4),
+        semantic_cohesion_score=round(semantic_cohesion_score, 4),
         candidate_score=round(clamp_score(candidate_score), 4),
     )
 

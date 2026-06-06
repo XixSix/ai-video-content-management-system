@@ -1,4 +1,4 @@
-import re
+from app.workflows.chaptering.scores.normalize import lowercase_collapse_whitespace
 
 TRANSITION_MARKER_SCORES = (
     ("so the next part", 1.0),
@@ -21,7 +21,7 @@ TRANSITION_MARKER_SCORES = (
 
 def transition_marker_score(text: str) -> float:
     """Return weighted transition marker strength for text starts."""
-    normalized = re.sub(r"\s+", " ", text.strip().lower())
+    normalized = lowercase_collapse_whitespace(text)
     matching_scores = [
         score
         for marker, score in TRANSITION_MARKER_SCORES

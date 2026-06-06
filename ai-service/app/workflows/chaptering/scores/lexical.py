@@ -5,10 +5,11 @@ from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
 
 from app.workflows.chaptering.scores.common import clamp_score
+from app.workflows.chaptering.scores.normalize import lemmatize_token, stem_token
 from app.workflows.chaptering.scores.scoring import cosine_similarity
 
 CONTENT_POS_PREFIXES = ("NN", "VB", "JJ")
-TOKEN_RE = re.compile(r"[a-z0-9]+(?:'[a-z0-9]+)?")
+TOKEN_RE = re.compile(r"[a-z0-9]+(?:'[a-z0-9]+)?")  # ASCII word/number token.
 
 
 def lexical_cohesion_score(left_text: str, right_text: str) -> float:
@@ -42,7 +43,7 @@ def _content_word_counts(text: str) -> Counter[str]:
     tagged_tokens = pos_tag(raw_tokens)
     content_words: list[str] = []
     for token, tag in tagged_tokens:
-        normalized_token = token.lower()
+        normalized_token = stem_token(lemmatize_token(token, pos_tag=tag))
         if tag.startswith(CONTENT_POS_PREFIXES) and TOKEN_RE.fullmatch(
             normalized_token
         ):

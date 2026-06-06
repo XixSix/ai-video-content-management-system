@@ -1,10 +1,10 @@
-import re
 from dataclasses import dataclass
 
 from nltk.tokenize.punkt import PunktSentenceTokenizer
 
 from app.schemas.chaptering import ChapteringTranscriptSegment, ChapteringTranscriptWord
 from app.workflows.chaptering.schemas import ChapterUnit
+from app.workflows.chaptering.scores.normalize import collapse_whitespace
 
 
 @dataclass(frozen=True)
@@ -372,10 +372,8 @@ def _unique_segment_ids(words: list[TimelineWord]) -> list[str]:
 
 
 def _join_text(words: list[TimelineWord]) -> str:
-    """Join word text with normalized whitespace."""
-    return _normalize_text(" ".join(word.text for word in words if word.text.strip()))
+    """Join word text and collapse repeated whitespace."""
+    raw_text = " ".join(word.text for word in words if word.text.strip())
 
+    return collapse_whitespace(raw_text)
 
-def _normalize_text(text: str) -> str:
-    """Collapse repeated whitespace."""
-    return re.sub(r"\s+", " ", text).strip()

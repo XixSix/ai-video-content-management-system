@@ -237,6 +237,7 @@ def _map_scores(
         score=scores.score or 0.0,
         boundary_score=scores.boundary_score or 0.0,
         semantic_shift_score=scores.semantic_shift_score or 0.0,
+        semantic_cohesion_score=scores.semantic_cohesion_score or 0.0,
         lexical_shift_score=scores.lexical_shift_score or 0.0,
         valley_depth_score=scores.valley_depth_score or 0.0,
         discourse_marker_score=scores.discourse_marker_score or 0.0,

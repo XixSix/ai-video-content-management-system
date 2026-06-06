@@ -64,18 +64,17 @@ def attach_semantic_shift_scores(
     gap_scores: list[ChapterGapScore],
     semantic_shift_scores_by_time: dict[float, float],
 ) -> list[ChapterGapScore]:
-    """Return gap scores with optional semantic shift folded into metadata."""
+    """Return gap scores with optional semantic scores folded into metadata."""
     if not semantic_shift_scores_by_time:
         return gap_scores
 
     return [
-        replace(
+        _with_semantic_scores(
             gap_score,
-            semantic_shift_score=round(
-                clamp_score(semantic_shift_scores_by_time.get(gap_score.time, 0.0)),
-                4,
-            ),
+            semantic_shift_scores_by_time[gap_score.time],
         )
+        if gap_score.time in semantic_shift_scores_by_time
+        else gap_score
         for gap_score in gap_scores
     ]
 
@@ -92,6 +91,8 @@ def gap_scores_to_candidates(
             previous_unit_ids=gap_score.previous_unit_ids,
             next_unit_ids=gap_score.next_unit_ids,
             cheap_score=gap_score.combined_score,
+            semantic_shift_score=gap_score.semantic_shift_score,
+            semantic_cohesion_score=gap_score.semantic_cohesion_score,
             discourse_marker_score=gap_score.discourse_marker_score,
             pause_score=gap_score.pause_score,
             lexical_shift_score=gap_score.lexical_shift_score,
@@ -164,6 +165,20 @@ def _score_gap(
         boundary_quality_score=round(boundary_quality_score, 4),
         duration_sanity_score=round(duration_sanity_score, 4),
         combined_score=round(clamp_score(combined_score), 4),
+    )
+
+
+def _with_semantic_scores(
+    gap_score: ChapterGapScore,
+    semantic_shift_score: float,
+) -> ChapterGapScore:
+    semantic_shift_score = clamp_score(semantic_shift_score)
+    semantic_cohesion_score = clamp_score(1.0 - semantic_shift_score)
+
+    return replace(
+        gap_score,
+        semantic_shift_score=round(semantic_shift_score, 4),
+        semantic_cohesion_score=round(semantic_cohesion_score, 4),
     )
 
 

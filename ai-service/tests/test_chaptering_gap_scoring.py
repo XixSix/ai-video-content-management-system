@@ -13,6 +13,7 @@ from app.workflows.chaptering.scores.gap_scoring import (
     gap_scores_to_candidates,
     score_unit_gaps,
 )
+from app.workflows.chaptering.scores.quality import boundary_quality_score
 from app.workflows.chaptering.pipelines.shared import run_units_pipeline
 from app.workflows.chaptering.schemas import (
     BoundaryEvaluation,
@@ -75,6 +76,17 @@ def test_score_unit_gaps_scores_pause_marker_and_context_quality() -> None:
     assert gap.combined_score > 0
 
 
+def test_boundary_quality_score_ignores_whitespace() -> None:
+    assert (
+        boundary_quality_score(
+            "a b c",
+            "x  y\tz",
+            min_context_text_chars=5,
+        )
+        == 0.6
+    )
+
+
 def test_score_unit_gaps_filters_times_that_cannot_form_valid_chapters() -> None:
     gap_scores = score_unit_gaps(
         [
@@ -108,8 +120,11 @@ def test_semantic_scores_attach_to_gap_scores_without_changing_candidate_times()
     candidates = gap_scores_to_candidates(scored)
 
     assert scored[0].semantic_shift_score == 0.75
+    assert scored[0].semantic_cohesion_score == 0.25
     assert [candidate.time for candidate in candidates] == [10]
     assert candidates[0].cheap_score == scored[0].combined_score
+    assert candidates[0].semantic_shift_score == scored[0].semantic_shift_score
+    assert candidates[0].semantic_cohesion_score == scored[0].semantic_cohesion_score
 
 
 def test_units_pipeline_uses_scored_gap_candidate_times_without_embeddings() -> None:

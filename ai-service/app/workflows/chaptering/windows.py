@@ -3,6 +3,7 @@ from app.workflows.chaptering.schemas import (
     ChapterContextWindow,
     ChapterUnit,
 )
+from app.workflows.chaptering.scores.normalize import collapse_whitespace
 
 
 def build_context_windows(
@@ -71,4 +72,5 @@ def _units_after_candidate(
 
 def _join_unit_text(units: list[ChapterUnit]) -> str:
     """Join preferred unit text into a compact context string."""
-    return " ".join(unit.clean_text or unit.text for unit in units).strip()
+    raw_text = " ".join(unit.clean_text for unit in units)
+    return collapse_whitespace(raw_text)
