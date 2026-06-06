@@ -217,6 +217,7 @@ model Media {
   processingJobs     ProcessingJob[]
   transcripts        Transcript[]
   transcriptSegments TranscriptSegment[]
+  transcriptWords    TranscriptWord[]
   videoChapters      VideoChapter[]
   clipCandidates     ClipCandidate[]
   shortClips         ShortClip[]
@@ -299,6 +300,7 @@ model Transcript {
   job   ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
 
   segments        TranscriptSegment[]
+  words           TranscriptWord[]
   videoChapters   VideoChapter[]
   clipCandidates  ClipCandidate[]
   shortClips      ShortClip[]
@@ -330,11 +332,46 @@ model TranscriptSegment {
   transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
   media      Media      @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
+  words TranscriptWord[]
+
   @@unique([transcriptId, segmentIndex])
   @@index([transcriptId])
   @@index([mediaId])
   @@index([startTime, endTime])
   @@map("transcript_segments")
+}
+
+model TranscriptWord {
+  id           String @id @default(uuid()) @db.Uuid
+  transcriptId String @map("transcript_id") @db.Uuid
+  segmentId    String @map("segment_id") @db.Uuid
+  mediaId      String @map("media_id") @db.Uuid
+
+  wordIndex        Int @map("word_index")
+  segmentWordIndex Int @map("segment_word_index")
+
+  startTime Float @map("start_time")
+  endTime   Float @map("end_time")
+
+  text      String  @db.Text
+  cleanText String? @map("clean_text") @db.Text
+
+  confidence   Float?
+  speakerLabel String? @map("speaker_label") @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  transcript Transcript        @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  segment    TranscriptSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  media      Media             @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([transcriptId, wordIndex])
+  @@unique([segmentId, segmentWordIndex])
+  @@index([transcriptId])
+  @@index([segmentId])
+  @@index([mediaId])
+  @@index([startTime, endTime])
+  @@map("transcript_words")
 }
 
 model VideoChapter {

@@ -278,6 +278,7 @@ export type TranscriptSegmentWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"TranscriptSegment"> | Date | string
   transcript?: Prisma.XOR<Prisma.TranscriptScalarRelationFilter, Prisma.TranscriptWhereInput>
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
+  words?: Prisma.TranscriptWordListRelationFilter
 }
 
 export type TranscriptSegmentOrderByWithRelationInput = {
@@ -294,6 +295,7 @@ export type TranscriptSegmentOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   transcript?: Prisma.TranscriptOrderByWithRelationInput
   media?: Prisma.MediaOrderByWithRelationInput
+  words?: Prisma.TranscriptWordOrderByRelationAggregateInput
 }
 
 export type TranscriptSegmentWhereUniqueInput = Prisma.AtLeast<{
@@ -314,6 +316,7 @@ export type TranscriptSegmentWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"TranscriptSegment"> | Date | string
   transcript?: Prisma.XOR<Prisma.TranscriptScalarRelationFilter, Prisma.TranscriptWhereInput>
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
+  words?: Prisma.TranscriptWordListRelationFilter
 }, "id" | "transcriptId_segmentIndex">
 
 export type TranscriptSegmentOrderByWithAggregationInput = {
@@ -364,6 +367,7 @@ export type TranscriptSegmentCreateInput = {
   createdAt?: Date | string
   transcript: Prisma.TranscriptCreateNestedOneWithoutSegmentsInput
   media: Prisma.MediaCreateNestedOneWithoutTranscriptSegmentsInput
+  words?: Prisma.TranscriptWordCreateNestedManyWithoutSegmentInput
 }
 
 export type TranscriptSegmentUncheckedCreateInput = {
@@ -378,6 +382,7 @@ export type TranscriptSegmentUncheckedCreateInput = {
   confidence?: number | null
   speakerLabel?: string | null
   createdAt?: Date | string
+  words?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutSegmentInput
 }
 
 export type TranscriptSegmentUpdateInput = {
@@ -392,6 +397,7 @@ export type TranscriptSegmentUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutSegmentsNestedInput
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptSegmentsNestedInput
+  words?: Prisma.TranscriptWordUpdateManyWithoutSegmentNestedInput
 }
 
 export type TranscriptSegmentUncheckedUpdateInput = {
@@ -406,6 +412,7 @@ export type TranscriptSegmentUncheckedUpdateInput = {
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  words?: Prisma.TranscriptWordUncheckedUpdateManyWithoutSegmentNestedInput
 }
 
 export type TranscriptSegmentCreateManyInput = {
@@ -519,6 +526,11 @@ export type TranscriptSegmentSumOrderByAggregateInput = {
   confidence?: Prisma.SortOrder
 }
 
+export type TranscriptSegmentScalarRelationFilter = {
+  is?: Prisma.TranscriptSegmentWhereInput
+  isNot?: Prisma.TranscriptSegmentWhereInput
+}
+
 export type TranscriptSegmentCreateNestedManyWithoutMediaInput = {
   create?: Prisma.XOR<Prisma.TranscriptSegmentCreateWithoutMediaInput, Prisma.TranscriptSegmentUncheckedCreateWithoutMediaInput> | Prisma.TranscriptSegmentCreateWithoutMediaInput[] | Prisma.TranscriptSegmentUncheckedCreateWithoutMediaInput[]
   connectOrCreate?: Prisma.TranscriptSegmentCreateOrConnectWithoutMediaInput | Prisma.TranscriptSegmentCreateOrConnectWithoutMediaInput[]
@@ -611,6 +623,20 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type TranscriptSegmentCreateNestedOneWithoutWordsInput = {
+  create?: Prisma.XOR<Prisma.TranscriptSegmentCreateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedCreateWithoutWordsInput>
+  connectOrCreate?: Prisma.TranscriptSegmentCreateOrConnectWithoutWordsInput
+  connect?: Prisma.TranscriptSegmentWhereUniqueInput
+}
+
+export type TranscriptSegmentUpdateOneRequiredWithoutWordsNestedInput = {
+  create?: Prisma.XOR<Prisma.TranscriptSegmentCreateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedCreateWithoutWordsInput>
+  connectOrCreate?: Prisma.TranscriptSegmentCreateOrConnectWithoutWordsInput
+  upsert?: Prisma.TranscriptSegmentUpsertWithoutWordsInput
+  connect?: Prisma.TranscriptSegmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TranscriptSegmentUpdateToOneWithWhereWithoutWordsInput, Prisma.TranscriptSegmentUpdateWithoutWordsInput>, Prisma.TranscriptSegmentUncheckedUpdateWithoutWordsInput>
+}
+
 export type TranscriptSegmentCreateWithoutMediaInput = {
   id?: string
   segmentIndex: number
@@ -622,6 +648,7 @@ export type TranscriptSegmentCreateWithoutMediaInput = {
   speakerLabel?: string | null
   createdAt?: Date | string
   transcript: Prisma.TranscriptCreateNestedOneWithoutSegmentsInput
+  words?: Prisma.TranscriptWordCreateNestedManyWithoutSegmentInput
 }
 
 export type TranscriptSegmentUncheckedCreateWithoutMediaInput = {
@@ -635,6 +662,7 @@ export type TranscriptSegmentUncheckedCreateWithoutMediaInput = {
   confidence?: number | null
   speakerLabel?: string | null
   createdAt?: Date | string
+  words?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutSegmentInput
 }
 
 export type TranscriptSegmentCreateOrConnectWithoutMediaInput = {
@@ -691,6 +719,7 @@ export type TranscriptSegmentCreateWithoutTranscriptInput = {
   speakerLabel?: string | null
   createdAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptSegmentsInput
+  words?: Prisma.TranscriptWordCreateNestedManyWithoutSegmentInput
 }
 
 export type TranscriptSegmentUncheckedCreateWithoutTranscriptInput = {
@@ -704,6 +733,7 @@ export type TranscriptSegmentUncheckedCreateWithoutTranscriptInput = {
   confidence?: number | null
   speakerLabel?: string | null
   createdAt?: Date | string
+  words?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutSegmentInput
 }
 
 export type TranscriptSegmentCreateOrConnectWithoutTranscriptInput = {
@@ -732,6 +762,78 @@ export type TranscriptSegmentUpdateManyWithWhereWithoutTranscriptInput = {
   data: Prisma.XOR<Prisma.TranscriptSegmentUpdateManyMutationInput, Prisma.TranscriptSegmentUncheckedUpdateManyWithoutTranscriptInput>
 }
 
+export type TranscriptSegmentCreateWithoutWordsInput = {
+  id?: string
+  segmentIndex: number
+  startTime: number
+  endTime: number
+  text: string
+  cleanText?: string | null
+  confidence?: number | null
+  speakerLabel?: string | null
+  createdAt?: Date | string
+  transcript: Prisma.TranscriptCreateNestedOneWithoutSegmentsInput
+  media: Prisma.MediaCreateNestedOneWithoutTranscriptSegmentsInput
+}
+
+export type TranscriptSegmentUncheckedCreateWithoutWordsInput = {
+  id?: string
+  transcriptId: string
+  mediaId: string
+  segmentIndex: number
+  startTime: number
+  endTime: number
+  text: string
+  cleanText?: string | null
+  confidence?: number | null
+  speakerLabel?: string | null
+  createdAt?: Date | string
+}
+
+export type TranscriptSegmentCreateOrConnectWithoutWordsInput = {
+  where: Prisma.TranscriptSegmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.TranscriptSegmentCreateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedCreateWithoutWordsInput>
+}
+
+export type TranscriptSegmentUpsertWithoutWordsInput = {
+  update: Prisma.XOR<Prisma.TranscriptSegmentUpdateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedUpdateWithoutWordsInput>
+  create: Prisma.XOR<Prisma.TranscriptSegmentCreateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedCreateWithoutWordsInput>
+  where?: Prisma.TranscriptSegmentWhereInput
+}
+
+export type TranscriptSegmentUpdateToOneWithWhereWithoutWordsInput = {
+  where?: Prisma.TranscriptSegmentWhereInput
+  data: Prisma.XOR<Prisma.TranscriptSegmentUpdateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedUpdateWithoutWordsInput>
+}
+
+export type TranscriptSegmentUpdateWithoutWordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  segmentIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  cleanText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transcript?: Prisma.TranscriptUpdateOneRequiredWithoutSegmentsNestedInput
+  media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptSegmentsNestedInput
+}
+
+export type TranscriptSegmentUncheckedUpdateWithoutWordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  segmentIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  cleanText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type TranscriptSegmentCreateManyMediaInput = {
   id?: string
   transcriptId: string
@@ -756,6 +858,7 @@ export type TranscriptSegmentUpdateWithoutMediaInput = {
   speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutSegmentsNestedInput
+  words?: Prisma.TranscriptWordUpdateManyWithoutSegmentNestedInput
 }
 
 export type TranscriptSegmentUncheckedUpdateWithoutMediaInput = {
@@ -769,6 +872,7 @@ export type TranscriptSegmentUncheckedUpdateWithoutMediaInput = {
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  words?: Prisma.TranscriptWordUncheckedUpdateManyWithoutSegmentNestedInput
 }
 
 export type TranscriptSegmentUncheckedUpdateManyWithoutMediaInput = {
@@ -808,6 +912,7 @@ export type TranscriptSegmentUpdateWithoutTranscriptInput = {
   speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptSegmentsNestedInput
+  words?: Prisma.TranscriptWordUpdateManyWithoutSegmentNestedInput
 }
 
 export type TranscriptSegmentUncheckedUpdateWithoutTranscriptInput = {
@@ -821,6 +926,7 @@ export type TranscriptSegmentUncheckedUpdateWithoutTranscriptInput = {
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   speakerLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  words?: Prisma.TranscriptWordUncheckedUpdateManyWithoutSegmentNestedInput
 }
 
 export type TranscriptSegmentUncheckedUpdateManyWithoutTranscriptInput = {
@@ -837,6 +943,35 @@ export type TranscriptSegmentUncheckedUpdateManyWithoutTranscriptInput = {
 }
 
 
+/**
+ * Count Type TranscriptSegmentCountOutputType
+ */
+
+export type TranscriptSegmentCountOutputType = {
+  words: number
+}
+
+export type TranscriptSegmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  words?: boolean | TranscriptSegmentCountOutputTypeCountWordsArgs
+}
+
+/**
+ * TranscriptSegmentCountOutputType without action
+ */
+export type TranscriptSegmentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TranscriptSegmentCountOutputType
+   */
+  select?: Prisma.TranscriptSegmentCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * TranscriptSegmentCountOutputType without action
+ */
+export type TranscriptSegmentCountOutputTypeCountWordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TranscriptWordWhereInput
+}
+
 
 export type TranscriptSegmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -852,6 +987,8 @@ export type TranscriptSegmentSelect<ExtArgs extends runtime.Types.Extensions.Int
   createdAt?: boolean
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
+  words?: boolean | Prisma.TranscriptSegment$wordsArgs<ExtArgs>
+  _count?: boolean | Prisma.TranscriptSegmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["transcriptSegment"]>
 
 export type TranscriptSegmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -904,6 +1041,8 @@ export type TranscriptSegmentOmit<ExtArgs extends runtime.Types.Extensions.Inter
 export type TranscriptSegmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
+  words?: boolean | Prisma.TranscriptSegment$wordsArgs<ExtArgs>
+  _count?: boolean | Prisma.TranscriptSegmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TranscriptSegmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
@@ -919,6 +1058,7 @@ export type $TranscriptSegmentPayload<ExtArgs extends runtime.Types.Extensions.I
   objects: {
     transcript: Prisma.$TranscriptPayload<ExtArgs>
     media: Prisma.$MediaPayload<ExtArgs>
+    words: Prisma.$TranscriptWordPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1328,6 +1468,7 @@ export interface Prisma__TranscriptSegmentClient<T, Null = never, ExtArgs extend
   readonly [Symbol.toStringTag]: "PrismaPromise"
   transcript<T extends Prisma.TranscriptDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TranscriptDefaultArgs<ExtArgs>>): Prisma.Prisma__TranscriptClient<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   media<T extends Prisma.MediaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaDefaultArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  words<T extends Prisma.TranscriptSegment$wordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TranscriptSegment$wordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptWordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1766,6 +1907,30 @@ export type TranscriptSegmentDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many TranscriptSegments to delete.
    */
   limit?: number
+}
+
+/**
+ * TranscriptSegment.words
+ */
+export type TranscriptSegment$wordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TranscriptWord
+   */
+  select?: Prisma.TranscriptWordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TranscriptWord
+   */
+  omit?: Prisma.TranscriptWordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TranscriptWordInclude<ExtArgs> | null
+  where?: Prisma.TranscriptWordWhereInput
+  orderBy?: Prisma.TranscriptWordOrderByWithRelationInput | Prisma.TranscriptWordOrderByWithRelationInput[]
+  cursor?: Prisma.TranscriptWordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TranscriptWordScalarFieldEnum | Prisma.TranscriptWordScalarFieldEnum[]
 }
 
 /**
