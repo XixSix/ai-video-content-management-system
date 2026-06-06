@@ -54,6 +54,8 @@ class ChapterCandidate:
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
     lexical_shift_score: float = 0.0
+    lexical_valley_depth_score: float = 0.0
+    semantic_valley_depth_score: float = 0.0
     valley_depth_score: float = 0.0
     boundary_quality_score: float = 0.0
     duration_sanity_score: float = 0.0
@@ -126,6 +128,8 @@ class ChapterGapScore:
     lexical_shift_score: float = 0.0
     semantic_shift_score: float = 0.0
     semantic_cohesion_score: float = 0.0
+    lexical_valley_depth_score: float = 0.0
+    semantic_valley_depth_score: float = 0.0
     valley_depth_score: float = 0.0
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
@@ -162,7 +166,7 @@ class CandidateScoringConfig:
 
 @dataclass(frozen=True)
 class CandidateRetentionConfig:
-    """Store candidate retention tuning values for embedding cost control."""
+    """Store candidate retention tuning values for ranking and LLM review."""
 
     min_limit: int
     max_limit: int
@@ -177,6 +181,7 @@ class ValleyDetectionConfig:
     smoothing_radius: int
     peak_window: int
     min_valley_depth: float
+    semantic_weight: float
 
 
 @dataclass(frozen=True)

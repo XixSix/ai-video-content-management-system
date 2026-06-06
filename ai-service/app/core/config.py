@@ -172,6 +172,12 @@ class Settings(BaseSettings):
         ge=0.0,
         alias="CHAPTERING_VALLEY_MIN_DEPTH",
     )
+    chaptering_valley_semantic_weight: float = Field(
+        default=0.70,
+        ge=0.0,
+        le=1.0,
+        alias="CHAPTERING_VALLEY_SEMANTIC_WEIGHT",
+    )
 
     @property
     def bind_address(self) -> str:

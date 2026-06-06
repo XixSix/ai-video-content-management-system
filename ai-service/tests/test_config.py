@@ -19,6 +19,7 @@ def test_settings_use_chaptering_defaults() -> None:
     assert settings.chaptering_valley_smoothing_radius == 1
     assert settings.chaptering_valley_peak_window == 2
     assert settings.chaptering_valley_min_depth == 0.18
+    assert settings.chaptering_valley_semantic_weight == 0.70
 
 
 def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -64,6 +65,7 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("CHAPTERING_VALLEY_SMOOTHING_RADIUS", "2")
     monkeypatch.setenv("CHAPTERING_VALLEY_PEAK_WINDOW", "4")
     monkeypatch.setenv("CHAPTERING_VALLEY_MIN_DEPTH", "0.3")
+    monkeypatch.setenv("CHAPTERING_VALLEY_SEMANTIC_WEIGHT", "0.6")
 
     settings = Settings(_env_file=None)
 
@@ -110,6 +112,7 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.chaptering_valley_smoothing_radius == 2
     assert settings.chaptering_valley_peak_window == 4
     assert settings.chaptering_valley_min_depth == 0.3
+    assert settings.chaptering_valley_semantic_weight == 0.6
 
 
 def test_settings_reject_invalid_port(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -72,22 +72,23 @@ def score_boundary_candidates(
     ]
 
 
-def retain_candidates_for_embedding(
+def retain_candidates_for_boundary_review(
     candidates: list[ChapterCandidate],
     *,
     media_duration: float,
     target_chapter_duration: float,
     config: CandidateRetentionConfig,
 ) -> list[ChapterCandidate]:
-    """Keep a bounded candidate set for embedding and final selection.
+    """Keep a bounded candidate set for ranking and optional LLM review.
 
-    Retention keeps top cheap-score candidates and fills the remaining budget
-    with evenly distributed coverage candidates.
+    Retention keeps top valley-score candidates once valley detection has
+    produced candidates, falls back to cheap score otherwise, and fills the
+    remaining budget with evenly distributed coverage candidates.
     """
     if not candidates:
         return []
 
-    limit = _embedding_candidate_limit(
+    limit = _boundary_review_candidate_limit(
         media_duration=media_duration,
         target_chapter_duration=target_chapter_duration,
         config=config,
@@ -95,12 +96,16 @@ def retain_candidates_for_embedding(
     if len(candidates) <= limit:
         return candidates
 
+    use_valley_score = any(candidate.valley_depth_score > 0 for candidate in candidates)
     top_limit = max(1, math.ceil(limit * config.top_score_fraction))
     selected_by_time = {
         candidate.time: candidate
         for candidate in sorted(
             candidates,
-            key=lambda candidate: (-candidate.cheap_score, candidate.time),
+            key=lambda candidate: (
+                -_retention_score(candidate, use_valley_score=use_valley_score),
+                candidate.time,
+            ),
         )[:top_limit]
     }
 
@@ -110,13 +115,25 @@ def retain_candidates_for_embedding(
     if len(selected_by_time) < limit:
         for candidate in sorted(
             candidates,
-            key=lambda candidate: (-candidate.cheap_score, candidate.time),
+            key=lambda candidate: (
+                -_retention_score(candidate, use_valley_score=use_valley_score),
+                candidate.time,
+            ),
         ):
             selected_by_time.setdefault(candidate.time, candidate)
             if len(selected_by_time) >= limit:
                 break
 
     return sorted(selected_by_time.values(), key=lambda candidate: candidate.time)
+
+
+def _retention_score(
+    candidate: ChapterCandidate,
+    *,
+    use_valley_score: bool,
+) -> float:
+    """Return the score used to retain candidates before boundary review."""
+    return candidate.valley_depth_score if use_valley_score else candidate.cheap_score
 
 
 def _candidate_from_unit(
@@ -233,7 +250,7 @@ def _join_unit_text(units: Iterable[ChapterUnit]) -> str:
     ).strip()
 
 
-def _embedding_candidate_limit(
+def _boundary_review_candidate_limit(
     *,
     media_duration: float,
     target_chapter_duration: float,

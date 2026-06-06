@@ -106,6 +106,7 @@ def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineC
             smoothing_radius=settings.chaptering_valley_smoothing_radius,
             peak_window=settings.chaptering_valley_peak_window,
             min_valley_depth=settings.chaptering_valley_min_depth,
+            semantic_weight=settings.chaptering_valley_semantic_weight,
         ),
         retention=CandidateRetentionConfig(
             min_limit=settings.chaptering_embedding_candidate_min_limit,

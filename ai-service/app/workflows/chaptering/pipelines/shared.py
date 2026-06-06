@@ -6,7 +6,7 @@ from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
 from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
 from app.workflows.chaptering.candidates import (
-    retain_candidates_for_embedding,
+    retain_candidates_for_boundary_review,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
 from app.workflows.chaptering.llm_evaluation import apply_boundary_evaluations
@@ -73,7 +73,7 @@ def run_units_pipeline(
     )
     candidate_gap_scores = valley_gap_scores or gap_scores
     scored_candidates = gap_scores_to_candidates(candidate_gap_scores)
-    retained_candidates = retain_candidates_for_embedding(
+    retained_candidates = retain_candidates_for_boundary_review(
         scored_candidates,
         media_duration=duration,
         target_chapter_duration=options.target_chapter_duration_seconds,
@@ -81,7 +81,6 @@ def run_units_pipeline(
     )
     ranked_candidates = rank_boundary_candidates(
         retained_candidates,
-        semantic_shift_scores_by_time=semantic_shift_scores_by_time,
         max_chapters=options.max_chapters,
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
         config=config.retention,

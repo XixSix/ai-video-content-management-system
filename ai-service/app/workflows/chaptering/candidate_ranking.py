@@ -11,24 +11,20 @@ from app.workflows.chaptering.schemas import (
 def rank_boundary_candidates(
     candidates: list[ChapterCandidate],
     *,
-    semantic_shift_scores_by_time: dict[float, float],
     max_chapters: int,
     min_candidate_distance_seconds: float,
     config: CandidateRetentionConfig,
 ) -> list[ChapterCandidate]:
     """Score, dedupe, and retain final deterministic boundary candidates.
 
-    The ranking step folds optional semantic shift into retained candidates,
-    computes the Phase 5 candidate score, suppresses nearby duplicate boundary
-    times, and keeps both high-scoring and timeline-coverage candidates.
+    The ranking step computes the Phase 5 candidate score, suppresses nearby
+    duplicate boundary times, and keeps both high-scoring and timeline-coverage
+    candidates.
     """
     if not candidates:
         return []
 
-    scored_candidates = [
-        _score_candidate(candidate, semantic_shift_scores_by_time)
-        for candidate in candidates
-    ]
+    scored_candidates = [_score_candidate(candidate) for candidate in candidates]
     deduped_candidates = _suppress_nearby_candidates(
         scored_candidates,
         min_candidate_distance_seconds=min_candidate_distance_seconds,
@@ -42,34 +38,16 @@ def rank_boundary_candidates(
     return sorted(retained_candidates, key=lambda candidate: candidate.time)
 
 
-def _score_candidate(
-    candidate: ChapterCandidate,
-    semantic_shift_scores_by_time: dict[float, float],
-) -> ChapterCandidate:
-    semantic_scores_available = candidate.time in semantic_shift_scores_by_time
-    semantic_shift_score = (
-        clamp_score(semantic_shift_scores_by_time.get(candidate.time, 0.0))
-        if semantic_scores_available
-        else candidate.semantic_shift_score
-    )
-    semantic_cohesion_score = (
-        clamp_score(1.0 - semantic_shift_score)
-        if semantic_scores_available
-        else candidate.semantic_cohesion_score
-    )
+def _score_candidate(candidate: ChapterCandidate) -> ChapterCandidate:
     candidate_score = (
-        0.35 * candidate.valley_depth_score
-        + 0.30 * semantic_shift_score
-        + 0.15 * candidate.lexical_shift_score
+        candidate.valley_depth_score
         + 0.10 * candidate.discourse_marker_score
         + 0.05 * candidate.pause_score
-        + 0.05 * candidate.duration_sanity_score
+        - 0.10 * (1.0 - candidate.boundary_quality_score)
     )
 
     return replace(
         candidate,
-        semantic_shift_score=round(semantic_shift_score, 4),
-        semantic_cohesion_score=round(semantic_cohesion_score, 4),
         candidate_score=round(clamp_score(candidate_score), 4),
     )
 

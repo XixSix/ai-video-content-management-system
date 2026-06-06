@@ -519,6 +519,7 @@ def _pipeline_config(
             smoothing_radius=0,
             peak_window=2,
             min_valley_depth=min_valley_depth,
+            semantic_weight=0.70,
         ),
         retention=CandidateRetentionConfig(
             min_limit=12,

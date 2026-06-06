@@ -96,6 +96,8 @@ def gap_scores_to_candidates(
             discourse_marker_score=gap_score.discourse_marker_score,
             pause_score=gap_score.pause_score,
             lexical_shift_score=gap_score.lexical_shift_score,
+            lexical_valley_depth_score=gap_score.lexical_valley_depth_score,
+            semantic_valley_depth_score=gap_score.semantic_valley_depth_score,
             valley_depth_score=gap_score.valley_depth_score,
             boundary_quality_score=gap_score.boundary_quality_score,
             duration_sanity_score=gap_score.duration_sanity_score,
