@@ -1,10 +1,11 @@
 import re
 
 from app.workflows.chaptering.schemas import ChapterUnit, UnitRepairConfig
+from app.workflows.chaptering.scores.normalize import collapse_whitespace
 
 
 TERMINAL_PUNCTUATION = (".", "!", "?")
-TRANSITION_OPENER_RE = re.compile(
+TRANSITION_OPENER_RE = re.compile(  # Transition phrases at the start of a unit.
     r"^(?:"
     r"at(?:\s+number)?|"
     r"now|"
@@ -20,7 +21,7 @@ TRANSITION_OPENER_RE = re.compile(
     r")\b",
     re.IGNORECASE,
 )
-BACKCHANNEL_RE = re.compile(
+BACKCHANNEL_RE = re.compile(  # Standalone acknowledgements with low topic signal.
     r"^(?:ok(?:ay)?|yes|yeah|yep|no|nope|right|sure|correct|exactly|thanks?)"
     r"[\s.!?,]*$",
     re.IGNORECASE,
@@ -135,7 +136,7 @@ def _looks_like_leading_fragment(unit: ChapterUnit) -> bool:
 
 def _looks_like_transition_opener(unit: ChapterUnit) -> bool:
     """Return true for short transition markers that should prefix following text."""
-    text = _normalize_text(unit.text)
+    text = collapse_whitespace(unit.text)
     return bool(TRANSITION_OPENER_RE.match(text))
 
 
@@ -164,7 +165,7 @@ def _looks_like_previous_sentence_continuation(
 
 def _looks_like_backchannel(unit: ChapterUnit) -> bool:
     """Return true for standalone acknowledgements with low topic signal."""
-    text = _normalize_text(unit.text)
+    text = collapse_whitespace(unit.text)
     return bool(BACKCHANNEL_RE.match(text))
 
 
@@ -180,7 +181,7 @@ def _can_merge_units(
 
 def _merge_units(left: ChapterUnit, right: ChapterUnit) -> ChapterUnit:
     """Merge adjacent units while preserving source segment identity."""
-    text = _normalize_text(f"{left.text} {right.text}")
+    text = collapse_whitespace(f"{left.text} {right.text}")
     return ChapterUnit(
         unit_id=left.unit_id,
         start_time=left.start_time,
@@ -225,7 +226,7 @@ def _unit_duration(unit: ChapterUnit) -> float:
 
 
 def _unit_word_count(unit: ChapterUnit) -> int:
-    return len(re.findall(r"[^\W\d_]+", unit.text))
+    return len(re.findall(r"[^\W\d_]+", unit.text))  # Unicode letters only.
 
 
 def _gap_between(left: ChapterUnit, right: ChapterUnit) -> float:
@@ -235,6 +236,3 @@ def _gap_between(left: ChapterUnit, right: ChapterUnit) -> float:
 def _has_terminal_punctuation(unit: ChapterUnit) -> bool:
     return unit.text.rstrip().endswith(TERMINAL_PUNCTUATION)
 
-
-def _normalize_text(text: str) -> str:
-    return re.sub(r"\s+", " ", text).strip()

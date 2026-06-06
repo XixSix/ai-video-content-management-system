@@ -2,9 +2,10 @@ import re
 
 from app.schemas.chaptering import ChapteringTranscriptSegment
 from app.workflows.chaptering.schemas import ChapterUnit
+from app.workflows.chaptering.scores.normalize import collapse_whitespace
 
-SENTENCE_END_RE = re.compile(r"[.!?。！？…]['\")\]]*$")
-WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
+SENTENCE_END_RE = re.compile(r"[.!?。！？…]['\")\]]*$")  # Sentence-ending mark.
+WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)  # Unicode word chars except "_".
 
 
 def build_segment_chapter_units(
@@ -198,18 +199,13 @@ def _unit_from_segments(
     index: int,
     segments: list[ChapteringTranscriptSegment],
 ) -> ChapterUnit:
-    text = _join_text(segments)
     return ChapterUnit(
         unit_id=f"unit_{index + 1:04d}",
         start_time=segments[0].start_seconds,
         end_time=segments[-1].end_seconds,
-        text=text,
-        clean_text=_normalize_text(
-            " ".join(
-                (segment.clean_text or segment.text).strip()
-                for segment in segments
-                if (segment.clean_text or segment.text).strip()
-            )
+        text=_join_text(segments),
+        clean_text=collapse_whitespace(
+            " ".join(segment.clean_text or segment.text for segment in segments)
         ),
         segment_ids=[segment.segment_id for segment in segments],
     )
@@ -217,11 +213,7 @@ def _unit_from_segments(
 
 def _join_text(segments: list[ChapteringTranscriptSegment]) -> str:
     """Join raw segment text with normalized whitespace."""
-    return _normalize_text(
+    return collapse_whitespace(
         " ".join(segment.text.strip() for segment in segments if segment.text.strip())
     )
 
-
-def _normalize_text(text: str) -> str:
-    """Collapse repeated whitespace."""
-    return re.sub(r"\s+", " ", text).strip()

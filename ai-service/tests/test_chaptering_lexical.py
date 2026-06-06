@@ -1,6 +1,21 @@
 import pytest
 
 from app.workflows.chaptering.scores import lexical
+from app.workflows.chaptering.scores import normalize
+
+
+def test_normalize_stems_tokens() -> None:
+    assert normalize.stem_token("Running") == "run"
+
+
+def test_normalize_lemmatize_falls_back_when_wordnet_is_missing(monkeypatch) -> None:
+    class MissingWordNetLemmatizer:
+        def lemmatize(self, token: str, pos: str) -> str:
+            raise LookupError
+
+    monkeypatch.setattr(normalize, "_WORDNET_LEMMATIZER", MissingWordNetLemmatizer())
+
+    assert normalize.lemmatize_token("Running", pos_tag="VBG") == "running"
 
 
 def test_lexical_cohesion_prefers_nltk_word_tokenize(monkeypatch) -> None:
@@ -48,6 +63,21 @@ def test_lexical_cohesion_uses_nltk_pos_tags_for_content_words(monkeypatch) -> N
     )
 
     assert score == pytest.approx(0.5)
+
+
+def test_lexical_cohesion_stems_content_words(monkeypatch) -> None:
+    def fake_word_tokenize(text: str) -> list[str]:
+        return text.split()
+
+    def fake_pos_tag(tokens: list[str]) -> list[tuple[str, str]]:
+        return [(token, "VB") for token in tokens]
+
+    monkeypatch.setattr(lexical, "word_tokenize", fake_word_tokenize)
+    monkeypatch.setattr(lexical, "pos_tag", fake_pos_tag)
+
+    score = lexical.lexical_cohesion_score("uploads", "uploading")
+
+    assert score == pytest.approx(1.0)
 
 
 def test_lexical_cohesion_requires_nltk_tagger_data(
