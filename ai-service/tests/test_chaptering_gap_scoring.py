@@ -120,8 +120,11 @@ def test_semantic_scores_attach_to_gap_scores_without_changing_candidate_times()
     candidates = gap_scores_to_candidates(scored)
 
     assert scored[0].semantic_shift_score == 0.75
+    assert scored[0].semantic_cohesion_score == 0.25
     assert [candidate.time for candidate in candidates] == [10]
     assert candidates[0].cheap_score == scored[0].combined_score
+    assert candidates[0].semantic_shift_score == scored[0].semantic_shift_score
+    assert candidates[0].semantic_cohesion_score == scored[0].semantic_cohesion_score
 
 
 def test_units_pipeline_uses_scored_gap_candidate_times_without_embeddings() -> None:

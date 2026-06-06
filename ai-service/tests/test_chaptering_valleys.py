@@ -119,8 +119,11 @@ def _gap(
     time: float,
     lexical_cohesion: float,
     *,
-    semantic_shift: float = 0.0,
+    semantic_shift: float | None = None,
 ) -> ChapterGapScore:
+    semantic_shift_score = semantic_shift or 0.0
+    semantic_cohesion_score = 1 - semantic_shift if semantic_shift is not None else 0.0
+
     return ChapterGapScore(
         time=time,
         unit_index=index,
@@ -133,5 +136,6 @@ def _gap(
         right_unit_ids=[f"unit_{index + 1:04d}"],
         lexical_cohesion_score=lexical_cohesion,
         lexical_shift_score=1 - lexical_cohesion,
-        semantic_shift_score=semantic_shift,
+        semantic_shift_score=semantic_shift_score,
+        semantic_cohesion_score=semantic_cohesion_score,
     )

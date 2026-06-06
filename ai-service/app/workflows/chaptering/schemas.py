@@ -50,6 +50,7 @@ class ChapterCandidate:
     cheap_score: float = 0.0
     candidate_score: float = 0.0
     semantic_shift_score: float = 0.0
+    semantic_cohesion_score: float = 0.0
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0
     lexical_shift_score: float = 0.0
@@ -124,6 +125,7 @@ class ChapterGapScore:
     lexical_cohesion_score: float = 0.0
     lexical_shift_score: float = 0.0
     semantic_shift_score: float = 0.0
+    semantic_cohesion_score: float = 0.0
     valley_depth_score: float = 0.0
     discourse_marker_score: float = 0.0
     pause_score: float = 0.0

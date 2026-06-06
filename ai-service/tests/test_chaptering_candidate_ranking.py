@@ -47,6 +47,7 @@ def test_ranking_preserves_broad_timeline_coverage() -> None:
     times = [candidate.time for candidate in ranked]
     assert 10 in times
     assert 60 in times
+    assert all(candidate.semantic_cohesion_score == 0.0 for candidate in ranked)
 
 
 def test_semantic_scores_increase_final_candidate_score() -> None:
@@ -63,6 +64,8 @@ def test_semantic_scores_increase_final_candidate_score() -> None:
     by_time = {candidate.time: candidate for candidate in ranked}
 
     assert by_time[20].semantic_shift_score == 0.8
+    assert by_time[20].semantic_cohesion_score == 0.2
+    assert by_time[10].semantic_cohesion_score == 0.0
     assert by_time[20].candidate_score > by_time[10].candidate_score
 
 

@@ -79,4 +79,5 @@ message BoundaryScores {
   double duration_score = 8;
   double boundary_quality_score = 9;
   double llm_confidence_score = 10;
+  double semantic_cohesion_score = 11;
 }

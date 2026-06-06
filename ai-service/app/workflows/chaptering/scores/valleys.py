@@ -2,7 +2,7 @@
 
 Flow:
     1. Read each gap's lexical cohesion score.
-    2. Fold in semantic cohesion when embedding shift scores are available.
+    2. Fold in semantic cohesion when embedding scores are available.
     3. Smooth the resulting curve with a moving average to reduce noisy spikes.
     4. Treat points lower than both direct neighbors as candidate valleys.
     5. Score each valley by how far it drops from nearby left/right peaks.
@@ -12,7 +12,6 @@ Flow:
 
 from dataclasses import replace
 
-from app.workflows.chaptering.scores.common import clamp_score
 from app.workflows.chaptering.schemas import (
     ChapterGapScore,
     ValleyDetectionConfig,
@@ -31,8 +30,8 @@ def detect_valley_candidates(
         1. Return no candidates when fewer than three gaps are available,
            because a valley needs left, current, and right points.
         2. Build a cohesion curve from scored gaps. Lexical cohesion is always
-           present; semantic cohesion is added as `1 - semantic_shift_score`
-           when embedding scores are available.
+           present; stored semantic cohesion is averaged in when embedding
+           scores are available.
         3. Smooth the cohesion curve using `config.smoothing_radius`.
         4. Find local minima: points whose smoothed cohesion is lower than
            both direct neighbors.
@@ -72,19 +71,20 @@ def detect_valley_candidates(
 def _cohesion_curve(gap_scores: list[ChapterGapScore]) -> list[float]:
     """Return lexical-only or lexical-semantic cohesion for valley detection."""
     has_semantic_scores = any(
-        gap_score.semantic_shift_score > 0.0 for gap_score in gap_scores
+        gap_score.semantic_shift_score > 0.0 or gap_score.semantic_cohesion_score > 0.0
+        for gap_score in gap_scores
     )
     if not has_semantic_scores:
         return [gap_score.lexical_cohesion_score for gap_score in gap_scores]
 
-    return [
-        (
-            gap_score.lexical_cohesion_score
-            + clamp_score(1.0 - gap_score.semantic_shift_score)
+    cohesion_curve: list[float] = []
+    for gap_score in gap_scores:
+        semantic_cohesion_score = gap_score.semantic_cohesion_score
+        cohesion_curve.append(
+            (gap_score.lexical_cohesion_score + semantic_cohesion_score) / 2
         )
-        / 2
-        for gap_score in gap_scores
-    ]
+
+    return cohesion_curve
 
 
 def _smooth_values(values: list[float], *, radius: int) -> list[float]:
