@@ -8,6 +8,7 @@ from app.grpc.server import create_server
 
 logger = logging.getLogger(__name__)
 
+
 def main() -> None:
     configure_logging()
     settings = get_settings()
