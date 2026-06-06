@@ -12,6 +12,8 @@ import type {
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
 const generateTranscriptMock = jest.fn<(input: unknown) => Promise<GenerateTranscriptResult>>()
+const exportTranscriptMock = jest.fn<(input: unknown) => Promise<GenerateTranscriptResult>>()
+const burnTranscriptMock = jest.fn<(input: unknown) => Promise<GenerateTranscriptResult>>()
 const listMediaTranscriptsMock = jest.fn<(userId: string, mediaId: string) => Promise<TranscriptSummaryData[]>>()
 const getTranscriptMock = jest.fn<(userId: string, transcriptId: string) => Promise<TranscriptDetailData>>()
 const listTranscriptSegmentsMock = jest.fn<(userId: string, transcriptId: string) => Promise<TranscriptSegmentData[]>>()
@@ -21,6 +23,8 @@ jest.unstable_mockModule('../auth/auth.service', () => ({
 }))
 
 jest.unstable_mockModule('./transcripts.service', () => ({
+  burnTranscript: burnTranscriptMock,
+  exportTranscript: exportTranscriptMock,
   generateTranscript: generateTranscriptMock,
   getTranscript: getTranscriptMock,
   listMediaTranscripts: listMediaTranscriptsMock,
@@ -59,6 +63,22 @@ const createJobResult = (): GenerateTranscriptResult => ({
     updatedAt: now,
     startedAt: null,
     completedAt: null
+  }
+})
+
+const createExportJobResult = (): GenerateTranscriptResult => ({
+  job: {
+    ...createJobResult().job,
+    jobType: 'GENERATE_SUBTITLE',
+    currentStep: null
+  }
+})
+
+const createBurnJobResult = (): GenerateTranscriptResult => ({
+  job: {
+    ...createJobResult().job,
+    jobType: 'BURN_SUBTITLE',
+    currentStep: null
   }
 })
 
@@ -107,11 +127,15 @@ describe('transcript routes', () => {
     authenticatedUser = createUser(userSequence)
     getAuthenticatedUserMock.mockReset()
     generateTranscriptMock.mockReset()
+    exportTranscriptMock.mockReset()
+    burnTranscriptMock.mockReset()
     listMediaTranscriptsMock.mockReset()
     getTranscriptMock.mockReset()
     listTranscriptSegmentsMock.mockReset()
     getAuthenticatedUserMock.mockImplementation(async () => authenticatedUser)
     generateTranscriptMock.mockResolvedValue(createJobResult())
+    exportTranscriptMock.mockResolvedValue(createExportJobResult())
+    burnTranscriptMock.mockResolvedValue(createBurnJobResult())
     listMediaTranscriptsMock.mockResolvedValue([createTranscriptSummary()])
     getTranscriptMock.mockResolvedValue(createTranscriptDetail())
     listTranscriptSegmentsMock.mockResolvedValue([createSegment()])
@@ -121,7 +145,9 @@ describe('transcript routes', () => {
     ['POST', `/api/v1/media/${mediaId}/transcripts/generate`],
     ['GET', `/api/v1/media/${mediaId}/transcripts`],
     ['GET', `/api/v1/transcripts/${transcriptId}`],
-    ['GET', `/api/v1/transcripts/${transcriptId}/segments`]
+    ['GET', `/api/v1/transcripts/${transcriptId}/segments`],
+    ['POST', `/api/v1/transcripts/${transcriptId}/export`],
+    ['POST', `/api/v1/transcripts/${transcriptId}/burn`]
   ])('%s %s requires an access token', async (method, path) => {
     const response = await request(app)[method.toLowerCase() as 'get' | 'post'](path).send({})
 
@@ -224,12 +250,97 @@ describe('transcript routes', () => {
       userId: authenticatedUser.id,
       mediaId,
       language: 'en',
-      generateSrt: true,
-      generateVtt: true,
-      burnTranscript: false,
       useVad: true,
       sourceSeparation: true,
       useDiarization: true
+    })
+  })
+
+  it('returns validation errors for invalid export payloads', async () => {
+    const response = await request(app)
+      .post(`/api/v1/transcripts/${transcriptId}/export`)
+      .set('Authorization', 'Bearer access-token')
+      .send({
+        format: 'pdf'
+      })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed'
+      }
+    })
+  })
+
+  it('returns validation errors for invalid transcript ids on export', async () => {
+    const response = await request(app)
+      .post('/api/v1/transcripts/not-a-uuid/export')
+      .set('Authorization', 'Bearer access-token')
+      .send({
+        format: 'srt'
+      })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR'
+      }
+    })
+  })
+
+  it('creates a transcript export job', async () => {
+    const response = await request(app)
+      .post(`/api/v1/transcripts/${transcriptId}/export`)
+      .set('Authorization', 'Bearer access-token')
+      .send({
+        format: 'srt'
+      })
+
+    expect(response.status).toBe(201)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        job: {
+          ...createExportJobResult().job,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          startedAt: null,
+          completedAt: null
+        }
+      }
+    })
+    expect(exportTranscriptMock).toHaveBeenCalledWith({
+      userId: authenticatedUser.id,
+      transcriptId,
+      format: 'srt'
+    })
+  })
+
+  it('creates a transcript burn job', async () => {
+    const response = await request(app)
+      .post(`/api/v1/transcripts/${transcriptId}/burn`)
+      .set('Authorization', 'Bearer access-token')
+      .send({})
+
+    expect(response.status).toBe(201)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        job: {
+          ...createBurnJobResult().job,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          startedAt: null,
+          completedAt: null
+        }
+      }
+    })
+    expect(burnTranscriptMock).toHaveBeenCalledWith({
+      userId: authenticatedUser.id,
+      transcriptId
     })
   })
 

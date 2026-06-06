@@ -10,14 +10,19 @@ export const transcriptParamsSchema = z.strictObject({
 
 export const generateTranscriptSchema = z.strictObject({
   language: z.enum(['auto', 'en']).default('auto'),
-  generateSrt: z.boolean().default(true),
-  generateVtt: z.boolean().default(true),
-  burnTranscript: z.boolean().default(false),
   useVad: z.boolean().default(true),
   sourceSeparation: z.boolean().default(false),
   useDiarization: z.boolean().default(false)
 })
 
+export const exportTranscriptSchema = z.strictObject({
+  format: z.enum(['json', 'txt', 'srt', 'vtt'])
+})
+
+export const burnTranscriptSchema = z.strictObject({})
+
 export type MediaTranscriptParams = z.infer<typeof mediaTranscriptParamsSchema>
 export type TranscriptParams = z.infer<typeof transcriptParamsSchema>
 export type GenerateTranscriptBody = z.infer<typeof generateTranscriptSchema>
+export type ExportTranscriptBody = z.infer<typeof exportTranscriptSchema>
+export type BurnTranscriptBody = z.infer<typeof burnTranscriptSchema>
