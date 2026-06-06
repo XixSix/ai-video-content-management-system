@@ -2,6 +2,10 @@ import re
 
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 
+_PORTER_STEMMER = PorterStemmer()
+_WORDNET_LEMMATIZER = WordNetLemmatizer()
+
+
 def collapse_whitespace(text: str) -> str:
     """Collapse repeated whitespace and trim both ends."""
     return re.sub(r"\s+", " ", text).strip()
@@ -24,7 +28,7 @@ def content_char_count(text: str) -> int:
 
 def stem_token(token: str) -> str:
     """Return a Porter stem for a normalized token."""
-    return PorterStemmer().stem(token.strip().lower())
+    return _PORTER_STEMMER.stem(token.strip().lower())
 
 
 def lemmatize_token(token: str, *, pos_tag: str | None = None) -> str:
@@ -34,7 +38,7 @@ def lemmatize_token(token: str, *, pos_tag: str | None = None) -> str:
         return ""
 
     try:
-        return WordNetLemmatizer().lemmatize(
+        return _WORDNET_LEMMATIZER.lemmatize(
             normalized_token,
             _wordnet_pos(pos_tag),
         )
