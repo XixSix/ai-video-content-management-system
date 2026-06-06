@@ -1,5 +1,4 @@
 import logging
-import math
 from collections.abc import Iterable
 from dataclasses import replace
 
@@ -15,7 +14,6 @@ from app.workflows.chaptering.scores.temporal import (
     pause_score as calculate_pause_score,
 )
 from app.workflows.chaptering.schemas import (
-    CandidateRetentionConfig,
     CandidateScoringConfig,
     ChapterCandidate,
     ChapterUnit,
@@ -70,70 +68,6 @@ def score_boundary_candidates(
         )
         for candidate in candidates
     ]
-
-
-def retain_candidates_for_boundary_review(
-    candidates: list[ChapterCandidate],
-    *,
-    media_duration: float,
-    target_chapter_duration: float,
-    config: CandidateRetentionConfig,
-) -> list[ChapterCandidate]:
-    """Keep a bounded candidate set for ranking and optional LLM review.
-
-    Retention keeps top valley-score candidates once valley detection has
-    produced candidates, falls back to cheap score otherwise, and fills the
-    remaining budget with evenly distributed coverage candidates.
-    """
-    if not candidates:
-        return []
-
-    limit = _boundary_review_candidate_limit(
-        media_duration=media_duration,
-        target_chapter_duration=target_chapter_duration,
-        config=config,
-    )
-    if len(candidates) <= limit:
-        return candidates
-
-    use_valley_score = any(candidate.valley_depth_score > 0 for candidate in candidates)
-    top_limit = max(1, math.ceil(limit * config.top_score_fraction))
-    selected_by_time = {
-        candidate.time: candidate
-        for candidate in sorted(
-            candidates,
-            key=lambda candidate: (
-                -_retention_score(candidate, use_valley_score=use_valley_score),
-                candidate.time,
-            ),
-        )[:top_limit]
-    }
-
-    for candidate in _downsample_evenly(candidates, limit - len(selected_by_time)):
-        selected_by_time.setdefault(candidate.time, candidate)
-
-    if len(selected_by_time) < limit:
-        for candidate in sorted(
-            candidates,
-            key=lambda candidate: (
-                -_retention_score(candidate, use_valley_score=use_valley_score),
-                candidate.time,
-            ),
-        ):
-            selected_by_time.setdefault(candidate.time, candidate)
-            if len(selected_by_time) >= limit:
-                break
-
-    return sorted(selected_by_time.values(), key=lambda candidate: candidate.time)
-
-
-def _retention_score(
-    candidate: ChapterCandidate,
-    *,
-    use_valley_score: bool,
-) -> float:
-    """Return the score used to retain candidates before boundary review."""
-    return candidate.valley_depth_score if use_valley_score else candidate.cheap_score
 
 
 def _candidate_from_unit(
@@ -248,47 +182,3 @@ def _join_unit_text(units: Iterable[ChapterUnit]) -> str:
     return " ".join(
         unit.clean_text or unit.text for unit in units if (unit.clean_text or unit.text)
     ).strip()
-
-
-def _boundary_review_candidate_limit(
-    *,
-    media_duration: float,
-    target_chapter_duration: float,
-    config: CandidateRetentionConfig,
-) -> int:
-    if media_duration <= 0 or target_chapter_duration <= 0:
-        return config.min_limit
-
-    estimated_chapter_count = max(
-        1, math.ceil(media_duration / target_chapter_duration)
-    )
-    return max(
-        config.min_limit,
-        min(
-            estimated_chapter_count * config.multiplier,
-            config.max_limit,
-        ),
-    )
-
-
-def _downsample_evenly(
-    candidates: list[ChapterCandidate],
-    max_candidates: int,
-) -> list[ChapterCandidate]:
-    """Keep candidates spread across the full timeline when density is high."""
-    if max_candidates <= 0:
-        return []
-
-    if max_candidates == 1:
-        return [candidates[0]]
-
-    last_index = len(candidates) - 1
-    selected_indexes = {
-        round(index * last_index / (max_candidates - 1))
-        for index in range(max_candidates)
-    }
-    return [
-        candidate
-        for index, candidate in enumerate(candidates)
-        if index in selected_indexes
-    ]

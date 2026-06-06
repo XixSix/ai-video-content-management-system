@@ -16,8 +16,10 @@ from app.schemas.chaptering import (
     ChapteringTranscriptSegment,
     ChapteringTranscriptWord,
 )
-from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
-from app.workflows.chaptering.candidates import retain_candidates_for_boundary_review
+from app.workflows.chaptering.candidate_ranking import (
+    prepare_boundary_candidates_for_review,
+    rank_final_boundary_candidates,
+)
 from app.workflows.chaptering.common import build_chapters
 from app.workflows.chaptering.scores.gap_scoring import (
     attach_semantic_shift_scores,
@@ -160,27 +162,22 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     )
     candidate_gap_scores = valley_gap_scores or semantic_gap_scores
     phase4_candidates = gap_scores_to_candidates(candidate_gap_scores)
-    retained_candidates = retain_candidates_for_boundary_review(
+    review_candidates = prepare_boundary_candidates_for_review(
         phase4_candidates,
-        media_duration=duration,
-        target_chapter_duration=args.target_chapter_duration,
-        config=config.retention,
-    )
-    ranked_candidates = rank_boundary_candidates(
-        retained_candidates,
         max_chapters=args.max_chapters,
         min_candidate_distance_seconds=args.min_chapter_duration / 2,
         config=config.retention,
     )
+    final_candidates = rank_final_boundary_candidates(review_candidates)
     boundaries = select_boundaries_from_candidates(
-        ranked_candidates,
+        final_candidates,
         media_duration=duration,
         min_duration=args.min_chapter_duration,
         target_duration=args.target_chapter_duration,
         max_duration=args.max_chapter_duration,
         max_chapters=args.max_chapters,
     )
-    candidates_by_time = {candidate.time: candidate for candidate in ranked_candidates}
+    candidates_by_time = {candidate.time: candidate for candidate in final_candidates}
     chapters = build_chapters(
         request,
         duration=duration,
@@ -205,7 +202,7 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
             *_unit_summary_lines(units),
             *_phase3_lines(semantic_gap_scores, args.top),
             *_phase4_lines(valley_gap_scores, candidate_gap_scores),
-            *_phase5_lines(retained_candidates, ranked_candidates, args.top),
+            *_phase5_lines(review_candidates, final_candidates, args.top),
             *_chapter_lines(chapters),
             *_pipeline_check_lines(pipeline_result),
             "",
@@ -343,21 +340,21 @@ def _phase4_lines(
 
 
 def _phase5_lines(
-    retained_candidates: list[ChapterCandidate],
-    ranked_candidates: list[ChapterCandidate],
+    review_candidates: list[ChapterCandidate],
+    final_candidates: list[ChapterCandidate],
     top: int,
 ) -> list[str]:
     return [
-        "## Phase 5: Candidate Ranking And Deterministic Fallback",
+        "## Phase 5: Candidate Preparation And Final Ranking",
         "",
-        f"- retained_candidates: `{len(retained_candidates)}`",
-        f"- ranked_candidates: `{len(ranked_candidates)}`",
+        f"- review_candidates: `{len(review_candidates)}`",
+        f"- final_candidates: `{len(final_candidates)}`",
         "",
-        "### Ranked Candidates",
+        "### Final Candidates",
         "",
         _candidate_table(
             sorted(
-                ranked_candidates,
+                final_candidates,
                 key=lambda candidate: (-candidate.candidate_score, candidate.time),
             )[:top]
         ),

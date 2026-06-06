@@ -7,19 +7,23 @@ from app.workflows.chaptering.schemas import (
     ChapterCandidate,
 )
 
+LLM_ALGORITHM_WEIGHT = 0.70
+LLM_CONFIDENCE_WEIGHT = 0.30
 
-def rank_boundary_candidates(
+
+def prepare_boundary_candidates_for_review(
     candidates: list[ChapterCandidate],
     *,
     max_chapters: int,
     min_candidate_distance_seconds: float,
     config: CandidateRetentionConfig,
 ) -> list[ChapterCandidate]:
-    """Score, dedupe, and retain final deterministic boundary candidates.
+    """Prepare a bounded candidate set for optional LLM boundary review.
 
-    The ranking step computes the Phase 5 candidate score, suppresses nearby
-    duplicate boundary times, and keeps both high-scoring and timeline-coverage
-    candidates.
+    This pre-review step computes the deterministic candidate score, suppresses
+    nearby duplicate boundary times, then keeps top-scoring and timeline
+    coverage candidates. It does not apply LLM judgments or select final
+    chapter boundaries.
     """
     if not candidates:
         return []
@@ -29,7 +33,7 @@ def rank_boundary_candidates(
         scored_candidates,
         min_candidate_distance_seconds=min_candidate_distance_seconds,
     )
-    retained_candidates = _retain_ranked_candidates(
+    retained_candidates = _retain_prepared_candidates(
         deduped_candidates,
         max_chapters=max_chapters,
         config=config,
@@ -50,6 +54,39 @@ def _score_candidate(candidate: ChapterCandidate) -> ChapterCandidate:
         candidate,
         candidate_score=round(clamp_score(candidate_score), 4),
     )
+
+
+def rank_final_boundary_candidates(
+    candidates: list[ChapterCandidate],
+) -> list[ChapterCandidate]:
+    """Overwrite candidate scores with final post-LLM selection scores.
+
+    Before this function, `candidate_score` is the deterministic pre-review
+    score. After this function, `candidate_score` is the final advisory score
+    consumed by boundary selection. Candidates without LLM judgments keep their
+    deterministic score.
+    """
+    return sorted(
+        [_with_final_candidate_score(candidate) for candidate in candidates],
+        key=lambda candidate: candidate.time,
+    )
+
+
+def _with_final_candidate_score(candidate: ChapterCandidate) -> ChapterCandidate:
+    if candidate.llm_is_boundary is True:
+        score = (
+            LLM_ALGORITHM_WEIGHT * candidate.candidate_score
+            + LLM_CONFIDENCE_WEIGHT * candidate.llm_confidence_score
+        )
+    elif candidate.llm_is_boundary is False:
+        score = (
+            LLM_ALGORITHM_WEIGHT * candidate.candidate_score
+            - LLM_CONFIDENCE_WEIGHT * candidate.llm_confidence_score
+        )
+    else:
+        score = candidate.candidate_score
+
+    return replace(candidate, candidate_score=round(clamp_score(score), 4))
 
 
 def _suppress_nearby_candidates(
@@ -78,13 +115,13 @@ def _suppress_nearby_candidates(
     return sorted(selected, key=lambda candidate: candidate.time)
 
 
-def _retain_ranked_candidates(
+def _retain_prepared_candidates(
     candidates: list[ChapterCandidate],
     *,
     max_chapters: int,
     config: CandidateRetentionConfig,
 ) -> list[ChapterCandidate]:
-    """Preserve top final-score candidates plus broad timeline coverage."""
+    """Preserve top pre-review candidates plus broad timeline coverage."""
     if not candidates:
         return []
 
