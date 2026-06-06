@@ -3,7 +3,13 @@ import { authenticate } from '../../middleware/auth.middleware'
 import { transcriptGenerateRateLimiter } from '../../middleware/transcript-rate-limit.middleware'
 import { validateRequest } from '../../middleware/validate-request'
 import * as transcriptsController from './transcripts.controller'
-import { generateTranscriptSchema, mediaTranscriptParamsSchema, transcriptParamsSchema } from './transcripts.schema'
+import {
+  burnTranscriptSchema,
+  exportTranscriptSchema,
+  generateTranscriptSchema,
+  mediaTranscriptParamsSchema,
+  transcriptParamsSchema
+} from './transcripts.schema'
 
 const mediaRouter = Router()
 const transcriptRouter = Router()
@@ -28,6 +34,16 @@ transcriptRouter.get(
   '/:transcriptId/segments',
   validateRequest({ params: transcriptParamsSchema }),
   transcriptsController.segments
+)
+transcriptRouter.post(
+  '/:transcriptId/export',
+  validateRequest({ params: transcriptParamsSchema, body: exportTranscriptSchema }),
+  transcriptsController.exportTranscript
+)
+transcriptRouter.post(
+  '/:transcriptId/burn',
+  validateRequest({ params: transcriptParamsSchema, body: burnTranscriptSchema }),
+  transcriptsController.burnTranscript
 )
 
 export { mediaRouter as mediaTranscriptRoutes, transcriptRouter as transcriptsRoutes }

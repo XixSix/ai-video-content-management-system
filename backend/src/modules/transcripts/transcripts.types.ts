@@ -1,8 +1,10 @@
 import type { JobResponseData } from '../jobs/jobs.types'
-import type { GenerateTranscriptBody } from './transcripts.schema'
+import type { ExportTranscriptBody, GenerateTranscriptBody } from './transcripts.schema'
 
 export const TRANSCRIPT_QUEUE_NAME = 'transcript_queue'
 export const TRANSCRIPT_TASK_NAME = 'transcribe'
+export const TRANSCRIPT_EXPORT_TASK_NAME = 'export_transcript'
+export const TRANSCRIPT_BURN_TASK_NAME = 'burn_transcript'
 export const TRANSCRIPT_CELERY_TASK_NAME = 'transcript_task'
 
 export type GenerateTranscriptInput = GenerateTranscriptBody & {
@@ -11,6 +13,20 @@ export type GenerateTranscriptInput = GenerateTranscriptBody & {
 }
 
 export type GenerateTranscriptResult = {
+  job: JobResponseData
+}
+
+export type ExportTranscriptInput = ExportTranscriptBody & {
+  transcriptId: string
+  userId: string
+}
+
+export type BurnTranscriptInput = {
+  transcriptId: string
+  userId: string
+}
+
+export type TranscriptJobResult = {
   job: JobResponseData
 }
 

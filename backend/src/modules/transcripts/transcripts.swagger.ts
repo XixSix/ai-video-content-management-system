@@ -9,15 +9,6 @@
  *           type: string
  *           enum: [auto, en]
  *           default: auto
- *         generateSrt:
- *           type: boolean
- *           default: true
- *         generateVtt:
- *           type: boolean
- *           default: true
- *         burnTranscript:
- *           type: boolean
- *           default: false
  *         useVad:
  *           type: boolean
  *           default: true
@@ -88,6 +79,14 @@
  *         speakerLabel:
  *           type: string
  *           nullable: true
+ *     TranscriptExportRequest:
+ *       type: object
+ *       required:
+ *         - format
+ *       properties:
+ *         format:
+ *           type: string
+ *           enum: [json, txt, srt, vtt]
  */
 
 /**
@@ -162,6 +161,71 @@
  *     responses:
  *       200:
  *         description: Transcript detail
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Transcript not found
+ */
+
+/**
+ * @swagger
+ * /transcripts/{transcriptId}/export:
+ *   post:
+ *     summary: Create a transcript export job
+ *     tags: [Transcripts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: transcriptId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TranscriptExportRequest'
+ *     responses:
+ *       201:
+ *         description: Transcript export job queued
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Transcript not found
+ */
+
+/**
+ * @swagger
+ * /transcripts/{transcriptId}/burn:
+ *   post:
+ *     summary: Create a transcript burn-in job
+ *     tags: [Transcripts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: transcriptId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             additionalProperties: false
+ *     responses:
+ *       201:
+ *         description: Transcript burn-in job queued
+ *       400:
+ *         description: Validation error
  *       401:
  *         description: Unauthorized
  *       404:

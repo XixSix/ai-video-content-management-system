@@ -17,6 +17,8 @@ const findTranscriptSegmentsByTranscriptIdAndUserIdMock =
   jest.fn<(transcriptId: string, userId: string) => Promise<TranscriptSegment[] | null>>()
 const publishTranscriptJobMock =
   jest.fn<(message: { jobId: string; mediaId: string; userId: string; s3Key: string }) => Promise<void>>()
+const publishTranscriptExportJobMock = jest.fn<(message: unknown) => Promise<void>>()
+const publishTranscriptBurnJobMock = jest.fn<(message: unknown) => Promise<void>>()
 
 jest.unstable_mockModule('./transcripts.repository', () => ({
   createProcessingJob: createProcessingJobMock,
@@ -29,6 +31,8 @@ jest.unstable_mockModule('./transcripts.repository', () => ({
 }))
 
 jest.unstable_mockModule('./transcripts.queue', () => ({
+  publishTranscriptBurnJob: publishTranscriptBurnJobMock,
+  publishTranscriptExportJob: publishTranscriptExportJobMock,
   publishTranscriptJob: publishTranscriptJobMock
 }))
 
@@ -133,6 +137,8 @@ describe('transcripts service', () => {
     findTranscriptByIdAndUserIdMock.mockReset()
     findTranscriptSegmentsByTranscriptIdAndUserIdMock.mockReset()
     publishTranscriptJobMock.mockReset()
+    publishTranscriptExportJobMock.mockReset()
+    publishTranscriptBurnJobMock.mockReset()
   })
 
   it('creates a pending transcribe job and publishes it', async () => {
@@ -145,9 +151,6 @@ describe('transcripts service', () => {
       mediaId,
       userId,
       language: 'en',
-      generateSrt: true,
-      generateVtt: true,
-      burnTranscript: false,
       useVad: true,
       sourceSeparation: true,
       useDiarization: true
@@ -161,9 +164,6 @@ describe('transcripts service', () => {
         status: 'PENDING',
         input: {
           language: 'en',
-          generateSrt: true,
-          generateVtt: true,
-          burnTranscript: false,
           useVad: true,
           sourceSeparation: true,
           useDiarization: true
@@ -195,9 +195,6 @@ describe('transcripts service', () => {
       mediaId,
       userId,
       language: 'en',
-      generateSrt: true,
-      generateVtt: true,
-      burnTranscript: false,
       useVad: true,
       sourceSeparation: true,
       useDiarization: true
@@ -222,9 +219,6 @@ describe('transcripts service', () => {
         mediaId,
         userId,
         language: 'auto',
-        generateSrt: true,
-        generateVtt: true,
-        burnTranscript: false,
         useVad: true,
         sourceSeparation: false,
         useDiarization: false
@@ -244,9 +238,6 @@ describe('transcripts service', () => {
         mediaId,
         userId,
         language: 'auto',
-        generateSrt: true,
-        generateVtt: true,
-        burnTranscript: false,
         useVad: true,
         sourceSeparation: false,
         useDiarization: false
@@ -270,9 +261,6 @@ describe('transcripts service', () => {
         mediaId,
         userId,
         language: 'auto',
-        generateSrt: true,
-        generateVtt: true,
-        burnTranscript: false,
         useVad: true,
         sourceSeparation: false,
         useDiarization: false
@@ -287,6 +275,167 @@ describe('transcripts service', () => {
       expect.objectContaining({
         status: 'FAILED',
         errorMessage: 'Failed to publish transcript generation job'
+      })
+    )
+  })
+
+  it('creates a pending transcript export job and publishes it', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript({ version: 3 }))
+    createProcessingJobMock.mockResolvedValue(createProcessingJob({ jobType: 'GENERATE_SUBTITLE' }))
+    publishTranscriptExportJobMock.mockResolvedValue()
+
+    const result = await transcriptsService.exportTranscript({
+      transcriptId,
+      userId,
+      format: 'vtt'
+    })
+
+    expect(findTranscriptByIdAndUserIdMock).toHaveBeenCalledWith(transcriptId, userId)
+    expect(createProcessingJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId,
+        userId,
+        jobType: 'GENERATE_SUBTITLE',
+        status: 'PENDING',
+        input: {
+          transcriptId,
+          transcriptVersion: 3,
+          format: 'vtt'
+        }
+      })
+    )
+    expect(publishTranscriptExportJobMock).toHaveBeenCalledWith({
+      jobId,
+      mediaId,
+      userId,
+      transcriptId,
+      transcriptVersion: 3,
+      format: 'vtt'
+    })
+    expect(result.job).toMatchObject({
+      id: jobId,
+      mediaId,
+      jobType: 'GENERATE_SUBTITLE',
+      status: 'PENDING'
+    })
+  })
+
+  it('creates a pending transcript burn job and publishes it', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript({ version: 4 }))
+    createProcessingJobMock.mockResolvedValue(createProcessingJob({ jobType: 'BURN_SUBTITLE' }))
+    publishTranscriptBurnJobMock.mockResolvedValue()
+
+    const result = await transcriptsService.burnTranscript({
+      transcriptId,
+      userId
+    })
+
+    expect(findTranscriptByIdAndUserIdMock).toHaveBeenCalledWith(transcriptId, userId)
+    expect(createProcessingJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId,
+        userId,
+        jobType: 'BURN_SUBTITLE',
+        status: 'PENDING',
+        input: {
+          transcriptId,
+          transcriptVersion: 4
+        }
+      })
+    )
+    expect(publishTranscriptBurnJobMock).toHaveBeenCalledWith({
+      jobId,
+      mediaId,
+      userId,
+      transcriptId,
+      transcriptVersion: 4
+    })
+    expect(result.job).toMatchObject({
+      id: jobId,
+      mediaId,
+      jobType: 'BURN_SUBTITLE',
+      status: 'PENDING'
+    })
+  })
+
+  it('throws TRANSCRIPT_NOT_FOUND when exporting a missing transcript', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(null)
+
+    await expect(
+      transcriptsService.exportTranscript({
+        transcriptId,
+        userId,
+        format: 'json'
+      })
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      code: 'TRANSCRIPT_NOT_FOUND'
+    })
+    expect(createProcessingJobMock).not.toHaveBeenCalled()
+  })
+
+  it('throws TRANSCRIPT_NOT_FOUND when burning a missing transcript', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(null)
+
+    await expect(
+      transcriptsService.burnTranscript({
+        transcriptId,
+        userId
+      })
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      code: 'TRANSCRIPT_NOT_FOUND'
+    })
+    expect(createProcessingJobMock).not.toHaveBeenCalled()
+  })
+
+  it('marks the export job failed when publishing fails', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    createProcessingJobMock.mockResolvedValue(createProcessingJob({ jobType: 'GENERATE_SUBTITLE' }))
+    updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
+    publishTranscriptExportJobMock.mockRejectedValue(new Error('RabbitMQ is unavailable'))
+
+    await expect(
+      transcriptsService.exportTranscript({
+        transcriptId,
+        userId,
+        format: 'srt'
+      })
+    ).rejects.toMatchObject({
+      statusCode: 502,
+      code: 'QUEUE_PUBLISH_FAILED'
+    })
+
+    expect(updateProcessingJobMock).toHaveBeenCalledWith(
+      jobId,
+      expect.objectContaining({
+        status: 'FAILED',
+        errorMessage: 'Failed to publish transcript export job'
+      })
+    )
+  })
+
+  it('marks the burn job failed when publishing fails', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    createProcessingJobMock.mockResolvedValue(createProcessingJob({ jobType: 'BURN_SUBTITLE' }))
+    updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
+    publishTranscriptBurnJobMock.mockRejectedValue(new Error('RabbitMQ is unavailable'))
+
+    await expect(
+      transcriptsService.burnTranscript({
+        transcriptId,
+        userId
+      })
+    ).rejects.toMatchObject({
+      statusCode: 502,
+      code: 'QUEUE_PUBLISH_FAILED'
+    })
+
+    expect(updateProcessingJobMock).toHaveBeenCalledWith(
+      jobId,
+      expect.objectContaining({
+        status: 'FAILED',
+        errorMessage: 'Failed to publish transcript burn job'
       })
     )
   })

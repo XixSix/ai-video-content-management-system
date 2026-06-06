@@ -12,9 +12,12 @@ import {
 import * as transcriptQueue from './transcripts.queue'
 import * as transcriptsRepo from './transcripts.repository'
 import type {
+  BurnTranscriptInput,
+  ExportTranscriptInput,
   GenerateTranscriptInput,
   GenerateTranscriptResult,
   TranscriptDetailData,
+  TranscriptJobResult,
   TranscriptSegmentData,
   TranscriptSummaryData
 } from './transcripts.types'
@@ -46,9 +49,6 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
     progress: 0,
     input: {
       language: input.language,
-      generateSrt: input.generateSrt,
-      generateVtt: input.generateVtt,
-      burnTranscript: input.burnTranscript,
       useVad: input.useVad,
       sourceSeparation: input.sourceSeparation,
       useDiarization: input.useDiarization
@@ -119,6 +119,94 @@ export const listTranscriptSegments = async (
   }
 
   return segments.map(toTranscriptSegmentData)
+}
+
+export const exportTranscript = async (input: ExportTranscriptInput): Promise<TranscriptJobResult> => {
+  const transcript = await transcriptsRepo.findTranscriptByIdAndUserId(input.transcriptId, input.userId)
+
+  if (!transcript) {
+    throw TranscriptError.notFound()
+  }
+
+  const job = await transcriptsRepo.createProcessingJob({
+    mediaId: transcript.mediaId,
+    userId: input.userId,
+    jobType: JobType.GENERATE_SUBTITLE,
+    status: JobStatus.PENDING,
+    progress: 0,
+    input: {
+      transcriptId: transcript.id,
+      transcriptVersion: transcript.version,
+      format: input.format
+    }
+  })
+
+  try {
+    await transcriptQueue.publishTranscriptExportJob({
+      jobId: job.id,
+      mediaId: transcript.mediaId,
+      userId: input.userId,
+      transcriptId: transcript.id,
+      transcriptVersion: transcript.version,
+      format: input.format
+    })
+  } catch {
+    await transcriptsRepo.updateProcessingJob(job.id, {
+      status: JobStatus.FAILED,
+      progress: 0,
+      errorMessage: 'Failed to publish transcript export job',
+      completedAt: new Date()
+    })
+
+    throw TranscriptError.queuePublishFailed('Failed to publish transcript export job')
+  }
+
+  return {
+    job: toJobResponseData(job)
+  }
+}
+
+export const burnTranscript = async (input: BurnTranscriptInput): Promise<TranscriptJobResult> => {
+  const transcript = await transcriptsRepo.findTranscriptByIdAndUserId(input.transcriptId, input.userId)
+
+  if (!transcript) {
+    throw TranscriptError.notFound()
+  }
+
+  const job = await transcriptsRepo.createProcessingJob({
+    mediaId: transcript.mediaId,
+    userId: input.userId,
+    jobType: JobType.BURN_SUBTITLE,
+    status: JobStatus.PENDING,
+    progress: 0,
+    input: {
+      transcriptId: transcript.id,
+      transcriptVersion: transcript.version
+    }
+  })
+
+  try {
+    await transcriptQueue.publishTranscriptBurnJob({
+      jobId: job.id,
+      mediaId: transcript.mediaId,
+      userId: input.userId,
+      transcriptId: transcript.id,
+      transcriptVersion: transcript.version
+    })
+  } catch {
+    await transcriptsRepo.updateProcessingJob(job.id, {
+      status: JobStatus.FAILED,
+      progress: 0,
+      errorMessage: 'Failed to publish transcript burn job',
+      completedAt: new Date()
+    })
+
+    throw TranscriptError.queuePublishFailed('Failed to publish transcript burn job')
+  }
+
+  return {
+    job: toJobResponseData(job)
+  }
 }
 
 const getOwnedMedia = async (userId: string, mediaId: string): Promise<Media> => {
