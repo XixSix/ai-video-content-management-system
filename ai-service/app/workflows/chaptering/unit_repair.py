@@ -235,4 +235,3 @@ def _gap_between(left: ChapterUnit, right: ChapterUnit) -> float:
 
 def _has_terminal_punctuation(unit: ChapterUnit) -> bool:
     return unit.text.rstrip().endswith(TERMINAL_PUNCTUATION)
-

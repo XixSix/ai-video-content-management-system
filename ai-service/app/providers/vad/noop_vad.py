@@ -5,7 +5,7 @@ class NoopVad:
     @property
     def model_name(self) -> str:
         return ""
-    
+
     def warm_up(self) -> None:
         return None
 

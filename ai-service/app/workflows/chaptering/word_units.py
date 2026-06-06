@@ -376,4 +376,3 @@ def _join_text(words: list[TimelineWord]) -> str:
     raw_text = " ".join(word.text for word in words if word.text.strip())
 
     return collapse_whitespace(raw_text)
-

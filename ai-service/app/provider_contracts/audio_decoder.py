@@ -18,4 +18,3 @@ class AudioWaveform(BaseModel):
 
 class AudioDecoderPort(Protocol):
     def decode(self, local_path: Path) -> AudioWaveform: ...
-

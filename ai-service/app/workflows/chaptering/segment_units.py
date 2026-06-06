@@ -216,4 +216,3 @@ def _join_text(segments: list[ChapteringTranscriptSegment]) -> str:
     return collapse_whitespace(
         " ".join(segment.text.strip() for segment in segments if segment.text.strip())
     )
-
