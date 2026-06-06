@@ -11,12 +11,8 @@ from app.workflows.chaptering.schemas import (
     ChapterCandidate,
     ChapterContextWindow,
 )
-from app.workflows.chaptering.scores.common import clamp_score
 
 logger = getLogger(__name__)
-
-LLM_ALGORITHM_WEIGHT = 0.70
-LLM_CONFIDENCE_WEIGHT = 0.30
 
 
 def apply_boundary_evaluations(
@@ -25,7 +21,7 @@ def apply_boundary_evaluations(
     *,
     provider: ChapterBoundaryEvaluationPort,
 ) -> tuple[list[ChapterCandidate], bool]:
-    """Apply optional LLM boundary judgments to ranked candidates.
+    """Attach optional LLM boundary judgments to prepared candidates.
 
     The provider can only evaluate candidate times already produced by code.
     Any provider exception or invalid evaluation set returns the original
@@ -33,7 +29,7 @@ def apply_boundary_evaluations(
 
     Returns:
         A tuple of `(candidates, applied)` where `applied` is true only when at
-        least one valid evaluation was folded into a candidate score.
+        least one valid evaluation was attached to a candidate.
     """
     inputs = build_boundary_evaluation_inputs(candidates, windows)
     if not inputs:
@@ -128,22 +124,10 @@ def _apply_evaluation(
     candidate: ChapterCandidate,
     evaluation: BoundaryEvaluation,
 ) -> ChapterCandidate:
-    """Return a candidate with LLM metadata and adjusted advisory score."""
-    if evaluation.is_chapter_boundary:
-        score = (
-            LLM_ALGORITHM_WEIGHT * candidate.candidate_score
-            + LLM_CONFIDENCE_WEIGHT * evaluation.confidence
-        )
-    else:
-        score = (
-            LLM_ALGORITHM_WEIGHT * candidate.candidate_score
-            - LLM_CONFIDENCE_WEIGHT * evaluation.confidence
-        )
-
+    """Return a candidate with LLM metadata attached."""
     return replace(
         candidate,
-        candidate_score=round(clamp_score(score), 4),
-        llm_confidence_score=round(clamp_score(evaluation.confidence), 4),
+        llm_confidence_score=round(evaluation.confidence, 4),
         llm_is_boundary=evaluation.is_chapter_boundary,
         transition_intent=evaluation.transition_intent,
         llm_reason=evaluation.reason,

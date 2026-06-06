@@ -16,8 +16,10 @@ from app.schemas.chaptering import (
     ChapteringTranscriptSegment,
     ChapteringTranscriptWord,
 )
-from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
-from app.workflows.chaptering.candidates import retain_candidates_for_embedding
+from app.workflows.chaptering.candidate_ranking import (
+    prepare_boundary_candidates_for_review,
+    rank_final_boundary_candidates,
+)
 from app.workflows.chaptering.common import build_chapters
 from app.workflows.chaptering.scores.gap_scoring import (
     attach_semantic_shift_scores,
@@ -78,6 +80,7 @@ def main() -> None:
     parser.add_argument("--valley-smoothing-radius", type=int, default=1)
     parser.add_argument("--valley-peak-window", type=int, default=2)
     parser.add_argument("--min-valley-depth", type=float, default=0.18)
+    parser.add_argument("--valley-semantic-weight", type=float, default=0.70)
     parser.add_argument("--retention-min-limit", type=int, default=12)
     parser.add_argument("--retention-max-limit", type=int, default=40)
     parser.add_argument("--retention-multiplier", type=int, default=4)
@@ -159,28 +162,22 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
     )
     candidate_gap_scores = valley_gap_scores or semantic_gap_scores
     phase4_candidates = gap_scores_to_candidates(candidate_gap_scores)
-    retained_candidates = retain_candidates_for_embedding(
+    review_candidates = prepare_boundary_candidates_for_review(
         phase4_candidates,
-        media_duration=duration,
-        target_chapter_duration=args.target_chapter_duration,
-        config=config.retention,
-    )
-    ranked_candidates = rank_boundary_candidates(
-        retained_candidates,
-        semantic_shift_scores_by_time=semantic_shift_scores_by_time,
         max_chapters=args.max_chapters,
         min_candidate_distance_seconds=args.min_chapter_duration / 2,
         config=config.retention,
     )
+    final_candidates = rank_final_boundary_candidates(review_candidates)
     boundaries = select_boundaries_from_candidates(
-        ranked_candidates,
+        final_candidates,
         media_duration=duration,
         min_duration=args.min_chapter_duration,
         target_duration=args.target_chapter_duration,
         max_duration=args.max_chapter_duration,
         max_chapters=args.max_chapters,
     )
-    candidates_by_time = {candidate.time: candidate for candidate in ranked_candidates}
+    candidates_by_time = {candidate.time: candidate for candidate in final_candidates}
     chapters = build_chapters(
         request,
         duration=duration,
@@ -205,7 +202,7 @@ def _inspect_transcript(transcript_json: Path, args: argparse.Namespace) -> str:
             *_unit_summary_lines(units),
             *_phase3_lines(semantic_gap_scores, args.top),
             *_phase4_lines(valley_gap_scores, candidate_gap_scores),
-            *_phase5_lines(retained_candidates, ranked_candidates, args.top),
+            *_phase5_lines(review_candidates, final_candidates, args.top),
             *_chapter_lines(chapters),
             *_pipeline_check_lines(pipeline_result),
             "",
@@ -244,7 +241,8 @@ def _header_lines(
         f"- embedding_context_seconds: `{args.embedding_context_seconds}`",
         f"- valley: smoothing_radius `{args.valley_smoothing_radius}`, "
         f"peak_window `{args.valley_peak_window}`, min_depth "
-        f"`{args.min_valley_depth}`",
+        f"`{args.min_valley_depth}`, semantic_weight "
+        f"`{args.valley_semantic_weight}`",
         f"- retention: min `{args.retention_min_limit}`, max "
         f"`{args.retention_max_limit}`, multiplier `{args.retention_multiplier}`, "
         f"top_score_fraction `{args.retention_top_score_fraction}`",
@@ -342,21 +340,21 @@ def _phase4_lines(
 
 
 def _phase5_lines(
-    retained_candidates: list[ChapterCandidate],
-    ranked_candidates: list[ChapterCandidate],
+    review_candidates: list[ChapterCandidate],
+    final_candidates: list[ChapterCandidate],
     top: int,
 ) -> list[str]:
     return [
-        "## Phase 5: Candidate Ranking And Deterministic Fallback",
+        "## Phase 5: Candidate Preparation And Final Ranking",
         "",
-        f"- retained_candidates: `{len(retained_candidates)}`",
-        f"- ranked_candidates: `{len(ranked_candidates)}`",
+        f"- review_candidates: `{len(review_candidates)}`",
+        f"- final_candidates: `{len(final_candidates)}`",
         "",
-        "### Ranked Candidates",
+        "### Final Candidates",
         "",
         _candidate_table(
             sorted(
-                ranked_candidates,
+                final_candidates,
                 key=lambda candidate: (-candidate.candidate_score, candidate.time),
             )[:top]
         ),
@@ -397,8 +395,8 @@ def _gap_table(gaps: list[ChapterGapScore]) -> str:
         return "_none_"
 
     rows = [
-        "| time | combined | lexical_cohesion | lexical_shift | semantic_shift | semantic_cohesion | valley | marker | pause | quality | duration | text |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| time | combined | lexical_cohesion | lexical_shift | semantic_shift | semantic_cohesion | lexical_valley | semantic_valley | valley | marker | pause | quality | duration | text |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for gap in gaps:
         text = _compact_text(gap.right_text or gap.left_text, limit=110)
@@ -406,6 +404,8 @@ def _gap_table(gaps: list[ChapterGapScore]) -> str:
             f"| {gap.time:.2f} | {gap.combined_score:.4f} | "
             f"{gap.lexical_cohesion_score:.4f} | {gap.lexical_shift_score:.4f} | "
             f"{gap.semantic_shift_score:.4f} | {gap.semantic_cohesion_score:.4f} | "
+            f"{gap.lexical_valley_depth_score:.4f} | "
+            f"{gap.semantic_valley_depth_score:.4f} | "
             f"{gap.valley_depth_score:.4f} | "
             f"{gap.discourse_marker_score:.4f} | {gap.pause_score:.4f} | "
             f"{gap.boundary_quality_score:.4f} | {gap.duration_sanity_score:.4f} | "
@@ -420,8 +420,8 @@ def _candidate_table(candidates: list[ChapterCandidate]) -> str:
         return "_none_"
 
     rows = [
-        "| time | candidate | cheap | semantic_shift | semantic_cohesion | lexical | valley | marker | pause | quality | duration |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| time | candidate | cheap | semantic_shift | semantic_cohesion | lexical | lexical_valley | semantic_valley | valley | marker | pause | quality | duration |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for candidate in candidates:
         rows.append(
@@ -429,6 +429,8 @@ def _candidate_table(candidates: list[ChapterCandidate]) -> str:
             f"{candidate.cheap_score:.4f} | {candidate.semantic_shift_score:.4f} | "
             f"{candidate.semantic_cohesion_score:.4f} | "
             f"{candidate.lexical_shift_score:.4f} | "
+            f"{candidate.lexical_valley_depth_score:.4f} | "
+            f"{candidate.semantic_valley_depth_score:.4f} | "
             f"{candidate.valley_depth_score:.4f} | "
             f"{candidate.discourse_marker_score:.4f} | {candidate.pause_score:.4f} | "
             f"{candidate.boundary_quality_score:.4f} | "
@@ -512,6 +514,7 @@ def _pipeline_config(
             smoothing_radius=args.valley_smoothing_radius,
             peak_window=args.valley_peak_window,
             min_valley_depth=args.min_valley_depth,
+            semantic_weight=args.valley_semantic_weight,
         ),
         retention=CandidateRetentionConfig(
             min_limit=args.retention_min_limit,

@@ -120,6 +120,7 @@ def _pipeline_config(strategy: str = "segment") -> ChapteringPipelineConfig:
             smoothing_radius=1,
             peak_window=2,
             min_valley_depth=0.18,
+            semantic_weight=0.70,
         ),
         retention=CandidateRetentionConfig(
             min_limit=12,

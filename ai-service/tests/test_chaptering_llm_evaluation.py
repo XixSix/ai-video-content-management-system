@@ -7,7 +7,7 @@ from app.workflows.chaptering.schemas import (
 )
 
 
-def test_valid_boundary_evaluation_updates_candidate_score_and_metadata() -> None:
+def test_valid_boundary_evaluation_attaches_metadata_without_changing_score() -> None:
     candidates, applied = apply_boundary_evaluations(
         [_candidate(20, score=0.2)],
         [_window(20)],
@@ -25,7 +25,7 @@ def test_valid_boundary_evaluation_updates_candidate_score_and_metadata() -> Non
     )
 
     assert applied is True
-    assert candidates[0].candidate_score == 0.41
+    assert candidates[0].candidate_score == 0.2
     assert candidates[0].llm_confidence_score == 0.9
     assert candidates[0].llm_is_boundary is True
     assert candidates[0].transition_intent == "CHANGE_TOPIC"
@@ -162,7 +162,7 @@ def test_missing_evaluation_leaves_candidate_score_unchanged() -> None:
     )
 
     assert applied is True
-    assert candidates[0].candidate_score == 0.38
+    assert candidates[0].candidate_score == 0.2
     assert candidates[1].candidate_score == 0.7
 
 

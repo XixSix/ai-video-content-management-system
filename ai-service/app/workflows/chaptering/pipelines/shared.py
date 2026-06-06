@@ -4,9 +4,9 @@ from app.provider_contracts.chapter_boundary_evaluation import (
 from app.provider_contracts.chapter_title import ChapterTitleProviderPort
 from app.provider_contracts.text_embedding import TextEmbeddingPort
 from app.schemas.chaptering import ChapterGenerationRequest, ChapterGenerationResult
-from app.workflows.chaptering.candidate_ranking import rank_boundary_candidates
-from app.workflows.chaptering.candidates import (
-    retain_candidates_for_embedding,
+from app.workflows.chaptering.candidate_ranking import (
+    prepare_boundary_candidates_for_review,
+    rank_final_boundary_candidates,
 )
 from app.workflows.chaptering.common import build_chapters, media_duration
 from app.workflows.chaptering.llm_evaluation import apply_boundary_evaluations
@@ -73,41 +73,35 @@ def run_units_pipeline(
     )
     candidate_gap_scores = valley_gap_scores or gap_scores
     scored_candidates = gap_scores_to_candidates(candidate_gap_scores)
-    retained_candidates = retain_candidates_for_embedding(
+    review_candidates = prepare_boundary_candidates_for_review(
         scored_candidates,
-        media_duration=duration,
-        target_chapter_duration=options.target_chapter_duration_seconds,
-        config=config.retention,
-    )
-    ranked_candidates = rank_boundary_candidates(
-        retained_candidates,
-        semantic_shift_scores_by_time=semantic_shift_scores_by_time,
         max_chapters=options.max_chapters,
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
         config=config.retention,
     )
     llm_applied = False
-    if options.use_llm and ranked_candidates:
+    if options.use_llm and review_candidates:
         llm_windows = build_context_windows(
             units,
-            ranked_candidates,
+            review_candidates,
             context_duration=config.context_window_seconds,
         )
-        ranked_candidates, llm_applied = apply_boundary_evaluations(
-            ranked_candidates,
+        review_candidates, llm_applied = apply_boundary_evaluations(
+            review_candidates,
             llm_windows,
             provider=boundary_evaluator,
         )
+    final_candidates = rank_final_boundary_candidates(review_candidates)
 
     boundaries = select_boundaries_from_candidates(
-        ranked_candidates,
+        final_candidates,
         media_duration=duration,
         min_duration=options.min_chapter_duration_seconds,
         target_duration=options.target_chapter_duration_seconds,
         max_duration=options.max_chapter_duration_seconds,
         max_chapters=options.max_chapters,
     )
-    candidates_by_time = {candidate.time: candidate for candidate in ranked_candidates}
+    candidates_by_time = {candidate.time: candidate for candidate in final_candidates}
     chapters = build_chapters(
         request,
         duration=duration,
