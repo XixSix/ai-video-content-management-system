@@ -55,7 +55,6 @@ const createJobResult = (): GenerateTranscriptResult => ({
     jobType: 'TRANSCRIBE',
     status: 'QUEUED',
     progress: 0,
-    currentStep: 'Queued for transcription',
     errorMessage: null,
     output: null,
     attemptCount: 0,
@@ -69,16 +68,14 @@ const createJobResult = (): GenerateTranscriptResult => ({
 const createExportJobResult = (): GenerateTranscriptResult => ({
   job: {
     ...createJobResult().job,
-    jobType: 'GENERATE_SUBTITLE',
-    currentStep: null
+    jobType: 'GENERATE_SUBTITLE'
   }
 })
 
 const createBurnJobResult = (): GenerateTranscriptResult => ({
   job: {
     ...createJobResult().job,
-    jobType: 'BURN_SUBTITLE',
-    currentStep: null
+    jobType: 'BURN_SUBTITLE'
   }
 })
 
@@ -88,7 +85,8 @@ const createTranscriptSummary = (): TranscriptSummaryData => ({
   jobId,
   language: 'en',
   source: 'LOCAL',
-  model: 'faster-whisper-large-v3',
+  asrModel: 'FASTER_WHISPER',
+  modelSize: 'LARGE_V3',
   fullTextPreview: 'Hello.',
   wordCount: 2,
   isEdited: false,

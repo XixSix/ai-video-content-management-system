@@ -75,7 +75,6 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   jobType: 'TRANSCRIBE',
   status: 'PENDING',
   progress: 0,
-  currentStep: null,
   errorMessage: null,
   queueName: null,
   taskName: null,
@@ -96,7 +95,8 @@ const createTranscript = (overrides: Partial<Transcript> = {}): Transcript => ({
   jobId,
   language: 'en',
   source: 'LOCAL',
-  model: 'faster-whisper-large-v3',
+  asrModel: 'FASTER_WHISPER',
+  modelSize: 'LARGE_V3',
   fullText: 'Hello. This is a transcript.',
   wordCount: 5,
   isEdited: false,
@@ -181,8 +181,7 @@ describe('transcripts service', () => {
       createProcessingJob({
         status: 'QUEUED',
         queueName: 'transcript_queue',
-        taskName: 'transcribe',
-        currentStep: 'Queued for transcription'
+        taskName: 'transcribe'
       })
     )
 

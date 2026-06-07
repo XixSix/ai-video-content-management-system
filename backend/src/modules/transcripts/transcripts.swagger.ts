@@ -32,9 +32,15 @@
  *           nullable: true
  *         source:
  *           type: string
- *         model:
+ *           enum: [IMPORTED, LOCAL]
+ *         asrModel:
  *           type: string
  *           nullable: true
+ *           enum: [FASTER_WHISPER, WHISPER]
+ *         modelSize:
+ *           type: string
+ *           nullable: true
+ *           enum: [LARGE_V3, LARGE_V3_TURBO, MEDIUM, MEDIUM_EN, SMALL, SMALL_EN, BASE, BASE_EN, TINY, TINY_EN]
  *         fullTextPreview:
  *           type: string
  *           nullable: true
