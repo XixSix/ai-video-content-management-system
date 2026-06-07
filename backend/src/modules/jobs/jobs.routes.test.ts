@@ -45,7 +45,6 @@ const createJob = (overrides: Partial<JobResponseData> = {}): JobResponseData =>
   jobType: 'TRANSCRIBE',
   status: 'TRANSCRIBING',
   progress: 55,
-  currentStep: 'Transcribing audio',
   errorMessage: null,
   output: { transcriptId: '00000000-0000-4000-8000-000000000004' },
   attemptCount: 0,
