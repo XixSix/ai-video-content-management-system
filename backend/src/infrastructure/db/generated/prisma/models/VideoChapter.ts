@@ -31,6 +31,7 @@ export type VideoChapterAvgAggregateOutputType = {
   startTime: number | null
   endTime: number | null
   transcriptVersion: number | null
+  version: number | null
   score: number | null
   boundaryScore: number | null
   pauseScore: number | null
@@ -48,6 +49,7 @@ export type VideoChapterSumAggregateOutputType = {
   startTime: number | null
   endTime: number | null
   transcriptVersion: number | null
+  version: number | null
   score: number | null
   boundaryScore: number | null
   pauseScore: number | null
@@ -69,8 +71,9 @@ export type VideoChapterMinAggregateOutputType = {
   startTime: number | null
   endTime: number | null
   title: string | null
-  summary: string | null
   transcriptVersion: number | null
+  version: number | null
+  isEdited: boolean | null
   source: $Enums.ChapterSource | null
   score: number | null
   boundaryScore: number | null
@@ -95,8 +98,9 @@ export type VideoChapterMaxAggregateOutputType = {
   startTime: number | null
   endTime: number | null
   title: string | null
-  summary: string | null
   transcriptVersion: number | null
+  version: number | null
+  isEdited: boolean | null
   source: $Enums.ChapterSource | null
   score: number | null
   boundaryScore: number | null
@@ -121,8 +125,9 @@ export type VideoChapterCountAggregateOutputType = {
   startTime: number
   endTime: number
   title: number
-  summary: number
   transcriptVersion: number
+  version: number
+  isEdited: number
   source: number
   score: number
   boundaryScore: number
@@ -145,6 +150,7 @@ export type VideoChapterAvgAggregateInputType = {
   startTime?: true
   endTime?: true
   transcriptVersion?: true
+  version?: true
   score?: true
   boundaryScore?: true
   pauseScore?: true
@@ -162,6 +168,7 @@ export type VideoChapterSumAggregateInputType = {
   startTime?: true
   endTime?: true
   transcriptVersion?: true
+  version?: true
   score?: true
   boundaryScore?: true
   pauseScore?: true
@@ -183,8 +190,9 @@ export type VideoChapterMinAggregateInputType = {
   startTime?: true
   endTime?: true
   title?: true
-  summary?: true
   transcriptVersion?: true
+  version?: true
+  isEdited?: true
   source?: true
   score?: true
   boundaryScore?: true
@@ -209,8 +217,9 @@ export type VideoChapterMaxAggregateInputType = {
   startTime?: true
   endTime?: true
   title?: true
-  summary?: true
   transcriptVersion?: true
+  version?: true
+  isEdited?: true
   source?: true
   score?: true
   boundaryScore?: true
@@ -235,8 +244,9 @@ export type VideoChapterCountAggregateInputType = {
   startTime?: true
   endTime?: true
   title?: true
-  summary?: true
   transcriptVersion?: true
+  version?: true
+  isEdited?: true
   source?: true
   score?: true
   boundaryScore?: true
@@ -348,8 +358,9 @@ export type VideoChapterGroupByOutputType = {
   startTime: number
   endTime: number
   title: string
-  summary: string | null
   transcriptVersion: number
+  version: number
+  isEdited: boolean
   source: $Enums.ChapterSource
   score: number | null
   boundaryScore: number | null
@@ -397,8 +408,9 @@ export type VideoChapterWhereInput = {
   startTime?: Prisma.FloatFilter<"VideoChapter"> | number
   endTime?: Prisma.FloatFilter<"VideoChapter"> | number
   title?: Prisma.StringFilter<"VideoChapter"> | string
-  summary?: Prisma.StringNullableFilter<"VideoChapter"> | string | null
   transcriptVersion?: Prisma.IntFilter<"VideoChapter"> | number
+  version?: Prisma.IntFilter<"VideoChapter"> | number
+  isEdited?: Prisma.BoolFilter<"VideoChapter"> | boolean
   source?: Prisma.EnumChapterSourceFilter<"VideoChapter"> | $Enums.ChapterSource
   score?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   boundaryScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
@@ -429,8 +441,9 @@ export type VideoChapterOrderByWithRelationInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  summary?: Prisma.SortOrderInput | Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   source?: Prisma.SortOrder
   score?: Prisma.SortOrderInput | Prisma.SortOrder
   boundaryScore?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -465,8 +478,9 @@ export type VideoChapterWhereUniqueInput = Prisma.AtLeast<{
   startTime?: Prisma.FloatFilter<"VideoChapter"> | number
   endTime?: Prisma.FloatFilter<"VideoChapter"> | number
   title?: Prisma.StringFilter<"VideoChapter"> | string
-  summary?: Prisma.StringNullableFilter<"VideoChapter"> | string | null
   transcriptVersion?: Prisma.IntFilter<"VideoChapter"> | number
+  version?: Prisma.IntFilter<"VideoChapter"> | number
+  isEdited?: Prisma.BoolFilter<"VideoChapter"> | boolean
   source?: Prisma.EnumChapterSourceFilter<"VideoChapter"> | $Enums.ChapterSource
   score?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   boundaryScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
@@ -497,8 +511,9 @@ export type VideoChapterOrderByWithAggregationInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  summary?: Prisma.SortOrderInput | Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   source?: Prisma.SortOrder
   score?: Prisma.SortOrderInput | Prisma.SortOrder
   boundaryScore?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -531,8 +546,9 @@ export type VideoChapterScalarWhereWithAggregatesInput = {
   startTime?: Prisma.FloatWithAggregatesFilter<"VideoChapter"> | number
   endTime?: Prisma.FloatWithAggregatesFilter<"VideoChapter"> | number
   title?: Prisma.StringWithAggregatesFilter<"VideoChapter"> | string
-  summary?: Prisma.StringNullableWithAggregatesFilter<"VideoChapter"> | string | null
   transcriptVersion?: Prisma.IntWithAggregatesFilter<"VideoChapter"> | number
+  version?: Prisma.IntWithAggregatesFilter<"VideoChapter"> | number
+  isEdited?: Prisma.BoolWithAggregatesFilter<"VideoChapter"> | boolean
   source?: Prisma.EnumChapterSourceWithAggregatesFilter<"VideoChapter"> | $Enums.ChapterSource
   score?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
   boundaryScore?: Prisma.FloatNullableWithAggregatesFilter<"VideoChapter"> | number | null
@@ -554,8 +570,9 @@ export type VideoChapterCreateInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -586,8 +603,9 @@ export type VideoChapterUncheckedCreateInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -612,8 +630,9 @@ export type VideoChapterUpdateInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -644,8 +663,9 @@ export type VideoChapterUncheckedUpdateInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -673,8 +693,9 @@ export type VideoChapterCreateManyInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -696,8 +717,9 @@ export type VideoChapterUpdateManyMutationInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -722,8 +744,9 @@ export type VideoChapterUncheckedUpdateManyInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -763,8 +786,9 @@ export type VideoChapterCountOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  summary?: Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   source?: Prisma.SortOrder
   score?: Prisma.SortOrder
   boundaryScore?: Prisma.SortOrder
@@ -785,6 +809,7 @@ export type VideoChapterAvgOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   score?: Prisma.SortOrder
   boundaryScore?: Prisma.SortOrder
   pauseScore?: Prisma.SortOrder
@@ -806,8 +831,9 @@ export type VideoChapterMaxOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  summary?: Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   source?: Prisma.SortOrder
   score?: Prisma.SortOrder
   boundaryScore?: Prisma.SortOrder
@@ -832,8 +858,9 @@ export type VideoChapterMinOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  summary?: Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   source?: Prisma.SortOrder
   score?: Prisma.SortOrder
   boundaryScore?: Prisma.SortOrder
@@ -854,6 +881,7 @@ export type VideoChapterSumOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   transcriptVersion?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   score?: Prisma.SortOrder
   boundaryScore?: Prisma.SortOrder
   pauseScore?: Prisma.SortOrder
@@ -1055,8 +1083,9 @@ export type VideoChapterCreateWithoutMediaInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1085,8 +1114,9 @@ export type VideoChapterUncheckedCreateWithoutMediaInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1143,8 +1173,9 @@ export type VideoChapterScalarWhereInput = {
   startTime?: Prisma.FloatFilter<"VideoChapter"> | number
   endTime?: Prisma.FloatFilter<"VideoChapter"> | number
   title?: Prisma.StringFilter<"VideoChapter"> | string
-  summary?: Prisma.StringNullableFilter<"VideoChapter"> | string | null
   transcriptVersion?: Prisma.IntFilter<"VideoChapter"> | number
+  version?: Prisma.IntFilter<"VideoChapter"> | number
+  isEdited?: Prisma.BoolFilter<"VideoChapter"> | boolean
   source?: Prisma.EnumChapterSourceFilter<"VideoChapter"> | $Enums.ChapterSource
   score?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
   boundaryScore?: Prisma.FloatNullableFilter<"VideoChapter"> | number | null
@@ -1166,8 +1197,9 @@ export type VideoChapterCreateWithoutJobInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1196,8 +1228,9 @@ export type VideoChapterUncheckedCreateWithoutJobInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1248,8 +1281,9 @@ export type VideoChapterCreateWithoutTranscriptInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1278,8 +1312,9 @@ export type VideoChapterUncheckedCreateWithoutTranscriptInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1330,8 +1365,9 @@ export type VideoChapterCreateWithoutClipCandidatesInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1361,8 +1397,9 @@ export type VideoChapterUncheckedCreateWithoutClipCandidatesInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1402,8 +1439,9 @@ export type VideoChapterUpdateWithoutClipCandidatesInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1433,8 +1471,9 @@ export type VideoChapterUncheckedUpdateWithoutClipCandidatesInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1458,8 +1497,9 @@ export type VideoChapterCreateWithoutShortClipsInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1489,8 +1529,9 @@ export type VideoChapterUncheckedCreateWithoutShortClipsInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1530,8 +1571,9 @@ export type VideoChapterUpdateWithoutShortClipsInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1561,8 +1603,9 @@ export type VideoChapterUncheckedUpdateWithoutShortClipsInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1586,8 +1629,9 @@ export type VideoChapterCreateWithoutGeneratedAssetsInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1617,8 +1661,9 @@ export type VideoChapterUncheckedCreateWithoutGeneratedAssetsInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1658,8 +1703,9 @@ export type VideoChapterUpdateWithoutGeneratedAssetsInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1689,8 +1735,9 @@ export type VideoChapterUncheckedUpdateWithoutGeneratedAssetsInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1716,8 +1763,9 @@ export type VideoChapterCreateManyMediaInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1739,8 +1787,9 @@ export type VideoChapterUpdateWithoutMediaInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1769,8 +1818,9 @@ export type VideoChapterUncheckedUpdateWithoutMediaInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1797,8 +1847,9 @@ export type VideoChapterUncheckedUpdateManyWithoutMediaInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1822,8 +1873,9 @@ export type VideoChapterCreateManyJobInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1845,8 +1897,9 @@ export type VideoChapterUpdateWithoutJobInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1875,8 +1928,9 @@ export type VideoChapterUncheckedUpdateWithoutJobInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1903,8 +1957,9 @@ export type VideoChapterUncheckedUpdateManyWithoutJobInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1928,8 +1983,9 @@ export type VideoChapterCreateManyTranscriptInput = {
   startTime: number
   endTime: number
   title: string
-  summary?: string | null
   transcriptVersion: number
+  version?: number
+  isEdited?: boolean
   source?: $Enums.ChapterSource
   score?: number | null
   boundaryScore?: number | null
@@ -1951,8 +2007,9 @@ export type VideoChapterUpdateWithoutTranscriptInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1981,8 +2038,9 @@ export type VideoChapterUncheckedUpdateWithoutTranscriptInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2009,8 +2067,9 @@ export type VideoChapterUncheckedUpdateManyWithoutTranscriptInput = {
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
   score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2084,8 +2143,9 @@ export type VideoChapterSelect<ExtArgs extends runtime.Types.Extensions.Internal
   startTime?: boolean
   endTime?: boolean
   title?: boolean
-  summary?: boolean
   transcriptVersion?: boolean
+  version?: boolean
+  isEdited?: boolean
   source?: boolean
   score?: boolean
   boundaryScore?: boolean
@@ -2117,8 +2177,9 @@ export type VideoChapterSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   startTime?: boolean
   endTime?: boolean
   title?: boolean
-  summary?: boolean
   transcriptVersion?: boolean
+  version?: boolean
+  isEdited?: boolean
   source?: boolean
   score?: boolean
   boundaryScore?: boolean
@@ -2146,8 +2207,9 @@ export type VideoChapterSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   startTime?: boolean
   endTime?: boolean
   title?: boolean
-  summary?: boolean
   transcriptVersion?: boolean
+  version?: boolean
+  isEdited?: boolean
   source?: boolean
   score?: boolean
   boundaryScore?: boolean
@@ -2175,8 +2237,9 @@ export type VideoChapterSelectScalar = {
   startTime?: boolean
   endTime?: boolean
   title?: boolean
-  summary?: boolean
   transcriptVersion?: boolean
+  version?: boolean
+  isEdited?: boolean
   source?: boolean
   score?: boolean
   boundaryScore?: boolean
@@ -2192,7 +2255,7 @@ export type VideoChapterSelectScalar = {
   updatedAt?: boolean
 }
 
-export type VideoChapterOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "transcriptId" | "jobId" | "chapterIndex" | "startTime" | "endTime" | "title" | "summary" | "transcriptVersion" | "source" | "score" | "boundaryScore" | "pauseScore" | "discourseMarkerScore" | "semanticShiftScore" | "lexicalShiftScore" | "valleyDepthScore" | "boundaryQualityScore" | "durationScore" | "llmConfidenceScore" | "createdAt" | "updatedAt", ExtArgs["result"]["videoChapter"]>
+export type VideoChapterOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "transcriptId" | "jobId" | "chapterIndex" | "startTime" | "endTime" | "title" | "transcriptVersion" | "version" | "isEdited" | "source" | "score" | "boundaryScore" | "pauseScore" | "discourseMarkerScore" | "semanticShiftScore" | "lexicalShiftScore" | "valleyDepthScore" | "boundaryQualityScore" | "durationScore" | "llmConfidenceScore" | "createdAt" | "updatedAt", ExtArgs["result"]["videoChapter"]>
 export type VideoChapterInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
@@ -2232,8 +2295,9 @@ export type $VideoChapterPayload<ExtArgs extends runtime.Types.Extensions.Intern
     startTime: number
     endTime: number
     title: string
-    summary: string | null
     transcriptVersion: number
+    version: number
+    isEdited: boolean
     source: $Enums.ChapterSource
     score: number | null
     boundaryScore: number | null
@@ -2684,8 +2748,9 @@ export interface VideoChapterFieldRefs {
   readonly startTime: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly endTime: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly title: Prisma.FieldRef<"VideoChapter", 'String'>
-  readonly summary: Prisma.FieldRef<"VideoChapter", 'String'>
   readonly transcriptVersion: Prisma.FieldRef<"VideoChapter", 'Int'>
+  readonly version: Prisma.FieldRef<"VideoChapter", 'Int'>
+  readonly isEdited: Prisma.FieldRef<"VideoChapter", 'Boolean'>
   readonly source: Prisma.FieldRef<"VideoChapter", 'ChapterSource'>
   readonly score: Prisma.FieldRef<"VideoChapter", 'Float'>
   readonly boundaryScore: Prisma.FieldRef<"VideoChapter", 'Float'>

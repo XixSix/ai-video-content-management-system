@@ -39,7 +39,7 @@ enum JobType {
   GENERATE_SUBTITLE
   GENERATE_CHAPTERS
   GENERATE_SHORT_CLIPS
-  GENERATE_AI_SUGGESTIONS
+  GENERATE_SUGGESTIONS
   BURN_SUBTITLE
   PUBLISH
 }
@@ -47,20 +47,11 @@ enum JobType {
 enum JobStatus {
   PENDING
   QUEUED
-  EXTRACTING_AUDIO
   TRANSCRIBING
-  PREPROCESSING_TRANSCRIPT
   GENERATING_SUBTITLE
   BURNING_SUBTITLE
   GENERATING_CHAPTERS
-  GENERATING_CLIP_CANDIDATES
-  DEDUPLICATING_CANDIDATES
-  SCORING_SALIENCY
-  SCORING_HIGHLIGHTS
-  FILTERING_DIVERSITY
-  SELECTING_CLIPS
-  CUTTING_VIDEO
-  CONVERTING_ASPECT_RATIO
+  GENERATING_SHORT_CLIPS
   GENERATING_SUGGESTIONS
   PUBLISHING
   COMPLETED
@@ -72,10 +63,28 @@ enum TranscriptSource {
   LOCAL
 }
 
+enum AsrModel {
+  FASTER_WHISPER @map("FASTER-WHISPER")
+  WHISPER
+}
+
+enum ModelSize {
+  LARGE_V3       @map("large-v3")
+  LARGE_V3_TURBO @map("large-v3-turbo")
+  MEDIUM         @map("medium")
+  MEDIUM_EN      @map("medium.en")
+  SMALL          @map("small")
+  SMALL_EN       @map("small.en")
+  BASE           @map("base")
+  BASE_EN        @map("base.en")
+  TINY           @map("tiny")
+  TINY_EN        @map("tiny.en")
+}
+
 enum ChapterSource {
-  RULE_BASED
-  LLM
-  USER_EDITED
+  IMPORTED
+  WORDS
+  SEGMENTS
 }
 
 enum ClipCandidateStatus {
@@ -93,7 +102,6 @@ enum ShortClipStatus {
 }
 
 enum AssetType {
-  THUMBNAIL
   SUBTITLE_SRT
   SUBTITLE_VTT
   BURNED_SUBTITLE_VIDEO
@@ -218,7 +226,6 @@ model Media {
   videoChapters      VideoChapter[]
   clipCandidates     ClipCandidate[]
   shortClips         ShortClip[]
-  generatedAssets    GeneratedAsset[]
   publishTasks       PublishTask[]
 
   @@unique([s3Bucket, s3Key])
@@ -237,7 +244,6 @@ model ProcessingJob {
   status  JobStatus @default(PENDING)
 
   progress     Int?    @default(0)
-  currentStep  String? @map("current_step") @db.VarChar(255)
   errorMessage String? @map("error_message") @db.Text
 
   queueName      String? @map("queue_name") @db.VarChar(100)
@@ -273,9 +279,10 @@ model Transcript {
   mediaId String  @map("media_id") @db.Uuid
   jobId   String? @map("job_id") @db.Uuid
 
-  language String?          @db.VarChar(20)
-  source   TranscriptSource @default(LOCAL)
-  model    String?          @db.VarChar(100)
+  language  String?          @db.VarChar(20)
+  source    TranscriptSource @default(LOCAL)
+  asrModel  AsrModel?        @map("asr_model")
+  modelSize ModelSize?       @map("model_size")
 
   fullText  String? @map("full_text") @db.Text
   wordCount Int?    @map("word_count")
@@ -375,12 +382,13 @@ model VideoChapter {
   startTime    Float @map("start_time")
   endTime      Float @map("end_time")
 
-  title   String  @db.VarChar(255)
-  summary String? @db.Text
+  title String @db.VarChar(255)
 
-  transcriptVersion Int @map("transcript_version")
+  transcriptVersion Int     @map("transcript_version")
+  version           Int     @default(1)
+  isEdited          Boolean @default(false) @map("is_edited")
 
-  source ChapterSource @default(LLM)
+  source ChapterSource @default(SEGMENTS)
   score  Float?
 
   boundaryScore        Float? @map("boundary_score")
@@ -515,9 +523,8 @@ model ShortClip {
 }
 
 model GeneratedAsset {
-  id      String @id @default(uuid()) @db.Uuid
-  userId  String @map("user_id") @db.Uuid
-  mediaId String @map("media_id") @db.Uuid
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
 
   transcriptId String? @map("transcript_id") @db.Uuid
   chapterId    String? @map("chapter_id") @db.Uuid
@@ -538,13 +545,11 @@ model GeneratedAsset {
   createdAt DateTime @default(now()) @map("created_at")
 
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  media      Media         @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   transcript Transcript?   @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
   chapter    VideoChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
 
   @@unique([s3Bucket, s3Key])
   @@index([userId])
-  @@index([mediaId])
   @@index([transcriptId])
   @@index([chapterId])
   @@index([assetType])

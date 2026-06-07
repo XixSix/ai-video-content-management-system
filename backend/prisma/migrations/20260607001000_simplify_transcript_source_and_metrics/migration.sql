@@ -2,13 +2,8 @@ ALTER TABLE "transcripts" ALTER COLUMN "source" DROP DEFAULT;
 
 UPDATE "transcripts"
 SET
-  "is_edited" = true,
-  "source" = 'LOCAL'
+  "is_edited" = true
 WHERE "source" = 'USER_EDITED';
-
-UPDATE "transcripts"
-SET "source" = 'LOCAL'
-WHERE "source" IN ('FASTER_WHISPER', 'WHISPER');
 
 ALTER TYPE "TranscriptSource" RENAME TO "TranscriptSource_old";
 
@@ -19,7 +14,12 @@ CREATE TYPE "TranscriptSource" AS ENUM (
 
 ALTER TABLE "transcripts"
 ALTER COLUMN "source" TYPE "TranscriptSource"
-USING "source"::text::"TranscriptSource";
+USING (
+  CASE
+    WHEN "source"::text = 'IMPORTED' THEN 'IMPORTED'
+    ELSE 'LOCAL'
+  END
+)::"TranscriptSource";
 
 ALTER TABLE "transcripts" ALTER COLUMN "source" SET DEFAULT 'LOCAL';
 

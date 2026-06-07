@@ -39,7 +39,6 @@ export type GeneratedAssetSumAggregateOutputType = {
 export type GeneratedAssetMinAggregateOutputType = {
   id: string | null
   userId: string | null
-  mediaId: string | null
   transcriptId: string | null
   chapterId: string | null
   assetType: $Enums.AssetType | null
@@ -56,7 +55,6 @@ export type GeneratedAssetMinAggregateOutputType = {
 export type GeneratedAssetMaxAggregateOutputType = {
   id: string | null
   userId: string | null
-  mediaId: string | null
   transcriptId: string | null
   chapterId: string | null
   assetType: $Enums.AssetType | null
@@ -73,7 +71,6 @@ export type GeneratedAssetMaxAggregateOutputType = {
 export type GeneratedAssetCountAggregateOutputType = {
   id: number
   userId: number
-  mediaId: number
   transcriptId: number
   chapterId: number
   assetType: number
@@ -103,7 +100,6 @@ export type GeneratedAssetSumAggregateInputType = {
 export type GeneratedAssetMinAggregateInputType = {
   id?: true
   userId?: true
-  mediaId?: true
   transcriptId?: true
   chapterId?: true
   assetType?: true
@@ -120,7 +116,6 @@ export type GeneratedAssetMinAggregateInputType = {
 export type GeneratedAssetMaxAggregateInputType = {
   id?: true
   userId?: true
-  mediaId?: true
   transcriptId?: true
   chapterId?: true
   assetType?: true
@@ -137,7 +132,6 @@ export type GeneratedAssetMaxAggregateInputType = {
 export type GeneratedAssetCountAggregateInputType = {
   id?: true
   userId?: true
-  mediaId?: true
   transcriptId?: true
   chapterId?: true
   assetType?: true
@@ -242,7 +236,6 @@ export type GeneratedAssetGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type GeneratedAssetGroupByOutputType = {
   id: string
   userId: string
-  mediaId: string
   transcriptId: string | null
   chapterId: string | null
   assetType: $Enums.AssetType
@@ -283,7 +276,6 @@ export type GeneratedAssetWhereInput = {
   NOT?: Prisma.GeneratedAssetWhereInput | Prisma.GeneratedAssetWhereInput[]
   id?: Prisma.UuidFilter<"GeneratedAsset"> | string
   userId?: Prisma.UuidFilter<"GeneratedAsset"> | string
-  mediaId?: Prisma.UuidFilter<"GeneratedAsset"> | string
   transcriptId?: Prisma.UuidNullableFilter<"GeneratedAsset"> | string | null
   chapterId?: Prisma.UuidNullableFilter<"GeneratedAsset"> | string | null
   assetType?: Prisma.EnumAssetTypeFilter<"GeneratedAsset"> | $Enums.AssetType
@@ -297,7 +289,6 @@ export type GeneratedAssetWhereInput = {
   metadata?: Prisma.JsonNullableFilter<"GeneratedAsset">
   createdAt?: Prisma.DateTimeFilter<"GeneratedAsset"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
   transcript?: Prisma.XOR<Prisma.TranscriptNullableScalarRelationFilter, Prisma.TranscriptWhereInput> | null
   chapter?: Prisma.XOR<Prisma.VideoChapterNullableScalarRelationFilter, Prisma.VideoChapterWhereInput> | null
 }
@@ -305,7 +296,6 @@ export type GeneratedAssetWhereInput = {
 export type GeneratedAssetOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  mediaId?: Prisma.SortOrder
   transcriptId?: Prisma.SortOrderInput | Prisma.SortOrder
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder
   assetType?: Prisma.SortOrder
@@ -319,7 +309,6 @@ export type GeneratedAssetOrderByWithRelationInput = {
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
-  media?: Prisma.MediaOrderByWithRelationInput
   transcript?: Prisma.TranscriptOrderByWithRelationInput
   chapter?: Prisma.VideoChapterOrderByWithRelationInput
 }
@@ -331,7 +320,6 @@ export type GeneratedAssetWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.GeneratedAssetWhereInput[]
   NOT?: Prisma.GeneratedAssetWhereInput | Prisma.GeneratedAssetWhereInput[]
   userId?: Prisma.UuidFilter<"GeneratedAsset"> | string
-  mediaId?: Prisma.UuidFilter<"GeneratedAsset"> | string
   transcriptId?: Prisma.UuidNullableFilter<"GeneratedAsset"> | string | null
   chapterId?: Prisma.UuidNullableFilter<"GeneratedAsset"> | string | null
   assetType?: Prisma.EnumAssetTypeFilter<"GeneratedAsset"> | $Enums.AssetType
@@ -345,7 +333,6 @@ export type GeneratedAssetWhereUniqueInput = Prisma.AtLeast<{
   metadata?: Prisma.JsonNullableFilter<"GeneratedAsset">
   createdAt?: Prisma.DateTimeFilter<"GeneratedAsset"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
   transcript?: Prisma.XOR<Prisma.TranscriptNullableScalarRelationFilter, Prisma.TranscriptWhereInput> | null
   chapter?: Prisma.XOR<Prisma.VideoChapterNullableScalarRelationFilter, Prisma.VideoChapterWhereInput> | null
 }, "id" | "s3Bucket_s3Key">
@@ -353,7 +340,6 @@ export type GeneratedAssetWhereUniqueInput = Prisma.AtLeast<{
 export type GeneratedAssetOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  mediaId?: Prisma.SortOrder
   transcriptId?: Prisma.SortOrderInput | Prisma.SortOrder
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder
   assetType?: Prisma.SortOrder
@@ -379,7 +365,6 @@ export type GeneratedAssetScalarWhereWithAggregatesInput = {
   NOT?: Prisma.GeneratedAssetScalarWhereWithAggregatesInput | Prisma.GeneratedAssetScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"GeneratedAsset"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"GeneratedAsset"> | string
-  mediaId?: Prisma.UuidWithAggregatesFilter<"GeneratedAsset"> | string
   transcriptId?: Prisma.UuidNullableWithAggregatesFilter<"GeneratedAsset"> | string | null
   chapterId?: Prisma.UuidNullableWithAggregatesFilter<"GeneratedAsset"> | string | null
   assetType?: Prisma.EnumAssetTypeWithAggregatesFilter<"GeneratedAsset"> | $Enums.AssetType
@@ -407,7 +392,6 @@ export type GeneratedAssetCreateInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutGeneratedAssetsInput
-  media: Prisma.MediaCreateNestedOneWithoutGeneratedAssetsInput
   transcript?: Prisma.TranscriptCreateNestedOneWithoutGeneratedAssetsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutGeneratedAssetsInput
 }
@@ -415,7 +399,6 @@ export type GeneratedAssetCreateInput = {
 export type GeneratedAssetUncheckedCreateInput = {
   id?: string
   userId: string
-  mediaId: string
   transcriptId?: string | null
   chapterId?: string | null
   assetType: $Enums.AssetType
@@ -443,7 +426,6 @@ export type GeneratedAssetUpdateInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutGeneratedAssetsNestedInput
-  media?: Prisma.MediaUpdateOneRequiredWithoutGeneratedAssetsNestedInput
   transcript?: Prisma.TranscriptUpdateOneWithoutGeneratedAssetsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutGeneratedAssetsNestedInput
 }
@@ -451,7 +433,6 @@ export type GeneratedAssetUpdateInput = {
 export type GeneratedAssetUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
@@ -469,7 +450,6 @@ export type GeneratedAssetUncheckedUpdateInput = {
 export type GeneratedAssetCreateManyInput = {
   id?: string
   userId: string
-  mediaId: string
   transcriptId?: string | null
   chapterId?: string | null
   assetType: $Enums.AssetType
@@ -501,7 +481,6 @@ export type GeneratedAssetUpdateManyMutationInput = {
 export type GeneratedAssetUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
@@ -534,7 +513,6 @@ export type GeneratedAssetS3BucketS3KeyCompoundUniqueInput = {
 export type GeneratedAssetCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  mediaId?: Prisma.SortOrder
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   assetType?: Prisma.SortOrder
@@ -557,7 +535,6 @@ export type GeneratedAssetAvgOrderByAggregateInput = {
 export type GeneratedAssetMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  mediaId?: Prisma.SortOrder
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   assetType?: Prisma.SortOrder
@@ -574,7 +551,6 @@ export type GeneratedAssetMaxOrderByAggregateInput = {
 export type GeneratedAssetMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  mediaId?: Prisma.SortOrder
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   assetType?: Prisma.SortOrder
@@ -632,48 +608,6 @@ export type GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput = {
   connect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
   update?: Prisma.GeneratedAssetUpdateWithWhereUniqueWithoutUserInput | Prisma.GeneratedAssetUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.GeneratedAssetUpdateManyWithWhereWithoutUserInput | Prisma.GeneratedAssetUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.GeneratedAssetScalarWhereInput | Prisma.GeneratedAssetScalarWhereInput[]
-}
-
-export type GeneratedAssetCreateNestedManyWithoutMediaInput = {
-  create?: Prisma.XOR<Prisma.GeneratedAssetCreateWithoutMediaInput, Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput> | Prisma.GeneratedAssetCreateWithoutMediaInput[] | Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput[]
-  connectOrCreate?: Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput | Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput[]
-  createMany?: Prisma.GeneratedAssetCreateManyMediaInputEnvelope
-  connect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-}
-
-export type GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput = {
-  create?: Prisma.XOR<Prisma.GeneratedAssetCreateWithoutMediaInput, Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput> | Prisma.GeneratedAssetCreateWithoutMediaInput[] | Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput[]
-  connectOrCreate?: Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput | Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput[]
-  createMany?: Prisma.GeneratedAssetCreateManyMediaInputEnvelope
-  connect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-}
-
-export type GeneratedAssetUpdateManyWithoutMediaNestedInput = {
-  create?: Prisma.XOR<Prisma.GeneratedAssetCreateWithoutMediaInput, Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput> | Prisma.GeneratedAssetCreateWithoutMediaInput[] | Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput[]
-  connectOrCreate?: Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput | Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput[]
-  upsert?: Prisma.GeneratedAssetUpsertWithWhereUniqueWithoutMediaInput | Prisma.GeneratedAssetUpsertWithWhereUniqueWithoutMediaInput[]
-  createMany?: Prisma.GeneratedAssetCreateManyMediaInputEnvelope
-  set?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  disconnect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  delete?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  connect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  update?: Prisma.GeneratedAssetUpdateWithWhereUniqueWithoutMediaInput | Prisma.GeneratedAssetUpdateWithWhereUniqueWithoutMediaInput[]
-  updateMany?: Prisma.GeneratedAssetUpdateManyWithWhereWithoutMediaInput | Prisma.GeneratedAssetUpdateManyWithWhereWithoutMediaInput[]
-  deleteMany?: Prisma.GeneratedAssetScalarWhereInput | Prisma.GeneratedAssetScalarWhereInput[]
-}
-
-export type GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput = {
-  create?: Prisma.XOR<Prisma.GeneratedAssetCreateWithoutMediaInput, Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput> | Prisma.GeneratedAssetCreateWithoutMediaInput[] | Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput[]
-  connectOrCreate?: Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput | Prisma.GeneratedAssetCreateOrConnectWithoutMediaInput[]
-  upsert?: Prisma.GeneratedAssetUpsertWithWhereUniqueWithoutMediaInput | Prisma.GeneratedAssetUpsertWithWhereUniqueWithoutMediaInput[]
-  createMany?: Prisma.GeneratedAssetCreateManyMediaInputEnvelope
-  set?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  disconnect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  delete?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  connect?: Prisma.GeneratedAssetWhereUniqueInput | Prisma.GeneratedAssetWhereUniqueInput[]
-  update?: Prisma.GeneratedAssetUpdateWithWhereUniqueWithoutMediaInput | Prisma.GeneratedAssetUpdateWithWhereUniqueWithoutMediaInput[]
-  updateMany?: Prisma.GeneratedAssetUpdateManyWithWhereWithoutMediaInput | Prisma.GeneratedAssetUpdateManyWithWhereWithoutMediaInput[]
   deleteMany?: Prisma.GeneratedAssetScalarWhereInput | Prisma.GeneratedAssetScalarWhereInput[]
 }
 
@@ -777,14 +711,12 @@ export type GeneratedAssetCreateWithoutUserInput = {
   fileSizeBytes?: bigint | number | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  media: Prisma.MediaCreateNestedOneWithoutGeneratedAssetsInput
   transcript?: Prisma.TranscriptCreateNestedOneWithoutGeneratedAssetsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutGeneratedAssetsInput
 }
 
 export type GeneratedAssetUncheckedCreateWithoutUserInput = {
   id?: string
-  mediaId: string
   transcriptId?: string | null
   chapterId?: string | null
   assetType: $Enums.AssetType
@@ -831,7 +763,6 @@ export type GeneratedAssetScalarWhereInput = {
   NOT?: Prisma.GeneratedAssetScalarWhereInput | Prisma.GeneratedAssetScalarWhereInput[]
   id?: Prisma.UuidFilter<"GeneratedAsset"> | string
   userId?: Prisma.UuidFilter<"GeneratedAsset"> | string
-  mediaId?: Prisma.UuidFilter<"GeneratedAsset"> | string
   transcriptId?: Prisma.UuidNullableFilter<"GeneratedAsset"> | string | null
   chapterId?: Prisma.UuidNullableFilter<"GeneratedAsset"> | string | null
   assetType?: Prisma.EnumAssetTypeFilter<"GeneratedAsset"> | $Enums.AssetType
@@ -844,66 +775,6 @@ export type GeneratedAssetScalarWhereInput = {
   fileSizeBytes?: Prisma.BigIntNullableFilter<"GeneratedAsset"> | bigint | number | null
   metadata?: Prisma.JsonNullableFilter<"GeneratedAsset">
   createdAt?: Prisma.DateTimeFilter<"GeneratedAsset"> | Date | string
-}
-
-export type GeneratedAssetCreateWithoutMediaInput = {
-  id?: string
-  assetType: $Enums.AssetType
-  transcriptVersion?: number | null
-  s3Bucket: string
-  s3Key: string
-  s3Region?: string | null
-  s3Etag?: string | null
-  mimeType?: string | null
-  fileSizeBytes?: bigint | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutGeneratedAssetsInput
-  transcript?: Prisma.TranscriptCreateNestedOneWithoutGeneratedAssetsInput
-  chapter?: Prisma.VideoChapterCreateNestedOneWithoutGeneratedAssetsInput
-}
-
-export type GeneratedAssetUncheckedCreateWithoutMediaInput = {
-  id?: string
-  userId: string
-  transcriptId?: string | null
-  chapterId?: string | null
-  assetType: $Enums.AssetType
-  transcriptVersion?: number | null
-  s3Bucket: string
-  s3Key: string
-  s3Region?: string | null
-  s3Etag?: string | null
-  mimeType?: string | null
-  fileSizeBytes?: bigint | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-}
-
-export type GeneratedAssetCreateOrConnectWithoutMediaInput = {
-  where: Prisma.GeneratedAssetWhereUniqueInput
-  create: Prisma.XOR<Prisma.GeneratedAssetCreateWithoutMediaInput, Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput>
-}
-
-export type GeneratedAssetCreateManyMediaInputEnvelope = {
-  data: Prisma.GeneratedAssetCreateManyMediaInput | Prisma.GeneratedAssetCreateManyMediaInput[]
-  skipDuplicates?: boolean
-}
-
-export type GeneratedAssetUpsertWithWhereUniqueWithoutMediaInput = {
-  where: Prisma.GeneratedAssetWhereUniqueInput
-  update: Prisma.XOR<Prisma.GeneratedAssetUpdateWithoutMediaInput, Prisma.GeneratedAssetUncheckedUpdateWithoutMediaInput>
-  create: Prisma.XOR<Prisma.GeneratedAssetCreateWithoutMediaInput, Prisma.GeneratedAssetUncheckedCreateWithoutMediaInput>
-}
-
-export type GeneratedAssetUpdateWithWhereUniqueWithoutMediaInput = {
-  where: Prisma.GeneratedAssetWhereUniqueInput
-  data: Prisma.XOR<Prisma.GeneratedAssetUpdateWithoutMediaInput, Prisma.GeneratedAssetUncheckedUpdateWithoutMediaInput>
-}
-
-export type GeneratedAssetUpdateManyWithWhereWithoutMediaInput = {
-  where: Prisma.GeneratedAssetScalarWhereInput
-  data: Prisma.XOR<Prisma.GeneratedAssetUpdateManyMutationInput, Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaInput>
 }
 
 export type GeneratedAssetCreateWithoutTranscriptInput = {
@@ -919,14 +790,12 @@ export type GeneratedAssetCreateWithoutTranscriptInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutGeneratedAssetsInput
-  media: Prisma.MediaCreateNestedOneWithoutGeneratedAssetsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutGeneratedAssetsInput
 }
 
 export type GeneratedAssetUncheckedCreateWithoutTranscriptInput = {
   id?: string
   userId: string
-  mediaId: string
   chapterId?: string | null
   assetType: $Enums.AssetType
   transcriptVersion?: number | null
@@ -979,14 +848,12 @@ export type GeneratedAssetCreateWithoutChapterInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutGeneratedAssetsInput
-  media: Prisma.MediaCreateNestedOneWithoutGeneratedAssetsInput
   transcript?: Prisma.TranscriptCreateNestedOneWithoutGeneratedAssetsInput
 }
 
 export type GeneratedAssetUncheckedCreateWithoutChapterInput = {
   id?: string
   userId: string
-  mediaId: string
   transcriptId?: string | null
   assetType: $Enums.AssetType
   transcriptVersion?: number | null
@@ -1028,7 +895,6 @@ export type GeneratedAssetUpdateManyWithWhereWithoutChapterInput = {
 
 export type GeneratedAssetCreateManyUserInput = {
   id?: string
-  mediaId: string
   transcriptId?: string | null
   chapterId?: string | null
   assetType: $Enums.AssetType
@@ -1055,14 +921,12 @@ export type GeneratedAssetUpdateWithoutUserInput = {
   fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  media?: Prisma.MediaUpdateOneRequiredWithoutGeneratedAssetsNestedInput
   transcript?: Prisma.TranscriptUpdateOneWithoutGeneratedAssetsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutGeneratedAssetsNestedInput
 }
 
 export type GeneratedAssetUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
@@ -1079,75 +943,6 @@ export type GeneratedAssetUncheckedUpdateWithoutUserInput = {
 
 export type GeneratedAssetUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
-  transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type GeneratedAssetCreateManyMediaInput = {
-  id?: string
-  userId: string
-  transcriptId?: string | null
-  chapterId?: string | null
-  assetType: $Enums.AssetType
-  transcriptVersion?: number | null
-  s3Bucket: string
-  s3Key: string
-  s3Region?: string | null
-  s3Etag?: string | null
-  mimeType?: string | null
-  fileSizeBytes?: bigint | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-}
-
-export type GeneratedAssetUpdateWithoutMediaInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutGeneratedAssetsNestedInput
-  transcript?: Prisma.TranscriptUpdateOneWithoutGeneratedAssetsNestedInput
-  chapter?: Prisma.VideoChapterUpdateOneWithoutGeneratedAssetsNestedInput
-}
-
-export type GeneratedAssetUncheckedUpdateWithoutMediaInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type GeneratedAssetUncheckedUpdateManyWithoutMediaInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
@@ -1165,7 +960,6 @@ export type GeneratedAssetUncheckedUpdateManyWithoutMediaInput = {
 export type GeneratedAssetCreateManyTranscriptInput = {
   id?: string
   userId: string
-  mediaId: string
   chapterId?: string | null
   assetType: $Enums.AssetType
   transcriptVersion?: number | null
@@ -1192,14 +986,12 @@ export type GeneratedAssetUpdateWithoutTranscriptInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutGeneratedAssetsNestedInput
-  media?: Prisma.MediaUpdateOneRequiredWithoutGeneratedAssetsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutGeneratedAssetsNestedInput
 }
 
 export type GeneratedAssetUncheckedUpdateWithoutTranscriptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1216,7 +1008,6 @@ export type GeneratedAssetUncheckedUpdateWithoutTranscriptInput = {
 export type GeneratedAssetUncheckedUpdateManyWithoutTranscriptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1233,7 +1024,6 @@ export type GeneratedAssetUncheckedUpdateManyWithoutTranscriptInput = {
 export type GeneratedAssetCreateManyChapterInput = {
   id?: string
   userId: string
-  mediaId: string
   transcriptId?: string | null
   assetType: $Enums.AssetType
   transcriptVersion?: number | null
@@ -1260,14 +1050,12 @@ export type GeneratedAssetUpdateWithoutChapterInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutGeneratedAssetsNestedInput
-  media?: Prisma.MediaUpdateOneRequiredWithoutGeneratedAssetsNestedInput
   transcript?: Prisma.TranscriptUpdateOneWithoutGeneratedAssetsNestedInput
 }
 
 export type GeneratedAssetUncheckedUpdateWithoutChapterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1284,7 +1072,6 @@ export type GeneratedAssetUncheckedUpdateWithoutChapterInput = {
 export type GeneratedAssetUncheckedUpdateManyWithoutChapterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1303,7 +1090,6 @@ export type GeneratedAssetUncheckedUpdateManyWithoutChapterInput = {
 export type GeneratedAssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  mediaId?: boolean
   transcriptId?: boolean
   chapterId?: boolean
   assetType?: boolean
@@ -1317,7 +1103,6 @@ export type GeneratedAssetSelect<ExtArgs extends runtime.Types.Extensions.Intern
   metadata?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.GeneratedAsset$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.GeneratedAsset$chapterArgs<ExtArgs>
 }, ExtArgs["result"]["generatedAsset"]>
@@ -1325,7 +1110,6 @@ export type GeneratedAssetSelect<ExtArgs extends runtime.Types.Extensions.Intern
 export type GeneratedAssetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  mediaId?: boolean
   transcriptId?: boolean
   chapterId?: boolean
   assetType?: boolean
@@ -1339,7 +1123,6 @@ export type GeneratedAssetSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   metadata?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.GeneratedAsset$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.GeneratedAsset$chapterArgs<ExtArgs>
 }, ExtArgs["result"]["generatedAsset"]>
@@ -1347,7 +1130,6 @@ export type GeneratedAssetSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 export type GeneratedAssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  mediaId?: boolean
   transcriptId?: boolean
   chapterId?: boolean
   assetType?: boolean
@@ -1361,7 +1143,6 @@ export type GeneratedAssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   metadata?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.GeneratedAsset$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.GeneratedAsset$chapterArgs<ExtArgs>
 }, ExtArgs["result"]["generatedAsset"]>
@@ -1369,7 +1150,6 @@ export type GeneratedAssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type GeneratedAssetSelectScalar = {
   id?: boolean
   userId?: boolean
-  mediaId?: boolean
   transcriptId?: boolean
   chapterId?: boolean
   assetType?: boolean
@@ -1384,22 +1164,19 @@ export type GeneratedAssetSelectScalar = {
   createdAt?: boolean
 }
 
-export type GeneratedAssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "mediaId" | "transcriptId" | "chapterId" | "assetType" | "transcriptVersion" | "s3Bucket" | "s3Key" | "s3Region" | "s3Etag" | "mimeType" | "fileSizeBytes" | "metadata" | "createdAt", ExtArgs["result"]["generatedAsset"]>
+export type GeneratedAssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "transcriptId" | "chapterId" | "assetType" | "transcriptVersion" | "s3Bucket" | "s3Key" | "s3Region" | "s3Etag" | "mimeType" | "fileSizeBytes" | "metadata" | "createdAt", ExtArgs["result"]["generatedAsset"]>
 export type GeneratedAssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.GeneratedAsset$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.GeneratedAsset$chapterArgs<ExtArgs>
 }
 export type GeneratedAssetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.GeneratedAsset$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.GeneratedAsset$chapterArgs<ExtArgs>
 }
 export type GeneratedAssetIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.GeneratedAsset$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.GeneratedAsset$chapterArgs<ExtArgs>
 }
@@ -1408,14 +1185,12 @@ export type $GeneratedAssetPayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "GeneratedAsset"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
-    media: Prisma.$MediaPayload<ExtArgs>
     transcript: Prisma.$TranscriptPayload<ExtArgs> | null
     chapter: Prisma.$VideoChapterPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    mediaId: string
     transcriptId: string | null
     chapterId: string | null
     assetType: $Enums.AssetType
@@ -1823,7 +1598,6 @@ readonly fields: GeneratedAssetFieldRefs;
 export interface Prisma__GeneratedAssetClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  media<T extends Prisma.MediaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaDefaultArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   transcript<T extends Prisma.GeneratedAsset$transcriptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GeneratedAsset$transcriptArgs<ExtArgs>>): Prisma.Prisma__TranscriptClient<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   chapter<T extends Prisma.GeneratedAsset$chapterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GeneratedAsset$chapterArgs<ExtArgs>>): Prisma.Prisma__VideoChapterClient<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1857,7 +1631,6 @@ export interface Prisma__GeneratedAssetClient<T, Null = never, ExtArgs extends r
 export interface GeneratedAssetFieldRefs {
   readonly id: Prisma.FieldRef<"GeneratedAsset", 'String'>
   readonly userId: Prisma.FieldRef<"GeneratedAsset", 'String'>
-  readonly mediaId: Prisma.FieldRef<"GeneratedAsset", 'String'>
   readonly transcriptId: Prisma.FieldRef<"GeneratedAsset", 'String'>
   readonly chapterId: Prisma.FieldRef<"GeneratedAsset", 'String'>
   readonly assetType: Prisma.FieldRef<"GeneratedAsset", 'AssetType'>
