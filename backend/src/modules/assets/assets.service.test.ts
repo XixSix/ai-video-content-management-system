@@ -33,15 +33,13 @@ const assetsService = await import('./assets.service')
 const userId = '00000000-0000-4000-8000-000000000001'
 const otherUserId = '00000000-0000-4000-8000-000000000002'
 const assetId = '00000000-0000-4000-8000-000000000003'
-const mediaId = '00000000-0000-4000-8000-000000000004'
-const transcriptId = '00000000-0000-4000-8000-000000000005'
-const chapterId = '00000000-0000-4000-8000-000000000006'
+const transcriptId = '00000000-0000-4000-8000-000000000004'
+const chapterId = '00000000-0000-4000-8000-000000000005'
 const now = new Date('2026-06-07T10:00:00.000Z')
 
 const createAsset = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset => ({
   id: assetId,
   userId,
-  mediaId,
   transcriptId,
   chapterId: null,
   assetType: 'SUBTITLE_SRT',
@@ -73,7 +71,6 @@ describe('assets service', () => {
       page: 2,
       limit: 10,
       assetType: 'SUBTITLE_SRT',
-      mediaId,
       transcriptId,
       chapterId,
       sortBy: 'assetType',
@@ -84,7 +81,6 @@ describe('assets service', () => {
       {
         userId,
         assetType: 'SUBTITLE_SRT',
-        mediaId,
         transcriptId,
         chapterId
       },
@@ -97,7 +93,6 @@ describe('assets service', () => {
       items: [
         {
           id: assetId,
-          mediaId,
           transcriptId,
           chapterId: null,
           assetType: 'SUBTITLE_SRT',

@@ -2,7 +2,6 @@ import type { AssetType, GeneratedAsset } from '../../infrastructure/db/generate
 
 export interface AssetResponseData {
   id: string
-  mediaId: string
   transcriptId: string | null
   chapterId: string | null
   assetType: AssetType

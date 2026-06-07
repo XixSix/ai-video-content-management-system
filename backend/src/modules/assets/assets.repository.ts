@@ -5,7 +5,6 @@ import type { AssetSortField, SortOrder } from './assets.types'
 export interface ListAssetsFilters {
   userId: string
   assetType?: AssetType
-  mediaId?: string
   transcriptId?: string
   chapterId?: string
 }
@@ -13,7 +12,6 @@ export interface ListAssetsFilters {
 const buildAssetWhere = (filters: ListAssetsFilters): Prisma.GeneratedAssetWhereInput => ({
   userId: filters.userId,
   ...(filters.assetType ? { assetType: filters.assetType } : {}),
-  ...(filters.mediaId ? { mediaId: filters.mediaId } : {}),
   ...(filters.transcriptId ? { transcriptId: filters.transcriptId } : {}),
   ...(filters.chapterId ? { chapterId: filters.chapterId } : {})
 })
