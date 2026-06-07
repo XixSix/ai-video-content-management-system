@@ -95,7 +95,6 @@ enum ShortClipStatus {
 }
 
 enum AssetType {
-  ORIGINAL_MEDIA
   THUMBNAIL
   SUBTITLE_SRT
   SUBTITLE_VTT

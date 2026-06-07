@@ -21,7 +21,7 @@
  *           nullable: true
  *         assetType:
  *           type: string
- *           enum: [ORIGINAL_MEDIA, THUMBNAIL, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
+ *           enum: [THUMBNAIL, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
  *         transcriptVersion:
  *           type: integer
  *           nullable: true
@@ -53,7 +53,7 @@
  *   get:
  *     summary: List generated assets
  *     description: List generated assets owned by the authenticated user.
- *     tags: [Assets]
+ *     tags: [Generated Assets]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -72,7 +72,7 @@
  *         name: assetType
  *         schema:
  *           type: string
- *           enum: [ORIGINAL_MEDIA, THUMBNAIL, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
+ *           enum: [THUMBNAIL, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
  *       - in: query
  *         name: mediaId
  *         schema:
@@ -112,7 +112,7 @@
  * /assets/{assetId}/download-url:
  *   get:
  *     summary: Create generated asset download URL
- *     tags: [Assets]
+ *     tags: [Generated Assets]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -149,7 +149,7 @@
  *   delete:
  *     summary: Delete generated asset
  *     description: Deletes the S3 object and hard-deletes the GeneratedAsset database row.
- *     tags: [Assets]
+ *     tags: [Generated Assets]
  *     security:
  *       - bearerAuth: []
  *     parameters:

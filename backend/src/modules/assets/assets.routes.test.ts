@@ -145,6 +145,22 @@ describe('asset routes', () => {
     })
   })
 
+  it('rejects original media as a generated asset type', async () => {
+    const response = await request(app)
+      .get('/api/v1/assets')
+      .query({ assetType: 'ORIGINAL_MEDIA' })
+      .set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed'
+      }
+    })
+  })
+
   it('returns validation errors for invalid asset ids', async () => {
     const response = await request(app)
       .get('/api/v1/assets/not-a-uuid/download-url')

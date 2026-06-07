@@ -122,7 +122,6 @@ export type ShortClipStatus = (typeof ShortClipStatus)[keyof typeof ShortClipSta
 
 
 export const AssetType = {
-  ORIGINAL_MEDIA: 'ORIGINAL_MEDIA',
   THUMBNAIL: 'THUMBNAIL',
   SUBTITLE_SRT: 'SUBTITLE_SRT',
   SUBTITLE_VTT: 'SUBTITLE_VTT',
