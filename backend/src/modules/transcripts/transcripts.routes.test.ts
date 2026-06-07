@@ -87,10 +87,9 @@ const createTranscriptSummary = (): TranscriptSummaryData => ({
   mediaId,
   jobId,
   language: 'en',
-  source: 'FASTER_WHISPER',
+  source: 'LOCAL',
   model: 'faster-whisper-large-v3',
   fullTextPreview: 'Hello.',
-  transcriptQualityScore: 0.95,
   wordCount: 2,
   isEdited: false,
   version: 1,
@@ -101,10 +100,7 @@ const createTranscriptSummary = (): TranscriptSummaryData => ({
 
 const createTranscriptDetail = (): TranscriptDetailData => ({
   ...createTranscriptSummary(),
-  fullText: 'Hello.',
-  fillerRatio: 0.1,
-  uniqueWordRatio: 0.8,
-  speechDensity: 0.7
+  fullText: 'Hello.'
 })
 
 const createSegment = (): TranscriptSegmentData => ({

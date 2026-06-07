@@ -27,19 +27,11 @@ export type AggregateTranscript = {
 }
 
 export type TranscriptAvgAggregateOutputType = {
-  transcriptQualityScore: number | null
-  fillerRatio: number | null
-  uniqueWordRatio: number | null
-  speechDensity: number | null
   wordCount: number | null
   version: number | null
 }
 
 export type TranscriptSumAggregateOutputType = {
-  transcriptQualityScore: number | null
-  fillerRatio: number | null
-  uniqueWordRatio: number | null
-  speechDensity: number | null
   wordCount: number | null
   version: number | null
 }
@@ -50,12 +42,9 @@ export type TranscriptMinAggregateOutputType = {
   jobId: string | null
   language: string | null
   source: $Enums.TranscriptSource | null
-  model: string | null
+  asrModel: $Enums.AsrModel | null
+  modelSize: $Enums.ModelSize | null
   fullText: string | null
-  transcriptQualityScore: number | null
-  fillerRatio: number | null
-  uniqueWordRatio: number | null
-  speechDensity: number | null
   wordCount: number | null
   isEdited: boolean | null
   version: number | null
@@ -70,12 +59,9 @@ export type TranscriptMaxAggregateOutputType = {
   jobId: string | null
   language: string | null
   source: $Enums.TranscriptSource | null
-  model: string | null
+  asrModel: $Enums.AsrModel | null
+  modelSize: $Enums.ModelSize | null
   fullText: string | null
-  transcriptQualityScore: number | null
-  fillerRatio: number | null
-  uniqueWordRatio: number | null
-  speechDensity: number | null
   wordCount: number | null
   isEdited: boolean | null
   version: number | null
@@ -90,13 +76,9 @@ export type TranscriptCountAggregateOutputType = {
   jobId: number
   language: number
   source: number
-  model: number
+  asrModel: number
+  modelSize: number
   fullText: number
-  content: number
-  transcriptQualityScore: number
-  fillerRatio: number
-  uniqueWordRatio: number
-  speechDensity: number
   wordCount: number
   isEdited: number
   version: number
@@ -108,19 +90,11 @@ export type TranscriptCountAggregateOutputType = {
 
 
 export type TranscriptAvgAggregateInputType = {
-  transcriptQualityScore?: true
-  fillerRatio?: true
-  uniqueWordRatio?: true
-  speechDensity?: true
   wordCount?: true
   version?: true
 }
 
 export type TranscriptSumAggregateInputType = {
-  transcriptQualityScore?: true
-  fillerRatio?: true
-  uniqueWordRatio?: true
-  speechDensity?: true
   wordCount?: true
   version?: true
 }
@@ -131,12 +105,9 @@ export type TranscriptMinAggregateInputType = {
   jobId?: true
   language?: true
   source?: true
-  model?: true
+  asrModel?: true
+  modelSize?: true
   fullText?: true
-  transcriptQualityScore?: true
-  fillerRatio?: true
-  uniqueWordRatio?: true
-  speechDensity?: true
   wordCount?: true
   isEdited?: true
   version?: true
@@ -151,12 +122,9 @@ export type TranscriptMaxAggregateInputType = {
   jobId?: true
   language?: true
   source?: true
-  model?: true
+  asrModel?: true
+  modelSize?: true
   fullText?: true
-  transcriptQualityScore?: true
-  fillerRatio?: true
-  uniqueWordRatio?: true
-  speechDensity?: true
   wordCount?: true
   isEdited?: true
   version?: true
@@ -171,13 +139,9 @@ export type TranscriptCountAggregateInputType = {
   jobId?: true
   language?: true
   source?: true
-  model?: true
+  asrModel?: true
+  modelSize?: true
   fullText?: true
-  content?: true
-  transcriptQualityScore?: true
-  fillerRatio?: true
-  uniqueWordRatio?: true
-  speechDensity?: true
   wordCount?: true
   isEdited?: true
   version?: true
@@ -279,13 +243,9 @@ export type TranscriptGroupByOutputType = {
   jobId: string | null
   language: string | null
   source: $Enums.TranscriptSource
-  model: string | null
+  asrModel: $Enums.AsrModel | null
+  modelSize: $Enums.ModelSize | null
   fullText: string | null
-  content: runtime.JsonValue | null
-  transcriptQualityScore: number | null
-  fillerRatio: number | null
-  uniqueWordRatio: number | null
-  speechDensity: number | null
   wordCount: number | null
   isEdited: boolean
   version: number
@@ -323,13 +283,9 @@ export type TranscriptWhereInput = {
   jobId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceFilter<"Transcript"> | $Enums.TranscriptSource
-  model?: Prisma.StringNullableFilter<"Transcript"> | string | null
+  asrModel?: Prisma.EnumAsrModelNullableFilter<"Transcript"> | $Enums.AsrModel | null
+  modelSize?: Prisma.EnumModelSizeNullableFilter<"Transcript"> | $Enums.ModelSize | null
   fullText?: Prisma.StringNullableFilter<"Transcript"> | string | null
-  content?: Prisma.JsonNullableFilter<"Transcript">
-  transcriptQualityScore?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  fillerRatio?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  uniqueWordRatio?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  speechDensity?: Prisma.FloatNullableFilter<"Transcript"> | number | null
   wordCount?: Prisma.IntNullableFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolFilter<"Transcript"> | boolean
   version?: Prisma.IntFilter<"Transcript"> | number
@@ -352,13 +308,9 @@ export type TranscriptOrderByWithRelationInput = {
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrderInput | Prisma.SortOrder
   source?: Prisma.SortOrder
-  model?: Prisma.SortOrderInput | Prisma.SortOrder
+  asrModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  modelSize?: Prisma.SortOrderInput | Prisma.SortOrder
   fullText?: Prisma.SortOrderInput | Prisma.SortOrder
-  content?: Prisma.SortOrderInput | Prisma.SortOrder
-  transcriptQualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrderInput | Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrderInput | Prisma.SortOrder
-  speechDensity?: Prisma.SortOrderInput | Prisma.SortOrder
   wordCount?: Prisma.SortOrderInput | Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -384,13 +336,9 @@ export type TranscriptWhereUniqueInput = Prisma.AtLeast<{
   jobId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceFilter<"Transcript"> | $Enums.TranscriptSource
-  model?: Prisma.StringNullableFilter<"Transcript"> | string | null
+  asrModel?: Prisma.EnumAsrModelNullableFilter<"Transcript"> | $Enums.AsrModel | null
+  modelSize?: Prisma.EnumModelSizeNullableFilter<"Transcript"> | $Enums.ModelSize | null
   fullText?: Prisma.StringNullableFilter<"Transcript"> | string | null
-  content?: Prisma.JsonNullableFilter<"Transcript">
-  transcriptQualityScore?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  fillerRatio?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  uniqueWordRatio?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  speechDensity?: Prisma.FloatNullableFilter<"Transcript"> | number | null
   wordCount?: Prisma.IntNullableFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolFilter<"Transcript"> | boolean
   version?: Prisma.IntFilter<"Transcript"> | number
@@ -413,13 +361,9 @@ export type TranscriptOrderByWithAggregationInput = {
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrderInput | Prisma.SortOrder
   source?: Prisma.SortOrder
-  model?: Prisma.SortOrderInput | Prisma.SortOrder
+  asrModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  modelSize?: Prisma.SortOrderInput | Prisma.SortOrder
   fullText?: Prisma.SortOrderInput | Prisma.SortOrder
-  content?: Prisma.SortOrderInput | Prisma.SortOrder
-  transcriptQualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrderInput | Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrderInput | Prisma.SortOrder
-  speechDensity?: Prisma.SortOrderInput | Prisma.SortOrder
   wordCount?: Prisma.SortOrderInput | Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -442,13 +386,9 @@ export type TranscriptScalarWhereWithAggregatesInput = {
   jobId?: Prisma.UuidNullableWithAggregatesFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableWithAggregatesFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceWithAggregatesFilter<"Transcript"> | $Enums.TranscriptSource
-  model?: Prisma.StringNullableWithAggregatesFilter<"Transcript"> | string | null
+  asrModel?: Prisma.EnumAsrModelNullableWithAggregatesFilter<"Transcript"> | $Enums.AsrModel | null
+  modelSize?: Prisma.EnumModelSizeNullableWithAggregatesFilter<"Transcript"> | $Enums.ModelSize | null
   fullText?: Prisma.StringNullableWithAggregatesFilter<"Transcript"> | string | null
-  content?: Prisma.JsonNullableWithAggregatesFilter<"Transcript">
-  transcriptQualityScore?: Prisma.FloatNullableWithAggregatesFilter<"Transcript"> | number | null
-  fillerRatio?: Prisma.FloatNullableWithAggregatesFilter<"Transcript"> | number | null
-  uniqueWordRatio?: Prisma.FloatNullableWithAggregatesFilter<"Transcript"> | number | null
-  speechDensity?: Prisma.FloatNullableWithAggregatesFilter<"Transcript"> | number | null
   wordCount?: Prisma.IntNullableWithAggregatesFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolWithAggregatesFilter<"Transcript"> | boolean
   version?: Prisma.IntWithAggregatesFilter<"Transcript"> | number
@@ -461,13 +401,9 @@ export type TranscriptCreateInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -490,13 +426,9 @@ export type TranscriptUncheckedCreateInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -515,13 +447,9 @@ export type TranscriptUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -544,13 +472,9 @@ export type TranscriptUncheckedUpdateInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -571,13 +495,9 @@ export type TranscriptCreateManyInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -590,13 +510,9 @@ export type TranscriptUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -611,13 +527,9 @@ export type TranscriptUncheckedUpdateManyInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -642,13 +554,9 @@ export type TranscriptCountOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   language?: Prisma.SortOrder
   source?: Prisma.SortOrder
-  model?: Prisma.SortOrder
+  asrModel?: Prisma.SortOrder
+  modelSize?: Prisma.SortOrder
   fullText?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  transcriptQualityScore?: Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrder
-  speechDensity?: Prisma.SortOrder
   wordCount?: Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -658,10 +566,6 @@ export type TranscriptCountOrderByAggregateInput = {
 }
 
 export type TranscriptAvgOrderByAggregateInput = {
-  transcriptQualityScore?: Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrder
-  speechDensity?: Prisma.SortOrder
   wordCount?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
@@ -672,12 +576,9 @@ export type TranscriptMaxOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   language?: Prisma.SortOrder
   source?: Prisma.SortOrder
-  model?: Prisma.SortOrder
+  asrModel?: Prisma.SortOrder
+  modelSize?: Prisma.SortOrder
   fullText?: Prisma.SortOrder
-  transcriptQualityScore?: Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrder
-  speechDensity?: Prisma.SortOrder
   wordCount?: Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -692,12 +593,9 @@ export type TranscriptMinOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   language?: Prisma.SortOrder
   source?: Prisma.SortOrder
-  model?: Prisma.SortOrder
+  asrModel?: Prisma.SortOrder
+  modelSize?: Prisma.SortOrder
   fullText?: Prisma.SortOrder
-  transcriptQualityScore?: Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrder
-  speechDensity?: Prisma.SortOrder
   wordCount?: Prisma.SortOrder
   isEdited?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -707,10 +605,6 @@ export type TranscriptMinOrderByAggregateInput = {
 }
 
 export type TranscriptSumOrderByAggregateInput = {
-  transcriptQualityScore?: Prisma.SortOrder
-  fillerRatio?: Prisma.SortOrder
-  uniqueWordRatio?: Prisma.SortOrder
-  speechDensity?: Prisma.SortOrder
   wordCount?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
@@ -813,6 +707,14 @@ export type EnumTranscriptSourceFieldUpdateOperationsInput = {
   set?: $Enums.TranscriptSource
 }
 
+export type NullableEnumAsrModelFieldUpdateOperationsInput = {
+  set?: $Enums.AsrModel | null
+}
+
+export type NullableEnumModelSizeFieldUpdateOperationsInput = {
+  set?: $Enums.ModelSize | null
+}
+
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
@@ -909,13 +811,9 @@ export type TranscriptCreateWithoutMediaInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -936,13 +834,9 @@ export type TranscriptUncheckedCreateWithoutMediaInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -992,13 +886,9 @@ export type TranscriptScalarWhereInput = {
   jobId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceFilter<"Transcript"> | $Enums.TranscriptSource
-  model?: Prisma.StringNullableFilter<"Transcript"> | string | null
+  asrModel?: Prisma.EnumAsrModelNullableFilter<"Transcript"> | $Enums.AsrModel | null
+  modelSize?: Prisma.EnumModelSizeNullableFilter<"Transcript"> | $Enums.ModelSize | null
   fullText?: Prisma.StringNullableFilter<"Transcript"> | string | null
-  content?: Prisma.JsonNullableFilter<"Transcript">
-  transcriptQualityScore?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  fillerRatio?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  uniqueWordRatio?: Prisma.FloatNullableFilter<"Transcript"> | number | null
-  speechDensity?: Prisma.FloatNullableFilter<"Transcript"> | number | null
   wordCount?: Prisma.IntNullableFilter<"Transcript"> | number | null
   isEdited?: Prisma.BoolFilter<"Transcript"> | boolean
   version?: Prisma.IntFilter<"Transcript"> | number
@@ -1011,13 +901,9 @@ export type TranscriptCreateWithoutJobInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1038,13 +924,9 @@ export type TranscriptUncheckedCreateWithoutJobInput = {
   mediaId: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1089,13 +971,9 @@ export type TranscriptCreateWithoutSegmentsInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1117,13 +995,9 @@ export type TranscriptUncheckedCreateWithoutSegmentsInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1157,13 +1031,9 @@ export type TranscriptUpdateWithoutSegmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1185,13 +1055,9 @@ export type TranscriptUncheckedUpdateWithoutSegmentsInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1209,13 +1075,9 @@ export type TranscriptCreateWithoutWordsInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1237,13 +1099,9 @@ export type TranscriptUncheckedCreateWithoutWordsInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1277,13 +1135,9 @@ export type TranscriptUpdateWithoutWordsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1305,13 +1159,9 @@ export type TranscriptUncheckedUpdateWithoutWordsInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1329,13 +1179,9 @@ export type TranscriptCreateWithoutVideoChaptersInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1357,13 +1203,9 @@ export type TranscriptUncheckedCreateWithoutVideoChaptersInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1397,13 +1239,9 @@ export type TranscriptUpdateWithoutVideoChaptersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1425,13 +1263,9 @@ export type TranscriptUncheckedUpdateWithoutVideoChaptersInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1449,13 +1283,9 @@ export type TranscriptCreateWithoutClipCandidatesInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1477,13 +1307,9 @@ export type TranscriptUncheckedCreateWithoutClipCandidatesInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1517,13 +1343,9 @@ export type TranscriptUpdateWithoutClipCandidatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1545,13 +1367,9 @@ export type TranscriptUncheckedUpdateWithoutClipCandidatesInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1569,13 +1387,9 @@ export type TranscriptCreateWithoutShortClipsInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1597,13 +1411,9 @@ export type TranscriptUncheckedCreateWithoutShortClipsInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1637,13 +1447,9 @@ export type TranscriptUpdateWithoutShortClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1665,13 +1471,9 @@ export type TranscriptUncheckedUpdateWithoutShortClipsInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1689,13 +1491,9 @@ export type TranscriptCreateWithoutGeneratedAssetsInput = {
   id?: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1717,13 +1515,9 @@ export type TranscriptUncheckedCreateWithoutGeneratedAssetsInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1757,13 +1551,9 @@ export type TranscriptUpdateWithoutGeneratedAssetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1785,13 +1575,9 @@ export type TranscriptUncheckedUpdateWithoutGeneratedAssetsInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1810,13 +1596,9 @@ export type TranscriptCreateManyMediaInput = {
   jobId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1829,13 +1611,9 @@ export type TranscriptUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1856,13 +1634,9 @@ export type TranscriptUncheckedUpdateWithoutMediaInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1882,13 +1656,9 @@ export type TranscriptUncheckedUpdateManyWithoutMediaInput = {
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1902,13 +1672,9 @@ export type TranscriptCreateManyJobInput = {
   mediaId: string
   language?: string | null
   source?: $Enums.TranscriptSource
-  model?: string | null
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
   fullText?: string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: number | null
-  fillerRatio?: number | null
-  uniqueWordRatio?: number | null
-  speechDensity?: number | null
   wordCount?: number | null
   isEdited?: boolean
   version?: number
@@ -1921,13 +1687,9 @@ export type TranscriptUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1948,13 +1710,9 @@ export type TranscriptUncheckedUpdateWithoutJobInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1974,13 +1732,9 @@ export type TranscriptUncheckedUpdateManyWithoutJobInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
   fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  transcriptQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fillerRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  uniqueWordRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  speechDensity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2071,13 +1825,9 @@ export type TranscriptSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   jobId?: boolean
   language?: boolean
   source?: boolean
-  model?: boolean
+  asrModel?: boolean
+  modelSize?: boolean
   fullText?: boolean
-  content?: boolean
-  transcriptQualityScore?: boolean
-  fillerRatio?: boolean
-  uniqueWordRatio?: boolean
-  speechDensity?: boolean
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
@@ -2101,13 +1851,9 @@ export type TranscriptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   jobId?: boolean
   language?: boolean
   source?: boolean
-  model?: boolean
+  asrModel?: boolean
+  modelSize?: boolean
   fullText?: boolean
-  content?: boolean
-  transcriptQualityScore?: boolean
-  fillerRatio?: boolean
-  uniqueWordRatio?: boolean
-  speechDensity?: boolean
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
@@ -2124,13 +1870,9 @@ export type TranscriptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   jobId?: boolean
   language?: boolean
   source?: boolean
-  model?: boolean
+  asrModel?: boolean
+  modelSize?: boolean
   fullText?: boolean
-  content?: boolean
-  transcriptQualityScore?: boolean
-  fillerRatio?: boolean
-  uniqueWordRatio?: boolean
-  speechDensity?: boolean
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
@@ -2147,13 +1889,9 @@ export type TranscriptSelectScalar = {
   jobId?: boolean
   language?: boolean
   source?: boolean
-  model?: boolean
+  asrModel?: boolean
+  modelSize?: boolean
   fullText?: boolean
-  content?: boolean
-  transcriptQualityScore?: boolean
-  fillerRatio?: boolean
-  uniqueWordRatio?: boolean
-  speechDensity?: boolean
   wordCount?: boolean
   isEdited?: boolean
   version?: boolean
@@ -2162,7 +1900,7 @@ export type TranscriptSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TranscriptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "jobId" | "language" | "source" | "model" | "fullText" | "content" | "transcriptQualityScore" | "fillerRatio" | "uniqueWordRatio" | "speechDensity" | "wordCount" | "isEdited" | "version" | "fullTextUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transcript"]>
+export type TranscriptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "jobId" | "language" | "source" | "asrModel" | "modelSize" | "fullText" | "wordCount" | "isEdited" | "version" | "fullTextUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transcript"]>
 export type TranscriptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
@@ -2201,13 +1939,9 @@ export type $TranscriptPayload<ExtArgs extends runtime.Types.Extensions.Internal
     jobId: string | null
     language: string | null
     source: $Enums.TranscriptSource
-    model: string | null
+    asrModel: $Enums.AsrModel | null
+    modelSize: $Enums.ModelSize | null
     fullText: string | null
-    content: runtime.JsonValue | null
-    transcriptQualityScore: number | null
-    fillerRatio: number | null
-    uniqueWordRatio: number | null
-    speechDensity: number | null
     wordCount: number | null
     isEdited: boolean
     version: number
@@ -2650,13 +2384,9 @@ export interface TranscriptFieldRefs {
   readonly jobId: Prisma.FieldRef<"Transcript", 'String'>
   readonly language: Prisma.FieldRef<"Transcript", 'String'>
   readonly source: Prisma.FieldRef<"Transcript", 'TranscriptSource'>
-  readonly model: Prisma.FieldRef<"Transcript", 'String'>
+  readonly asrModel: Prisma.FieldRef<"Transcript", 'AsrModel'>
+  readonly modelSize: Prisma.FieldRef<"Transcript", 'ModelSize'>
   readonly fullText: Prisma.FieldRef<"Transcript", 'String'>
-  readonly content: Prisma.FieldRef<"Transcript", 'Json'>
-  readonly transcriptQualityScore: Prisma.FieldRef<"Transcript", 'Float'>
-  readonly fillerRatio: Prisma.FieldRef<"Transcript", 'Float'>
-  readonly uniqueWordRatio: Prisma.FieldRef<"Transcript", 'Float'>
-  readonly speechDensity: Prisma.FieldRef<"Transcript", 'Float'>
   readonly wordCount: Prisma.FieldRef<"Transcript", 'Int'>
   readonly isEdited: Prisma.FieldRef<"Transcript", 'Boolean'>
   readonly version: Prisma.FieldRef<"Transcript", 'Int'>

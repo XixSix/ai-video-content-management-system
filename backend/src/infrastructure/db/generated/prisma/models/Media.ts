@@ -348,7 +348,6 @@ export type MediaWhereInput = {
   videoChapters?: Prisma.VideoChapterListRelationFilter
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
-  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }
 
@@ -380,7 +379,6 @@ export type MediaOrderByWithRelationInput = {
   videoChapters?: Prisma.VideoChapterOrderByRelationAggregateInput
   clipCandidates?: Prisma.ClipCandidateOrderByRelationAggregateInput
   shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
-  generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
 }
 
@@ -416,7 +414,6 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
   videoChapters?: Prisma.VideoChapterListRelationFilter
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
-  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }, "id" | "s3Bucket_s3Key">
 
@@ -499,7 +496,6 @@ export type MediaCreateInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -530,7 +526,6 @@ export type MediaUncheckedCreateInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -561,7 +556,6 @@ export type MediaUpdateInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -592,7 +586,6 @@ export type MediaUncheckedUpdateInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -938,20 +931,6 @@ export type MediaUpdateOneRequiredWithoutShortClipsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutShortClipsInput, Prisma.MediaUpdateWithoutShortClipsInput>, Prisma.MediaUncheckedUpdateWithoutShortClipsInput>
 }
 
-export type MediaCreateNestedOneWithoutGeneratedAssetsInput = {
-  create?: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
-  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutGeneratedAssetsInput
-  connect?: Prisma.MediaWhereUniqueInput
-}
-
-export type MediaUpdateOneRequiredWithoutGeneratedAssetsNestedInput = {
-  create?: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
-  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutGeneratedAssetsInput
-  upsert?: Prisma.MediaUpsertWithoutGeneratedAssetsInput
-  connect?: Prisma.MediaWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutGeneratedAssetsInput, Prisma.MediaUpdateWithoutGeneratedAssetsInput>, Prisma.MediaUncheckedUpdateWithoutGeneratedAssetsInput>
-}
-
 export type MediaCreateNestedOneWithoutPublishTasksInput = {
   create?: Prisma.XOR<Prisma.MediaCreateWithoutPublishTasksInput, Prisma.MediaUncheckedCreateWithoutPublishTasksInput>
   connectOrCreate?: Prisma.MediaCreateOrConnectWithoutPublishTasksInput
@@ -994,7 +973,6 @@ export type MediaCreateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1024,7 +1002,6 @@ export type MediaUncheckedCreateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1105,7 +1082,6 @@ export type MediaCreateWithoutProcessingJobsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1135,7 +1111,6 @@ export type MediaUncheckedCreateWithoutProcessingJobsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1181,7 +1156,6 @@ export type MediaUpdateWithoutProcessingJobsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -1211,7 +1185,6 @@ export type MediaUncheckedUpdateWithoutProcessingJobsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1241,7 +1214,6 @@ export type MediaCreateWithoutTranscriptsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1271,7 +1243,6 @@ export type MediaUncheckedCreateWithoutTranscriptsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1317,7 +1288,6 @@ export type MediaUpdateWithoutTranscriptsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -1347,7 +1317,6 @@ export type MediaUncheckedUpdateWithoutTranscriptsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1377,7 +1346,6 @@ export type MediaCreateWithoutTranscriptSegmentsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1407,7 +1375,6 @@ export type MediaUncheckedCreateWithoutTranscriptSegmentsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1453,7 +1420,6 @@ export type MediaUpdateWithoutTranscriptSegmentsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -1483,7 +1449,6 @@ export type MediaUncheckedUpdateWithoutTranscriptSegmentsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1513,7 +1478,6 @@ export type MediaCreateWithoutTranscriptWordsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1543,7 +1507,6 @@ export type MediaUncheckedCreateWithoutTranscriptWordsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1589,7 +1552,6 @@ export type MediaUpdateWithoutTranscriptWordsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -1619,7 +1581,6 @@ export type MediaUncheckedUpdateWithoutTranscriptWordsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1649,7 +1610,6 @@ export type MediaCreateWithoutVideoChaptersInput = {
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1679,7 +1639,6 @@ export type MediaUncheckedCreateWithoutVideoChaptersInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1725,7 +1684,6 @@ export type MediaUpdateWithoutVideoChaptersInput = {
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -1755,7 +1713,6 @@ export type MediaUncheckedUpdateWithoutVideoChaptersInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1785,7 +1742,6 @@ export type MediaCreateWithoutClipCandidatesInput = {
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1815,7 +1771,6 @@ export type MediaUncheckedCreateWithoutClipCandidatesInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1861,7 +1816,6 @@ export type MediaUpdateWithoutClipCandidatesInput = {
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -1891,7 +1845,6 @@ export type MediaUncheckedUpdateWithoutClipCandidatesInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1921,7 +1874,6 @@ export type MediaCreateWithoutShortClipsInput = {
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
@@ -1951,7 +1903,6 @@ export type MediaUncheckedCreateWithoutShortClipsInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1997,7 +1948,6 @@ export type MediaUpdateWithoutShortClipsInput = {
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -2027,143 +1977,6 @@ export type MediaUncheckedUpdateWithoutShortClipsInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
-}
-
-export type MediaCreateWithoutGeneratedAssetsInput = {
-  id?: string
-  type: $Enums.MediaType
-  title?: string | null
-  description?: string | null
-  originalFilename: string
-  s3Bucket: string
-  s3Key: string
-  s3Region?: string | null
-  s3Etag?: string | null
-  uploadId?: string | null
-  duration?: number | null
-  fileSizeBytes?: bigint | number | null
-  mimeType?: string | null
-  width?: number | null
-  height?: number | null
-  status?: $Enums.MediaStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutMediaInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
-  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
-  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
-  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
-  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
-}
-
-export type MediaUncheckedCreateWithoutGeneratedAssetsInput = {
-  id?: string
-  userId: string
-  type: $Enums.MediaType
-  title?: string | null
-  description?: string | null
-  originalFilename: string
-  s3Bucket: string
-  s3Key: string
-  s3Region?: string | null
-  s3Etag?: string | null
-  uploadId?: string | null
-  duration?: number | null
-  fileSizeBytes?: bigint | number | null
-  mimeType?: string | null
-  width?: number | null
-  height?: number | null
-  status?: $Enums.MediaStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
-  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
-  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
-  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
-  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
-}
-
-export type MediaCreateOrConnectWithoutGeneratedAssetsInput = {
-  where: Prisma.MediaWhereUniqueInput
-  create: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
-}
-
-export type MediaUpsertWithoutGeneratedAssetsInput = {
-  update: Prisma.XOR<Prisma.MediaUpdateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedUpdateWithoutGeneratedAssetsInput>
-  create: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
-  where?: Prisma.MediaWhereInput
-}
-
-export type MediaUpdateToOneWithWhereWithoutGeneratedAssetsInput = {
-  where?: Prisma.MediaWhereInput
-  data: Prisma.XOR<Prisma.MediaUpdateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedUpdateWithoutGeneratedAssetsInput>
-}
-
-export type MediaUpdateWithoutGeneratedAssetsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
-  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
-  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
-  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
-  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
-}
-
-export type MediaUncheckedUpdateWithoutGeneratedAssetsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
-  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
-  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
-  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
-  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -2194,7 +2007,6 @@ export type MediaCreateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutPublishTasksInput = {
@@ -2224,7 +2036,6 @@ export type MediaUncheckedCreateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
 }
 
 export type MediaCreateOrConnectWithoutPublishTasksInput = {
@@ -2270,7 +2081,6 @@ export type MediaUpdateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutPublishTasksInput = {
@@ -2300,7 +2110,6 @@ export type MediaUncheckedUpdateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaCreateManyUserInput = {
@@ -2350,7 +2159,6 @@ export type MediaUpdateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
@@ -2380,7 +2188,6 @@ export type MediaUncheckedUpdateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -2418,7 +2225,6 @@ export type MediaCountOutputType = {
   videoChapters: number
   clipCandidates: number
   shortClips: number
-  generatedAssets: number
   publishTasks: number
 }
 
@@ -2430,7 +2236,6 @@ export type MediaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   videoChapters?: boolean | MediaCountOutputTypeCountVideoChaptersArgs
   clipCandidates?: boolean | MediaCountOutputTypeCountClipCandidatesArgs
   shortClips?: boolean | MediaCountOutputTypeCountShortClipsArgs
-  generatedAssets?: boolean | MediaCountOutputTypeCountGeneratedAssetsArgs
   publishTasks?: boolean | MediaCountOutputTypeCountPublishTasksArgs
 }
 
@@ -2496,13 +2301,6 @@ export type MediaCountOutputTypeCountShortClipsArgs<ExtArgs extends runtime.Type
 /**
  * MediaCountOutputType without action
  */
-export type MediaCountOutputTypeCountGeneratedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.GeneratedAssetWhereInput
-}
-
-/**
- * MediaCountOutputType without action
- */
 export type MediaCountOutputTypeCountPublishTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PublishTaskWhereInput
 }
@@ -2536,7 +2334,6 @@ export type MediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   videoChapters?: boolean | Prisma.Media$videoChaptersArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.Media$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Media$shortClipsArgs<ExtArgs>
-  generatedAssets?: boolean | Prisma.Media$generatedAssetsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.Media$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.MediaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["media"]>
@@ -2619,7 +2416,6 @@ export type MediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   videoChapters?: boolean | Prisma.Media$videoChaptersArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.Media$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Media$shortClipsArgs<ExtArgs>
-  generatedAssets?: boolean | Prisma.Media$generatedAssetsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.Media$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.MediaCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2641,7 +2437,6 @@ export type $MediaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     videoChapters: Prisma.$VideoChapterPayload<ExtArgs>[]
     clipCandidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
     shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
-    generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3066,7 +2861,6 @@ export interface Prisma__MediaClient<T, Null = never, ExtArgs extends runtime.Ty
   videoChapters<T extends Prisma.Media$videoChaptersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$videoChaptersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clipCandidates<T extends Prisma.Media$clipCandidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$clipCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shortClips<T extends Prisma.Media$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  generatedAssets<T extends Prisma.Media$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   publishTasks<T extends Prisma.Media$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3682,30 +3476,6 @@ export type Media$shortClipsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ShortClipScalarFieldEnum | Prisma.ShortClipScalarFieldEnum[]
-}
-
-/**
- * Media.generatedAssets
- */
-export type Media$generatedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the GeneratedAsset
-   */
-  select?: Prisma.GeneratedAssetSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the GeneratedAsset
-   */
-  omit?: Prisma.GeneratedAssetOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.GeneratedAssetInclude<ExtArgs> | null
-  where?: Prisma.GeneratedAssetWhereInput
-  orderBy?: Prisma.GeneratedAssetOrderByWithRelationInput | Prisma.GeneratedAssetOrderByWithRelationInput[]
-  cursor?: Prisma.GeneratedAssetWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.GeneratedAssetScalarFieldEnum | Prisma.GeneratedAssetScalarFieldEnum[]
 }
 
 /**

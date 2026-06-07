@@ -38,7 +38,6 @@ export interface TranscriptSummaryData {
   source: string
   model: string | null
   fullTextPreview: string | null
-  transcriptQualityScore: number | null
   wordCount: number | null
   isEdited: boolean
   version: number
@@ -55,10 +54,6 @@ export interface TranscriptDetailData {
   source: string
   model: string | null
   fullText: string | null
-  transcriptQualityScore: number | null
-  fillerRatio: number | null
-  uniqueWordRatio: number | null
-  speechDensity: number | null
   wordCount: number | null
   isEdited: boolean
   version: number

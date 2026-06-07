@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { assetsRoutes } from './assets/assets.routes'
 import { authRoutes } from './auth/auth.routes'
 import { mediaChapterRoutes } from './chaptering/chaptering.routes'
 import { healthRouter } from './health/health.routes'
@@ -8,6 +9,7 @@ import { mediaTranscriptRoutes, transcriptsRoutes } from './transcripts/transcri
 
 export const apiRouter = Router()
 
+apiRouter.use('/assets', assetsRoutes)
 apiRouter.use('/auth', authRoutes)
 apiRouter.use('/media', mediaTranscriptRoutes)
 apiRouter.use('/media', mediaChapterRoutes)

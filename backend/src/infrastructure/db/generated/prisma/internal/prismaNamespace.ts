@@ -1630,7 +1630,6 @@ export const ProcessingJobScalarFieldEnum = {
   jobType: 'jobType',
   status: 'status',
   progress: 'progress',
-  currentStep: 'currentStep',
   errorMessage: 'errorMessage',
   queueName: 'queueName',
   taskName: 'taskName',
@@ -1653,13 +1652,9 @@ export const TranscriptScalarFieldEnum = {
   jobId: 'jobId',
   language: 'language',
   source: 'source',
-  model: 'model',
+  asrModel: 'asrModel',
+  modelSize: 'modelSize',
   fullText: 'fullText',
-  content: 'content',
-  transcriptQualityScore: 'transcriptQualityScore',
-  fillerRatio: 'fillerRatio',
-  uniqueWordRatio: 'uniqueWordRatio',
-  speechDensity: 'speechDensity',
   wordCount: 'wordCount',
   isEdited: 'isEdited',
   version: 'version',
@@ -1716,8 +1711,9 @@ export const VideoChapterScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   title: 'title',
-  summary: 'summary',
   transcriptVersion: 'transcriptVersion',
+  version: 'version',
+  isEdited: 'isEdited',
   source: 'source',
   score: 'score',
   boundaryScore: 'boundaryScore',
@@ -1800,7 +1796,6 @@ export type ShortClipScalarFieldEnum = (typeof ShortClipScalarFieldEnum)[keyof t
 export const GeneratedAssetScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  mediaId: 'mediaId',
   transcriptId: 'transcriptId',
   chapterId: 'chapterId',
   assetType: 'assetType',
@@ -2123,6 +2118,34 @@ export type EnumTranscriptSourceFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'TranscriptSource[]'
  */
 export type ListEnumTranscriptSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TranscriptSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AsrModel'
+ */
+export type EnumAsrModelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AsrModel'>
+    
+
+
+/**
+ * Reference to a field of type 'AsrModel[]'
+ */
+export type ListEnumAsrModelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AsrModel[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ModelSize'
+ */
+export type EnumModelSizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModelSize'>
+    
+
+
+/**
+ * Reference to a field of type 'ModelSize[]'
+ */
+export type ListEnumModelSizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModelSize[]'>
     
 
 

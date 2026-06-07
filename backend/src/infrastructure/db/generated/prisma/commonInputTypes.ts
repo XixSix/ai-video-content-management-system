@@ -442,6 +442,20 @@ export type EnumTranscriptSourceFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumTranscriptSourceFilter<$PrismaModel> | $Enums.TranscriptSource
 }
 
+export type EnumAsrModelNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.AsrModel | Prisma.EnumAsrModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumAsrModelNullableFilter<$PrismaModel> | $Enums.AsrModel | null
+}
+
+export type EnumModelSizeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModelSize | Prisma.EnumModelSizeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumModelSizeNullableFilter<$PrismaModel> | $Enums.ModelSize | null
+}
+
 export type BoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -470,6 +484,26 @@ export type EnumTranscriptSourceWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTranscriptSourceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTranscriptSourceFilter<$PrismaModel>
+}
+
+export type EnumAsrModelNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AsrModel | Prisma.EnumAsrModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumAsrModelNullableWithAggregatesFilter<$PrismaModel> | $Enums.AsrModel | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAsrModelNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAsrModelNullableFilter<$PrismaModel>
+}
+
+export type EnumModelSizeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModelSize | Prisma.EnumModelSizeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumModelSizeNullableWithAggregatesFilter<$PrismaModel> | $Enums.ModelSize | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumModelSizeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumModelSizeNullableFilter<$PrismaModel>
 }
 
 export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -1128,6 +1162,20 @@ export type NestedEnumTranscriptSourceFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumTranscriptSourceFilter<$PrismaModel> | $Enums.TranscriptSource
 }
 
+export type NestedEnumAsrModelNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.AsrModel | Prisma.EnumAsrModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumAsrModelNullableFilter<$PrismaModel> | $Enums.AsrModel | null
+}
+
+export type NestedEnumModelSizeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModelSize | Prisma.EnumModelSizeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumModelSizeNullableFilter<$PrismaModel> | $Enums.ModelSize | null
+}
+
 export type NestedBoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -1155,6 +1203,26 @@ export type NestedEnumTranscriptSourceWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTranscriptSourceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTranscriptSourceFilter<$PrismaModel>
+}
+
+export type NestedEnumAsrModelNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AsrModel | Prisma.EnumAsrModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.AsrModel[] | Prisma.ListEnumAsrModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumAsrModelNullableWithAggregatesFilter<$PrismaModel> | $Enums.AsrModel | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAsrModelNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAsrModelNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumModelSizeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModelSize | Prisma.EnumModelSizeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ModelSize[] | Prisma.ListEnumModelSizeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumModelSizeNullableWithAggregatesFilter<$PrismaModel> | $Enums.ModelSize | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumModelSizeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumModelSizeNullableFilter<$PrismaModel>
 }
 
 export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {

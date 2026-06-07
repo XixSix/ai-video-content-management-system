@@ -1,0 +1,4 @@
+ALTER TYPE "ModelSize" RENAME VALUE 'MEDIUM' TO 'medium';
+ALTER TYPE "ModelSize" RENAME VALUE 'SMALL' TO 'small';
+ALTER TYPE "ModelSize" RENAME VALUE 'BASE' TO 'base';
+ALTER TYPE "ModelSize" RENAME VALUE 'TINY' TO 'tiny';
