@@ -28,15 +28,20 @@ export interface ChapterData {
   startTime: number
   endTime: number
   title: string
-  summary: string | null
   transcriptVersion: number
+  version: number
+  isEdited: boolean
   source: ChapterSource
   score: number | null
   boundaryScore: number | null
   pauseScore: number | null
   discourseMarkerScore: number | null
   semanticShiftScore: number | null
+  lexicalShiftScore: number | null
+  valleyDepthScore: number | null
+  boundaryQualityScore: number | null
   durationScore: number | null
+  llmConfidenceScore: number | null
   createdAt: Date
   updatedAt: Date
 }
