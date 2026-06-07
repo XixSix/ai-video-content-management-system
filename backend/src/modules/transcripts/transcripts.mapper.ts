@@ -1,6 +1,20 @@
-import type { ProcessingJob, Transcript, TranscriptSegment } from '../../infrastructure/db/generated/prisma/client'
+import type {
+  ProcessingJob,
+  Transcript,
+  TranscriptEditDraft,
+  TranscriptSegment,
+  TranscriptWord
+} from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
-import type { TranscriptDetailData, TranscriptSegmentData, TranscriptSummaryData } from './transcripts.types'
+import type {
+  TranscriptDetailData,
+  TranscriptEditorBlockData,
+  TranscriptEditorDraftData,
+  TranscriptEditorTranscriptData,
+  TranscriptSegmentData,
+  TranscriptSummaryData,
+  TranscriptWordData
+} from './transcripts.types'
 
 const FULL_TEXT_PREVIEW_MAX_LENGTH = 300
 
@@ -67,6 +81,38 @@ export const toTranscriptSegmentData = (segment: TranscriptSegment): TranscriptS
   createdAt: segment.createdAt
 })
 
+export const toTranscriptWordData = (word: TranscriptWord): TranscriptWordData => ({
+  id: word.id,
+  transcriptId: word.transcriptId,
+  segmentId: word.segmentId,
+  mediaId: word.mediaId,
+  wordIndex: word.wordIndex,
+  segmentWordIndex: word.segmentWordIndex,
+  startTime: word.startTime,
+  endTime: word.endTime,
+  text: word.text,
+  cleanText: word.cleanText,
+  confidence: word.confidence,
+  speakerLabel: word.speakerLabel,
+  createdAt: word.createdAt
+})
+
+export const toTranscriptEditorTranscriptData = (transcript: Transcript): TranscriptEditorTranscriptData => ({
+  id: transcript.id,
+  mediaId: transcript.mediaId,
+  version: transcript.version,
+  isEdited: transcript.isEdited,
+  language: transcript.language
+})
+
+export const toTranscriptEditorDraftData = (draft: TranscriptEditDraft): TranscriptEditorDraftData => ({
+  id: draft.id,
+  baseTranscriptVersion: draft.baseTranscriptVersion,
+  revision: draft.revision,
+  clientSequence: draft.clientSequence,
+  blocks: toTranscriptEditorBlocks(draft.blocks)
+})
+
 const toFullTextPreview = (fullText: string | null): string | null => {
   if (!fullText) {
     return null
@@ -76,3 +122,6 @@ const toFullTextPreview = (fullText: string | null): string | null => {
     ? `${fullText.slice(0, FULL_TEXT_PREVIEW_MAX_LENGTH)}...`
     : fullText
 }
+
+const toTranscriptEditorBlocks = (blocks: unknown): TranscriptEditorBlockData[] =>
+  Array.isArray(blocks) ? (blocks as TranscriptEditorBlockData[]) : []

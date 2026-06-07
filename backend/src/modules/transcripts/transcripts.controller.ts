@@ -5,12 +5,15 @@ import type {
   ExportTranscriptBody,
   GenerateTranscriptBody,
   MediaTranscriptParams,
+  SaveTranscriptEditorDraftBody,
   TranscriptParams
 } from './transcripts.schema'
 import * as transcriptsService from './transcripts.service'
 import type {
   GenerateTranscriptResult,
   TranscriptDetailData,
+  TranscriptEditorData,
+  TranscriptEditorDraftData,
   TranscriptJobResult,
   TranscriptSegmentData,
   TranscriptSummaryData
@@ -59,6 +62,44 @@ export const segments: ParamsRequestHandler<TranscriptParams> = async (req, res,
     const segments = await transcriptsService.listTranscriptSegments(req.user!.id, req.params.transcriptId)
 
     sendSuccess<{ segments: TranscriptSegmentData[] }>(res, { segments })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const editor: ParamsRequestHandler<TranscriptParams> = async (req, res, next): Promise<void> => {
+  try {
+    const editorData = await transcriptsService.getTranscriptEditor(req.user!.id, req.params.transcriptId)
+
+    sendSuccess<TranscriptEditorData>(res, editorData)
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const saveEditorDraft: ParamsBodyRequestHandler<TranscriptParams, SaveTranscriptEditorDraftBody> = async (
+  req,
+  res,
+  next
+): Promise<void> => {
+  try {
+    const draft = await transcriptsService.saveTranscriptEditorDraft({
+      userId: req.user!.id,
+      transcriptId: req.params.transcriptId,
+      ...req.body
+    })
+
+    sendSuccess<{ draft: TranscriptEditorDraftData }>(res, { draft })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const discardEditorDraft: ParamsRequestHandler<TranscriptParams> = async (req, res, next): Promise<void> => {
+  try {
+    const discarded = await transcriptsService.discardTranscriptEditorDraft(req.user!.id, req.params.transcriptId)
+
+    sendSuccess<{ discarded: boolean }>(res, { discarded })
   } catch (error: unknown) {
     next(error)
   }

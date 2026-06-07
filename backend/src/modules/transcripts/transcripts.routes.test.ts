@@ -6,6 +6,8 @@ import { TranscriptError } from './transcripts.error'
 import type {
   GenerateTranscriptResult,
   TranscriptDetailData,
+  TranscriptEditorData,
+  TranscriptEditorDraftData,
   TranscriptSegmentData,
   TranscriptSummaryData
 } from './transcripts.types'
@@ -17,6 +19,9 @@ const burnTranscriptMock = jest.fn<(input: unknown) => Promise<GenerateTranscrip
 const listMediaTranscriptsMock = jest.fn<(userId: string, mediaId: string) => Promise<TranscriptSummaryData[]>>()
 const getTranscriptMock = jest.fn<(userId: string, transcriptId: string) => Promise<TranscriptDetailData>>()
 const listTranscriptSegmentsMock = jest.fn<(userId: string, transcriptId: string) => Promise<TranscriptSegmentData[]>>()
+const getTranscriptEditorMock = jest.fn<(userId: string, transcriptId: string) => Promise<TranscriptEditorData>>()
+const saveTranscriptEditorDraftMock = jest.fn<(input: unknown) => Promise<TranscriptEditorDraftData>>()
+const discardTranscriptEditorDraftMock = jest.fn<(userId: string, transcriptId: string) => Promise<boolean>>()
 
 jest.unstable_mockModule('../auth/auth.service', () => ({
   getAuthenticatedUser: getAuthenticatedUserMock
@@ -27,8 +32,11 @@ jest.unstable_mockModule('./transcripts.service', () => ({
   exportTranscript: exportTranscriptMock,
   generateTranscript: generateTranscriptMock,
   getTranscript: getTranscriptMock,
+  getTranscriptEditor: getTranscriptEditorMock,
   listMediaTranscripts: listMediaTranscriptsMock,
-  listTranscriptSegments: listTranscriptSegmentsMock
+  listTranscriptSegments: listTranscriptSegmentsMock,
+  saveTranscriptEditorDraft: saveTranscriptEditorDraftMock,
+  discardTranscriptEditorDraft: discardTranscriptEditorDraftMock
 }))
 
 const { app } = await import('../../app')
@@ -115,6 +123,52 @@ const createSegment = (): TranscriptSegmentData => ({
   createdAt: now
 })
 
+const createDraft = (): TranscriptEditorDraftData => ({
+  id: '00000000-0000-4000-8000-000000000006',
+  baseTranscriptVersion: 1,
+  revision: 2,
+  clientSequence: 12,
+  blocks: [
+    {
+      blockId: 'block_001',
+      startTime: 0,
+      endTime: 2.4,
+      text: 'Hello.',
+      sourceSegmentIds: [createSegment().id],
+      sourceWordIds: ['00000000-0000-4000-8000-000000000007']
+    }
+  ]
+})
+
+const createEditorData = (): TranscriptEditorData => ({
+  transcript: {
+    id: transcriptId,
+    mediaId,
+    version: 1,
+    isEdited: false,
+    language: 'en'
+  },
+  segments: [createSegment()],
+  words: [
+    {
+      id: '00000000-0000-4000-8000-000000000007',
+      transcriptId,
+      segmentId: createSegment().id,
+      mediaId,
+      wordIndex: 0,
+      segmentWordIndex: 0,
+      startTime: 0,
+      endTime: 0.4,
+      text: 'Hello',
+      cleanText: 'Hello',
+      confidence: 0.98,
+      speakerLabel: null,
+      createdAt: now
+    }
+  ],
+  draft: createDraft()
+})
+
 describe('transcript routes', () => {
   beforeEach(() => {
     userSequence += 1
@@ -126,6 +180,9 @@ describe('transcript routes', () => {
     listMediaTranscriptsMock.mockReset()
     getTranscriptMock.mockReset()
     listTranscriptSegmentsMock.mockReset()
+    getTranscriptEditorMock.mockReset()
+    saveTranscriptEditorDraftMock.mockReset()
+    discardTranscriptEditorDraftMock.mockReset()
     getAuthenticatedUserMock.mockImplementation(async () => authenticatedUser)
     generateTranscriptMock.mockResolvedValue(createJobResult())
     exportTranscriptMock.mockResolvedValue(createExportJobResult())
@@ -133,6 +190,9 @@ describe('transcript routes', () => {
     listMediaTranscriptsMock.mockResolvedValue([createTranscriptSummary()])
     getTranscriptMock.mockResolvedValue(createTranscriptDetail())
     listTranscriptSegmentsMock.mockResolvedValue([createSegment()])
+    getTranscriptEditorMock.mockResolvedValue(createEditorData())
+    saveTranscriptEditorDraftMock.mockResolvedValue(createDraft())
+    discardTranscriptEditorDraftMock.mockResolvedValue(true)
   })
 
   it.each([
@@ -140,10 +200,13 @@ describe('transcript routes', () => {
     ['GET', `/api/v1/media/${mediaId}/transcripts`],
     ['GET', `/api/v1/transcripts/${transcriptId}`],
     ['GET', `/api/v1/transcripts/${transcriptId}/segments`],
+    ['GET', `/api/v1/transcripts/${transcriptId}/editor`],
+    ['PATCH', `/api/v1/transcripts/${transcriptId}/editor/draft`],
+    ['DELETE', `/api/v1/transcripts/${transcriptId}/editor/draft`],
     ['POST', `/api/v1/transcripts/${transcriptId}/export`],
     ['POST', `/api/v1/transcripts/${transcriptId}/burn`]
   ])('%s %s requires an access token', async (method, path) => {
-    const response = await request(app)[method.toLowerCase() as 'get' | 'post'](path).send({})
+    const response = await request(app)[method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete'](path).send({})
 
     expect(response.status).toBe(401)
     expect(response.body).toMatchObject({
@@ -392,6 +455,102 @@ describe('transcript routes', () => {
       }
     })
     expect(listTranscriptSegmentsMock).toHaveBeenCalledWith(authenticatedUser.id, transcriptId)
+  })
+
+  it('returns transcript editor data', async () => {
+    const response = await request(app)
+      .get(`/api/v1/transcripts/${transcriptId}/editor`)
+      .set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        ...createEditorData(),
+        segments: [
+          {
+            ...createSegment(),
+            createdAt: now.toISOString()
+          }
+        ],
+        words: [
+          {
+            ...createEditorData().words[0],
+            createdAt: now.toISOString()
+          }
+        ]
+      }
+    })
+    expect(getTranscriptEditorMock).toHaveBeenCalledWith(authenticatedUser.id, transcriptId)
+  })
+
+  it('saves transcript editor drafts', async () => {
+    const body = {
+      baseTranscriptVersion: 1,
+      clientSequence: 12,
+      blocks: createDraft().blocks
+    }
+
+    const response = await request(app)
+      .patch(`/api/v1/transcripts/${transcriptId}/editor/draft`)
+      .set('Authorization', 'Bearer access-token')
+      .send(body)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        draft: createDraft()
+      }
+    })
+    expect(saveTranscriptEditorDraftMock).toHaveBeenCalledWith({
+      userId: authenticatedUser.id,
+      transcriptId,
+      ...body
+    })
+  })
+
+  it('returns validation errors for invalid transcript editor draft payloads', async () => {
+    const response = await request(app)
+      .patch(`/api/v1/transcripts/${transcriptId}/editor/draft`)
+      .set('Authorization', 'Bearer access-token')
+      .send({
+        baseTranscriptVersion: 1,
+        clientSequence: 12,
+        blocks: [
+          {
+            blockId: 'block_001',
+            startTime: 2.4,
+            endTime: 2.4,
+            text: 'Hello.',
+            sourceSegmentIds: []
+          }
+        ]
+      })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed'
+      }
+    })
+  })
+
+  it('discards transcript editor drafts', async () => {
+    const response = await request(app)
+      .delete(`/api/v1/transcripts/${transcriptId}/editor/draft`)
+      .set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        discarded: true
+      }
+    })
+    expect(discardTranscriptEditorDraftMock).toHaveBeenCalledWith(authenticatedUser.id, transcriptId)
   })
 
   it('returns media-style errors for forbidden media access', async () => {
