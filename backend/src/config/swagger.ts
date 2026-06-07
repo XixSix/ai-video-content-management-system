@@ -131,6 +131,10 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Chapters',
         description: 'Video chapter generation and read endpoints'
+      },
+      {
+        name: 'Assets',
+        description: 'Generated asset download and cleanup endpoints'
       }
     ]
   },

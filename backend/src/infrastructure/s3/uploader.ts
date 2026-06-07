@@ -137,6 +137,10 @@ export const deleteObject = async (bucket: string, key: string): Promise<void> =
 
     await s3Client.send(command)
   } catch (error: unknown) {
+    if (isObjectNotFoundError(error)) {
+      return
+    }
+
     throw toStorageError(error, 'Failed to delete object')
   }
 }
