@@ -1,6 +1,6 @@
 import type { JobResponseData } from '../jobs/jobs.types'
 import type { AsrModel, ModelSize, TranscriptSource } from '../../infrastructure/db/generated/prisma/client'
-import type { ExportTranscriptBody, GenerateTranscriptBody } from './transcripts.schema'
+import type { ExportTranscriptBody, GenerateTranscriptBody, SaveTranscriptEditorDraftBody } from './transcripts.schema'
 
 export const TRANSCRIPT_QUEUE_NAME = 'transcript_queue'
 export const TRANSCRIPT_TASK_NAME = 'transcribe'
@@ -23,6 +23,11 @@ export type ExportTranscriptInput = ExportTranscriptBody & {
 }
 
 export type BurnTranscriptInput = {
+  transcriptId: string
+  userId: string
+}
+
+export type SaveTranscriptEditorDraftInput = SaveTranscriptEditorDraftBody & {
   transcriptId: string
   userId: string
 }
@@ -77,4 +82,52 @@ export interface TranscriptSegmentData {
   confidence: number | null
   speakerLabel: string | null
   createdAt: Date
+}
+
+export interface TranscriptWordData {
+  id: string
+  transcriptId: string
+  segmentId: string
+  mediaId: string
+  wordIndex: number
+  segmentWordIndex: number
+  startTime: number
+  endTime: number
+  text: string
+  cleanText: string | null
+  confidence: number | null
+  speakerLabel: string | null
+  createdAt: Date
+}
+
+export interface TranscriptEditorTranscriptData {
+  id: string
+  mediaId: string
+  version: number
+  isEdited: boolean
+  language: string | null
+}
+
+export interface TranscriptEditorBlockData {
+  blockId: string
+  startTime: number
+  endTime: number
+  text: string
+  sourceSegmentIds: string[]
+  sourceWordIds: string[]
+}
+
+export interface TranscriptEditorDraftData {
+  id: string
+  baseTranscriptVersion: number
+  revision: number
+  clientSequence: number
+  blocks: TranscriptEditorBlockData[]
+}
+
+export interface TranscriptEditorData {
+  transcript: TranscriptEditorTranscriptData
+  segments: TranscriptSegmentData[]
+  words: TranscriptWordData[]
+  draft: TranscriptEditorDraftData | null
 }

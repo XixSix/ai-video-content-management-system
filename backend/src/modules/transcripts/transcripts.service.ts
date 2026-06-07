@@ -1,4 +1,4 @@
-import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import type { Media, Prisma } from '../../infrastructure/db/generated/prisma/client'
 import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
 import { MediaStatus, MediaType } from '../../infrastructure/db/generated/prisma/client'
 import { MediaError } from '../media/media.error'
@@ -6,8 +6,11 @@ import { TranscriptError } from './transcripts.error'
 import {
   toJobResponseData,
   toTranscriptDetailData,
+  toTranscriptEditorDraftData,
+  toTranscriptEditorTranscriptData,
   toTranscriptSegmentData,
-  toTranscriptSummaryData
+  toTranscriptSummaryData,
+  toTranscriptWordData
 } from './transcripts.mapper'
 import * as transcriptQueue from './transcripts.queue'
 import * as transcriptsRepo from './transcripts.repository'
@@ -16,7 +19,10 @@ import type {
   ExportTranscriptInput,
   GenerateTranscriptInput,
   GenerateTranscriptResult,
+  SaveTranscriptEditorDraftInput,
   TranscriptDetailData,
+  TranscriptEditorData,
+  TranscriptEditorDraftData,
   TranscriptJobResult,
   TranscriptSegmentData,
   TranscriptSummaryData
@@ -119,6 +125,75 @@ export const listTranscriptSegments = async (
   }
 
   return segments.map(toTranscriptSegmentData)
+}
+
+export const getTranscriptEditor = async (userId: string, transcriptId: string): Promise<TranscriptEditorData> => {
+  const transcript = await transcriptsRepo.findTranscriptByIdAndUserId(transcriptId, userId)
+
+  if (!transcript) {
+    throw TranscriptError.notFound()
+  }
+
+  const [segments, words, draft] = await Promise.all([
+    transcriptsRepo.findTranscriptSegmentsByTranscriptId(transcript.id),
+    transcriptsRepo.findTranscriptWordsByTranscriptId(transcript.id),
+    transcriptsRepo.findActiveTranscriptEditDraftByTranscriptId(transcript.id)
+  ])
+
+  if (segments.length === 0) {
+    throw TranscriptError.notFound('Transcript segments not found')
+  }
+
+  return {
+    transcript: toTranscriptEditorTranscriptData(transcript),
+    segments: segments.map(toTranscriptSegmentData),
+    words: words.map(toTranscriptWordData),
+    draft: draft ? toTranscriptEditorDraftData(draft) : null
+  }
+}
+
+export const saveTranscriptEditorDraft = async (
+  input: SaveTranscriptEditorDraftInput
+): Promise<TranscriptEditorDraftData> => {
+  const transcript = await transcriptsRepo.findTranscriptByIdAndUserId(input.transcriptId, input.userId)
+
+  if (!transcript) {
+    throw TranscriptError.notFound()
+  }
+
+  if (input.baseTranscriptVersion !== transcript.version) {
+    throw TranscriptError.versionConflict(transcript.version, input.baseTranscriptVersion)
+  }
+
+  const existingDraft = await transcriptsRepo.findTranscriptEditDraftByTranscriptId(input.transcriptId)
+
+  if (existingDraft && input.clientSequence <= existingDraft.clientSequence) {
+    return toTranscriptEditorDraftData(existingDraft)
+  }
+
+  const blocks = input.blocks as unknown as Prisma.InputJsonValue
+
+  const draft = await transcriptsRepo.upsertTranscriptEditDraft({
+    transcriptId: transcript.id,
+    userId: input.userId,
+    baseTranscriptVersion: input.baseTranscriptVersion,
+    clientSequence: input.clientSequence,
+    blocks
+  })
+
+  return toTranscriptEditorDraftData(draft)
+}
+
+export const discardTranscriptEditorDraft = async (userId: string, transcriptId: string): Promise<boolean> => {
+  const transcript = await transcriptsRepo.findTranscriptByIdAndUserId(transcriptId, userId)
+
+  if (!transcript) {
+    throw TranscriptError.notFound()
+  }
+
+  await transcriptsRepo.discardActiveTranscriptEditDraft(transcript.id)
+
+  return true
 }
 
 export const exportTranscript = async (input: ExportTranscriptInput): Promise<TranscriptJobResult> => {

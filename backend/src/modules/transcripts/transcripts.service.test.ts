@@ -3,7 +3,9 @@ import type {
   Media,
   ProcessingJob,
   Transcript,
-  TranscriptSegment
+  TranscriptEditDraft,
+  TranscriptSegment,
+  TranscriptWord
 } from '../../infrastructure/db/generated/prisma/client'
 
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
@@ -13,8 +15,16 @@ const findActiveTranscriptJobByMediaIdAndUserIdMock =
   jest.fn<(mediaId: string, userId: string) => Promise<ProcessingJob | null>>()
 const findTranscriptsByMediaIdAndUserIdMock = jest.fn<(mediaId: string, userId: string) => Promise<Transcript[]>>()
 const findTranscriptByIdAndUserIdMock = jest.fn<(transcriptId: string, userId: string) => Promise<Transcript | null>>()
+const findTranscriptSegmentsByTranscriptIdMock = jest.fn<(transcriptId: string) => Promise<TranscriptSegment[]>>()
 const findTranscriptSegmentsByTranscriptIdAndUserIdMock =
   jest.fn<(transcriptId: string, userId: string) => Promise<TranscriptSegment[] | null>>()
+const findTranscriptWordsByTranscriptIdMock = jest.fn<(transcriptId: string) => Promise<TranscriptWord[]>>()
+const findActiveTranscriptEditDraftByTranscriptIdMock =
+  jest.fn<(transcriptId: string) => Promise<TranscriptEditDraft | null>>()
+const findTranscriptEditDraftByTranscriptIdMock =
+  jest.fn<(transcriptId: string) => Promise<TranscriptEditDraft | null>>()
+const upsertTranscriptEditDraftMock = jest.fn<(data: unknown) => Promise<TranscriptEditDraft>>()
+const discardActiveTranscriptEditDraftMock = jest.fn<(transcriptId: string) => Promise<void>>()
 const publishTranscriptJobMock =
   jest.fn<(message: { jobId: string; mediaId: string; userId: string; s3Key: string }) => Promise<void>>()
 const publishTranscriptExportJobMock = jest.fn<(message: unknown) => Promise<void>>()
@@ -24,9 +34,15 @@ jest.unstable_mockModule('./transcripts.repository', () => ({
   createProcessingJob: createProcessingJobMock,
   findActiveTranscriptJobByMediaIdAndUserId: findActiveTranscriptJobByMediaIdAndUserIdMock,
   findMediaById: findMediaByIdMock,
+  discardActiveTranscriptEditDraft: discardActiveTranscriptEditDraftMock,
+  findActiveTranscriptEditDraftByTranscriptId: findActiveTranscriptEditDraftByTranscriptIdMock,
+  findTranscriptEditDraftByTranscriptId: findTranscriptEditDraftByTranscriptIdMock,
   findTranscriptByIdAndUserId: findTranscriptByIdAndUserIdMock,
+  findTranscriptSegmentsByTranscriptId: findTranscriptSegmentsByTranscriptIdMock,
   findTranscriptSegmentsByTranscriptIdAndUserId: findTranscriptSegmentsByTranscriptIdAndUserIdMock,
+  findTranscriptWordsByTranscriptId: findTranscriptWordsByTranscriptIdMock,
   findTranscriptsByMediaIdAndUserId: findTranscriptsByMediaIdAndUserIdMock,
+  upsertTranscriptEditDraft: upsertTranscriptEditDraftMock,
   updateProcessingJob: updateProcessingJobMock
 }))
 
@@ -122,6 +138,47 @@ const createSegment = (overrides: Partial<TranscriptSegment> = {}): TranscriptSe
   ...overrides
 })
 
+const createWord = (overrides: Partial<TranscriptWord> = {}): TranscriptWord => ({
+  id: '00000000-0000-4000-8000-000000000006',
+  transcriptId,
+  segmentId: createSegment().id,
+  mediaId,
+  wordIndex: 0,
+  segmentWordIndex: 0,
+  startTime: 0,
+  endTime: 0.5,
+  text: 'Hello',
+  cleanText: 'Hello',
+  confidence: 0.98,
+  speakerLabel: null,
+  createdAt: now,
+  ...overrides
+})
+
+const createDraft = (overrides: Partial<TranscriptEditDraft> = {}): TranscriptEditDraft => ({
+  id: '00000000-0000-4000-8000-000000000007',
+  transcriptId,
+  userId,
+  baseTranscriptVersion: 1,
+  revision: 1,
+  clientSequence: 12,
+  blocks: [
+    {
+      blockId: 'block_001',
+      startTime: 0,
+      endTime: 4.2,
+      text: 'Hello.',
+      sourceSegmentIds: [createSegment().id],
+      sourceWordIds: [createWord().id]
+    }
+  ],
+  createdAt: now,
+  updatedAt: now,
+  appliedAt: null,
+  discardedAt: null,
+  ...overrides
+})
+
 describe('transcripts service', () => {
   beforeEach(() => {
     findMediaByIdMock.mockReset()
@@ -130,7 +187,13 @@ describe('transcripts service', () => {
     findActiveTranscriptJobByMediaIdAndUserIdMock.mockReset()
     findTranscriptsByMediaIdAndUserIdMock.mockReset()
     findTranscriptByIdAndUserIdMock.mockReset()
+    findTranscriptSegmentsByTranscriptIdMock.mockReset()
     findTranscriptSegmentsByTranscriptIdAndUserIdMock.mockReset()
+    findTranscriptWordsByTranscriptIdMock.mockReset()
+    findActiveTranscriptEditDraftByTranscriptIdMock.mockReset()
+    findTranscriptEditDraftByTranscriptIdMock.mockReset()
+    upsertTranscriptEditDraftMock.mockReset()
+    discardActiveTranscriptEditDraftMock.mockReset()
     publishTranscriptJobMock.mockReset()
     publishTranscriptExportJobMock.mockReset()
     publishTranscriptBurnJobMock.mockReset()
@@ -473,6 +536,203 @@ describe('transcripts service', () => {
         text: 'Hello.'
       })
     ])
+  })
+
+  it('returns editor data for an owned transcript', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    findTranscriptSegmentsByTranscriptIdMock.mockResolvedValue([createSegment({ segmentIndex: 1 })])
+    findTranscriptWordsByTranscriptIdMock.mockResolvedValue([createWord({ wordIndex: 2 })])
+    findActiveTranscriptEditDraftByTranscriptIdMock.mockResolvedValue(createDraft())
+
+    const editor = await transcriptsService.getTranscriptEditor(userId, transcriptId)
+
+    expect(editor).toMatchObject({
+      transcript: {
+        id: transcriptId,
+        mediaId,
+        version: 1,
+        isEdited: false,
+        language: 'en'
+      },
+      segments: [
+        {
+          segmentIndex: 1
+        }
+      ],
+      words: [
+        {
+          wordIndex: 2,
+          text: 'Hello'
+        }
+      ],
+      draft: {
+        id: '00000000-0000-4000-8000-000000000007',
+        revision: 1,
+        clientSequence: 12
+      }
+    })
+    expect(findTranscriptSegmentsByTranscriptIdMock).toHaveBeenCalledWith(transcriptId)
+    expect(findTranscriptSegmentsByTranscriptIdAndUserIdMock).not.toHaveBeenCalled()
+    expect(findTranscriptWordsByTranscriptIdMock).toHaveBeenCalledWith(transcriptId)
+    expect(findActiveTranscriptEditDraftByTranscriptIdMock).toHaveBeenCalledWith(transcriptId)
+  })
+
+  it('throws when an owned transcript has no segments for the editor', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    findTranscriptSegmentsByTranscriptIdMock.mockResolvedValue([])
+    findTranscriptWordsByTranscriptIdMock.mockResolvedValue([])
+    findActiveTranscriptEditDraftByTranscriptIdMock.mockResolvedValue(null)
+
+    await expect(transcriptsService.getTranscriptEditor(userId, transcriptId)).rejects.toMatchObject({
+      statusCode: 404,
+      code: 'TRANSCRIPT_NOT_FOUND',
+      message: 'Transcript segments not found'
+    })
+  })
+
+  it('returns empty words and null draft when optional editor data is missing', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    findTranscriptSegmentsByTranscriptIdMock.mockResolvedValue([createSegment()])
+    findTranscriptWordsByTranscriptIdMock.mockResolvedValue([])
+    findActiveTranscriptEditDraftByTranscriptIdMock.mockResolvedValue(null)
+
+    const editor = await transcriptsService.getTranscriptEditor(userId, transcriptId)
+
+    expect(editor.words).toEqual([])
+    expect(editor.draft).toBeNull()
+  })
+
+  it('upserts an editor draft when none exists', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    findTranscriptEditDraftByTranscriptIdMock.mockResolvedValue(null)
+    upsertTranscriptEditDraftMock.mockResolvedValue(createDraft())
+
+    const draft = await transcriptsService.saveTranscriptEditorDraft({
+      transcriptId,
+      userId,
+      baseTranscriptVersion: 1,
+      clientSequence: 12,
+      blocks: [
+        {
+          blockId: 'block_001',
+          startTime: 0,
+          endTime: 4.2,
+          text: 'Hello.',
+          sourceSegmentIds: [createSegment().id],
+          sourceWordIds: [createWord().id]
+        }
+      ]
+    })
+
+    expect(upsertTranscriptEditDraftMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transcriptId,
+        userId,
+        baseTranscriptVersion: 1,
+        clientSequence: 12
+      })
+    )
+    expect(draft).toMatchObject({
+      id: '00000000-0000-4000-8000-000000000007',
+      revision: 1,
+      clientSequence: 12
+    })
+  })
+
+  it('upserts an editor draft when client sequence increases', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    findTranscriptEditDraftByTranscriptIdMock.mockResolvedValue(createDraft({ clientSequence: 12 }))
+    upsertTranscriptEditDraftMock.mockResolvedValue(createDraft({ revision: 2, clientSequence: 13 }))
+
+    const draft = await transcriptsService.saveTranscriptEditorDraft({
+      transcriptId,
+      userId,
+      baseTranscriptVersion: 1,
+      clientSequence: 13,
+      blocks: [
+        {
+          blockId: 'block_001',
+          startTime: 0,
+          endTime: 4.2,
+          text: 'Hello updated.',
+          sourceSegmentIds: [createSegment().id],
+          sourceWordIds: [createWord().id]
+        }
+      ]
+    })
+
+    expect(upsertTranscriptEditDraftMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transcriptId,
+        userId,
+        baseTranscriptVersion: 1,
+        clientSequence: 13
+      })
+    )
+    expect(draft).toMatchObject({
+      revision: 2,
+      clientSequence: 13
+    })
+  })
+
+  it('does not overwrite an editor draft when client sequence is equal or lower', async () => {
+    const existingDraft = createDraft({ clientSequence: 12 })
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    findTranscriptEditDraftByTranscriptIdMock.mockResolvedValue(existingDraft)
+
+    const draft = await transcriptsService.saveTranscriptEditorDraft({
+      transcriptId,
+      userId,
+      baseTranscriptVersion: 1,
+      clientSequence: 12,
+      blocks: [
+        {
+          blockId: 'block_001',
+          startTime: 0,
+          endTime: 4.2,
+          text: 'Stale text.',
+          sourceSegmentIds: [createSegment().id],
+          sourceWordIds: [createWord().id]
+        }
+      ]
+    })
+
+    expect(upsertTranscriptEditDraftMock).not.toHaveBeenCalled()
+    expect(draft).toMatchObject({
+      clientSequence: existingDraft.clientSequence,
+      blocks: existingDraft.blocks
+    })
+  })
+
+  it('throws version conflict details when saving a stale editor draft', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript({ version: 4 }))
+
+    await expect(
+      transcriptsService.saveTranscriptEditorDraft({
+        transcriptId,
+        userId,
+        baseTranscriptVersion: 3,
+        clientSequence: 12,
+        blocks: []
+      })
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'TRANSCRIPT_EDITOR_VERSION_CONFLICT',
+      details: {
+        currentVersion: 4,
+        baseTranscriptVersion: 3
+      }
+    })
+    expect(findTranscriptEditDraftByTranscriptIdMock).not.toHaveBeenCalled()
+  })
+
+  it('discards editor drafts idempotently', async () => {
+    findTranscriptByIdAndUserIdMock.mockResolvedValue(createTranscript())
+    discardActiveTranscriptEditDraftMock.mockResolvedValue()
+
+    await expect(transcriptsService.discardTranscriptEditorDraft(userId, transcriptId)).resolves.toBe(true)
+
+    expect(discardActiveTranscriptEditDraftMock).toHaveBeenCalledWith(transcriptId)
   })
 
   it('throws TRANSCRIPT_NOT_FOUND when transcript is missing or not owned', async () => {

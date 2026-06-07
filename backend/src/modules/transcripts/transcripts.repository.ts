@@ -4,7 +4,9 @@ import type {
   Prisma,
   ProcessingJob,
   Transcript,
-  TranscriptSegment
+  TranscriptEditDraft,
+  TranscriptSegment,
+  TranscriptWord
 } from '../../infrastructure/db/generated/prisma/client'
 import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
 
@@ -89,6 +91,84 @@ export const findTranscriptSegmentsByTranscriptIdAndUserId = async (
     },
     orderBy: {
       segmentIndex: 'asc'
+    }
+  })
+}
+
+export const findTranscriptSegmentsByTranscriptId = async (transcriptId: string): Promise<TranscriptSegment[]> =>
+  prisma.transcriptSegment.findMany({
+    where: {
+      transcriptId
+    },
+    orderBy: {
+      segmentIndex: 'asc'
+    }
+  })
+
+export const findTranscriptWordsByTranscriptId = async (transcriptId: string): Promise<TranscriptWord[]> =>
+  prisma.transcriptWord.findMany({
+    where: {
+      transcriptId
+    },
+    orderBy: {
+      wordIndex: 'asc'
+    }
+  })
+
+export const findActiveTranscriptEditDraftByTranscriptId = async (
+  transcriptId: string
+): Promise<TranscriptEditDraft | null> =>
+  prisma.transcriptEditDraft.findFirst({
+    where: {
+      transcriptId,
+      appliedAt: null,
+      discardedAt: null
+    }
+  })
+
+export const findTranscriptEditDraftByTranscriptId = async (
+  transcriptId: string
+): Promise<TranscriptEditDraft | null> =>
+  prisma.transcriptEditDraft.findUnique({
+    where: {
+      transcriptId
+    }
+  })
+
+export type CreateTranscriptEditDraftData = {
+  transcriptId: string
+  userId: string
+  baseTranscriptVersion: number
+  clientSequence: number
+  blocks: Prisma.InputJsonValue
+}
+
+export const upsertTranscriptEditDraft = async (data: CreateTranscriptEditDraftData): Promise<TranscriptEditDraft> =>
+  prisma.transcriptEditDraft.upsert({
+    where: {
+      transcriptId: data.transcriptId
+    },
+    create: data,
+    update: {
+      baseTranscriptVersion: data.baseTranscriptVersion,
+      clientSequence: data.clientSequence,
+      blocks: data.blocks,
+      discardedAt: null,
+      revision: {
+        increment: 1
+      }
+    }
+  })
+
+export const discardActiveTranscriptEditDraft = async (transcriptId: string): Promise<void> => {
+  await prisma.transcriptEditDraft.updateMany({
+    where: {
+      transcriptId,
+      appliedAt: null,
+      discardedAt: null
+    },
+    data: {
+      discardedAt: new Date()
     }
   })
 }

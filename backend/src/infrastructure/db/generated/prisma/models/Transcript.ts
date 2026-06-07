@@ -300,6 +300,7 @@ export type TranscriptWhereInput = {
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
+  editDraft?: Prisma.XOR<Prisma.TranscriptEditDraftNullableScalarRelationFilter, Prisma.TranscriptEditDraftWhereInput> | null
 }
 
 export type TranscriptOrderByWithRelationInput = {
@@ -325,6 +326,7 @@ export type TranscriptOrderByWithRelationInput = {
   clipCandidates?: Prisma.ClipCandidateOrderByRelationAggregateInput
   shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
   generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
+  editDraft?: Prisma.TranscriptEditDraftOrderByWithRelationInput
 }
 
 export type TranscriptWhereUniqueInput = Prisma.AtLeast<{
@@ -353,6 +355,7 @@ export type TranscriptWhereUniqueInput = Prisma.AtLeast<{
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
+  editDraft?: Prisma.XOR<Prisma.TranscriptEditDraftNullableScalarRelationFilter, Prisma.TranscriptEditDraftWhereInput> | null
 }, "id">
 
 export type TranscriptOrderByWithAggregationInput = {
@@ -418,6 +421,7 @@ export type TranscriptCreateInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateInput = {
@@ -441,6 +445,7 @@ export type TranscriptUncheckedCreateInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUpdateInput = {
@@ -464,6 +469,7 @@ export type TranscriptUpdateInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateInput = {
@@ -487,6 +493,7 @@ export type TranscriptUncheckedUpdateInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptCreateManyInput = {
@@ -747,6 +754,20 @@ export type TranscriptUpdateOneRequiredWithoutWordsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TranscriptUpdateToOneWithWhereWithoutWordsInput, Prisma.TranscriptUpdateWithoutWordsInput>, Prisma.TranscriptUncheckedUpdateWithoutWordsInput>
 }
 
+export type TranscriptCreateNestedOneWithoutEditDraftInput = {
+  create?: Prisma.XOR<Prisma.TranscriptCreateWithoutEditDraftInput, Prisma.TranscriptUncheckedCreateWithoutEditDraftInput>
+  connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutEditDraftInput
+  connect?: Prisma.TranscriptWhereUniqueInput
+}
+
+export type TranscriptUpdateOneRequiredWithoutEditDraftNestedInput = {
+  create?: Prisma.XOR<Prisma.TranscriptCreateWithoutEditDraftInput, Prisma.TranscriptUncheckedCreateWithoutEditDraftInput>
+  connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutEditDraftInput
+  upsert?: Prisma.TranscriptUpsertWithoutEditDraftInput
+  connect?: Prisma.TranscriptWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TranscriptUpdateToOneWithWhereWithoutEditDraftInput, Prisma.TranscriptUpdateWithoutEditDraftInput>, Prisma.TranscriptUncheckedUpdateWithoutEditDraftInput>
+}
+
 export type TranscriptCreateNestedOneWithoutVideoChaptersInput = {
   create?: Prisma.XOR<Prisma.TranscriptCreateWithoutVideoChaptersInput, Prisma.TranscriptUncheckedCreateWithoutVideoChaptersInput>
   connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutVideoChaptersInput
@@ -827,6 +848,7 @@ export type TranscriptCreateWithoutMediaInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutMediaInput = {
@@ -849,6 +871,7 @@ export type TranscriptUncheckedCreateWithoutMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutMediaInput = {
@@ -917,6 +940,7 @@ export type TranscriptCreateWithoutJobInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutJobInput = {
@@ -939,6 +963,7 @@ export type TranscriptUncheckedCreateWithoutJobInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutJobInput = {
@@ -987,6 +1012,7 @@ export type TranscriptCreateWithoutSegmentsInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutSegmentsInput = {
@@ -1009,6 +1035,7 @@ export type TranscriptUncheckedCreateWithoutSegmentsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutSegmentsInput = {
@@ -1047,6 +1074,7 @@ export type TranscriptUpdateWithoutSegmentsInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutSegmentsInput = {
@@ -1069,6 +1097,7 @@ export type TranscriptUncheckedUpdateWithoutSegmentsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptCreateWithoutWordsInput = {
@@ -1091,6 +1120,7 @@ export type TranscriptCreateWithoutWordsInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutWordsInput = {
@@ -1113,6 +1143,7 @@ export type TranscriptUncheckedCreateWithoutWordsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutWordsInput = {
@@ -1151,6 +1182,7 @@ export type TranscriptUpdateWithoutWordsInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutWordsInput = {
@@ -1169,6 +1201,115 @@ export type TranscriptUncheckedUpdateWithoutWordsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   segments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutTranscriptNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutTranscriptNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
+}
+
+export type TranscriptCreateWithoutEditDraftInput = {
+  id?: string
+  language?: string | null
+  source?: $Enums.TranscriptSource
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
+  fullText?: string | null
+  wordCount?: number | null
+  isEdited?: boolean
+  version?: number
+  fullTextUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
+  job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
+  words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+}
+
+export type TranscriptUncheckedCreateWithoutEditDraftInput = {
+  id?: string
+  mediaId: string
+  jobId?: string | null
+  language?: string | null
+  source?: $Enums.TranscriptSource
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
+  fullText?: string | null
+  wordCount?: number | null
+  isEdited?: boolean
+  version?: number
+  fullTextUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  segments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutTranscriptInput
+  words?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutTranscriptInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutTranscriptInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+}
+
+export type TranscriptCreateOrConnectWithoutEditDraftInput = {
+  where: Prisma.TranscriptWhereUniqueInput
+  create: Prisma.XOR<Prisma.TranscriptCreateWithoutEditDraftInput, Prisma.TranscriptUncheckedCreateWithoutEditDraftInput>
+}
+
+export type TranscriptUpsertWithoutEditDraftInput = {
+  update: Prisma.XOR<Prisma.TranscriptUpdateWithoutEditDraftInput, Prisma.TranscriptUncheckedUpdateWithoutEditDraftInput>
+  create: Prisma.XOR<Prisma.TranscriptCreateWithoutEditDraftInput, Prisma.TranscriptUncheckedCreateWithoutEditDraftInput>
+  where?: Prisma.TranscriptWhereInput
+}
+
+export type TranscriptUpdateToOneWithWhereWithoutEditDraftInput = {
+  where?: Prisma.TranscriptWhereInput
+  data: Prisma.XOR<Prisma.TranscriptUpdateWithoutEditDraftInput, Prisma.TranscriptUncheckedUpdateWithoutEditDraftInput>
+}
+
+export type TranscriptUpdateWithoutEditDraftInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
+  fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
+  job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
+  words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+}
+
+export type TranscriptUncheckedUpdateWithoutEditDraftInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
+  fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  segments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutTranscriptNestedInput
+  words?: Prisma.TranscriptWordUncheckedUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
@@ -1195,6 +1336,7 @@ export type TranscriptCreateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutVideoChaptersInput = {
@@ -1217,6 +1359,7 @@ export type TranscriptUncheckedCreateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutVideoChaptersInput = {
@@ -1255,6 +1398,7 @@ export type TranscriptUpdateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutVideoChaptersInput = {
@@ -1277,6 +1421,7 @@ export type TranscriptUncheckedUpdateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptCreateWithoutClipCandidatesInput = {
@@ -1299,6 +1444,7 @@ export type TranscriptCreateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutClipCandidatesInput = {
@@ -1321,6 +1467,7 @@ export type TranscriptUncheckedCreateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutClipCandidatesInput = {
@@ -1359,6 +1506,7 @@ export type TranscriptUpdateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutClipCandidatesInput = {
@@ -1381,6 +1529,7 @@ export type TranscriptUncheckedUpdateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptCreateWithoutShortClipsInput = {
@@ -1403,6 +1552,7 @@ export type TranscriptCreateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutShortClipsInput = {
@@ -1425,6 +1575,7 @@ export type TranscriptUncheckedCreateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutShortClipsInput = {
@@ -1463,6 +1614,7 @@ export type TranscriptUpdateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutShortClipsInput = {
@@ -1485,6 +1637,7 @@ export type TranscriptUncheckedUpdateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptCreateWithoutGeneratedAssetsInput = {
@@ -1507,6 +1660,7 @@ export type TranscriptCreateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptUncheckedCreateWithoutGeneratedAssetsInput = {
@@ -1529,6 +1683,7 @@ export type TranscriptUncheckedCreateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
 }
 
 export type TranscriptCreateOrConnectWithoutGeneratedAssetsInput = {
@@ -1567,6 +1722,7 @@ export type TranscriptUpdateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutGeneratedAssetsInput = {
@@ -1589,6 +1745,7 @@ export type TranscriptUncheckedUpdateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptCreateManyMediaInput = {
@@ -1627,6 +1784,7 @@ export type TranscriptUpdateWithoutMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutMediaInput = {
@@ -1649,6 +1807,7 @@ export type TranscriptUncheckedUpdateWithoutMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateManyWithoutMediaInput = {
@@ -1703,6 +1862,7 @@ export type TranscriptUpdateWithoutJobInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateWithoutJobInput = {
@@ -1725,6 +1885,7 @@ export type TranscriptUncheckedUpdateWithoutJobInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
 }
 
 export type TranscriptUncheckedUpdateManyWithoutJobInput = {
@@ -1842,6 +2003,7 @@ export type TranscriptSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   clipCandidates?: boolean | Prisma.Transcript$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Transcript$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.Transcript$generatedAssetsArgs<ExtArgs>
+  editDraft?: boolean | Prisma.Transcript$editDraftArgs<ExtArgs>
   _count?: boolean | Prisma.TranscriptCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["transcript"]>
 
@@ -1910,6 +2072,7 @@ export type TranscriptInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   clipCandidates?: boolean | Prisma.Transcript$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Transcript$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.Transcript$generatedAssetsArgs<ExtArgs>
+  editDraft?: boolean | Prisma.Transcript$editDraftArgs<ExtArgs>
   _count?: boolean | Prisma.TranscriptCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TranscriptIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1932,6 +2095,7 @@ export type $TranscriptPayload<ExtArgs extends runtime.Types.Extensions.Internal
     clipCandidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
     shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
     generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
+    editDraft: Prisma.$TranscriptEditDraftPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2350,6 +2514,7 @@ export interface Prisma__TranscriptClient<T, Null = never, ExtArgs extends runti
   clipCandidates<T extends Prisma.Transcript$clipCandidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$clipCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shortClips<T extends Prisma.Transcript$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   generatedAssets<T extends Prisma.Transcript$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  editDraft<T extends Prisma.Transcript$editDraftArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$editDraftArgs<ExtArgs>>): Prisma.Prisma__TranscriptEditDraftClient<runtime.Types.Result.GetResult<Prisma.$TranscriptEditDraftPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2954,6 +3119,25 @@ export type Transcript$generatedAssetsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.GeneratedAssetScalarFieldEnum | Prisma.GeneratedAssetScalarFieldEnum[]
+}
+
+/**
+ * Transcript.editDraft
+ */
+export type Transcript$editDraftArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TranscriptEditDraft
+   */
+  select?: Prisma.TranscriptEditDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TranscriptEditDraft
+   */
+  omit?: Prisma.TranscriptEditDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TranscriptEditDraftInclude<ExtArgs> | null
+  where?: Prisma.TranscriptEditDraftWhereInput
 }
 
 /**

@@ -8,6 +8,7 @@ import {
   exportTranscriptSchema,
   generateTranscriptSchema,
   mediaTranscriptParamsSchema,
+  saveTranscriptEditorDraftSchema,
   transcriptParamsSchema
 } from './transcripts.schema'
 
@@ -34,6 +35,21 @@ transcriptRouter.get(
   '/:transcriptId/segments',
   validateRequest({ params: transcriptParamsSchema }),
   transcriptsController.segments
+)
+transcriptRouter.get(
+  '/:transcriptId/editor',
+  validateRequest({ params: transcriptParamsSchema }),
+  transcriptsController.editor
+)
+transcriptRouter.patch(
+  '/:transcriptId/editor/draft',
+  validateRequest({ params: transcriptParamsSchema, body: saveTranscriptEditorDraftSchema }),
+  transcriptsController.saveEditorDraft
+)
+transcriptRouter.delete(
+  '/:transcriptId/editor/draft',
+  validateRequest({ params: transcriptParamsSchema }),
+  transcriptsController.discardEditorDraft
 )
 transcriptRouter.post(
   '/:transcriptId/export',
