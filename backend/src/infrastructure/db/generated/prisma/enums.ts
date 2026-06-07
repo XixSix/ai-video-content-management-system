@@ -83,10 +83,8 @@ export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]
 
 
 export const TranscriptSource = {
-  FASTER_WHISPER: 'FASTER_WHISPER',
-  WHISPER: 'WHISPER',
   IMPORTED: 'IMPORTED',
-  USER_EDITED: 'USER_EDITED'
+  LOCAL: 'LOCAL'
 } as const
 
 export type TranscriptSource = (typeof TranscriptSource)[keyof typeof TranscriptSource]

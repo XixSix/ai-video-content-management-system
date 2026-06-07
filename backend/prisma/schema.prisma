@@ -68,10 +68,8 @@ enum JobStatus {
 }
 
 enum TranscriptSource {
-  FASTER_WHISPER
-  WHISPER
   IMPORTED
-  USER_EDITED
+  LOCAL
 }
 
 enum ChapterSource {
@@ -276,17 +274,11 @@ model Transcript {
   jobId   String? @map("job_id") @db.Uuid
 
   language String?          @db.VarChar(20)
-  source   TranscriptSource @default(FASTER_WHISPER)
+  source   TranscriptSource @default(LOCAL)
   model    String?          @db.VarChar(100)
 
-  fullText String? @map("full_text") @db.Text
-  content  Json?
-
-  transcriptQualityScore Float? @map("transcript_quality_score")
-  fillerRatio            Float? @map("filler_ratio")
-  uniqueWordRatio        Float? @map("unique_word_ratio")
-  speechDensity          Float? @map("speech_density")
-  wordCount              Int?   @map("word_count")
+  fullText  String? @map("full_text") @db.Text
+  wordCount Int?    @map("word_count")
 
   isEdited          Boolean   @default(false) @map("is_edited")
   version           Int       @default(1)
