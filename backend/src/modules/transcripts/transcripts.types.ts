@@ -1,9 +1,5 @@
 import type { JobResponseData } from '../jobs/jobs.types'
-import type {
-  AsrModel,
-  ModelSize,
-  TranscriptSource
-} from '../../infrastructure/db/generated/prisma/client'
+import type { AsrModel, ModelSize, TranscriptSource } from '../../infrastructure/db/generated/prisma/client'
 import type { ExportTranscriptBody, GenerateTranscriptBody } from './transcripts.schema'
 
 export const TRANSCRIPT_QUEUE_NAME = 'transcript_queue'
