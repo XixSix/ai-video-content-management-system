@@ -22,9 +22,8 @@ const { app } = await import('../../app')
 
 const userId = '00000000-0000-4000-8000-000000000001'
 const assetId = '00000000-0000-4000-8000-000000000002'
-const mediaId = '00000000-0000-4000-8000-000000000003'
-const transcriptId = '00000000-0000-4000-8000-000000000004'
-const chapterId = '00000000-0000-4000-8000-000000000005'
+const transcriptId = '00000000-0000-4000-8000-000000000003'
+const chapterId = '00000000-0000-4000-8000-000000000004'
 const now = new Date('2026-06-07T10:00:00.000Z')
 
 const authenticatedUser: AuthenticatedUser = {
@@ -36,7 +35,6 @@ const authenticatedUser: AuthenticatedUser = {
 
 const createAsset = (): AssetResponseData => ({
   id: assetId,
-  mediaId,
   transcriptId,
   chapterId: null,
   assetType: 'SUBTITLE_SRT',
@@ -91,7 +89,6 @@ describe('asset routes', () => {
       .get('/api/v1/assets')
       .query({
         assetType: 'SUBTITLE_SRT',
-        mediaId,
         transcriptId,
         chapterId,
         page: '1',
@@ -119,7 +116,6 @@ describe('asset routes', () => {
     })
     expect(listAssetsMock).toHaveBeenCalledWith(userId, {
       assetType: 'SUBTITLE_SRT',
-      mediaId,
       transcriptId,
       chapterId,
       page: 1,

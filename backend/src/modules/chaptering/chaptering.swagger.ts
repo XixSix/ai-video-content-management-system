@@ -59,16 +59,18 @@
  *         title:
  *           type: string
  *           example: System introduction
- *         summary:
- *           type: string
- *           nullable: true
- *           example: This chapter introduces the main topic and context.
  *         transcriptVersion:
  *           type: integer
  *           example: 1
+ *         version:
+ *           type: integer
+ *           example: 1
+ *         isEdited:
+ *           type: boolean
+ *           example: false
  *         source:
  *           type: string
- *           enum: [RULE_BASED, LLM, USER_EDITED]
+ *           enum: [IMPORTED, WORDS, SEGMENTS]
  *         score:
  *           type: number
  *           nullable: true
@@ -84,7 +86,19 @@
  *         semanticShiftScore:
  *           type: number
  *           nullable: true
+ *         lexicalShiftScore:
+ *           type: number
+ *           nullable: true
+ *         valleyDepthScore:
+ *           type: number
+ *           nullable: true
+ *         boundaryQualityScore:
+ *           type: number
+ *           nullable: true
  *         durationScore:
+ *           type: number
+ *           nullable: true
+ *         llmConfidenceScore:
  *           type: number
  *           nullable: true
  *         createdAt:

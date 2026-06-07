@@ -1,4 +1,9 @@
 import type { JobResponseData } from '../jobs/jobs.types'
+import type {
+  AsrModel,
+  ModelSize,
+  TranscriptSource
+} from '../../infrastructure/db/generated/prisma/client'
 import type { ExportTranscriptBody, GenerateTranscriptBody } from './transcripts.schema'
 
 export const TRANSCRIPT_QUEUE_NAME = 'transcript_queue'
@@ -35,8 +40,9 @@ export interface TranscriptSummaryData {
   mediaId: string
   jobId: string | null
   language: string | null
-  source: string
-  model: string | null
+  source: TranscriptSource
+  asrModel: AsrModel | null
+  modelSize: ModelSize | null
   fullTextPreview: string | null
   wordCount: number | null
   isEdited: boolean
@@ -51,8 +57,9 @@ export interface TranscriptDetailData {
   mediaId: string
   jobId: string | null
   language: string | null
-  source: string
-  model: string | null
+  source: TranscriptSource
+  asrModel: AsrModel | null
+  modelSize: ModelSize | null
   fullText: string | null
   wordCount: number | null
   isEdited: boolean

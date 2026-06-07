@@ -8,9 +8,6 @@
  *         id:
  *           type: string
  *           format: uuid
- *         mediaId:
- *           type: string
- *           format: uuid
  *         transcriptId:
  *           type: string
  *           format: uuid
@@ -21,7 +18,7 @@
  *           nullable: true
  *         assetType:
  *           type: string
- *           enum: [THUMBNAIL, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
+ *           enum: [SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
  *         transcriptVersion:
  *           type: integer
  *           nullable: true
@@ -72,12 +69,7 @@
  *         name: assetType
  *         schema:
  *           type: string
- *           enum: [THUMBNAIL, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
- *       - in: query
- *         name: mediaId
- *         schema:
- *           type: string
- *           format: uuid
+ *           enum: [SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
  *       - in: query
  *         name: transcriptId
  *         schema:

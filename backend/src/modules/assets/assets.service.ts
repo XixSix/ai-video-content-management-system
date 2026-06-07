@@ -22,7 +22,6 @@ export const listAssets = async (
     {
       userId,
       assetType: query.assetType,
-      mediaId: query.mediaId,
       transcriptId: query.transcriptId,
       chapterId: query.chapterId
     },
