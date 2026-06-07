@@ -155,15 +155,16 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  media            Media[]
-  processingJobs   ProcessingJob[]
-  shortClips       ShortClip[]
-  generatedAssets  GeneratedAsset[]
-  aiSuggestions    AiSuggestion[]
-  platformAccounts PlatformAccount[]
-  publishTasks     PublishTask[]
-  authSessions     AuthSession[]
-  auditLogs        AuditLog[]
+  media                Media[]
+  processingJobs       ProcessingJob[]
+  shortClips           ShortClip[]
+  generatedAssets      GeneratedAsset[]
+  aiSuggestions        AiSuggestion[]
+  platformAccounts     PlatformAccount[]
+  publishTasks         PublishTask[]
+  authSessions         AuthSession[]
+  auditLogs            AuditLog[]
+  transcriptEditDrafts TranscriptEditDraft[]
 
   @@map("users")
 }
@@ -303,6 +304,7 @@ model Transcript {
   clipCandidates  ClipCandidate[]
   shortClips      ShortClip[]
   generatedAssets GeneratedAsset[]
+  editDraft       TranscriptEditDraft?
 
   @@index([mediaId])
   @@index([jobId])
@@ -370,6 +372,30 @@ model TranscriptWord {
   @@index([mediaId])
   @@index([startTime, endTime])
   @@map("transcript_words")
+}
+
+model TranscriptEditDraft {
+  id           String @id @default(uuid()) @db.Uuid
+  transcriptId String @unique @map("transcript_id") @db.Uuid
+  userId       String @map("user_id") @db.Uuid
+
+  baseTranscriptVersion Int @map("base_transcript_version")
+  revision              Int @default(1)
+  clientSequence        Int @default(0) @map("client_sequence")
+
+  blocks Json
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  appliedAt   DateTime? @map("applied_at")
+  discardedAt DateTime? @map("discarded_at")
+
+  transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([transcriptId])
+  @@map("transcript_edit_drafts")
 }
 
 model VideoChapter {

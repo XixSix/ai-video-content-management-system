@@ -391,6 +391,7 @@ export const ModelName = {
   Transcript: 'Transcript',
   TranscriptSegment: 'TranscriptSegment',
   TranscriptWord: 'TranscriptWord',
+  TranscriptEditDraft: 'TranscriptEditDraft',
   VideoChapter: 'VideoChapter',
   ClipCandidate: 'ClipCandidate',
   ShortClip: 'ShortClip',
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "media" | "processingJob" | "transcript" | "transcriptSegment" | "transcriptWord" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "publishTask" | "auditLog"
+    modelProps: "user" | "authSession" | "media" | "processingJob" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "publishTask" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -933,6 +934,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TranscriptWordCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TranscriptWordCountAggregateOutputType> | number
+        }
+      }
+    }
+    TranscriptEditDraft: {
+      payload: Prisma.$TranscriptEditDraftPayload<ExtArgs>
+      fields: Prisma.TranscriptEditDraftFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TranscriptEditDraftFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TranscriptEditDraftFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>
+        }
+        findFirst: {
+          args: Prisma.TranscriptEditDraftFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TranscriptEditDraftFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>
+        }
+        findMany: {
+          args: Prisma.TranscriptEditDraftFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>[]
+        }
+        create: {
+          args: Prisma.TranscriptEditDraftCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>
+        }
+        createMany: {
+          args: Prisma.TranscriptEditDraftCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TranscriptEditDraftCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>[]
+        }
+        delete: {
+          args: Prisma.TranscriptEditDraftDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>
+        }
+        update: {
+          args: Prisma.TranscriptEditDraftUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>
+        }
+        deleteMany: {
+          args: Prisma.TranscriptEditDraftDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TranscriptEditDraftUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TranscriptEditDraftUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>[]
+        }
+        upsert: {
+          args: Prisma.TranscriptEditDraftUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptEditDraftPayload>
+        }
+        aggregate: {
+          args: Prisma.TranscriptEditDraftAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTranscriptEditDraft>
+        }
+        groupBy: {
+          args: Prisma.TranscriptEditDraftGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranscriptEditDraftGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TranscriptEditDraftCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranscriptEditDraftCountAggregateOutputType> | number
         }
       }
     }
@@ -1702,6 +1777,23 @@ export const TranscriptWordScalarFieldEnum = {
 export type TranscriptWordScalarFieldEnum = (typeof TranscriptWordScalarFieldEnum)[keyof typeof TranscriptWordScalarFieldEnum]
 
 
+export const TranscriptEditDraftScalarFieldEnum = {
+  id: 'id',
+  transcriptId: 'transcriptId',
+  userId: 'userId',
+  baseTranscriptVersion: 'baseTranscriptVersion',
+  revision: 'revision',
+  clientSequence: 'clientSequence',
+  blocks: 'blocks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  appliedAt: 'appliedAt',
+  discardedAt: 'discardedAt'
+} as const
+
+export type TranscriptEditDraftScalarFieldEnum = (typeof TranscriptEditDraftScalarFieldEnum)[keyof typeof TranscriptEditDraftScalarFieldEnum]
+
+
 export const VideoChapterScalarFieldEnum = {
   id: 'id',
   mediaId: 'mediaId',
@@ -2398,6 +2490,7 @@ export type GlobalOmitConfig = {
   transcript?: Prisma.TranscriptOmit
   transcriptSegment?: Prisma.TranscriptSegmentOmit
   transcriptWord?: Prisma.TranscriptWordOmit
+  transcriptEditDraft?: Prisma.TranscriptEditDraftOmit
   videoChapter?: Prisma.VideoChapterOmit
   clipCandidate?: Prisma.ClipCandidateOmit
   shortClip?: Prisma.ShortClipOmit

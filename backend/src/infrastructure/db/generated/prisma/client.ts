@@ -77,6 +77,11 @@ export type TranscriptSegment = Prisma.TranscriptSegmentModel
  */
 export type TranscriptWord = Prisma.TranscriptWordModel
 /**
+ * Model TranscriptEditDraft
+ * 
+ */
+export type TranscriptEditDraft = Prisma.TranscriptEditDraftModel
+/**
  * Model VideoChapter
  * 
  */
