@@ -3,6 +3,7 @@ from app.workflows.chaptering.word_units import (
     TimelineWord,
     build_word_chapter_units,
     collect_timeline_words,
+    has_sufficient_word_alignment_coverage,
 )
 
 
@@ -79,6 +80,60 @@ def test_build_word_chapter_units_groups_words_by_budget() -> None:
     assert units[0].start_time == 0
     assert units[0].end_time == 1.5
     assert units[0].segment_ids == ["seg-1"]
+
+
+def test_word_alignment_coverage_rejects_low_usable_word_count() -> None:
+    segments = [
+        _segment(
+            1,
+            0,
+            6,
+            "one two three four five",
+            words=[
+                _word(1, "seg-1", 0, 0.5, "one"),
+                _word(2, "seg-1", 0.5, 1.0, "two"),
+            ],
+        )
+    ]
+
+    assert not has_sufficient_word_alignment_coverage(segments, _timeline(segments))
+
+
+def test_word_alignment_coverage_accepts_threshold_usable_word_count() -> None:
+    segments = [
+        _segment(
+            1,
+            0,
+            6,
+            "one two three four five",
+            words=[
+                _word(1, "seg-1", 0, 0.5, "one"),
+                _word(2, "seg-1", 0.5, 1.0, "two"),
+                _word(3, "seg-1", 1.0, 1.5, "three"),
+                _word(4, "seg-1", 1.5, 2.0, "four"),
+                _word(5, "seg-1", 2.0, 2.0, "five"),
+            ],
+        )
+    ]
+
+    assert has_sufficient_word_alignment_coverage(segments, _timeline(segments))
+
+
+def test_word_alignment_coverage_uses_clean_text_when_available() -> None:
+    segment = _segment(
+        1,
+        0,
+        6,
+        "raw one two three four five",
+        words=[
+            _word(1, "seg-1", 0, 0.5, "edited"),
+            _word(2, "seg-1", 0.5, 1.0, "one"),
+            _word(3, "seg-1", 1.0, 1.5, "two"),
+        ],
+    )
+    segment = segment.model_copy(update={"clean_text": "edited one two"})
+
+    assert has_sufficient_word_alignment_coverage([segment], _timeline([segment]))
 
 
 def test_build_word_chapter_units_waits_for_sentence_hint_after_target() -> None:

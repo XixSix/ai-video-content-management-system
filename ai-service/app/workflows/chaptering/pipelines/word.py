@@ -10,6 +10,7 @@ from app.workflows.chaptering.schemas import ChapteringPipelineConfig
 from app.workflows.chaptering.word_units import (
     build_word_chapter_units,
     collect_timeline_words,
+    has_sufficient_word_alignment_coverage,
 )
 
 
@@ -28,7 +29,7 @@ def run_word_pipeline(
     strategy so chapter generation remains available for segment-only inputs.
     """
     timeline_words = collect_timeline_words(request.segments)
-    if not timeline_words:
+    if not has_sufficient_word_alignment_coverage(request.segments, timeline_words):
         return run_segment_pipeline(
             request=request,
             embedding=embedding,

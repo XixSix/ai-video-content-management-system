@@ -1,10 +1,14 @@
 from dataclasses import dataclass
+import re
 
 from nltk.tokenize.punkt import PunktSentenceTokenizer
 
 from app.schemas.chaptering import ChapteringTranscriptSegment, ChapteringTranscriptWord
 from app.workflows.chaptering.schemas import ChapterUnit
 from app.workflows.chaptering.scores.normalize import collapse_whitespace
+
+MIN_USABLE_WORD_COVERAGE = 0.8
+WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)  # Unicode word chars except "_".
 
 
 @dataclass(frozen=True)
@@ -74,6 +78,25 @@ def collect_timeline_words(
                 words.append(timeline_word)
 
     return sorted(words, key=lambda word: (word.start_seconds, word.end_seconds))
+
+
+def has_sufficient_word_alignment_coverage(
+    segments: list[ChapteringTranscriptSegment],
+    timeline_words: list[TimelineWord],
+    *,
+    min_coverage: float = MIN_USABLE_WORD_COVERAGE,
+) -> bool:
+    """Return true when usable word timestamps cover enough analysis text."""
+    expected_word_count = sum(
+        _word_count(segment.clean_text or segment.text)
+        for segment in segments
+        if segment.text.strip()
+    )
+
+    if expected_word_count == 0:
+        return False
+
+    return len(timeline_words) / expected_word_count >= min_coverage
 
 
 def _normalize_word(word: ChapteringTranscriptWord) -> TimelineWord | None:
@@ -376,3 +399,7 @@ def _join_text(words: list[TimelineWord]) -> str:
     raw_text = " ".join(word.text for word in words if word.text.strip())
 
     return collapse_whitespace(raw_text)
+
+
+def _word_count(text: str) -> int:
+    return len(WORD_RE.findall(text))
