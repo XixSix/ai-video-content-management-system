@@ -9,6 +9,13 @@ export type ParamsRequestHandler<TParams extends ParamsDictionary> = RequestHand
 
 export type ParamsBodyRequestHandler<TParams extends ParamsDictionary, TBody> = RequestHandler<TParams, unknown, TBody>
 
+export type ParamsQueryRequestHandler<TParams extends ParamsDictionary, TQuery> = RequestHandler<
+  TParams,
+  unknown,
+  unknown,
+  Record<string, unknown> & Partial<Record<keyof TQuery, unknown>>
+>
+
 export type QueryRequestHandler<TQuery> = RequestHandler<
   ParamsDictionary,
   unknown,
