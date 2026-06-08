@@ -20,6 +20,26 @@ def test_repair_micro_units_merges_acknowledgement_backward() -> None:
     assert units[0].segment_ids == ["seg-1", "seg-2"]
 
 
+def test_repair_micro_units_preserves_clean_text_when_merging() -> None:
+    units = repair_micro_units(
+        [
+            _unit(
+                1,
+                0,
+                8,
+                "raw topic has enough context",
+                clean_text="edited topic has enough context",
+            ),
+            _unit(2, 8, 8.5, "OK.", clean_text="okay."),
+        ],
+        pause_boundary_seconds=1.0,
+        config=_repair_config(),
+    )
+
+    assert units[0].text == "raw topic has enough context OK."
+    assert units[0].clean_text == "edited topic has enough context okay."
+
+
 def test_repair_micro_units_merges_leading_fragment_forward() -> None:
     units = repair_micro_units(
         [
@@ -37,6 +57,47 @@ def test_repair_micro_units_merges_leading_fragment_forward() -> None:
     ]
     assert units[1].start_time == 8.5
     assert units[1].segment_ids == ["seg-2", "seg-3"]
+
+
+def test_repair_micro_units_treats_unicode_sentence_end_as_terminal() -> None:
+    units = repair_micro_units(
+        [
+            _unit(1, 0, 8, "previous topic has enough context。"),
+            _unit(2, 8.5, 9.0, "OK。"),
+            _unit(3, 9.0, 16, "next topic has enough context"),
+        ],
+        pause_boundary_seconds=1.0,
+        config=_repair_config(),
+    )
+
+    assert [unit.text for unit in units] == [
+        "previous topic has enough context。 OK。",
+        "next topic has enough context",
+    ]
+
+
+def test_repair_micro_units_counts_numeric_tokens_consistently() -> None:
+    units = repair_micro_units(
+        [
+            _unit(1, 0, 8, "previous topic has enough context."),
+            _unit(2, 8.5, 13.5, "step 1 item 2 value 3 done"),
+            _unit(3, 13.5, 20, "next topic has enough context"),
+        ],
+        pause_boundary_seconds=1.0,
+        config=UnitRepairConfig(
+            short_duration_seconds=4.0,
+            min_words=7,
+            fragment_max_words=2,
+            sparse_duration_seconds=6.0,
+            continuation_gap_seconds=0.05,
+        ),
+    )
+
+    assert [unit.text for unit in units] == [
+        "previous topic has enough context.",
+        "step 1 item 2 value 3 done",
+        "next topic has enough context",
+    ]
 
 
 def test_repair_micro_units_merges_lowercase_continuation_backward() -> None:
@@ -140,12 +201,19 @@ def _repair_config() -> UnitRepairConfig:
     )
 
 
-def _unit(index: int, start: float, end: float, text: str) -> ChapterUnit:
+def _unit(
+    index: int,
+    start: float,
+    end: float,
+    text: str,
+    *,
+    clean_text: str | None = None,
+) -> ChapterUnit:
     return ChapterUnit(
         unit_id=f"unit_{index:04d}",
         start_time=start,
         end_time=end,
         text=text,
-        clean_text=text,
+        clean_text=clean_text or text,
         segment_ids=[f"seg-{index}"],
     )

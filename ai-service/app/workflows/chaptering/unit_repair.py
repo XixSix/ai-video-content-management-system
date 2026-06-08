@@ -4,7 +4,8 @@ from app.workflows.chaptering.schemas import ChapterUnit, UnitRepairConfig
 from app.workflows.chaptering.scores.normalize import collapse_whitespace
 
 
-TERMINAL_PUNCTUATION = (".", "!", "?")
+TERMINAL_PUNCTUATION = (".", "!", "?", "。", "！", "？", "…")
+WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)  # Unicode word chars except "_".
 TRANSITION_OPENER_RE = re.compile(  # Transition phrases at the start of a unit.
     r"^(?:"
     r"at(?:\s+number)?|"
@@ -182,12 +183,13 @@ def _can_merge_units(
 def _merge_units(left: ChapterUnit, right: ChapterUnit) -> ChapterUnit:
     """Merge adjacent units while preserving source segment identity."""
     text = collapse_whitespace(f"{left.text} {right.text}")
+    clean_text = collapse_whitespace(f"{left.clean_text} {right.clean_text}")
     return ChapterUnit(
         unit_id=left.unit_id,
         start_time=left.start_time,
         end_time=right.end_time,
         text=text,
-        clean_text=text,
+        clean_text=clean_text,
         segment_ids=_unique_segment_ids(left.segment_ids, right.segment_ids),
     )
 
@@ -226,7 +228,7 @@ def _unit_duration(unit: ChapterUnit) -> float:
 
 
 def _unit_word_count(unit: ChapterUnit) -> int:
-    return len(re.findall(r"[^\W\d_]+", unit.text))  # Unicode letters only.
+    return len(WORD_RE.findall(unit.text))
 
 
 def _gap_between(left: ChapterUnit, right: ChapterUnit) -> float:
