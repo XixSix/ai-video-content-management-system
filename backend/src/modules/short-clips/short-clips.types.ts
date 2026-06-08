@@ -18,6 +18,11 @@ export type GenerateShortClipsServiceResult = GenerateShortClipsResult & {
   wasCreated: boolean
 }
 
+export interface CreateShortClipDownloadUrlResult {
+  url: string
+  expiresInSeconds: number
+}
+
 export interface ClipCandidateData {
   id: string
   mediaId: string
@@ -82,4 +87,5 @@ export interface PaginatedResult<TItem> {
 }
 
 export type ClipCandidateSortField = 'finalScore' | 'createdAt' | 'startTime' | 'duration'
+export type ShortClipSortField = 'createdAt' | 'startTime' | 'duration' | 'score'
 export type SortOrder = 'asc' | 'desc'

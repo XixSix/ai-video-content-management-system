@@ -5,10 +5,12 @@ import type {
   Media,
   Prisma,
   ProcessingJob,
+  ShortClip,
+  ShortClipStatus,
   Transcript
 } from '../../infrastructure/db/generated/prisma/client'
 import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
-import type { ClipCandidateSortField, SortOrder } from './short-clips.types'
+import type { ClipCandidateSortField, ShortClipSortField, SortOrder } from './short-clips.types'
 
 export interface ListClipCandidatesFilters {
   mediaId: string
@@ -17,6 +19,12 @@ export interface ListClipCandidatesFilters {
   transcriptId?: string
   chapterId?: string
   jobId?: string
+}
+
+export interface ListShortClipsFilters {
+  mediaId: string
+  userId: string
+  status?: ShortClipStatus
 }
 
 export const findMediaById = async (id: string): Promise<Media | null> =>
@@ -107,5 +115,36 @@ export const findClipCandidatesByMediaIdAndUserId = async (
 
 export const findClipCandidateById = async (id: string): Promise<ClipCandidate | null> =>
   prisma.clipCandidate.findUnique({
+    where: { id }
+  })
+
+const buildShortClipWhere = (filters: ListShortClipsFilters): Prisma.ShortClipWhereInput => ({
+  mediaId: filters.mediaId,
+  userId: filters.userId,
+  ...(filters.status ? { status: filters.status } : {})
+})
+
+export const findShortClipsByMediaIdAndUserId = async (
+  filters: ListShortClipsFilters,
+  skip: number,
+  take: number,
+  sortBy: ShortClipSortField,
+  sortOrder: SortOrder
+): Promise<[ShortClip[], number]> => {
+  const where = buildShortClipWhere(filters)
+
+  return Promise.all([
+    prisma.shortClip.findMany({
+      where,
+      skip,
+      take,
+      orderBy: [{ [sortBy]: sortOrder }, { createdAt: 'desc' }]
+    }),
+    prisma.shortClip.count({ where })
+  ])
+}
+
+export const findShortClipById = async (id: string): Promise<ShortClip | null> =>
+  prisma.shortClip.findUnique({
     where: { id }
   })
