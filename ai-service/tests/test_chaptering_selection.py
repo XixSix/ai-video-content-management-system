@@ -94,7 +94,7 @@ def _candidate(time: float, *, score: float) -> ChapterCandidate:
         time=time,
         unit_index=int(time),
         unit_id=f"unit_{int(time):04d}",
-        previous_unit_ids=[f"unit_{int(time) - 1:04d}"],
-        next_unit_ids=[f"unit_{int(time):04d}"],
+        left_adjacent_unit_ids=[f"unit_{int(time) - 1:04d}"],
+        right_adjacent_unit_ids=[f"unit_{int(time):04d}"],
         candidate_score=score,
     )

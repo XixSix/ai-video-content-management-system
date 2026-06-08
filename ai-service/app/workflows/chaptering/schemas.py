@@ -45,8 +45,8 @@ class ChapterCandidate:
     time: float
     unit_index: int
     unit_id: str
-    previous_unit_ids: list[str]
-    next_unit_ids: list[str]
+    left_adjacent_unit_ids: list[str]
+    right_adjacent_unit_ids: list[str]
     cheap_score: float = 0.0
     candidate_score: float = 0.0
     semantic_shift_score: float = 0.0
@@ -118,8 +118,8 @@ class ChapterGapScore:
     time: float
     unit_index: int
     unit_id: str
-    previous_unit_ids: list[str]
-    next_unit_ids: list[str]
+    left_adjacent_unit_ids: list[str]
+    right_adjacent_unit_ids: list[str]
     left_text: str
     right_text: str
     left_unit_ids: list[str]

@@ -13,6 +13,7 @@ from app.workflows.chaptering.scores.gap_scoring import (
     gap_scores_to_candidates,
     score_unit_gaps,
 )
+from app.workflows.chaptering.scores.scoring import score_boundary
 from app.workflows.chaptering.scores.quality import boundary_quality_score
 from app.workflows.chaptering.pipelines.shared import run_units_pipeline
 from app.workflows.chaptering.schemas import (
@@ -74,6 +75,27 @@ def test_score_unit_gaps_scores_pause_marker_and_context_quality() -> None:
     assert gap.discourse_marker_score == 1.0
     assert gap.boundary_quality_score == 1.0
     assert gap.combined_score > 0
+
+
+def test_score_boundary_uses_clean_text_for_transition_marker() -> None:
+    segment = _segment(
+        2,
+        10,
+        20,
+        "Raw edited transcript content.",
+    ).model_copy(update={"clean_text": "Next topic is edited transcript content."})
+
+    score = score_boundary(
+        [
+            _segment(1, 0, 10, "Previous section has enough context."),
+            segment,
+        ],
+        start_time=10,
+        previous_start=0,
+        target_duration=10,
+    )
+
+    assert score.discourse_marker_score == 1.0
 
 
 def test_boundary_quality_score_ignores_whitespace() -> None:

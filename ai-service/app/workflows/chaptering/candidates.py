@@ -79,8 +79,8 @@ def _candidate_from_unit(
         time=unit.start_time,
         unit_index=unit_index,
         unit_id=unit.unit_id,
-        previous_unit_ids=[units[unit_index - 1].unit_id],
-        next_unit_ids=[unit.unit_id],
+        left_adjacent_unit_ids=[units[unit_index - 1].unit_id],
+        right_adjacent_unit_ids=[unit.unit_id],
     )
 
 
