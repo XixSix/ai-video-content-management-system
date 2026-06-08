@@ -161,6 +161,7 @@ model User {
   generatedAssets      GeneratedAsset[]
   aiSuggestions        AiSuggestion[]
   platformAccounts     PlatformAccount[]
+  platformOAuthStates  PlatformOAuthState[]
   publishTasks         PublishTask[]
   authSessions         AuthSession[]
   auditLogs            AuditLog[]
@@ -633,6 +634,25 @@ model PlatformAccount {
   @@index([userId])
   @@index([platform])
   @@map("platform_accounts")
+}
+
+model PlatformOAuthState {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  platform  Platform
+  stateHash String   @unique @map("state_hash") @db.Text
+  expiresAt DateTime @map("expires_at")
+
+  consumedAt DateTime? @map("consumed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([platform])
+  @@index([expiresAt])
+  @@map("platform_oauth_states")
 }
 
 model PublishTask {

@@ -88,6 +88,11 @@ export type AiSuggestion = Prisma.AiSuggestionModel
  */
 export type PlatformAccount = Prisma.PlatformAccountModel
 /**
+ * Model PlatformOAuthState
+ * 
+ */
+export type PlatformOAuthState = Prisma.PlatformOAuthStateModel
+/**
  * Model PublishTask
  * 
  */

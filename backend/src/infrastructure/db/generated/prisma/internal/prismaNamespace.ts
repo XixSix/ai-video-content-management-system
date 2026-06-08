@@ -398,6 +398,7 @@ export const ModelName = {
   GeneratedAsset: 'GeneratedAsset',
   AiSuggestion: 'AiSuggestion',
   PlatformAccount: 'PlatformAccount',
+  PlatformOAuthState: 'PlatformOAuthState',
   PublishTask: 'PublishTask',
   AuditLog: 'AuditLog'
 } as const
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "media" | "processingJob" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "publishTask" | "auditLog"
+    modelProps: "user" | "authSession" | "media" | "processingJob" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "platformOAuthState" | "publishTask" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1455,6 +1456,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlatformOAuthState: {
+      payload: Prisma.$PlatformOAuthStatePayload<ExtArgs>
+      fields: Prisma.PlatformOAuthStateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformOAuthStateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformOAuthStateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformOAuthStateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformOAuthStateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>
+        }
+        findMany: {
+          args: Prisma.PlatformOAuthStateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>[]
+        }
+        create: {
+          args: Prisma.PlatformOAuthStateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>
+        }
+        createMany: {
+          args: Prisma.PlatformOAuthStateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformOAuthStateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformOAuthStateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>
+        }
+        update: {
+          args: Prisma.PlatformOAuthStateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformOAuthStateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformOAuthStateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformOAuthStateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformOAuthStateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformOAuthStatePayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformOAuthStateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformOAuthState>
+        }
+        groupBy: {
+          args: Prisma.PlatformOAuthStateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformOAuthStateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformOAuthStateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformOAuthStateCountAggregateOutputType> | number
+        }
+      }
+    }
     PublishTask: {
       payload: Prisma.$PublishTaskPayload<ExtArgs>
       fields: Prisma.PublishTaskFieldRefs
@@ -1936,6 +2011,19 @@ export const PlatformAccountScalarFieldEnum = {
 } as const
 
 export type PlatformAccountScalarFieldEnum = (typeof PlatformAccountScalarFieldEnum)[keyof typeof PlatformAccountScalarFieldEnum]
+
+
+export const PlatformOAuthStateScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  platform: 'platform',
+  stateHash: 'stateHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformOAuthStateScalarFieldEnum = (typeof PlatformOAuthStateScalarFieldEnum)[keyof typeof PlatformOAuthStateScalarFieldEnum]
 
 
 export const PublishTaskScalarFieldEnum = {
@@ -2497,6 +2585,7 @@ export type GlobalOmitConfig = {
   generatedAsset?: Prisma.GeneratedAssetOmit
   aiSuggestion?: Prisma.AiSuggestionOmit
   platformAccount?: Prisma.PlatformAccountOmit
+  platformOAuthState?: Prisma.PlatformOAuthStateOmit
   publishTask?: Prisma.PublishTaskOmit
   auditLog?: Prisma.AuditLogOmit
 }

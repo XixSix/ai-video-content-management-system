@@ -65,6 +65,7 @@ export const ModelName = {
   GeneratedAsset: 'GeneratedAsset',
   AiSuggestion: 'AiSuggestion',
   PlatformAccount: 'PlatformAccount',
+  PlatformOAuthState: 'PlatformOAuthState',
   PublishTask: 'PublishTask',
   AuditLog: 'AuditLog'
 } as const
@@ -379,6 +380,19 @@ export const PlatformAccountScalarFieldEnum = {
 } as const
 
 export type PlatformAccountScalarFieldEnum = (typeof PlatformAccountScalarFieldEnum)[keyof typeof PlatformAccountScalarFieldEnum]
+
+
+export const PlatformOAuthStateScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  platform: 'platform',
+  stateHash: 'stateHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformOAuthStateScalarFieldEnum = (typeof PlatformOAuthStateScalarFieldEnum)[keyof typeof PlatformOAuthStateScalarFieldEnum]
 
 
 export const PublishTaskScalarFieldEnum = {
