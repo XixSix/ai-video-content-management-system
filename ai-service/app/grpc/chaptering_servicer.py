@@ -57,7 +57,13 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
             )
 
         previous_start = -1.0
+        has_text = False
         for index, segment in enumerate(request.segments):
+            if not segment.segment_id.strip():
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    f"segments[{index}].segment_id is required",
+                )
             if segment.start_seconds >= segment.end_seconds:
                 context.abort(
                     grpc.StatusCode.INVALID_ARGUMENT,
@@ -73,13 +79,33 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
                     grpc.StatusCode.INVALID_ARGUMENT,
                     f"segments[{index}] exceeds media_duration_seconds",
                 )
-            if not segment.text.strip():
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    f"segments[{index}].text is required",
-                )
-            self._validate_segment_words(segment, index, request, context)
+            if segment.text.strip():
+                has_text = True
             previous_start = segment.start_seconds
+
+        if not has_text:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "transcript text is empty",
+            )
+
+        if request.options.min_chapter_duration_seconds <= 0:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "options.min_chapter_duration_seconds must be greater than 0",
+            )
+
+        if request.options.target_chapter_duration_seconds <= 0:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "options.target_chapter_duration_seconds must be greater than 0",
+            )
+
+        if request.options.max_chapter_duration_seconds <= 0:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "options.max_chapter_duration_seconds must be greater than 0",
+            )
 
         if request.options.max_chapters <= 0:
             context.abort(
@@ -104,17 +130,7 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
                     clean_text=segment.clean_text.strip() or None,
                     speaker_label=segment.speaker_label.strip() or None,
                     confidence=segment.confidence,
-                    words=[
-                        ChapteringTranscriptWord(
-                            word_id=word.word_id.strip(),
-                            segment_id=word.segment_id.strip() or None,
-                            start_seconds=word.start_seconds,
-                            end_seconds=word.end_seconds,
-                            text=word.text.strip(),
-                            confidence=word.confidence,
-                        )
-                        for word in segment.words
-                    ],
+                    words=_map_segment_words(segment),
                 )
                 for segment in request.segments
             ],
@@ -133,69 +149,6 @@ class ChapteringServicer(chaptering_pb2_grpc.ChapteringServiceServicer):
                 use_llm=request.options.use_llm,
             ),
         )
-
-    def _validate_segment_words(
-        self,
-        segment: chaptering_pb2.TranscriptSegment,
-        segment_index: int,
-        request: chaptering_pb2.GenerateChaptersRequest,
-        context: grpc.ServicerContext,
-    ) -> None:
-        previous_start = -1.0
-        segment_id = segment.segment_id.strip()
-
-        for word_index, word in enumerate(segment.words):
-            if word.start_seconds >= word.end_seconds:
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    (
-                        f"segments[{segment_index}].words[{word_index}] must have "
-                        "start_seconds < end_seconds"
-                    ),
-                )
-            if word.start_seconds < previous_start:
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    f"segments[{segment_index}].words must be sorted by timestamp",
-                )
-            if word.end_seconds > request.media_duration_seconds + 1.0:
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    (
-                        f"segments[{segment_index}].words[{word_index}] exceeds "
-                        "media_duration_seconds"
-                    ),
-                )
-            if word.start_seconds < segment.start_seconds - 1.0:
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    (
-                        f"segments[{segment_index}].words[{word_index}] starts "
-                        "before the segment"
-                    ),
-                )
-            if word.end_seconds > segment.end_seconds + 1.0:
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    (
-                        f"segments[{segment_index}].words[{word_index}] ends "
-                        "after the segment"
-                    ),
-                )
-            if not word.text.strip():
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    f"segments[{segment_index}].words[{word_index}].text is required",
-                )
-            if word.segment_id.strip() and word.segment_id.strip() != segment_id:
-                context.abort(
-                    grpc.StatusCode.INVALID_ARGUMENT,
-                    (
-                        f"segments[{segment_index}].words[{word_index}].segment_id "
-                        "must match parent segment_id"
-                    ),
-                )
-            previous_start = word.start_seconds
 
     def _map_response(
         self,
@@ -246,3 +199,42 @@ def _map_scores(
         boundary_quality_score=scores.boundary_quality_score or 0.0,
         llm_confidence_score=scores.llm_confidence_score or 0.0,
     )
+
+
+def _map_segment_words(
+    segment: chaptering_pb2.TranscriptSegment,
+) -> list[ChapteringTranscriptWord]:
+    return [
+        ChapteringTranscriptWord(
+            word_id=word.word_id.strip(),
+            segment_id=word.segment_id.strip() or segment.segment_id.strip(),
+            start_seconds=word.start_seconds,
+            end_seconds=word.end_seconds,
+            text=word.text.strip(),
+            confidence=word.confidence,
+        )
+        for word in segment.words
+        if _is_usable_word(segment, word)
+    ]
+
+
+def _is_usable_word(
+    segment: chaptering_pb2.TranscriptSegment,
+    word: chaptering_pb2.TranscriptWord,
+) -> bool:
+    word_segment_id = word.segment_id.strip()
+    parent_segment_id = segment.segment_id.strip()
+
+    if not word.word_id.strip() or not word.text.strip():
+        return False
+
+    if word.start_seconds >= word.end_seconds:
+        return False
+
+    if word_segment_id and word_segment_id != parent_segment_id:
+        return False
+
+    if word.start_seconds < segment.start_seconds - 1.0:
+        return False
+
+    return word.end_seconds <= segment.end_seconds + 1.0

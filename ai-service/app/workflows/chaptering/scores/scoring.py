@@ -47,7 +47,9 @@ def score_boundary(
         long_pause_seconds=LONG_PAUSE_SECONDS,
         max_pause_score_seconds=3.0,
     )
-    discourse_score = transition_marker_score(segment.text) if segment else 0.0
+    discourse_score = (
+        transition_marker_score(segment.clean_text or segment.text) if segment else 0.0
+    )
     duration = start_time - previous_start
     duration_score = (
         1.0 - clamp_score(abs(duration - target_duration) / target_duration)

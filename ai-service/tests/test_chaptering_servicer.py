@@ -208,7 +208,29 @@ def test_generate_chapters_rejects_segment_beyond_media_duration() -> None:
     assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
 
 
-def test_generate_chapters_rejects_invalid_word_timestamps() -> None:
+def test_generate_chapters_rejects_empty_transcript_text() -> None:
+    request = _generate_request()
+    request.segments[0].text = " "
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+    assert "transcript text is empty" in error.value.details
+
+
+def test_generate_chapters_rejects_missing_segment_id() -> None:
+    request = _generate_request()
+    request.segments[0].segment_id = " "
+
+    with pytest.raises(AbortError) as error:
+        ChapteringServicer().GenerateChapters(request, _context())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+    assert "segment_id" in error.value.details
+
+
+def test_generate_chapters_drops_invalid_word_timestamps() -> None:
     request = _generate_request()
     request.segments[0].words.extend(
         [
@@ -221,11 +243,15 @@ def test_generate_chapters_rejects_invalid_word_timestamps() -> None:
             )
         ]
     )
+    workflow = CapturingWorkflow()
 
-    with pytest.raises(AbortError) as error:
-        ChapteringServicer().GenerateChapters(request, _context())
+    ChapteringServicer(workflow=cast(ChapteringWorkflow, workflow)).GenerateChapters(
+        request,
+        _context(),
+    )
 
-    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+    assert workflow.request is not None
+    assert workflow.request.segments[0].words == []
 
 
 def test_generate_chapters_maps_word_timestamps_to_workflow_request() -> None:
@@ -266,6 +292,39 @@ def test_generate_chapters_maps_word_timestamps_to_workflow_request() -> None:
     assert words[0].end_seconds == 0.5
     assert words[0].text == "Topic"
     assert words[0].confidence == pytest.approx(0.9)
+
+
+def test_generate_chapters_filters_mixed_word_alignment() -> None:
+    request = _generate_request()
+    request.segments[0].words.extend(
+        [
+            chaptering_pb2.TranscriptWord(
+                word_id="word-1",
+                segment_id="seg-1",
+                start_seconds=0,
+                end_seconds=0,
+                text="Topic",
+            ),
+            chaptering_pb2.TranscriptWord(
+                word_id="word-2",
+                segment_id="seg-1",
+                start_seconds=0.5,
+                end_seconds=1.0,
+                text="introduction",
+            ),
+        ]
+    )
+    workflow = CapturingWorkflow()
+
+    ChapteringServicer(workflow=cast(ChapteringWorkflow, workflow)).GenerateChapters(
+        request,
+        _context(),
+    )
+
+    assert workflow.request is not None
+    words = workflow.request.segments[0].words
+    assert len(words) == 1
+    assert words[0].word_id == "word-2"
 
 
 def test_generate_chapters_returns_fallback_chapter() -> None:
