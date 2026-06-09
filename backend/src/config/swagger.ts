@@ -141,6 +141,10 @@ const options: swaggerJsdoc.Options = {
         description: 'OAuth connection endpoints for external publishing platforms'
       },
       {
+        name: 'Publish Tasks',
+        description: 'Publishing task drafts, listing, and metadata management endpoints'
+      },
+      {
         name: 'Short Clips',
         description: 'Short clip generation, candidate review, and download endpoints'
       }
