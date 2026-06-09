@@ -1,0 +1,18 @@
+import { z } from 'zod'
+
+export const platformRouteSchema = z.enum(['YOUTUBE'])
+
+export const platformParamsSchema = z.strictObject({
+  platform: platformRouteSchema
+})
+
+export const platformOAuthCallbackQuerySchema = z.strictObject({
+  code: z.string().min(1).optional(),
+  state: z.string().min(1).optional(),
+  error: z.string().min(1).optional(),
+  error_description: z.string().min(1).optional()
+})
+
+export type PlatformParams = z.infer<typeof platformParamsSchema>
+export type PlatformOAuthCallbackQuery = z.infer<typeof platformOAuthCallbackQuerySchema>
+export type PlatformRoute = z.infer<typeof platformRouteSchema>

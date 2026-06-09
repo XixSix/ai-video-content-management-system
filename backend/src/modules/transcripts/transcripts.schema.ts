@@ -24,8 +24,8 @@ export const burnTranscriptSchema = z.strictObject({})
 const transcriptEditorBlockSchema = z
   .strictObject({
     blockId: z.string().trim().min(1),
-    startTime: z.number().finite().nonnegative(),
-    endTime: z.number().finite().nonnegative(),
+    startTime: z.number().nonnegative(),
+    endTime: z.number().nonnegative(),
     text: z.string(),
     sourceSegmentIds: z.array(z.uuid()).min(1),
     sourceWordIds: z.array(z.uuid()).default([])

@@ -48,8 +48,8 @@ const envSchema = z.object({
     .positive()
     .default(1000 * 60 * 60),
   TRANSCRIPT_GENERATE_RATE_LIMIT: z.coerce.number().int().positive().default(10),
-  S3_ENDPOINT: z.string().url().default('http://localhost:9000'),
-  S3_PUBLIC_ENDPOINT: z.string().url().optional(),
+  S3_ENDPOINT: z.url().default('http://localhost:9000'),
+  S3_PUBLIC_ENDPOINT: z.url().optional(),
   S3_REGION: z.string().min(1).default('us-east-1'),
   S3_BUCKET: z.string().min(1).default('avcms-media'),
   S3_ACCESS_KEY_ID: z.string().min(1).default('minioadmin'),
@@ -68,7 +68,26 @@ const envSchema = z.object({
     .default(10 * 1024 * 1024),
   PRESIGNED_UPLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
   PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
-  RABBITMQ_URL: z.string().url().default('amqp://localhost:5672')
+  RABBITMQ_URL: z.url().default('amqp://localhost:5672'),
+  YOUTUBE_CLIENT_ID: z.string().min(1, 'YOUTUBE_CLIENT_ID is required'),
+  YOUTUBE_CLIENT_SECRET: z.string().min(1, 'YOUTUBE_CLIENT_SECRET is required'),
+  YOUTUBE_REDIRECT_URI: z.url('YOUTUBE_REDIRECT_URI must be a valid URL'),
+  PLATFORM_TOKEN_ENCRYPTION_KEY: z
+    .string()
+    .min(1, 'PLATFORM_TOKEN_ENCRYPTION_KEY is required')
+    .refine((value: string): boolean => {
+      try {
+        return Buffer.from(value, 'base64').length === 32
+      } catch {
+        return false
+      }
+    }, 'PLATFORM_TOKEN_ENCRYPTION_KEY must be a base64-encoded 32-byte key'),
+  PLATFORM_OAUTH_STATE_TTL_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(10 * 60 * 1000),
+  FRONTEND_OAUTH_REDIRECT_URL: z.url().default('http://localhost:5173/settings/integrations')
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
@@ -133,6 +152,14 @@ export const config = {
   },
   rabbitmq: {
     url: env.RABBITMQ_URL
+  },
+  platform: {
+    youtubeClientId: env.YOUTUBE_CLIENT_ID,
+    youtubeClientSecret: env.YOUTUBE_CLIENT_SECRET,
+    youtubeRedirectUri: env.YOUTUBE_REDIRECT_URI,
+    tokenEncryptionKey: env.PLATFORM_TOKEN_ENCRYPTION_KEY,
+    oauthStateTtlMs: env.PLATFORM_OAUTH_STATE_TTL_MS,
+    frontendOauthRedirectUrl: env.FRONTEND_OAUTH_REDIRECT_URL
   }
 } as const
 
