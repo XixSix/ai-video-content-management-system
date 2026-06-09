@@ -11,6 +11,10 @@ export const resolvePlatform = (platformRoute: PlatformRoute): Platform => {
     return Platform.YOUTUBE
   }
 
+  if (platformRoute === 'FACEBOOK') {
+    return Platform.FACEBOOK
+  }
+
   throw new Error(`Unsupported platform route: ${platformRoute}`)
 }
 

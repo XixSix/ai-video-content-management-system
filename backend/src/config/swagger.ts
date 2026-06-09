@@ -135,6 +135,14 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Generated Assets',
         description: 'Generated asset listing, download, and cleanup endpoints'
+      },
+      {
+        name: 'Platform Accounts',
+        description: 'OAuth connection endpoints for external publishing platforms'
+      },
+      {
+        name: 'Short Clips',
+        description: 'Short clip generation, candidate review, and download endpoints'
       }
     ]
   },

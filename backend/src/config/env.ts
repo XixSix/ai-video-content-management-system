@@ -72,6 +72,10 @@ const envSchema = z.object({
   YOUTUBE_CLIENT_ID: z.string().min(1, 'YOUTUBE_CLIENT_ID is required'),
   YOUTUBE_CLIENT_SECRET: z.string().min(1, 'YOUTUBE_CLIENT_SECRET is required'),
   YOUTUBE_REDIRECT_URI: z.url('YOUTUBE_REDIRECT_URI must be a valid URL'),
+  FACEBOOK_APP_ID: z.string().min(1, 'FACEBOOK_APP_ID is required'),
+  FACEBOOK_APP_SECRET: z.string().min(1, 'FACEBOOK_APP_SECRET is required'),
+  FACEBOOK_REDIRECT_URI: z.url('FACEBOOK_REDIRECT_URI must be a valid URL'),
+  FACEBOOK_GRAPH_API_VERSION: z.string().min(1).default('v25.0'),
   PLATFORM_TOKEN_ENCRYPTION_KEY: z
     .string()
     .min(1, 'PLATFORM_TOKEN_ENCRYPTION_KEY is required')
@@ -157,6 +161,10 @@ export const config = {
     youtubeClientId: env.YOUTUBE_CLIENT_ID,
     youtubeClientSecret: env.YOUTUBE_CLIENT_SECRET,
     youtubeRedirectUri: env.YOUTUBE_REDIRECT_URI,
+    facebookAppId: env.FACEBOOK_APP_ID,
+    facebookAppSecret: env.FACEBOOK_APP_SECRET,
+    facebookRedirectUri: env.FACEBOOK_REDIRECT_URI,
+    facebookGraphApiVersion: env.FACEBOOK_GRAPH_API_VERSION,
     tokenEncryptionKey: env.PLATFORM_TOKEN_ENCRYPTION_KEY,
     oauthStateTtlMs: env.PLATFORM_OAUTH_STATE_TTL_MS,
     frontendOauthRedirectUrl: env.FRONTEND_OAUTH_REDIRECT_URL

@@ -41,6 +41,18 @@ export interface YouTubeChannelProfile {
   platformUserId: string
 }
 
+export interface FacebookConnectionTokens {
+  accessToken: string
+  refreshToken: string | null
+  expiresAt: Date | null
+}
+
+export interface FacebookPageProfile {
+  accountName: string
+  platformUserId: string
+  pageAccessToken: string
+}
+
 export interface CreatePlatformOAuthStateInput {
   userId: string
   platform: Platform

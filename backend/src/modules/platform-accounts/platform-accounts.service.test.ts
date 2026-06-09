@@ -16,6 +16,10 @@ const createYouTubeAuthUrlMock = jest.fn<(state: string) => string>()
 const exchangeYouTubeCodeMock = jest.fn<(code: string) => Promise<unknown>>()
 const getAuthenticatedYouTubeChannelMock = jest.fn<(tokens: unknown) => Promise<unknown>>()
 const revokeYouTubeTokenMock = jest.fn<(token: string) => Promise<void>>()
+const createFacebookAuthUrlMock = jest.fn<(state: string) => string>()
+const exchangeFacebookCodeMock = jest.fn<(code: string) => Promise<unknown>>()
+const getAuthenticatedFacebookPageMock = jest.fn<(tokens: unknown) => Promise<unknown>>()
+const revokeFacebookTokenMock = jest.fn<(token: string) => Promise<void>>()
 
 jest.unstable_mockModule('./platform-accounts.repository', () => ({
   createPlatformOAuthState: createPlatformOAuthStateMock,
@@ -32,6 +36,13 @@ jest.unstable_mockModule('../../infrastructure/google/youtube-oauth', () => ({
   exchangeYouTubeCode: exchangeYouTubeCodeMock,
   getAuthenticatedYouTubeChannel: getAuthenticatedYouTubeChannelMock,
   revokeYouTubeToken: revokeYouTubeTokenMock
+}))
+
+jest.unstable_mockModule('../../infrastructure/facebook/facebook-oauth', () => ({
+  createFacebookAuthUrl: createFacebookAuthUrlMock,
+  exchangeFacebookCode: exchangeFacebookCodeMock,
+  getAuthenticatedFacebookPage: getAuthenticatedFacebookPageMock,
+  revokeFacebookToken: revokeFacebookTokenMock
 }))
 
 const platformAccountsService = await import('./platform-accounts.service')
@@ -80,6 +91,10 @@ describe('platform account service', () => {
     exchangeYouTubeCodeMock.mockReset()
     getAuthenticatedYouTubeChannelMock.mockReset()
     revokeYouTubeTokenMock.mockReset()
+    createFacebookAuthUrlMock.mockReset()
+    exchangeFacebookCodeMock.mockReset()
+    getAuthenticatedFacebookPageMock.mockReset()
+    revokeFacebookTokenMock.mockReset()
 
     createPlatformOAuthStateMock.mockResolvedValue(createOAuthStateRecord())
     findPlatformOAuthStateByHashAndPlatformMock.mockResolvedValue(createOAuthStateRecord())
@@ -89,16 +104,28 @@ describe('platform account service', () => {
     upsertConnectedPlatformAccountMock.mockResolvedValue(createPlatformAccountRecord())
     revokePlatformAccountMock.mockResolvedValue(createPlatformAccountRecord({ status: 'REVOKED' }))
     createYouTubeAuthUrlMock.mockReturnValue('https://accounts.google.com/o/oauth2/v2/auth?state=test-state')
+    createFacebookAuthUrlMock.mockReturnValue('https://www.facebook.com/v25.0/dialog/oauth?state=test-state')
     exchangeYouTubeCodeMock.mockResolvedValue({
       accessToken: 'new-access-token',
       refreshToken: 'new-refresh-token',
       expiresAt: new Date(now.getTime() + 60 * 60 * 1000)
     })
+    exchangeFacebookCodeMock.mockResolvedValue({
+      accessToken: 'facebook-user-token',
+      refreshToken: null,
+      expiresAt: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000)
+    })
     getAuthenticatedYouTubeChannelMock.mockResolvedValue({
       accountName: 'VidPilot Channel',
       platformUserId: 'UC1234567890'
     })
+    getAuthenticatedFacebookPageMock.mockResolvedValue({
+      accountName: 'VidPilot Page',
+      platformUserId: '123456789',
+      pageAccessToken: 'facebook-page-token'
+    })
     revokeYouTubeTokenMock.mockResolvedValue()
+    revokeFacebookTokenMock.mockResolvedValue()
   })
 
   afterEach(() => {
@@ -137,6 +164,22 @@ describe('platform account service', () => {
       })
     )
     expect(createYouTubeAuthUrlMock).toHaveBeenCalledWith(expect.any(String))
+  })
+
+  it('creates a Facebook OAuth state and auth URL', async () => {
+    const result = await platformAccountsService.createPlatformConnection(userId, 'FACEBOOK')
+
+    expect(result).toEqual({
+      authUrl: 'https://www.facebook.com/v25.0/dialog/oauth?state=test-state'
+    })
+    expect(createPlatformOAuthStateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId,
+        platform: Platform.FACEBOOK,
+        expiresAt: new Date(now.getTime() + config.platform.oauthStateTtlMs)
+      })
+    )
+    expect(createFacebookAuthUrlMock).toHaveBeenCalledWith(expect.any(String))
   })
 
   it('handles a successful YouTube OAuth callback', async () => {
@@ -181,6 +224,55 @@ describe('platform account service', () => {
     expect(platformAccountsUtil.decryptToken(upsertInput.refreshTokenEncrypted!)).toBe('new-refresh-token')
   })
 
+  it('handles a successful Facebook OAuth callback and stores the Page access token', async () => {
+    const facebookOAuthState = {
+      ...createOAuthStateRecord(),
+      platform: Platform.FACEBOOK
+    }
+    findPlatformOAuthStateByHashAndPlatformMock.mockResolvedValue(facebookOAuthState)
+    consumePlatformOAuthStateMock.mockResolvedValue(facebookOAuthState)
+    findPlatformAccountByUserIdAndPlatformMock.mockResolvedValue(null)
+
+    const result = await platformAccountsService.handlePlatformCallback({
+      platform: 'FACEBOOK',
+      query: {
+        code: 'oauth-code',
+        state: 'oauth-state'
+      }
+    })
+
+    expect(result).toEqual({
+      redirectUrl: 'http://localhost:5173/settings/integrations?platform=FACEBOOK&status=connected'
+    })
+    expect(findPlatformOAuthStateByHashAndPlatformMock).toHaveBeenCalledWith(
+      platformAccountsUtil.hashOAuthState('oauth-state'),
+      Platform.FACEBOOK
+    )
+    expect(exchangeFacebookCodeMock).toHaveBeenCalledWith('oauth-code')
+    expect(getAuthenticatedFacebookPageMock).toHaveBeenCalledWith({
+      accessToken: 'facebook-user-token',
+      refreshToken: null,
+      expiresAt: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000)
+    })
+    expect(upsertConnectedPlatformAccountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId,
+        platform: Platform.FACEBOOK,
+        accountName: 'VidPilot Page',
+        platformUserId: '123456789',
+        tokenLast4: 'oken'
+      })
+    )
+
+    const upsertInput = upsertConnectedPlatformAccountMock.mock.calls[0]?.[0] as {
+      accessTokenEncrypted: string
+      refreshTokenEncrypted: string | null
+    }
+    expect(platformAccountsUtil.decryptToken(upsertInput.accessTokenEncrypted)).toBe('facebook-page-token')
+    expect(upsertInput.refreshTokenEncrypted).not.toBeNull()
+    expect(platformAccountsUtil.decryptToken(upsertInput.refreshTokenEncrypted!)).toBe('facebook-user-token')
+  })
+
   it('reuses the existing refresh token when Google does not return a new one', async () => {
     const existingAccount = createPlatformAccountRecord()
     exchangeYouTubeCodeMock.mockResolvedValue({
@@ -215,6 +307,20 @@ describe('platform account service', () => {
 
     expect(findPlatformAccountByUserIdAndPlatformMock).toHaveBeenCalledWith(userId, Platform.YOUTUBE)
     expect(revokeYouTubeTokenMock).toHaveBeenCalledWith('existing-refresh-token')
+    expect(revokePlatformAccountMock).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000003')
+  })
+
+  it('disconnects Facebook accounts with a best-effort token revocation', async () => {
+    const account = createPlatformAccountRecord({
+      platform: Platform.FACEBOOK,
+      refreshTokenEncrypted: platformAccountsUtil.encryptToken('facebook-user-token')
+    })
+    findPlatformAccountByUserIdAndPlatformMock.mockResolvedValue(account)
+
+    await expect(platformAccountsService.disconnectPlatformAccount(userId, 'FACEBOOK')).resolves.toBeUndefined()
+
+    expect(findPlatformAccountByUserIdAndPlatformMock).toHaveBeenCalledWith(userId, Platform.FACEBOOK)
+    expect(revokeFacebookTokenMock).toHaveBeenCalledWith('facebook-user-token')
     expect(revokePlatformAccountMock).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000003')
   })
 
