@@ -40,4 +40,12 @@ export class PublishTasksError extends AppError {
   static locked(message = 'Publish task cannot be edited in its current status'): PublishTasksError {
     return new PublishTasksError(message, 409, 'PUBLISH_TASK_LOCKED')
   }
+
+  static invalidSchedule(message = 'Publish schedule is invalid'): PublishTasksError {
+    return new PublishTasksError(message, 400, 'PUBLISH_SCHEDULE_INVALID')
+  }
+
+  static queuePublishFailed(message = 'Failed to publish publish task job'): PublishTasksError {
+    return new PublishTasksError(message, 502, 'PUBLISH_QUEUE_PUBLISH_FAILED')
+  }
 }

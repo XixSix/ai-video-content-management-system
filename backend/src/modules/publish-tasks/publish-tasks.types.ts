@@ -1,4 +1,9 @@
 import type { Platform, Prisma, PublishStatus, PublishTask } from '../../infrastructure/db/generated/prisma/client'
+import type { JobResponseData } from '../jobs/jobs.types'
+
+export const PUBLISH_QUEUE_NAME = 'publish_queue'
+export const PUBLISH_TASK_NAME = 'publish'
+export const PUBLISH_CELERY_TASK_NAME = 'publish_task'
 
 export interface PublishTaskData {
   id: string
@@ -28,6 +33,11 @@ export interface PaginatedResult<TItem> {
   page: number
   limit: number
   totalPages: number
+}
+
+export interface PublishTaskJobResult {
+  publishTask: PublishTaskData
+  job: JobResponseData
 }
 
 export type PublishTaskRecord = PublishTask

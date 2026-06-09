@@ -132,6 +132,13 @@
  *           type: string
  *           format: date-time
  *           nullable: true
+ *     SchedulePublishTaskRequest:
+ *       type: object
+ *       required: [scheduledAt]
+ *       properties:
+ *         scheduledAt:
+ *           type: string
+ *           format: date-time
  */
 
 /**
@@ -302,4 +309,107 @@
  *         description: Publish task or platform account not found
  *       409:
  *         description: Publish task is locked or platform account is invalid
+ */
+
+/**
+ * @swagger
+ * /publish-tasks/{publishTaskId}/publish:
+ *   post:
+ *     summary: Publish task now
+ *     description: Create a publish processing job and enqueue immediate publishing.
+ *     tags: [Publish Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: publishTaskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       201:
+ *         description: Publish job queued
+ *       400:
+ *         description: Invalid publish task ID
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Publish task, target, or platform account not found
+ *       409:
+ *         description: Publish task is locked or target/account state is invalid
+ *       502:
+ *         description: Failed to enqueue publish job
+ */
+
+/**
+ * @swagger
+ * /publish-tasks/{publishTaskId}/schedule:
+ *   post:
+ *     summary: Schedule publish task
+ *     description: Create a publish processing job with a Celery ETA and mark the task scheduled.
+ *     tags: [Publish Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: publishTaskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SchedulePublishTaskRequest'
+ *     responses:
+ *       201:
+ *         description: Scheduled publish job queued
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Publish task, target, or platform account not found
+ *       409:
+ *         description: Publish task is locked or target/account state is invalid
+ *       502:
+ *         description: Failed to enqueue publish job
+ */
+
+/**
+ * @swagger
+ * /publish-tasks/{publishTaskId}/cancel:
+ *   post:
+ *     summary: Cancel publish task
+ *     description: Cancel a draft or scheduled publish task.
+ *     tags: [Publish Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: publishTaskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Publish task canceled
+ *       400:
+ *         description: Invalid publish task ID
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Publish task not found
+ *       409:
+ *         description: Publish task cannot be canceled in its current status
  */

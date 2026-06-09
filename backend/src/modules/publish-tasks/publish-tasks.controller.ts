@@ -9,10 +9,11 @@ import type {
   CreatePublishTaskBody,
   ListPublishTasksQuery,
   PublishTaskParams,
+  SchedulePublishTaskBody,
   UpdatePublishTaskBody
 } from './publish-tasks.schema'
 import * as publishTasksService from './publish-tasks.service'
-import type { PaginatedResult, PublishTaskData } from './publish-tasks.types'
+import type { PaginatedResult, PublishTaskData, PublishTaskJobResult } from './publish-tasks.types'
 
 export const create: BodyRequestHandler<CreatePublishTaskBody> = async (req, res, next): Promise<void> => {
   try {
@@ -60,6 +61,40 @@ export const update: ParamsBodyRequestHandler<PublishTaskParams, UpdatePublishTa
 ): Promise<void> => {
   try {
     const publishTask = await publishTasksService.updatePublishTask(req.user!.id, req.params.publishTaskId, req.body)
+
+    sendSuccess<{ publishTask: PublishTaskData }>(res, { publishTask })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const publish: ParamsRequestHandler<PublishTaskParams> = async (req, res, next): Promise<void> => {
+  try {
+    const result = await publishTasksService.publishPublishTask(req.user!.id, req.params.publishTaskId)
+
+    sendSuccess<PublishTaskJobResult>(res, result, 201)
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const schedule: ParamsBodyRequestHandler<PublishTaskParams, SchedulePublishTaskBody> = async (
+  req,
+  res,
+  next
+): Promise<void> => {
+  try {
+    const result = await publishTasksService.schedulePublishTask(req.user!.id, req.params.publishTaskId, req.body)
+
+    sendSuccess<PublishTaskJobResult>(res, result, 201)
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+export const cancel: ParamsRequestHandler<PublishTaskParams> = async (req, res, next): Promise<void> => {
+  try {
+    const publishTask = await publishTasksService.cancelPublishTask(req.user!.id, req.params.publishTaskId)
 
     sendSuccess<{ publishTask: PublishTaskData }>(res, { publishTask })
   } catch (error: unknown) {

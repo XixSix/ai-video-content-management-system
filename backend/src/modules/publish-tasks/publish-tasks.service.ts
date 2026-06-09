@@ -1,20 +1,33 @@
 import {
+  JobStatus,
+  JobType,
   PlatformAccountStatus,
   Prisma,
   PublishStatus,
   type Media,
   type Platform,
   type PlatformAccount,
+  type ProcessingJob,
   type PublishTask,
   type ShortClip
 } from '../../infrastructure/db/generated/prisma/client'
-import { toPublishTaskData } from './publish-tasks.mapper'
+import { toJobResponseData, toPublishTaskData } from './publish-tasks.mapper'
+import * as publishTasksQueue from './publish-tasks.queue'
 import * as publishTasksRepo from './publish-tasks.repository'
-import type { CreatePublishTaskBody, ListPublishTasksQuery, UpdatePublishTaskBody } from './publish-tasks.schema'
+import type {
+  CreatePublishTaskBody,
+  ListPublishTasksQuery,
+  SchedulePublishTaskBody,
+  UpdatePublishTaskBody
+} from './publish-tasks.schema'
 import { PublishTasksError } from './publish-tasks.error'
-import type { PaginatedResult, PublishTaskData } from './publish-tasks.types'
+import type { PaginatedResult, PublishTaskData, PublishTaskJobResult } from './publish-tasks.types'
 
 const editableStatuses: PublishStatus[] = [PublishStatus.DRAFT, PublishStatus.SCHEDULED, PublishStatus.FAILED]
+const publishableStatuses: PublishStatus[] = [PublishStatus.DRAFT, PublishStatus.FAILED]
+const cancelableStatuses: PublishStatus[] = [PublishStatus.DRAFT, PublishStatus.SCHEDULED]
+const cancelableJobStatuses: JobStatus[] = [JobStatus.PENDING, JobStatus.QUEUED]
+const publishQueueFailureMessage = 'Failed to publish task job'
 
 export const createPublishTask = async (userId: string, body: CreatePublishTaskBody): Promise<PublishTaskData> => {
   await ensurePublishTarget(userId, body)
@@ -117,6 +130,124 @@ export const updatePublishTask = async (
   return toPublishTaskData(updatedTask)
 }
 
+export const publishPublishTask = async (userId: string, publishTaskId: string): Promise<PublishTaskJobResult> => {
+  return startPublishTask(userId, publishTaskId, null)
+}
+
+export const schedulePublishTask = async (
+  userId: string,
+  publishTaskId: string,
+  body: SchedulePublishTaskBody
+): Promise<PublishTaskJobResult> => {
+  if (body.scheduledAt.getTime() <= Date.now()) {
+    throw PublishTasksError.invalidSchedule('scheduledAt must be in the future')
+  }
+
+  return startPublishTask(userId, publishTaskId, body.scheduledAt)
+}
+
+export const cancelPublishTask = async (userId: string, publishTaskId: string): Promise<PublishTaskData> => {
+  const task = await getOwnedPublishTask(userId, publishTaskId)
+
+  if (!cancelableStatuses.includes(task.status)) {
+    throw PublishTasksError.locked('Publish task cannot be canceled in its current status')
+  }
+
+  const job = task.jobId ? await publishTasksRepo.findProcessingJobById(task.jobId) : null
+
+  if (job && job.userId === userId && job.jobType === JobType.PUBLISH && cancelableJobStatuses.includes(job.status)) {
+    await publishTasksRepo.updateProcessingJob(job.id, {
+      status: JobStatus.FAILED,
+      progress: 0,
+      errorMessage: 'Publish task was canceled',
+      completedAt: new Date()
+    })
+  }
+
+  const updatedTask = await publishTasksRepo.updatePublishTask(task.id, {
+    status: PublishStatus.CANCELED,
+    errorMessage: null
+  })
+
+  return toPublishTaskData(updatedTask)
+}
+
+const startPublishTask = async (
+  userId: string,
+  publishTaskId: string,
+  scheduledAt: Date | null
+): Promise<PublishTaskJobResult> => {
+  const task = await getOwnedPublishTask(userId, publishTaskId)
+
+  if (!publishableStatuses.includes(task.status)) {
+    throw PublishTasksError.locked('Publish task cannot be published in its current status')
+  }
+
+  const publishContext = await getPublishContext(userId, task)
+  const scheduledAtIso = scheduledAt?.toISOString() ?? null
+  const job = await publishTasksRepo.createProcessingJob({
+    mediaId: publishContext.jobMediaId,
+    userId,
+    jobType: JobType.PUBLISH,
+    status: JobStatus.PENDING,
+    progress: 0,
+    input: {
+      publishTaskId: task.id,
+      mediaId: task.mediaId,
+      shortClipId: task.shortClipId,
+      platform: task.platform,
+      platformAccountId: publishContext.platformAccountId,
+      scheduledAt: scheduledAtIso
+    }
+  })
+
+  const updatedTask = await publishTasksRepo.updatePublishTask(task.id, {
+    jobId: job.id,
+    status: scheduledAt ? PublishStatus.SCHEDULED : PublishStatus.PUBLISHING,
+    scheduledAt,
+    errorMessage: null
+  })
+
+  try {
+    await publishTasksQueue.publishPublishTaskJob(
+      {
+        jobId: job.id,
+        publishTaskId: task.id,
+        mediaId: task.mediaId,
+        shortClipId: task.shortClipId,
+        userId,
+        platform: task.platform,
+        platformAccountId: publishContext.platformAccountId,
+        scheduledAt: scheduledAtIso
+      },
+      scheduledAtIso ?? undefined
+    )
+  } catch {
+    await markPublishJobFailed(job, task.id)
+    throw PublishTasksError.queuePublishFailed()
+  }
+
+  return {
+    publishTask: toPublishTaskData(updatedTask),
+    job: toJobResponseData(job)
+  }
+}
+
+const markPublishJobFailed = async (job: ProcessingJob, publishTaskId: string): Promise<void> => {
+  await Promise.all([
+    publishTasksRepo.updateProcessingJob(job.id, {
+      status: JobStatus.FAILED,
+      progress: 0,
+      errorMessage: publishQueueFailureMessage,
+      completedAt: new Date()
+    }),
+    publishTasksRepo.updatePublishTask(publishTaskId, {
+      status: PublishStatus.FAILED,
+      errorMessage: publishQueueFailureMessage
+    })
+  ])
+}
+
 const ensurePublishTarget = async (
   userId: string,
   body: Pick<CreatePublishTaskBody, 'mediaId' | 'shortClipId'>
@@ -129,6 +260,38 @@ const ensurePublishTarget = async (
   if (body.shortClipId) {
     await getOwnedPublishableShortClip(userId, body.shortClipId)
   }
+}
+
+const getPublishContext = async (
+  userId: string,
+  task: PublishTask
+): Promise<{ jobMediaId: string; platformAccountId: string }> => {
+  const jobMediaId = await getPublishTaskMediaId(userId, task)
+
+  if (!task.platformAccountId) {
+    throw PublishTasksError.platformAccountNotFound()
+  }
+
+  await getUsablePlatformAccount(userId, task.platform, task.platformAccountId)
+
+  return {
+    jobMediaId,
+    platformAccountId: task.platformAccountId
+  }
+}
+
+const getPublishTaskMediaId = async (userId: string, task: PublishTask): Promise<string> => {
+  if (task.mediaId) {
+    const media = await getOwnedPublishableMedia(userId, task.mediaId)
+    return media.id
+  }
+
+  if (task.shortClipId) {
+    const shortClip = await getOwnedPublishableShortClip(userId, task.shortClipId)
+    return shortClip.mediaId
+  }
+
+  throw PublishTasksError.targetNotFound()
 }
 
 const getOwnedPublishTask = async (userId: string, publishTaskId: string): Promise<PublishTask> => {

@@ -9,6 +9,9 @@ export const publishTaskParamsSchema = z.strictObject({
 
 const hashtagsSchema = z.array(z.string().trim().min(1).max(100)).max(30)
 const scheduledAtSchema = z.iso.datetime().transform((value) => new Date(value))
+const futureScheduledAtSchema = scheduledAtSchema.refine((value) => value.getTime() > Date.now(), {
+  message: 'scheduledAt must be in the future'
+})
 
 export const createPublishTaskSchema = z
   .strictObject({
@@ -61,7 +64,12 @@ export const updatePublishTaskSchema = z
     }
   )
 
+export const schedulePublishTaskSchema = z.strictObject({
+  scheduledAt: futureScheduledAtSchema
+})
+
 export type PublishTaskParams = z.infer<typeof publishTaskParamsSchema>
 export type CreatePublishTaskBody = z.infer<typeof createPublishTaskSchema>
 export type ListPublishTasksQuery = z.infer<typeof listPublishTasksQuerySchema>
 export type UpdatePublishTaskBody = z.infer<typeof updatePublishTaskSchema>
+export type SchedulePublishTaskBody = z.infer<typeof schedulePublishTaskSchema>
