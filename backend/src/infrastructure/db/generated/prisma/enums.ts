@@ -188,7 +188,8 @@ export const PublishStatus = {
   SCHEDULED: 'SCHEDULED',
   PUBLISHING: 'PUBLISHING',
   PUBLISHED: 'PUBLISHED',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  CANCELED: 'CANCELED'
 } as const
 
 export type PublishStatus = (typeof PublishStatus)[keyof typeof PublishStatus]

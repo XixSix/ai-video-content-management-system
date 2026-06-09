@@ -141,6 +141,7 @@ enum PublishStatus {
   PUBLISHING
   PUBLISHED
   FAILED
+  CANCELED
 }
 
 model User {
