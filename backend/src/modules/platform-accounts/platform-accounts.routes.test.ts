@@ -76,6 +76,7 @@ describe('platform account routes', () => {
   it.each([
     ['GET', '/api/v1/platform-accounts'],
     ['POST', '/api/v1/platform-accounts/YOUTUBE/connect'],
+    ['POST', '/api/v1/platform-accounts/FACEBOOK/connect'],
     ['DELETE', '/api/v1/platform-accounts/YOUTUBE']
   ])('%s %s requires an access token', async (method, path) => {
     const response = await request(app)[method.toLowerCase() as 'get' | 'post' | 'delete'](path).send({})
@@ -123,6 +124,25 @@ describe('platform account routes', () => {
       }
     })
     expect(createPlatformConnectionMock).toHaveBeenCalledWith(userId, 'YOUTUBE')
+  })
+
+  it('creates a Facebook connection URL', async () => {
+    createPlatformConnectionMock.mockResolvedValue({
+      authUrl: 'https://www.facebook.com/v25.0/dialog/oauth?state=test-state'
+    })
+
+    const response = await request(app)
+      .post('/api/v1/platform-accounts/FACEBOOK/connect')
+      .set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        authUrl: 'https://www.facebook.com/v25.0/dialog/oauth?state=test-state'
+      }
+    })
+    expect(createPlatformConnectionMock).toHaveBeenCalledWith(userId, 'FACEBOOK')
   })
 
   it('redirects a public OAuth callback on success', async () => {

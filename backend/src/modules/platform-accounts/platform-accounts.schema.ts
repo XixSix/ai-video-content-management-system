@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const platformRouteSchema = z.enum(['YOUTUBE'])
+export const platformRouteSchema = z.enum(['YOUTUBE', 'FACEBOOK'])
 
 export const platformParamsSchema = z.strictObject({
   platform: platformRouteSchema

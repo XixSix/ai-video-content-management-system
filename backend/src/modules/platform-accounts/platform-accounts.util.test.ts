@@ -4,7 +4,8 @@ import {
   decryptToken,
   encryptToken,
   getTokenLast4,
-  hashOAuthState
+  hashOAuthState,
+  resolvePlatform
 } from './platform-accounts.util'
 
 describe('platform account utilities', () => {
@@ -24,5 +25,10 @@ describe('platform account utilities', () => {
   it('hashes oauth state and exposes the last four token characters', () => {
     expect(hashOAuthState('oauth-state')).toHaveLength(64)
     expect(getTokenLast4('refresh-token')).toBe('oken')
+  })
+
+  it('resolves platform route values to Prisma platform enums', () => {
+    expect(resolvePlatform('YOUTUBE')).toBe('YOUTUBE')
+    expect(resolvePlatform('FACEBOOK')).toBe('FACEBOOK')
   })
 })

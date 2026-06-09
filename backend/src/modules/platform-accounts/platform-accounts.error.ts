@@ -36,4 +36,8 @@ export class PlatformAccountsError extends AppError {
   static channelFetchFailed(message = 'Failed to load the authenticated YouTube channel'): PlatformAccountsError {
     return new PlatformAccountsError(message, 502, 'PLATFORM_OAUTH_CHANNEL_FETCH_FAILED')
   }
+
+  static accountFetchFailed(message = 'Failed to load the authenticated platform account'): PlatformAccountsError {
+    return new PlatformAccountsError(message, 502, 'PLATFORM_OAUTH_ACCOUNT_FETCH_FAILED')
+  }
 }
