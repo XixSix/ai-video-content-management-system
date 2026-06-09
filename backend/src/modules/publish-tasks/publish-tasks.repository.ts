@@ -3,6 +3,7 @@ import type {
   Media,
   Platform,
   PlatformAccount,
+  ProcessingJob,
   Prisma,
   PublishStatus,
   PublishTask,
@@ -61,6 +62,23 @@ export const updatePublishTask = async (
   data: Prisma.PublishTaskUncheckedUpdateInput
 ): Promise<PublishTask> =>
   prisma.publishTask.update({
+    where: { id },
+    data
+  })
+
+export const createProcessingJob = async (data: Prisma.ProcessingJobUncheckedCreateInput): Promise<ProcessingJob> =>
+  prisma.processingJob.create({ data })
+
+export const findProcessingJobById = async (id: string): Promise<ProcessingJob | null> =>
+  prisma.processingJob.findUnique({
+    where: { id }
+  })
+
+export const updateProcessingJob = async (
+  id: string,
+  data: Prisma.ProcessingJobUncheckedUpdateInput
+): Promise<ProcessingJob> =>
+  prisma.processingJob.update({
     where: { id },
     data
   })

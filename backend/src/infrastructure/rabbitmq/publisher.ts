@@ -9,6 +9,7 @@ interface PublishCeleryTaskInput {
   kwargs: Record<string, unknown>
   args?: unknown[]
   taskId?: string
+  eta?: string
   options?: Options.Publish
 }
 
@@ -43,6 +44,7 @@ export const publishCeleryTaskToQueue = async ({
   kwargs,
   args = [],
   taskId = randomUUID(),
+  eta = undefined,
   options = {}
 }: PublishCeleryTaskInput): Promise<void> => {
   const connection = getRabbitMQConnection()
@@ -73,7 +75,7 @@ export const publishCeleryTaskToQueue = async ({
       // optional
       meth: null,
       shadow: null,
-      eta: null,
+      eta,
       expires: null,
       retries: 0,
       timelimit: [null, null],

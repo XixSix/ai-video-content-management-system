@@ -3,11 +3,15 @@ import {
   Prisma,
   type Media,
   type PlatformAccount,
+  type ProcessingJob,
   type PublishTask,
   type ShortClip
 } from '../../infrastructure/db/generated/prisma/client'
 
 const createPublishTaskMock = jest.fn<(data: unknown) => Promise<PublishTask>>()
+const createProcessingJobMock = jest.fn<(data: unknown) => Promise<ProcessingJob>>()
+const findProcessingJobByIdMock = jest.fn<(id: string) => Promise<ProcessingJob | null>>()
+const updateProcessingJobMock = jest.fn<(id: string, data: unknown) => Promise<ProcessingJob>>()
 const findPublishTasksByUserIdMock =
   jest.fn<
     (
@@ -23,15 +27,23 @@ const updatePublishTaskMock = jest.fn<(id: string, data: unknown) => Promise<Pub
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
 const findShortClipByIdMock = jest.fn<(id: string) => Promise<ShortClip | null>>()
 const findPlatformAccountByIdMock = jest.fn<(id: string) => Promise<PlatformAccount | null>>()
+const publishPublishTaskJobMock = jest.fn<(message: unknown, eta?: string) => Promise<void>>()
 
 jest.unstable_mockModule('./publish-tasks.repository', () => ({
+  createProcessingJob: createProcessingJobMock,
   createPublishTask: createPublishTaskMock,
   findMediaById: findMediaByIdMock,
   findPlatformAccountById: findPlatformAccountByIdMock,
+  findProcessingJobById: findProcessingJobByIdMock,
   findPublishTaskById: findPublishTaskByIdMock,
   findPublishTasksByUserId: findPublishTasksByUserIdMock,
   findShortClipById: findShortClipByIdMock,
+  updateProcessingJob: updateProcessingJobMock,
   updatePublishTask: updatePublishTaskMock
+}))
+
+jest.unstable_mockModule('./publish-tasks.queue', () => ({
+  publishPublishTaskJob: publishPublishTaskJobMock
 }))
 
 const publishTasksService = await import('./publish-tasks.service')
@@ -39,6 +51,7 @@ const publishTasksService = await import('./publish-tasks.service')
 const userId = '00000000-0000-4000-8000-000000000001'
 const otherUserId = '00000000-0000-4000-8000-000000000099'
 const publishTaskId = '00000000-0000-4000-8000-000000000002'
+const jobId = '00000000-0000-4000-8000-000000000007'
 const mediaId = '00000000-0000-4000-8000-000000000003'
 const shortClipId = '00000000-0000-4000-8000-000000000004'
 const platformAccountId = '00000000-0000-4000-8000-000000000005'
@@ -135,15 +148,40 @@ const createPublishTask = (overrides: Partial<PublishTask> = {}): PublishTask =>
   ...overrides
 })
 
+const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): ProcessingJob => ({
+  id: jobId,
+  mediaId,
+  userId,
+  jobType: 'PUBLISH',
+  status: 'PENDING',
+  progress: 0,
+  errorMessage: null,
+  queueName: null,
+  taskName: null,
+  externalTaskId: null,
+  attemptCount: 0,
+  input: null,
+  output: null,
+  createdAt: now,
+  updatedAt: now,
+  startedAt: null,
+  completedAt: null,
+  ...overrides
+})
+
 describe('publish task service', () => {
   beforeEach(() => {
     createPublishTaskMock.mockReset()
+    createProcessingJobMock.mockReset()
+    findProcessingJobByIdMock.mockReset()
+    updateProcessingJobMock.mockReset()
     findPublishTasksByUserIdMock.mockReset()
     findPublishTaskByIdMock.mockReset()
     updatePublishTaskMock.mockReset()
     findMediaByIdMock.mockReset()
     findShortClipByIdMock.mockReset()
     findPlatformAccountByIdMock.mockReset()
+    publishPublishTaskJobMock.mockReset()
   })
 
   it('creates a media publish task with a required connected platform account', async () => {
@@ -411,5 +449,230 @@ describe('publish task service', () => {
     }
 
     expect(updatePublishTaskMock).not.toHaveBeenCalled()
+  })
+
+  it('publishes a draft media publish task by creating a job and enqueueing it', async () => {
+    findPublishTaskByIdMock.mockResolvedValue(createPublishTask())
+    findMediaByIdMock.mockResolvedValue(createMedia())
+    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
+    createProcessingJobMock.mockResolvedValue(createProcessingJob())
+    updatePublishTaskMock.mockResolvedValue(createPublishTask({ jobId, status: 'PUBLISHING' }))
+    publishPublishTaskJobMock.mockResolvedValue()
+
+    const result = await publishTasksService.publishPublishTask(userId, publishTaskId)
+
+    expect(createProcessingJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId,
+        userId,
+        jobType: 'PUBLISH',
+        status: 'PENDING',
+        progress: 0,
+        input: expect.objectContaining({
+          publishTaskId,
+          mediaId,
+          shortClipId: null,
+          platform: 'FACEBOOK',
+          platformAccountId,
+          scheduledAt: null
+        })
+      })
+    )
+    expect(updatePublishTaskMock).toHaveBeenCalledWith(
+      publishTaskId,
+      expect.objectContaining({
+        jobId,
+        status: 'PUBLISHING',
+        scheduledAt: null,
+        errorMessage: null
+      })
+    )
+    expect(publishPublishTaskJobMock).toHaveBeenCalledWith(
+      {
+        jobId,
+        publishTaskId,
+        mediaId,
+        shortClipId: null,
+        userId,
+        platform: 'FACEBOOK',
+        platformAccountId,
+        scheduledAt: null
+      },
+      undefined
+    )
+    expect(result.publishTask).toMatchObject({ id: publishTaskId, status: 'PUBLISHING', jobId })
+    expect(result.job).toMatchObject({ id: jobId, jobType: 'PUBLISH', status: 'PENDING' })
+  })
+
+  it('schedules a failed short clip publish task with a Celery ETA', async () => {
+    const futureScheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    const scheduledAtIso = futureScheduledAt.toISOString()
+
+    findPublishTaskByIdMock.mockResolvedValue(createPublishTask({ mediaId: null, shortClipId, status: 'FAILED' }))
+    findShortClipByIdMock.mockResolvedValue(createShortClip())
+    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
+    createProcessingJobMock.mockResolvedValue(createProcessingJob())
+    updatePublishTaskMock.mockResolvedValue(
+      createPublishTask({ mediaId: null, shortClipId, jobId, status: 'SCHEDULED', scheduledAt: futureScheduledAt })
+    )
+    publishPublishTaskJobMock.mockResolvedValue()
+
+    const result = await publishTasksService.schedulePublishTask(userId, publishTaskId, {
+      scheduledAt: futureScheduledAt
+    })
+
+    expect(createProcessingJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId,
+        jobType: 'PUBLISH',
+        input: expect.objectContaining({
+          publishTaskId,
+          mediaId: null,
+          shortClipId,
+          scheduledAt: scheduledAtIso
+        })
+      })
+    )
+    expect(updatePublishTaskMock).toHaveBeenCalledWith(
+      publishTaskId,
+      expect.objectContaining({
+        jobId,
+        status: 'SCHEDULED',
+        scheduledAt: futureScheduledAt,
+        errorMessage: null
+      })
+    )
+    expect(publishPublishTaskJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobId,
+        publishTaskId,
+        mediaId: null,
+        shortClipId,
+        scheduledAt: scheduledAtIso
+      }),
+      scheduledAtIso
+    )
+    expect(result.publishTask).toMatchObject({ status: 'SCHEDULED', scheduledAt: futureScheduledAt })
+  })
+
+  it('cancels a scheduled publish task and fails a pending linked publish job', async () => {
+    findPublishTaskByIdMock.mockResolvedValue(createPublishTask({ jobId, status: 'SCHEDULED', scheduledAt }))
+    findProcessingJobByIdMock.mockResolvedValue(createProcessingJob())
+    updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
+    updatePublishTaskMock.mockResolvedValue(createPublishTask({ jobId, status: 'CANCELED', scheduledAt }))
+
+    const result = await publishTasksService.cancelPublishTask(userId, publishTaskId)
+
+    expect(updateProcessingJobMock).toHaveBeenCalledWith(
+      jobId,
+      expect.objectContaining({
+        status: 'FAILED',
+        progress: 0,
+        errorMessage: 'Publish task was canceled',
+        completedAt: expect.any(Date)
+      })
+    )
+    expect(updatePublishTaskMock).toHaveBeenCalledWith(
+      publishTaskId,
+      expect.objectContaining({
+        status: 'CANCELED',
+        errorMessage: null
+      })
+    )
+    expect(result).toMatchObject({ id: publishTaskId, status: 'CANCELED' })
+  })
+
+  it('rejects invalid action status transitions', async () => {
+    findPublishTaskByIdMock.mockResolvedValueOnce(createPublishTask({ status: 'SCHEDULED' }))
+    await expect(publishTasksService.publishPublishTask(userId, publishTaskId)).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'PUBLISH_TASK_LOCKED'
+    })
+
+    findPublishTaskByIdMock.mockResolvedValueOnce(createPublishTask({ status: 'PUBLISHING' }))
+    await expect(
+      publishTasksService.schedulePublishTask(userId, publishTaskId, {
+        scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      })
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'PUBLISH_TASK_LOCKED'
+    })
+
+    findPublishTaskByIdMock.mockResolvedValueOnce(createPublishTask({ status: 'PUBLISHED' }))
+    await expect(publishTasksService.cancelPublishTask(userId, publishTaskId)).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'PUBLISH_TASK_LOCKED'
+    })
+
+    expect(createProcessingJobMock).not.toHaveBeenCalled()
+    expect(updatePublishTaskMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects schedule requests in the past', async () => {
+    await expect(
+      publishTasksService.schedulePublishTask(userId, publishTaskId, {
+        scheduledAt: new Date('2026-06-08T10:00:00.000Z')
+      })
+    ).rejects.toMatchObject({
+      statusCode: 400,
+      code: 'PUBLISH_SCHEDULE_INVALID'
+    })
+
+    expect(findPublishTaskByIdMock).not.toHaveBeenCalled()
+  })
+
+  it('revalidates publish targets and platform accounts before starting a publish job', async () => {
+    findPublishTaskByIdMock.mockResolvedValueOnce(createPublishTask())
+    findMediaByIdMock.mockResolvedValueOnce(createMedia({ status: 'DELETED' }))
+
+    await expect(publishTasksService.publishPublishTask(userId, publishTaskId)).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'PUBLISH_TARGET_INVALID_STATE'
+    })
+
+    findPublishTaskByIdMock.mockResolvedValueOnce(createPublishTask())
+    findMediaByIdMock.mockResolvedValueOnce(createMedia())
+    findPlatformAccountByIdMock.mockResolvedValueOnce(createPlatformAccount({ status: 'REVOKED' }))
+
+    await expect(publishTasksService.publishPublishTask(userId, publishTaskId)).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'PLATFORM_ACCOUNT_INVALID_STATE'
+    })
+
+    expect(createProcessingJobMock).not.toHaveBeenCalled()
+  })
+
+  it('marks the publish job and task failed when queue publish fails', async () => {
+    findPublishTaskByIdMock.mockResolvedValue(createPublishTask())
+    findMediaByIdMock.mockResolvedValue(createMedia())
+    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
+    createProcessingJobMock.mockResolvedValue(createProcessingJob())
+    updatePublishTaskMock.mockResolvedValueOnce(createPublishTask({ jobId, status: 'PUBLISHING' }))
+    updatePublishTaskMock.mockResolvedValueOnce(createPublishTask({ jobId, status: 'FAILED' }))
+    updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
+    publishPublishTaskJobMock.mockRejectedValue(new Error('RabbitMQ unavailable'))
+
+    await expect(publishTasksService.publishPublishTask(userId, publishTaskId)).rejects.toMatchObject({
+      statusCode: 502,
+      code: 'PUBLISH_QUEUE_PUBLISH_FAILED'
+    })
+
+    expect(updateProcessingJobMock).toHaveBeenCalledWith(
+      jobId,
+      expect.objectContaining({
+        status: 'FAILED',
+        progress: 0,
+        errorMessage: 'Failed to publish task job',
+        completedAt: expect.any(Date)
+      })
+    )
+    expect(updatePublishTaskMock).toHaveBeenLastCalledWith(
+      publishTaskId,
+      expect.objectContaining({
+        status: 'FAILED',
+        errorMessage: 'Failed to publish task job'
+      })
+    )
   })
 })
