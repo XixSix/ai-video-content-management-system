@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Box, ChevronsUpDown, Sparkles } from "lucide-react";
 import { navigationConfig } from "./dashboard-nav";
+import { useSocialAccountsStore } from "@/features/social-accounts/social-accounts.store";
 import {
   Sidebar,
   SidebarContent,
@@ -23,24 +24,44 @@ const accountNav = navigationConfig.slice(6);
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const isSocialAccountsOpen = useSocialAccountsStore(
+    (state) => state.isManagerOpen
+  );
+  const openSocialAccounts = useSocialAccountsStore((state) => state.openManager);
 
   const renderNavItems = (items: typeof navigationConfig) =>
     items.map((item) => {
-      const isActive = pathname === item.href;
+      const isRouteItem = "href" in item;
+      const isActive = isRouteItem
+        ? pathname === item.href
+        : item.action === "open-social-accounts" && isSocialAccountsOpen;
 
       return (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton
-            asChild
-            isActive={isActive}
-            className="h-9 rounded-lg px-2.5 text-[14px] font-medium text-sidebar-foreground/72 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:mx-auto"
-            tooltip={item.title}
-          >
-            <Link href={item.href}>
+          {isRouteItem ? (
+            <SidebarMenuButton
+              asChild
+              isActive={isActive}
+              className="h-9 rounded-lg px-2.5 text-[14px] font-medium text-sidebar-foreground/72 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:mx-auto"
+              tooltip={item.title}
+            >
+              <Link href={item.href}>
+                <item.icon className="mr-2 size-4 shrink-0 text-current opacity-60 group-data-[active=true]/menu-button:opacity-100" />
+                <span className="min-w-0 truncate">{item.title}</span>
+              </Link>
+            </SidebarMenuButton>
+          ) : (
+            <SidebarMenuButton
+              type="button"
+              isActive={isActive}
+              className="h-9 rounded-lg px-2.5 text-[14px] font-medium text-sidebar-foreground/72 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:mx-auto"
+              tooltip={item.title}
+              onClick={openSocialAccounts}
+            >
               <item.icon className="mr-2 size-4 shrink-0 text-current opacity-60 group-data-[active=true]/menu-button:opacity-100" />
               <span className="min-w-0 truncate">{item.title}</span>
-            </Link>
-          </SidebarMenuButton>
+            </SidebarMenuButton>
+          )}
         </SidebarMenuItem>
       );
     });

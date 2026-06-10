@@ -9,7 +9,9 @@ export function DashboardHeader() {
   const pathname = usePathname();
   
   // Find current route title or default to "Home" if matched "/"
-  const currentNav = navigationConfig.find((item) => item.href === pathname);
+  const currentNav = navigationConfig.find(
+    (item) => "href" in item && item.href === pathname
+  );
   const title = currentNav ? currentNav.title : "Workspace";
 
   return (
