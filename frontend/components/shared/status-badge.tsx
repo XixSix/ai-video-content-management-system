@@ -8,6 +8,7 @@ type StatusValue =
   | "FAILED"
   | "QUEUED"
   | "DRAFT"
+  | "DELETED"
 
 const statusConfig: Record<
   StatusValue,
@@ -42,6 +43,10 @@ const statusConfig: Record<
   },
   DRAFT: {
     label: "Draft",
+    variant: "neutral",
+  },
+  DELETED: {
+    label: "Deleted",
     variant: "neutral",
   },
 }
