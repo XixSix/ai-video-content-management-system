@@ -1,92 +1,93 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Video, Scissors, FileText, Mic, PlayCircle } from "lucide-react";
-import Link from "next/link";
+import { SectionHeader } from "@/components/shared/section-header"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  homeProcessingSummary,
+  homeQuickActions,
+  homeRecentMedia,
+  homeRecentOutputs,
+} from "@/features/home/home.data"
+import { MediaCard } from "@/features/home/components/media-card"
+import { OutputCard } from "@/features/home/components/output-card"
+import { ProcessingSummaryStrip } from "@/features/home/components/processing-summary-strip"
+import { QuickActionCard } from "@/features/home/components/quick-action-card"
+import { UploadHero } from "@/features/home/components/upload-hero"
 
 export default function Home() {
+  const recentOutputs = homeRecentOutputs.slice(0, 4)
+
   return (
-    <div className="flex flex-col gap-8 max-w-5xl mx-auto py-6">
-      <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-semibold tracking-tight">What would you like to create?</h2>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover:bg-muted/50 transition-colors cursor-pointer border-border/50">
-            <CardHeader className="flex flex-col gap-2 pb-2">
-              <div className="p-2 bg-primary/10 w-fit rounded-lg">
-                <Video className="w-5 h-5 text-primary" />
-              </div>
-              <CardTitle className="text-base">Upload a video</CardTitle>
-              <CardDescription className="text-xs">Add video to your library for processing</CardDescription>
-            </CardHeader>
-          </Card>
-          
-          <Card className="hover:bg-muted/50 transition-colors cursor-pointer border-border/50">
-            <CardHeader className="flex flex-col gap-2 pb-2">
-              <div className="p-2 bg-primary/10 w-fit rounded-lg">
-                <Scissors className="w-5 h-5 text-primary" />
-              </div>
-              <CardTitle className="text-base">Generate short clips</CardTitle>
-              <CardDescription className="text-xs">Extract viral shorts from long videos</CardDescription>
-            </CardHeader>
-          </Card>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 py-6 lg:gap-10">
+      <UploadHero />
 
-          <Card className="hover:bg-muted/50 transition-colors cursor-pointer border-border/50">
-            <CardHeader className="flex flex-col gap-2 pb-2">
-              <div className="p-2 bg-primary/10 w-fit rounded-lg">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <CardTitle className="text-base">Create transcript</CardTitle>
-              <CardDescription className="text-xs">Generate highly accurate captions</CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="hover:bg-muted/50 transition-colors cursor-pointer border-border/50 opacity-60">
-            <CardHeader className="flex flex-col gap-2 pb-2">
-              <div className="p-2 bg-primary/10 w-fit rounded-lg">
-                <Mic className="w-5 h-5 text-primary" />
-              </div>
-              <CardTitle className="text-base flex items-center gap-2">
-                Create voiceover
-                <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded-sm uppercase font-semibold">Soon</span>
-              </CardTitle>
-              <CardDescription className="text-xs">Text-to-speech with AI voices</CardDescription>
-            </CardHeader>
-          </Card>
+      <section className="space-y-4">
+        <SectionHeader
+          title="Jump back into work"
+          description="Use direct entry points for the workflows that come up most often in your editing and publishing routine."
+        />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {homeQuickActions.map((action) => (
+            <QuickActionCard key={action.id} {...action} />
+          ))}
         </div>
       </section>
 
-      <section>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Recent Projects</h3>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/media">View all</Link>
-          </Button>
-        </div>
-        
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {/* Mock Recent Project */}
-          <Card className="overflow-hidden border-border/50 hover:border-border transition-colors group cursor-pointer">
-            <div className="aspect-video bg-muted relative flex items-center justify-center">
-              <PlayCircle className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-            <CardContent className="p-4">
-              <h4 className="font-medium truncate">Product Launch Keynote.mp4</h4>
-              <p className="text-xs text-muted-foreground mt-1">Edited 2 hours ago</p>
-            </CardContent>
-          </Card>
+      <ProcessingSummaryStrip summary={homeProcessingSummary} />
 
-          <Card className="overflow-hidden border-border/50 hover:border-border transition-colors group cursor-pointer">
-            <div className="aspect-video bg-muted relative flex items-center justify-center">
-              <PlayCircle className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-            <CardContent className="p-4">
-              <h4 className="font-medium truncate">Customer Testimonial.mov</h4>
-              <p className="text-xs text-muted-foreground mt-1">Edited yesterday</p>
+      <section className="space-y-4">
+        <SectionHeader
+          title="Recent media"
+          description="Source uploads stay front and center so you can continue transcript, chapter, clip, and subtitle work without hunting for the original file."
+          actionLabel="View library"
+          actionHref="/media"
+        />
+        {homeRecentMedia.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {homeRecentMedia.map((item) => (
+              <MediaCard key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <Card className="border-border/70 bg-card/95">
+            <CardContent className="p-6">
+              <p className="text-sm font-medium text-foreground">
+                No media uploaded yet.
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your first source file will appear here once it lands in Media
+                Library.
+              </p>
             </CardContent>
           </Card>
-        </div>
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeader
+          title="Recent outputs"
+          description="Keep an eye on the latest transcript, chapter, clip, and subtitle artifacts without turning Home into a job console."
+          actionLabel="Open Studio"
+          actionHref="/studio"
+        />
+        {recentOutputs.length > 0 ? (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {recentOutputs.map((item) => (
+              <OutputCard key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <Card className="border-border/70 bg-card/95">
+            <CardContent className="p-6">
+              <p className="text-sm font-medium text-foreground">
+                No recent outputs yet.
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Generated transcripts, chapters, clips, and subtitles will show
+                up here as they become available.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </section>
     </div>
-  );
+  )
 }
