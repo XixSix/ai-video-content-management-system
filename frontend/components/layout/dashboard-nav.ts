@@ -8,7 +8,21 @@ import {
   Settings,
 } from "lucide-react";
 
-export const navigationConfig = [
+type RouteNavigationItem = {
+  title: string
+  href: string
+  icon: typeof Home
+}
+
+type ActionNavigationItem = {
+  title: string
+  action: "open-social-accounts"
+  icon: typeof Home
+}
+
+export type NavigationItem = RouteNavigationItem | ActionNavigationItem
+
+export const navigationConfig: NavigationItem[] = [
   {
     title: "Home",
     href: "/",
@@ -31,7 +45,7 @@ export const navigationConfig = [
   },
   {
     title: "Social Accounts",
-    href: "/social-accounts",
+    action: "open-social-accounts",
     icon: Share2,
   },
   {
