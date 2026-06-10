@@ -19,6 +19,8 @@ dependencies = [
 [project.scripts]
 generate-proto = "app.scripts.generate_proto:main"
 ai-service = "app.main:main"
+chaptering-build-units = "app.cli:chaptering_build_units"
+chaptering-analyze-units = "app.cli:chaptering_analyze_units"
 
 [build-system]
 requires = ["hatchling"]
