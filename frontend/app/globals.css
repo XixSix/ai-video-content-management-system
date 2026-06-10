@@ -225,3 +225,78 @@
     background: transparent;
   }
 }
+
+@keyframes media-upload-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes upload-progress-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@layer utilities {
+  .uploading-shell {
+    position: relative;
+    isolation: isolate;
+    box-shadow:
+      0 0 0 1px rgba(251, 191, 36, 0.15),
+      0 12px 32px -16px rgba(251, 191, 36, 0.25);
+  }
+
+  .uploading-shell::before {
+    content: "";
+    position: absolute;
+    inset: -1.5px;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from 0deg,
+      rgba(251, 191, 36, 0.85) 0deg,
+      rgba(245, 158, 11, 0.9) 60deg,
+      rgba(251, 191, 36, 0.75) 140deg,
+      rgba(253, 224, 71, 0.6) 200deg,
+      rgba(251, 191, 36, 0.3) 260deg,
+      transparent 290deg,
+      transparent 360deg
+    );
+    animation: media-upload-spin 2.4s linear infinite;
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .uploading-shell > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .upload-progress-bar {
+    background: linear-gradient(
+      90deg,
+      #34d399,
+      #2dd4bf,
+      #38bdf8,
+      #818cf8,
+      #34d399
+    );
+    background-size: 200% 100%;
+    animation: upload-progress-shimmer 2s ease-in-out infinite;
+  }
+
+  .uploading-spinner {
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-top-color: rgba(255, 255, 255, 0.8);
+    animation: media-upload-spin 0.9s linear infinite;
+  }
+}
