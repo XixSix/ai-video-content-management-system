@@ -6,6 +6,7 @@ import { useParams } from "next/navigation"
 import { StudioInspector } from "@/features/studio-editor/components/studio-inspector"
 import { StudioPanel } from "@/features/studio-editor/components/studio-panel"
 import { StudioSidebar } from "@/features/studio-editor/components/studio-sidebar"
+import { StudioEditorProvider } from "@/features/studio-editor/studio-editor-context"
 import {
   StudioTimeline,
   TIMELINE_DEFAULT_HEIGHT,
@@ -206,51 +207,53 @@ export default function StudioLayout({
   }
 
   return (
-    <div
-      className="grid h-screen overflow-hidden bg-background text-foreground"
-      style={{
-        gridTemplateRows: `auto minmax(0, 1fr) 12px ${timelineHeight}px`,
-      }}
-    >
-      <StudioTopbar projectName={projectName} />
-
+    <StudioEditorProvider>
       <div
-        ref={mainRef}
-        className="grid h-full min-h-0 overflow-hidden"
+        className="grid h-screen overflow-hidden bg-background text-foreground"
         style={{
-          gridTemplateColumns: `${STUDIO_RAIL_WIDTH}px ${leftPanelWidth}px minmax(0, 1fr) ${rightPanelWidth}px`,
+          gridTemplateRows: `auto minmax(0, 1fr) 12px ${timelineHeight}px`,
         }}
       >
-        <StudioSidebar />
-        <div className="min-h-0 min-w-0">
-          <StudioPanel />
+        <StudioTopbar projectName={projectName} />
+
+        <div
+          ref={mainRef}
+          className="grid h-full min-h-0 overflow-hidden"
+          style={{
+            gridTemplateColumns: `${STUDIO_RAIL_WIDTH}px ${leftPanelWidth}px minmax(0, 1fr) ${rightPanelWidth}px`,
+          }}
+        >
+          <StudioSidebar />
+          <div className="min-h-0 min-w-0">
+            <StudioPanel />
+          </div>
+          <div className="relative min-h-0 min-w-0 overflow-hidden">
+            <ResizeDivider
+              label="Resize left panel"
+              isDragging={activeResizeTarget === "left-panel"}
+              onResizeStart={(event) => startResize("left-panel", event)}
+              className="absolute inset-y-0 left-0 -translate-x-1/2"
+            />
+            <main className="h-full min-h-0 min-w-0 overflow-hidden">{children}</main>
+            <ResizeDivider
+              label="Resize right panel"
+              isDragging={activeResizeTarget === "right-panel"}
+              onResizeStart={(event) => startResize("right-panel", event)}
+              className="absolute inset-y-0 right-0 translate-x-1/2"
+            />
+          </div>
+          <div className="min-h-0 min-w-0">
+            <StudioInspector />
+          </div>
         </div>
-        <div className="relative min-h-0 min-w-0 overflow-hidden">
-          <ResizeDivider
-            label="Resize left panel"
-            isDragging={activeResizeTarget === "left-panel"}
-            onResizeStart={(event) => startResize("left-panel", event)}
-            className="absolute inset-y-0 left-0 -translate-x-1/2"
-          />
-          <main className="h-full min-h-0 min-w-0 overflow-hidden">{children}</main>
-          <ResizeDivider
-            label="Resize right panel"
-            isDragging={activeResizeTarget === "right-panel"}
-            onResizeStart={(event) => startResize("right-panel", event)}
-            className="absolute inset-y-0 right-0 translate-x-1/2"
-          />
-        </div>
-        <div className="min-h-0 min-w-0">
-          <StudioInspector />
-        </div>
+
+        <TimelineResizeDivider
+          isDragging={activeResizeTarget === "timeline"}
+          onResizeStart={(event) => startResize("timeline", event)}
+        />
+
+        <StudioTimeline />
       </div>
-
-      <TimelineResizeDivider
-        isDragging={activeResizeTarget === "timeline"}
-        onResizeStart={(event) => startResize("timeline", event)}
-      />
-
-      <StudioTimeline />
-    </div>
+    </StudioEditorProvider>
   )
 }
