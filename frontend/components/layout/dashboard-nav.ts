@@ -30,7 +30,7 @@ export const navigationConfig: NavigationItem[] = [
   },
   {
     title: "Media Library",
-    href: "/media",
+    href: "/media-library",
     icon: Library,
   },
   {

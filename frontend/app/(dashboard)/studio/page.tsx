@@ -1,7 +1,5 @@
+import { StudioProjectHub } from "@/features/studio-hub/components/studio-project-hub"
+
 export default function StudioPage() {
-  return (
-    <div className="flex items-center justify-center h-[50vh] text-muted-foreground">
-      Studio Workspace - Coming soon
-    </div>
-  );
+  return <StudioProjectHub />
 }

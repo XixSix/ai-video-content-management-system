@@ -18,7 +18,7 @@ export const homeQuickActions: QuickAction[] = [
     id: "upload-media",
     label: "Upload Media",
     description: "Add source video or audio and route it into your workspace.",
-    href: "/media",
+    href: "/media-library",
     icon: Upload,
   },
   {

@@ -51,7 +51,7 @@ export function UploadHero() {
 
           <div className="flex flex-wrap gap-3">
             <Button size="lg" asChild>
-              <Link href="/media">
+              <Link href="/media-library">
                 <UploadCloud className="size-4" />
                 Upload media
               </Link>

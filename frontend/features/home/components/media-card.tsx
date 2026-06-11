@@ -72,7 +72,7 @@ export function MediaCard({ item }: MediaCardProps) {
 
       <CardFooter className="justify-between gap-2">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/media">View media</Link>
+          <Link href="/media-library">View media</Link>
         </Button>
         <Button size="sm" asChild>
           <Link href="/studio">

@@ -38,7 +38,7 @@ export default function Home() {
           title="Recent media"
           description="Source uploads stay front and center so you can continue transcript, chapter, clip, and subtitle work without hunting for the original file."
           actionLabel="View library"
-          actionHref="/media"
+          actionHref="/media-library"
         />
         {homeRecentMedia.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
