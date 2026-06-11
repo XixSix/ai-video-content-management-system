@@ -22,33 +22,13 @@ const timelineToneClassName = {
   muted: "border-amber-500/25 bg-amber-500/12 text-amber-700 dark:text-amber-300",
 } as const
 
-export const TIMELINE_MIN_HEIGHT = 120
-export const TIMELINE_MAX_HEIGHT = 220
-export const TIMELINE_DEFAULT_HEIGHT = 144
+export const TIMELINE_MIN_HEIGHT = 128
+export const TIMELINE_MAX_HEIGHT = 420
+export const TIMELINE_DEFAULT_HEIGHT = 168
 
-type StudioTimelineProps = {
-  isDragging: boolean
-  onResizeStart: (event: React.PointerEvent<HTMLButtonElement>) => void
-}
-
-export function StudioTimeline({
-  isDragging,
-  onResizeStart,
-}: StudioTimelineProps) {
+export function StudioTimeline() {
   return (
     <footer className="flex h-full min-h-0 flex-col border-t border-border bg-[#0b0b0c] text-white">
-      <button
-        type="button"
-        aria-label="Resize timeline"
-        onPointerDown={onResizeStart}
-        className={cn(
-          "group flex h-3 shrink-0 cursor-row-resize items-center justify-center border-b border-white/8 bg-[#0b0b0c] transition-colors",
-          isDragging ? "bg-white/8" : "hover:bg-white/6"
-        )}
-      >
-        <span className="h-1 w-12 rounded-full bg-white/14 transition-colors group-hover:bg-white/24" />
-      </button>
-
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/8 px-4 text-sm">
           <div className="flex items-center gap-2">
