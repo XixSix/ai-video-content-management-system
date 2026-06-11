@@ -12,7 +12,7 @@ import {
   ZoomOut,
 } from "lucide-react"
 
-import { studioTimelineTracks } from "@/features/studio/studio.data"
+import { studioTimelineTracks } from "@/features/studio-editor/studio.data"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 

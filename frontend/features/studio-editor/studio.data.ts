@@ -14,10 +14,6 @@ import type {
   StudioTimelineTrack,
 } from "./studio.types"
 
-export const studioProjectName = "Untitled project"
-
-export const studioCreditsLabel = "2,679 credits remaining"
-
 export const studioRailItems: StudioRailItem[] = [
   {
     id: "media",

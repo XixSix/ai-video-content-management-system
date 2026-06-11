@@ -1,22 +1,25 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useParams } from "next/navigation"
 
-import { StudioInspector } from "@/features/studio/components/studio-inspector"
-import { StudioSidebar } from "@/features/studio/components/studio-sidebar"
-import { StudioTimeline } from "@/features/studio/components/studio-timeline"
+import { StudioInspector } from "@/features/studio-editor/components/studio-inspector"
+import { StudioSidebar } from "@/features/studio-editor/components/studio-sidebar"
+import { StudioTimeline } from "@/features/studio-editor/components/studio-timeline"
+import { getStudioProjectDisplayName } from "@/features/studio-hub/studio-projects.data"
 import {
   TIMELINE_DEFAULT_HEIGHT,
   TIMELINE_MAX_HEIGHT,
   TIMELINE_MIN_HEIGHT,
-} from "@/features/studio/components/studio-timeline"
-import { StudioTopbar } from "@/features/studio/components/studio-topbar"
+} from "@/features/studio-editor/components/studio-timeline"
+import { StudioTopbar } from "@/features/studio-editor/components/studio-topbar"
 
 export default function StudioLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const params = useParams<{ projectId: string }>()
   const [timelineHeight, setTimelineHeight] = useState(TIMELINE_DEFAULT_HEIGHT)
   const [isTimelineDragging, setIsTimelineDragging] = useState(false)
   const resizeStateRef = useRef<{
@@ -24,6 +27,7 @@ export default function StudioLayout({
     startHeight: number
     startY: number
   } | null>(null)
+  const projectName = getStudioProjectDisplayName(params.projectId ?? "untitled-project")
 
   useEffect(() => {
     if (!isTimelineDragging) {
@@ -97,7 +101,7 @@ export default function StudioLayout({
         gridTemplateRows: `auto minmax(0, 1fr) ${timelineHeight}px`,
       }}
     >
-      <StudioTopbar />
+      <StudioTopbar projectName={projectName} />
 
       <div className="grid h-full min-h-0 overflow-hidden grid-cols-[326px_minmax(0,1fr)_292px]">
         <StudioSidebar />

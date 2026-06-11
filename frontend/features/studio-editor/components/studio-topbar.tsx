@@ -12,7 +12,6 @@ import {
   Undo2,
 } from "lucide-react"
 
-import { studioProjectName } from "@/features/studio/studio.data"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -26,6 +25,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 
+type StudioTopbarProps = {
+  projectName: string
+}
+
 function StudioMenu() {
   const { setTheme } = useTheme()
 
@@ -38,7 +41,7 @@ function StudioMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
         <DropdownMenuItem asChild>
-          <Link href="/">Back to projects</Link>
+          <Link href="/studio">Back to projects</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>Version history</DropdownMenuItem>
         <DropdownMenuItem>Keyboard shortcuts</DropdownMenuItem>
@@ -64,7 +67,7 @@ function StudioMenu() {
   )
 }
 
-export function StudioTopbar() {
+export function StudioTopbar({ projectName }: StudioTopbarProps) {
   return (
     <header className="relative flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/88">
       <div className="flex min-w-0 items-center gap-2">
@@ -85,7 +88,7 @@ export function StudioTopbar() {
 
       <div className="pointer-events-none absolute inset-x-0 flex justify-center px-24">
         <p className="max-w-[32rem] truncate text-sm font-semibold text-foreground">
-          {studioProjectName}
+          {projectName}
         </p>
       </div>
 

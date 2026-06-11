@@ -1,6 +1,6 @@
 "use client"
 
-import { studioCanvasOverlays } from "@/features/studio/studio.data"
+import { studioCanvasOverlays } from "@/features/studio-editor/studio.data"
 
 export function StudioCanvas() {
   return (

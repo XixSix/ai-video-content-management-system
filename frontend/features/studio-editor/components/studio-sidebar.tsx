@@ -1,7 +1,7 @@
 "use client"
 
-import { StudioPanel } from "@/features/studio/components/studio-panel"
-import { StudioRail } from "@/features/studio/components/studio-rail"
+import { StudioPanel } from "@/features/studio-editor/components/studio-panel"
+import { StudioRail } from "@/features/studio-editor/components/studio-rail"
 
 export function StudioSidebar() {
   return (

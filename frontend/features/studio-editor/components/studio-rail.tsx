@@ -1,6 +1,6 @@
 "use client"
 
-import { studioRailItems } from "@/features/studio/studio.data"
+import { studioRailItems } from "@/features/studio-editor/studio.data"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
