@@ -73,7 +73,7 @@ export function ProcessingSummaryStrip({
           </div>
 
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/media">View media</Link>
+            <Link href="/media-library">View media</Link>
           </Button>
         </div>
       </CardContent>
