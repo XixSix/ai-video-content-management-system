@@ -3,4 +3,5 @@ skills-lock.json
 .env
 docs
 AGENTS.md
+!frontend/AGENTS.md
 .vscode
