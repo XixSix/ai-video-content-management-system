@@ -8,11 +8,18 @@ import {
   studioTextPresets,
   studioToolPanels,
 } from "./studio.data"
+import {
+  rebuildTranscriptMeta,
+  rebuildTranscriptSegmentsFromWords,
+} from "./studio-captions"
 import type {
   StudioCanvasLayer,
   StudioEditorProject,
   StudioSelection,
   StudioStaleOutputType,
+  StudioTranscript,
+  StudioTranscriptSegment,
+  StudioTranscriptWord,
   StudioToolId,
 } from "./studio.types"
 
@@ -22,7 +29,10 @@ function clampTime(timeSeconds: number, durationSeconds: number) {
 
 type StudioEditorContextValue = {
   activeTool: StudioToolId
+  canRedo: boolean
+  canUndo: boolean
   currentTime: number
+  discardTranscriptChanges: () => void
   hasStaleAssets: boolean
   hasStaleChapters: boolean
   hasStaleClips: boolean
@@ -35,6 +45,7 @@ type StudioEditorContextValue = {
   selectedTargetId: string
   staleOutputTypes: StudioStaleOutputType[]
   addTextLayerFromPreset: (presetId: string) => void
+  commitTranscriptWordText: (wordId: string, text: string) => void
   markTranscriptDirty: () => void
   saveTranscriptMock: () => void
   seekToTime: (timeSeconds: number) => void
@@ -44,6 +55,9 @@ type StudioEditorContextValue = {
   selectClipCandidate: (clipCandidateId: string) => void
   selectTranscriptSegment: (segmentId: string) => void
   toolPanel: (typeof studioToolPanels)[StudioToolId]
+  redoEditorChange: () => void
+  undoEditorChange: () => void
+  updateTranscriptWordText: (wordId: string, text: string) => void
   updateTextLayerContent: (layerId: string, content: string) => void
   updateTextLayerStyle: (
     layerId: string,
@@ -68,6 +82,58 @@ type StudioEditorContextValue = {
   ) => void
 }
 
+type SavedTranscriptState = {
+  transcript: StudioTranscript
+  transcriptSegments: StudioTranscriptSegment[]
+  transcriptWords: StudioTranscriptWord[]
+}
+
+type StudioHistorySnapshot = {
+  hasUnsavedTranscriptChanges: boolean
+  project: StudioEditorProject
+  savedTranscriptState: SavedTranscriptState
+}
+
+const MAX_HISTORY_SNAPSHOTS = 50
+
+function cloneSavedTranscriptState(project: StudioEditorProject): SavedTranscriptState {
+  return {
+    transcript: { ...project.transcript },
+    transcriptSegments: project.transcriptSegments.map((segment) => ({ ...segment })),
+    transcriptWords: project.transcriptWords.map((word) => ({ ...word })),
+  }
+}
+
+function cloneSavedTranscriptSnapshot(state: SavedTranscriptState): SavedTranscriptState {
+  return {
+    transcript: { ...state.transcript },
+    transcriptSegments: state.transcriptSegments.map((segment) => ({ ...segment })),
+    transcriptWords: state.transcriptWords.map((word) => ({ ...word })),
+  }
+}
+
+function cloneProject(project: StudioEditorProject): StudioEditorProject {
+  return {
+    ...project,
+    media: { ...project.media },
+    projectMedia: project.projectMedia.map((item) => ({ ...item })),
+    transcript: { ...project.transcript },
+    transcriptSegments: project.transcriptSegments.map((segment) => ({ ...segment })),
+    transcriptWords: project.transcriptWords.map((word) => ({ ...word })),
+    chapters: project.chapters.map((chapter) => ({ ...chapter })),
+    clipCandidates: project.clipCandidates.map((clipCandidate) => ({ ...clipCandidate })),
+    shortClips: project.shortClips.map((shortClip) => ({ ...shortClip })),
+    generatedAssets: project.generatedAssets.map((asset) => ({ ...asset })),
+    processingJobs: project.processingJobs.map((job) => ({ ...job })),
+    sourceMedia: { ...project.sourceMedia },
+    layers: project.layers.map((layer) => ({ ...layer })),
+    timelineTracks: project.timelineTracks.map((track) => ({
+      ...track,
+      segments: track.segments.map((segment) => ({ ...segment })),
+    })),
+  }
+}
+
 const StudioEditorContext = createContext<StudioEditorContextValue | null>(null)
 
 export function StudioEditorProvider({
@@ -76,6 +142,11 @@ export function StudioEditorProvider({
   children: React.ReactNode
 }) {
   const [project, setProject] = useState<StudioEditorProject>(studioEditorProject)
+  const [savedTranscriptState, setSavedTranscriptState] = useState<SavedTranscriptState>(() =>
+    cloneSavedTranscriptState(studioEditorProject)
+  )
+  const [historyPast, setHistoryPast] = useState<StudioHistorySnapshot[]>([])
+  const [historyFuture, setHistoryFuture] = useState<StudioHistorySnapshot[]>([])
   const [activeTool, setActiveTool] = useState<StudioToolId>("media")
   const [selectedItemId, setSelectedItemId] = useState("source-media")
   const [currentTime, setCurrentTime] = useState(18.22)
@@ -112,6 +183,55 @@ export function StudioEditorProvider({
     staleOutputTypes.push("assets")
   }
 
+  const createHistorySnapshot = (): StudioHistorySnapshot => ({
+    hasUnsavedTranscriptChanges,
+    project: cloneProject(project),
+    savedTranscriptState: cloneSavedTranscriptSnapshot(savedTranscriptState),
+  })
+
+  const recordEditorHistory = () => {
+    const snapshot = createHistorySnapshot()
+
+    setHistoryPast((currentHistory) => [
+      ...currentHistory.slice(-(MAX_HISTORY_SNAPSHOTS - 1)),
+      snapshot,
+    ])
+    setHistoryFuture([])
+  }
+
+  const undoEditorChange = () => {
+    const previousSnapshot = historyPast.at(-1)
+
+    if (!previousSnapshot) {
+      return
+    }
+
+    setHistoryFuture((currentHistory) => [createHistorySnapshot(), ...currentHistory])
+    setHistoryPast((currentHistory) => currentHistory.slice(0, -1))
+    setProject(cloneProject(previousSnapshot.project))
+    setSavedTranscriptState(
+      cloneSavedTranscriptSnapshot(previousSnapshot.savedTranscriptState)
+    )
+    setHasUnsavedTranscriptChanges(previousSnapshot.hasUnsavedTranscriptChanges)
+  }
+
+  const redoEditorChange = () => {
+    const nextSnapshot = historyFuture[0]
+
+    if (!nextSnapshot) {
+      return
+    }
+
+    setHistoryPast((currentHistory) => [
+      ...currentHistory.slice(-(MAX_HISTORY_SNAPSHOTS - 1)),
+      createHistorySnapshot(),
+    ])
+    setHistoryFuture((currentHistory) => currentHistory.slice(1))
+    setProject(cloneProject(nextSnapshot.project))
+    setSavedTranscriptState(cloneSavedTranscriptSnapshot(nextSnapshot.savedTranscriptState))
+    setHasUnsavedTranscriptChanges(nextSnapshot.hasUnsavedTranscriptChanges)
+  }
+
   const seekToTime = (timeSeconds: number) => {
     setCurrentTime(clampTime(timeSeconds, project.media.durationSeconds))
   }
@@ -122,6 +242,8 @@ export function StudioEditorProvider({
     if (!preset) {
       return
     }
+
+    recordEditorHistory()
 
     const layerId = `text-${Date.now()}`
     const nextLayer: StudioCanvasLayer = {
@@ -157,6 +279,14 @@ export function StudioEditorProvider({
   }
 
   const updateTextLayerContent = (layerId: string, content: string) => {
+    const layer = project.layers.find((item) => item.id === layerId)
+
+    if (!layer || layer.kind !== "text" || layer.content === content) {
+      return
+    }
+
+    recordEditorHistory()
+
     setProject((currentProject) => ({
       ...currentProject,
       layers: currentProject.layers.map((layer) =>
@@ -186,6 +316,8 @@ export function StudioEditorProvider({
       >
     >
   ) => {
+    recordEditorHistory()
+
     setProject((currentProject) => ({
       ...currentProject,
       layers: currentProject.layers.map((layer) =>
@@ -240,22 +372,107 @@ export function StudioEditorProvider({
     setHasUnsavedTranscriptChanges(true)
   }
 
-  const saveTranscriptMock = () => {
+  const updateTranscriptWordText = (wordId: string, text: string) => {
+    const word = project.transcriptWords.find((item) => item.id === wordId)
+
+    if (!word || word.text === text) {
+      return
+    }
+
+    recordEditorHistory()
+
     setProject((currentProject) => ({
       ...currentProject,
-      transcript: {
-        ...currentProject.transcript,
-        version: currentProject.transcript.version + 1,
-        isEdited: true,
-      },
+      transcriptWords: currentProject.transcriptWords.map((word) =>
+        word.id === wordId ? { ...word, text } : word
+      ),
     }))
+    setHasUnsavedTranscriptChanges(true)
+  }
+
+  const commitTranscriptWordText = (wordId: string, text: string) => {
+    const nextText = text.trim()
+    const currentWord = project.transcriptWords.find((word) => word.id === wordId)
+
+    if (!currentWord || currentWord.text === nextText) {
+      return
+    }
+
+    recordEditorHistory()
+
+    const transcriptWords = project.transcriptWords.map((word) =>
+      word.id === wordId ? { ...word, text: nextText } : word
+    )
+    const transcriptSegments = rebuildTranscriptSegmentsFromWords(
+      project.transcriptSegments,
+      transcriptWords
+    )
+    const transcript = {
+      ...rebuildTranscriptMeta(project.transcript, transcriptSegments, transcriptWords),
+      version: project.transcript.version + 1,
+    }
+    const nextProject = {
+      ...project,
+      transcript,
+      transcriptSegments,
+      transcriptWords,
+    }
+
+    setProject(nextProject)
+    setSavedTranscriptState(cloneSavedTranscriptState(nextProject))
+
+    setHasUnsavedTranscriptChanges(false)
+  }
+
+  const discardTranscriptChanges = () => {
+    if (!hasUnsavedTranscriptChanges) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      transcript: { ...savedTranscriptState.transcript },
+      transcriptSegments: savedTranscriptState.transcriptSegments.map((segment) => ({
+        ...segment,
+      })),
+      transcriptWords: savedTranscriptState.transcriptWords.map((word) => ({ ...word })),
+    }))
+    setHasUnsavedTranscriptChanges(false)
+  }
+
+  const saveTranscriptMock = () => {
+    recordEditorHistory()
+
+    const transcriptSegments = rebuildTranscriptSegmentsFromWords(
+      project.transcriptSegments,
+      project.transcriptWords
+    )
+    const transcript = {
+      ...rebuildTranscriptMeta(project.transcript, transcriptSegments, project.transcriptWords),
+      version: project.transcript.version + 1,
+    }
+    const nextProject = {
+      ...project,
+      transcript,
+      transcriptSegments,
+    }
+
+    setProject(nextProject)
+    setSavedTranscriptState(cloneSavedTranscriptState(nextProject))
+
     setHasUnsavedTranscriptChanges(false)
   }
 
   const value: StudioEditorContextValue = {
     addTextLayerFromPreset,
     activeTool,
+    canRedo: historyFuture.length > 0,
+    canUndo: historyPast.length > 0,
+    commitTranscriptWordText,
     currentTime,
+    discardTranscriptChanges,
     hasStaleAssets,
     hasStaleChapters,
     hasStaleClips,
@@ -281,6 +498,9 @@ export function StudioEditorProvider({
     setActiveTool,
     setSelectedItemId,
     toolPanel: studioToolPanels[activeTool],
+    redoEditorChange,
+    undoEditorChange,
+    updateTranscriptWordText,
     updateTextLayerContent,
     updateTextLayerStyle,
   }

@@ -17,6 +17,8 @@ import type {
   StudioTextAnimationName,
   StudioTextFontFamily,
   StudioTextPreset,
+  StudioTranscriptSegment,
+  StudioTranscriptWord,
   StudioToolId,
   StudioToolPanelContent,
 } from "./studio.types"
@@ -231,6 +233,82 @@ export const studioTextPresets: StudioTextPreset[] = [
   },
 ]
 
+function createTranscriptWords(segments: StudioTranscriptSegment[]) {
+  let runningWordIndex = 0
+
+  return segments.flatMap<StudioTranscriptWord>((segment) => {
+    const tokens = segment.text.split(/\s+/)
+    const wordDuration = (segment.endTime - segment.startTime) / Math.max(tokens.length, 1)
+
+    return tokens.map((token, tokenIndex) => {
+      const startTime = Number((segment.startTime + tokenIndex * wordDuration).toFixed(2))
+      const endTime = Number(
+        (tokenIndex === tokens.length - 1
+          ? segment.endTime
+          : segment.startTime + (tokenIndex + 1) * wordDuration
+        ).toFixed(2)
+      )
+
+      const nextWord: StudioTranscriptWord = {
+        id: `word_${String(runningWordIndex + 1).padStart(3, "0")}`,
+        segmentId: segment.id,
+        wordIndex: runningWordIndex,
+        startTime,
+        endTime,
+        sourceText: token,
+        text: token,
+        confidence: segment.confidence,
+      }
+
+      runningWordIndex += 1
+
+      return nextWord
+    })
+  })
+}
+
+const transcriptSegments: StudioTranscriptSegment[] = [
+  {
+    id: "segment_001",
+    segmentIndex: 0,
+    startTime: 0,
+    endTime: 8.2,
+    text: "Today we are showing how teams can ship short-form content faster from one source recording.",
+    speakerLabel: "Speaker 1",
+    confidence: 0.98,
+  },
+  {
+    id: "segment_002",
+    segmentIndex: 1,
+    startTime: 8.2,
+    endTime: 15.6,
+    text: "The workflow starts with a clean transcript before anything downstream becomes useful.",
+    speakerLabel: "Speaker 1",
+    confidence: 0.97,
+  },
+  {
+    id: "segment_003",
+    segmentIndex: 2,
+    startTime: 15.6,
+    endTime: 24.3,
+    text: "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
+    speakerLabel: "Speaker 1",
+    confidence: 0.96,
+  },
+  {
+    id: "segment_004",
+    segmentIndex: 3,
+    startTime: 24.3,
+    endTime: 33.4,
+    text: "That gives the team something they can review, publish, and reuse without re-uploading the source video.",
+    speakerLabel: "Speaker 2",
+    confidence: 0.95,
+  },
+]
+
+const transcriptWords = createTranscriptWords(transcriptSegments)
+const transcriptFullText = transcriptSegments.map((segment) => segment.text).join(" ")
+
 export const studioEditorProject: StudioEditorProject = {
   media: {
     id: "media_001",
@@ -335,51 +413,14 @@ export const studioEditorProject: StudioEditorProject = {
     id: "transcript_001",
     language: "English",
     version: 4,
-    wordCount: 1278,
+    wordCount: transcriptWords.length,
     isEdited: false,
-    fullText:
-      "Today we are showing how teams can ship short-form content faster from one source recording. The workflow starts with a clean transcript, then chapters, then reusable clip candidates.",
+    fullText: transcriptFullText,
     source: "Whisper large-v3",
     createdAt: "2026-06-11T09:15:00.000Z",
   },
-  transcriptSegments: [
-    {
-      id: "segment_001",
-      segmentIndex: 0,
-      startTime: 0,
-      endTime: 8.2,
-      text: "Today we are showing how teams can ship short-form content faster from one source recording.",
-      speakerLabel: "Speaker 1",
-      confidence: 0.98,
-    },
-    {
-      id: "segment_002",
-      segmentIndex: 1,
-      startTime: 8.2,
-      endTime: 15.6,
-      text: "The workflow starts with a clean transcript before anything downstream becomes useful.",
-      speakerLabel: "Speaker 1",
-      confidence: 0.97,
-    },
-    {
-      id: "segment_003",
-      segmentIndex: 2,
-      startTime: 15.6,
-      endTime: 24.3,
-      text: "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
-      speakerLabel: "Speaker 1",
-      confidence: 0.96,
-    },
-    {
-      id: "segment_004",
-      segmentIndex: 3,
-      startTime: 24.3,
-      endTime: 33.4,
-      text: "That gives the team something they can review, publish, and reuse without re-uploading the source video.",
-      speakerLabel: "Speaker 2",
-      confidence: 0.95,
-    },
-  ],
+  transcriptSegments,
+  transcriptWords,
   chapters: [
     {
       id: "chapter_001",

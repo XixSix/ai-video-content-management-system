@@ -197,6 +197,39 @@ export type StudioTranscriptSegment = {
   confidence: number
 }
 
+export type StudioTranscriptWord = {
+  id: string
+  segmentId: string
+  wordIndex: number
+  startTime: number
+  endTime: number
+  sourceText: string
+  text: string
+  confidence: number
+}
+
+export type StudioCaptionWordGroup = {
+  id: string
+  sourceWordId: string
+  sourceSegmentId: string
+  startTime: number
+  endTime: number
+  sourceText: string
+  text: string
+  confidence: number
+  isEdited: boolean
+  isOmitted: boolean
+}
+
+export type StudioCaptionCue = {
+  id: string
+  startTime: number
+  endTime: number
+  speakerLabel: string
+  sourceSegmentIds: string[]
+  wordGroups: StudioCaptionWordGroup[]
+}
+
 export type StudioChapter = {
   id: string
   chapterIndex: number
@@ -309,6 +342,7 @@ export type StudioEditorProject = {
   projectMedia: StudioProjectMediaItem[]
   transcript: StudioTranscript
   transcriptSegments: StudioTranscriptSegment[]
+  transcriptWords: StudioTranscriptWord[]
   chapters: StudioChapter[]
   clipCandidates: StudioClipCandidate[]
   shortClips: StudioShortClip[]
