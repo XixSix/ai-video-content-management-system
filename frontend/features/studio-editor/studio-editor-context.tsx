@@ -52,7 +52,7 @@ export function StudioEditorProvider({
 }) {
   const [project, setProject] = useState<StudioEditorProject>(studioEditorProject)
   const [activeTool, setActiveTool] = useState<StudioToolId>("media")
-  const [selectedItemId, setSelectedItemId] = useState("hook-copy")
+  const [selectedItemId, setSelectedItemId] = useState("source-media")
   const [currentTime, setCurrentTime] = useState(18.22)
   const [selectedTranscriptSegmentId, setSelectedTranscriptSegmentId] = useState<string | null>(
     null
@@ -167,7 +167,11 @@ export function StudioEditorProvider({
     selectedItem,
     selectedTranscriptSegmentId,
     selectedTargetId:
-      selectedItem.kind === "segment" ? selectedItem.linkedSelectionId : selectedItem.id,
+      selectedItem.kind === "segment"
+        ? selectedItem.linkedSelectionId
+        : selectedItem.kind === "media" && selectedItem.linkedSelectionId
+          ? selectedItem.linkedSelectionId
+          : selectedItem.id,
     selectTranscriptSegment,
     staleOutputTypes,
     setActiveTool,

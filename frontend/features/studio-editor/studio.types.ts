@@ -68,6 +68,36 @@ export type StudioMediaDetail = {
   streamUrl: string
 }
 
+export type StudioProjectMediaType = "VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE"
+
+export type StudioProjectMediaStatus =
+  | "READY"
+  | "UPLOADING"
+  | "PROCESSING"
+  | "FAILED"
+
+export type StudioProjectMediaOrigin = "SOURCE" | "LIBRARY" | "UPLOAD"
+
+export type StudioProjectMediaItem = {
+  id: string
+  type: StudioProjectMediaType
+  name: string
+  summary: string
+  origin: StudioProjectMediaOrigin
+  status: StudioProjectMediaStatus
+  format: string
+  metadata: string
+  usageLabel: string
+  durationLabel?: string
+  resolutionLabel?: string
+  dimensionsLabel?: string
+  sizeLabel?: string
+  language?: string
+  linkedMediaName?: string
+  linkedSelectionId?: string
+  startTime?: number
+}
+
 export type StudioTranscript = {
   id: string
   language: string
@@ -185,9 +215,19 @@ export type StudioSelection =
       linkedSelectionId: string
       trackLabel: string
     }
+  | {
+      id: string
+      kind: "media"
+      label: string
+      summary: string
+      detail: string
+      media: StudioProjectMediaItem
+      linkedSelectionId?: string
+    }
 
 export type StudioEditorProject = {
   media: StudioMediaDetail
+  projectMedia: StudioProjectMediaItem[]
   transcript: StudioTranscript
   transcriptSegments: StudioTranscriptSegment[]
   chapters: StudioChapter[]

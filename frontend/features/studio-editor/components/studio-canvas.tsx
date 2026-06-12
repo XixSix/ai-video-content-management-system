@@ -12,6 +12,7 @@ const CANVAS_VERTICAL_PADDING = 48
 export function StudioCanvas() {
   const { project, selectedItem, selectedTargetId, setSelectedItemId, setActiveTool } =
     useStudioEditor()
+  const isSourceSelected = selectedTargetId === project.sourceMedia.id
   const canvasAreaRef = useRef<HTMLDivElement>(null)
   const [previewSize, setPreviewSize] = useState<{
     height: number
@@ -76,7 +77,10 @@ export function StudioCanvas() {
               setActiveTool("media")
               setSelectedItemId(project.sourceMedia.id)
             }}
-            className="relative aspect-video max-h-full max-w-full overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,#1e7397,#0c4364_55%,#092c43)] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.55)]"
+            className={cn(
+              "relative aspect-video max-h-full max-w-full overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,#1e7397,#0c4364_55%,#092c43)] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.55)]",
+              isSourceSelected ? "ring-2 ring-sky-300/75 ring-offset-0" : null
+            )}
             style={{
               height: previewSize?.height,
               width: previewSize?.width ?? "100%",
