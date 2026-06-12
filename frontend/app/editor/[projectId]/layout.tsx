@@ -1,17 +1,25 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import type { ReactNode } from "react"
+import { useState } from "react"
 import { useParams } from "next/navigation"
+import {
+  Group as PanelGroup,
+  Panel,
+  Separator as PanelResizeHandle,
+  usePanelRef,
+} from "react-resizable-panels"
+import type { PanelSize } from "react-resizable-panels"
 
 import { StudioInspector } from "@/features/studio-editor/components/studio-inspector"
 import { StudioPanel } from "@/features/studio-editor/components/studio-panel"
 import { StudioSidebar } from "@/features/studio-editor/components/studio-sidebar"
 import { StudioEditorProvider } from "@/features/studio-editor/studio-editor-context"
 import {
+  TIMELINE_COLLAPSED_HEIGHT,
   StudioTimeline,
   TIMELINE_DEFAULT_HEIGHT,
   TIMELINE_MAX_HEIGHT,
-  TIMELINE_MIN_HEIGHT,
 } from "@/features/studio-editor/components/studio-timeline"
 import { StudioTopbar } from "@/features/studio-editor/components/studio-topbar"
 import { getStudioProjectDisplayName } from "@/features/studio-hub/studio-projects.data"
@@ -25,234 +33,221 @@ const RIGHT_PANEL_MIN_WIDTH = 300
 const RIGHT_PANEL_MAX_WIDTH = 740
 const RIGHT_PANEL_DEFAULT_WIDTH = 340
 const MEDIA_MIN_WIDTH = 360
+const SIDE_PANEL_COLLAPSED_HANDLE_WIDTH = 4
+const TIMELINE_COLLAPSE_HEIGHT = 64
 
-type ResizeTarget = "left-panel" | "right-panel" | "timeline"
-
-type ResizeState = {
-  pointerId: number
-  startHeight: number
-  startWidth: number
-  startX: number
-  startY: number
-  target: ResizeTarget
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value))
-}
-
-function ResizeDivider({
-  className,
-  isDragging,
+function SideResizeHandle({
+  isCollapsed,
   label,
-  onResizeStart,
+  side,
 }: {
-  className?: string
-  isDragging: boolean
+  isCollapsed?: boolean
   label: string
-  onResizeStart: (event: React.PointerEvent<HTMLButtonElement>) => void
+  side: "left" | "right"
 }) {
   return (
-    <button
-      type="button"
+    <PanelResizeHandle
       aria-label={label}
-      onPointerDown={onResizeStart}
       className={cn(
-        "group relative z-10 h-full w-3 cursor-col-resize touch-none",
-        "after:absolute after:inset-y-0 after:left-1/2 after:w-px after:-translate-x-1/2 after:bg-border",
-        "before:absolute before:left-1/2 before:top-1/2 before:h-10 before:w-1 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-muted-foreground/35 before:opacity-80 before:transition",
-        "hover:before:h-14 hover:before:bg-muted-foreground/65",
-        isDragging ? "before:h-14 before:bg-primary/70" : null,
-        className
+        "group relative z-10 h-full cursor-col-resize touch-none outline-none",
+        isCollapsed ? "w-6" : "w-3",
+        isCollapsed
+          ? "hover:[&_.studio-resize-track]:border-muted-foreground/35 hover:[&_.studio-resize-grip]:bg-muted-foreground"
+          : "hover:[&_.studio-resize-grip]:h-14 hover:[&_.studio-resize-grip]:bg-muted-foreground/65",
+        side === "left" ? "-ml-1" : "-mr-1"
       )}
-    />
+    >
+      {isCollapsed ? (
+        <>
+          <span className="studio-resize-track absolute left-1/2 top-1/2 h-16 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-muted-foreground/20 bg-surface-muted shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition" />
+          <span className="studio-resize-grip absolute left-1/2 top-1/2 h-8 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground/65 transition" />
+        </>
+      ) : (
+        <>
+          <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border" />
+          <span className="studio-resize-grip absolute left-1/2 top-1/2 h-10 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground/35 opacity-80 transition" />
+        </>
+      )}
+    </PanelResizeHandle>
   )
 }
 
 function TimelineResizeDivider({
-  isDragging,
-  onResizeStart,
+  isCollapsed,
 }: {
-  isDragging: boolean
-  onResizeStart: (event: React.PointerEvent<HTMLButtonElement>) => void
+  isCollapsed: boolean
 }) {
   return (
-    <button
-      type="button"
+    <PanelResizeHandle
       data-studio-timeline-divider=""
       aria-label="Resize timeline"
-      onPointerDown={onResizeStart}
       className={cn(
-        "group flex h-3 cursor-row-resize touch-none items-center justify-center border-y border-border bg-background transition-colors",
-        isDragging ? "bg-muted" : "hover:bg-muted/70"
+        "group flex cursor-row-resize touch-none items-center justify-center border-y border-border bg-background outline-none transition-colors",
+        isCollapsed ? "h-4" : "h-3",
+        "hover:bg-muted/70"
       )}
     >
-      <span className="h-1 w-12 rounded-full bg-muted-foreground/35 transition-colors group-hover:bg-muted-foreground/60" />
-    </button>
+      <span
+        className={cn(
+          "rounded-full transition-colors",
+          isCollapsed
+            ? "h-2 w-16 border border-muted-foreground/20 bg-surface-muted shadow-[0_4px_14px_rgba(0,0,0,0.2)]"
+            : "h-1 w-12 bg-muted-foreground/35",
+          "group-hover:bg-muted-foreground/60",
+        )}
+      />
+    </PanelResizeHandle>
   )
 }
 
 export default function StudioLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const params = useParams<{ projectId: string }>()
-  const mainRef = useRef<HTMLDivElement>(null)
-  const [leftPanelWidth, setLeftPanelWidth] = useState(LEFT_PANEL_DEFAULT_WIDTH)
-  const [rightPanelWidth, setRightPanelWidth] = useState(RIGHT_PANEL_DEFAULT_WIDTH)
-  const [timelineHeight, setTimelineHeight] = useState(TIMELINE_DEFAULT_HEIGHT)
-  const [activeResizeTarget, setActiveResizeTarget] = useState<ResizeTarget | null>(
-    null
-  )
-  const resizeStateRef = useRef<ResizeState | null>(null)
+  const timelinePanelRef = usePanelRef()
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
+  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false)
+  const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false)
   const projectName = getStudioProjectDisplayName(params.projectId ?? "untitled-project")
 
-  useEffect(() => {
-    if (!activeResizeTarget) {
-      document.body.style.removeProperty("cursor")
-      document.body.style.removeProperty("user-select")
+  const syncLeftPanelCollapsed = (panelSize: PanelSize) => {
+    setIsLeftPanelCollapsed(panelSize.inPixels <= SIDE_PANEL_COLLAPSED_HANDLE_WIDTH)
+  }
+
+  const syncRightPanelCollapsed = (panelSize: PanelSize) => {
+    setIsRightPanelCollapsed(panelSize.inPixels <= SIDE_PANEL_COLLAPSED_HANDLE_WIDTH)
+  }
+
+  const syncTimelineCollapsed = (panelSize: PanelSize) => {
+    setIsTimelineCollapsed(panelSize.inPixels <= TIMELINE_COLLAPSE_HEIGHT)
+  }
+
+  const handleTimelineToggle = () => {
+    if (isTimelineCollapsed) {
+      timelinePanelRef.current?.resize(`${TIMELINE_DEFAULT_HEIGHT}px`)
+      setIsTimelineCollapsed(false)
       return
     }
 
-    document.body.style.cursor =
-      activeResizeTarget === "timeline" ? "row-resize" : "col-resize"
-    document.body.style.userSelect = "none"
-
-    return () => {
-      document.body.style.removeProperty("cursor")
-      document.body.style.removeProperty("user-select")
-    }
-  }, [activeResizeTarget])
-
-  useEffect(() => {
-    if (!activeResizeTarget) {
-      return
-    }
-
-    const handlePointerMove = (event: PointerEvent) => {
-      const resizeState = resizeStateRef.current
-
-      if (!resizeState || event.pointerId !== resizeState.pointerId) {
-        return
-      }
-
-      if (resizeState.target === "timeline") {
-        const nextHeight = resizeState.startHeight + (resizeState.startY - event.clientY)
-        setTimelineHeight(clamp(nextHeight, TIMELINE_MIN_HEIGHT, TIMELINE_MAX_HEIGHT))
-        return
-      }
-
-      const mainWidth = mainRef.current?.getBoundingClientRect().width ?? 0
-      const availablePanelWidth = Math.max(
-        0,
-        mainWidth - STUDIO_RAIL_WIDTH - MEDIA_MIN_WIDTH
-      )
-
-      if (resizeState.target === "left-panel") {
-        const panelMaxWidth = Math.min(
-          LEFT_PANEL_MAX_WIDTH,
-          Math.max(LEFT_PANEL_MIN_WIDTH, availablePanelWidth - rightPanelWidth)
-        )
-        const nextWidth = resizeState.startWidth + (event.clientX - resizeState.startX)
-        setLeftPanelWidth(clamp(nextWidth, LEFT_PANEL_MIN_WIDTH, panelMaxWidth))
-        return
-      }
-
-      const panelMaxWidth = Math.min(
-        RIGHT_PANEL_MAX_WIDTH,
-        Math.max(RIGHT_PANEL_MIN_WIDTH, availablePanelWidth - leftPanelWidth)
-      )
-      const nextWidth = resizeState.startWidth + (resizeState.startX - event.clientX)
-      setRightPanelWidth(clamp(nextWidth, RIGHT_PANEL_MIN_WIDTH, panelMaxWidth))
-    }
-
-    const handlePointerUp = (event: PointerEvent) => {
-      const resizeState = resizeStateRef.current
-
-      if (!resizeState || event.pointerId !== resizeState.pointerId) {
-        return
-      }
-
-      resizeStateRef.current = null
-      setActiveResizeTarget(null)
-    }
-
-    window.addEventListener("pointermove", handlePointerMove)
-    window.addEventListener("pointerup", handlePointerUp)
-    window.addEventListener("pointercancel", handlePointerUp)
-
-    return () => {
-      window.removeEventListener("pointermove", handlePointerMove)
-      window.removeEventListener("pointerup", handlePointerUp)
-      window.removeEventListener("pointercancel", handlePointerUp)
-    }
-  }, [activeResizeTarget, leftPanelWidth, rightPanelWidth])
-
-  const startResize = (
-    target: ResizeTarget,
-    event: React.PointerEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault()
-    event.currentTarget.setPointerCapture(event.pointerId)
-    resizeStateRef.current = {
-      pointerId: event.pointerId,
-      startHeight: timelineHeight,
-      startWidth: target === "right-panel" ? rightPanelWidth : leftPanelWidth,
-      startX: event.clientX,
-      startY: event.clientY,
-      target,
-    }
-    setActiveResizeTarget(target)
+    timelinePanelRef.current?.resize(`${TIMELINE_COLLAPSED_HEIGHT}px`)
+    setIsTimelineCollapsed(true)
   }
 
   return (
     <StudioEditorProvider>
-      <div
-        className="grid h-screen overflow-hidden bg-background text-foreground"
-        style={{
-          gridTemplateRows: `auto minmax(0, 1fr) 12px ${timelineHeight}px`,
-        }}
-      >
+      <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
         <StudioTopbar projectName={projectName} />
 
-        <div
-          ref={mainRef}
-          className="grid h-full min-h-0 overflow-hidden"
-          style={{
-            gridTemplateColumns: `${STUDIO_RAIL_WIDTH}px ${leftPanelWidth}px minmax(0, 1fr) ${rightPanelWidth}px`,
-          }}
+        <PanelGroup
+          id="studio-editor-vertical-layout"
+          orientation="vertical"
+          resizeTargetMinimumSize={{ fine: 16, coarse: 32 }}
+          className="min-h-0 flex-1"
         >
-          <StudioSidebar />
-          <div className="min-h-0 min-w-0">
-            <StudioPanel />
-          </div>
-          <div className="relative min-h-0 min-w-0 overflow-hidden">
-            <ResizeDivider
-              label="Resize left panel"
-              isDragging={activeResizeTarget === "left-panel"}
-              onResizeStart={(event) => startResize("left-panel", event)}
-              className="absolute inset-y-0 left-0 -translate-x-1/2"
-            />
-            <main className="h-full min-h-0 min-w-0 overflow-hidden">{children}</main>
-            <ResizeDivider
-              label="Resize right panel"
-              isDragging={activeResizeTarget === "right-panel"}
-              onResizeStart={(event) => startResize("right-panel", event)}
-              className="absolute inset-y-0 right-0 translate-x-1/2"
-            />
-          </div>
-          <div className="min-h-0 min-w-0">
-            <StudioInspector />
-          </div>
-        </div>
+          <Panel id="studio-main-panel" minSize="320px">
+            <div
+              className="grid h-full min-h-0 overflow-hidden"
+              style={{
+                gridTemplateColumns: `${STUDIO_RAIL_WIDTH}px minmax(0, 1fr)`,
+              }}
+            >
+              <StudioSidebar />
 
-        <TimelineResizeDivider
-          isDragging={activeResizeTarget === "timeline"}
-          onResizeStart={(event) => startResize("timeline", event)}
-        />
+              <PanelGroup
+                id="studio-editor-horizontal-layout"
+                orientation="horizontal"
+                resizeTargetMinimumSize={{ fine: 14, coarse: 32 }}
+                className="min-h-0 min-w-0"
+              >
+                <Panel
+                  id="studio-left-panel"
+                  defaultSize={`${LEFT_PANEL_DEFAULT_WIDTH}px`}
+                  minSize="0px"
+                  maxSize={`${LEFT_PANEL_MAX_WIDTH}px`}
+                  groupResizeBehavior="preserve-pixel-size"
+                  onResize={syncLeftPanelCollapsed}
+                  className="min-h-0 min-w-0 overflow-hidden"
+                >
+                  <div
+                    className={cn(
+                      "h-full transition-opacity duration-100 ease-out",
+                      isLeftPanelCollapsed
+                        ? "pointer-events-none opacity-0"
+                        : "opacity-100"
+                    )}
+                    style={{ minWidth: LEFT_PANEL_MIN_WIDTH }}
+                  >
+                    <StudioPanel />
+                  </div>
+                </Panel>
 
-        <StudioTimeline />
+                <SideResizeHandle
+                  label="Resize left panel"
+                  side="left"
+                  isCollapsed={isLeftPanelCollapsed}
+                />
+
+                <Panel
+                  id="studio-canvas-panel"
+                  minSize={`${MEDIA_MIN_WIDTH}px`}
+                  className="min-h-0 min-w-0"
+                >
+                  <main className="h-full min-h-0 min-w-0 overflow-hidden">
+                    {children}
+                  </main>
+                </Panel>
+
+                <SideResizeHandle
+                  label="Resize right panel"
+                  side="right"
+                  isCollapsed={isRightPanelCollapsed}
+                />
+
+                <Panel
+                  id="studio-right-panel"
+                  defaultSize={`${RIGHT_PANEL_DEFAULT_WIDTH}px`}
+                  minSize="0px"
+                  maxSize={`${RIGHT_PANEL_MAX_WIDTH}px`}
+                  groupResizeBehavior="preserve-pixel-size"
+                  onResize={syncRightPanelCollapsed}
+                  className="min-h-0 min-w-0 overflow-hidden"
+                >
+                  <div
+                    className={cn(
+                      "h-full transition-opacity duration-100 ease-out",
+                      isRightPanelCollapsed
+                        ? "pointer-events-none opacity-0"
+                        : "opacity-100"
+                    )}
+                    style={{ minWidth: RIGHT_PANEL_MIN_WIDTH }}
+                  >
+                    <StudioInspector />
+                  </div>
+                </Panel>
+              </PanelGroup>
+            </div>
+          </Panel>
+
+          <TimelineResizeDivider isCollapsed={isTimelineCollapsed} />
+
+          <Panel
+            id="studio-timeline-panel"
+            panelRef={timelinePanelRef}
+            defaultSize={`${TIMELINE_DEFAULT_HEIGHT}px`}
+            minSize={`${TIMELINE_COLLAPSED_HEIGHT}px`}
+            maxSize={`${TIMELINE_MAX_HEIGHT}px`}
+            groupResizeBehavior="preserve-pixel-size"
+            onResize={syncTimelineCollapsed}
+            className="min-h-0 min-w-0"
+          >
+            <StudioTimeline
+              isCollapsed={isTimelineCollapsed}
+              onToggleCollapse={handleTimelineToggle}
+            />
+          </Panel>
+        </PanelGroup>
       </div>
     </StudioEditorProvider>
   )

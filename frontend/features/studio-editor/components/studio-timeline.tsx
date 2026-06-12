@@ -26,6 +26,15 @@ const timelineToneClassName = {
 export const TIMELINE_MIN_HEIGHT = 128
 export const TIMELINE_MAX_HEIGHT = 420
 export const TIMELINE_DEFAULT_HEIGHT = 168
+export const TIMELINE_COLLAPSED_HEIGHT = 48
+
+function formatTimeLabel(totalSeconds: number) {
+  const clampedSeconds = Math.max(0, totalSeconds)
+  const minutes = Math.floor(clampedSeconds / 60)
+  const seconds = clampedSeconds - minutes * 60
+
+  return `${String(minutes).padStart(2, "0")}:${seconds.toFixed(2).padStart(5, "0")}`
+}
 
 function getTrackToolId(trackId: StudioTimelineTrack["id"]) {
   if (trackId === "captions") {
@@ -63,21 +72,34 @@ function getSelectionToolId(trackId: StudioTimelineTrack["id"], selectionId: str
   return getTrackToolId(trackId)
 }
 
-export function StudioTimeline() {
-  const { project, selectedItem, setActiveTool, setSelectedItemId } = useStudioEditor()
+export function StudioTimeline({
+  isCollapsed,
+  onToggleCollapse,
+}: {
+  isCollapsed: boolean
+  onToggleCollapse: () => void
+}) {
+  const { currentTime, project, seekToTime, selectedItem, setActiveTool, setSelectedItemId } =
+    useStudioEditor()
 
   return (
     <footer className="flex h-full min-h-0 flex-col border-t border-border bg-[#0b0b0c] text-white">
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/8 px-4 text-sm">
+        <div
+          className={cn(
+            "flex h-12 shrink-0 items-center justify-between px-4 text-sm",
+            isCollapsed ? null : "border-b border-white/8"
+          )}
+        >
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
+              onClick={onToggleCollapse}
               className="h-8 rounded-md px-2 text-white hover:bg-white/8 hover:text-white"
             >
               <ChevronDown className="size-4" />
-              Hide timeline
+              {isCollapsed ? "Show timeline" : "Hide timeline"}
             </Button>
             <Button
               variant="ghost"
@@ -122,9 +144,9 @@ export function StudioTimeline() {
             >
               <Forward className="size-4" />
             </Button>
-            <p className="ml-2 font-medium text-white">00:18.22</p>
+            <p className="ml-2 font-medium text-white">{formatTimeLabel(currentTime)}</p>
             <p className="text-white/40">/</p>
-            <p className="text-white/72">07:31.09</p>
+            <p className="text-white/72">{project.media.durationLabel}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -136,6 +158,7 @@ export function StudioTimeline() {
           </div>
         </div>
 
+        {isCollapsed ? null : (
         <div className="relative min-h-0 flex-1 overflow-auto px-4 py-3">
           <div className="pointer-events-none absolute inset-y-3 left-[31%] w-px bg-white/90" />
           <div className="min-w-[980px] space-y-3 pb-1">
@@ -186,6 +209,9 @@ export function StudioTimeline() {
                             onClick={() => {
                               setActiveTool(getSelectionToolId(track.id, segment.selectionId))
                               setSelectedItemId(segment.id)
+                              if (typeof segment.startTime === "number") {
+                                seekToTime(segment.startTime)
+                              }
                             }}
                             className={cn(
                               "relative h-8 rounded-lg border px-3 text-left text-xs font-medium leading-8 transition",
@@ -272,6 +298,7 @@ export function StudioTimeline() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </footer>
   )

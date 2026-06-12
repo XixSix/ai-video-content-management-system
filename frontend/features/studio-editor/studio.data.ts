@@ -3,6 +3,7 @@ import {
   Captions,
   Clapperboard,
   FolderOpen,
+  ListTree,
   Scissors,
   Sparkles,
   Type,
@@ -21,12 +22,172 @@ export const studioRailItems: StudioRailItem[] = [
   { id: "assets", label: "Assets", icon: FolderOpen },
   { id: "text", label: "Text", icon: Type },
   { id: "captions", label: "Captions", icon: Captions },
+  { id: "chapters", label: "Chapters", icon: ListTree },
   { id: "audio", label: "Audio", icon: AudioLines },
   { id: "clips", label: "Clips", icon: Scissors },
   { id: "ai", label: "AI", icon: Sparkles },
 ]
 
 export const studioEditorProject: StudioEditorProject = {
+  media: {
+    id: "media_001",
+    title: "Launch Keynote Full Session",
+    thumbnailUrl: "/window.svg",
+    durationSeconds: 1864,
+    durationLabel: "31:04",
+    status: "UPLOADED",
+    type: "VIDEO",
+    width: 1920,
+    height: 1080,
+    streamUrl: "https://example.com/media/launch-keynote.m3u8",
+  },
+  transcript: {
+    id: "transcript_001",
+    language: "English",
+    version: 4,
+    wordCount: 1278,
+    isEdited: false,
+    fullText:
+      "Today we are showing how teams can ship short-form content faster from one source recording. The workflow starts with a clean transcript, then chapters, then reusable clip candidates.",
+    source: "Whisper large-v3",
+    createdAt: "2026-06-11T09:15:00.000Z",
+  },
+  transcriptSegments: [
+    {
+      id: "segment_001",
+      segmentIndex: 0,
+      startTime: 0,
+      endTime: 8.2,
+      text: "Today we are showing how teams can ship short-form content faster from one source recording.",
+      speakerLabel: "Speaker 1",
+      confidence: 0.98,
+    },
+    {
+      id: "segment_002",
+      segmentIndex: 1,
+      startTime: 8.2,
+      endTime: 15.6,
+      text: "The workflow starts with a clean transcript before anything downstream becomes useful.",
+      speakerLabel: "Speaker 1",
+      confidence: 0.97,
+    },
+    {
+      id: "segment_003",
+      segmentIndex: 2,
+      startTime: 15.6,
+      endTime: 24.3,
+      text: "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
+      speakerLabel: "Speaker 1",
+      confidence: 0.96,
+    },
+    {
+      id: "segment_004",
+      segmentIndex: 3,
+      startTime: 24.3,
+      endTime: 33.4,
+      text: "That gives the team something they can review, publish, and reuse without re-uploading the source video.",
+      speakerLabel: "Speaker 2",
+      confidence: 0.95,
+    },
+  ],
+  chapters: [
+    {
+      id: "chapter_001",
+      chapterIndex: 1,
+      startTime: 0,
+      endTime: 92,
+      title: "Why transcript quality matters",
+      summary: "Frames the transcript as the source of truth for downstream content quality.",
+      transcriptVersion: 3,
+      score: 0.91,
+    },
+    {
+      id: "chapter_002",
+      chapterIndex: 2,
+      startTime: 92,
+      endTime: 224,
+      title: "Reusable content pipeline",
+      summary: "Explains how chapters and clips stack on top of one long-form recording.",
+      transcriptVersion: 3,
+      score: 0.88,
+    },
+  ],
+  clipCandidates: [
+    {
+      id: "candidate_001",
+      startTime: 12,
+      endTime: 42,
+      duration: 30,
+      text: "The workflow starts with a clean transcript before anything downstream becomes useful.",
+      finalScore: 0.92,
+      hookScore: 0.87,
+      status: "SELECTED",
+      transcriptVersion: 3,
+    },
+    {
+      id: "candidate_002",
+      startTime: 104,
+      endTime: 138,
+      duration: 34,
+      text: "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
+      finalScore: 0.89,
+      hookScore: 0.84,
+      status: "CANDIDATE",
+      transcriptVersion: 4,
+    },
+  ],
+  shortClips: [
+    {
+      id: "short_clip_001",
+      title: "Transcript before everything",
+      caption: "Why transcript cleanup pays off before chapters and clips.",
+      duration: 30,
+      status: "READY",
+      videoPath: "short-clips/launch-keynote/clip-001.mp4",
+      thumbnailPath: "short-clips/launch-keynote/clip-001.jpg",
+      aspectRatio: "9:16",
+      transcriptVersion: 3,
+    },
+  ],
+  generatedAssets: [
+    {
+      id: "asset_001",
+      assetType: "SRT",
+      label: "English subtitles",
+      status: "READY",
+      transcriptVersion: 3,
+    },
+    {
+      id: "asset_002",
+      assetType: "BURNED_SUBTITLE_VIDEO",
+      label: "Burned subtitle preview",
+      status: "READY",
+      transcriptVersion: 4,
+    },
+  ],
+  processingJobs: [
+    {
+      id: "job_001",
+      jobType: "TRANSCRIPT",
+      status: "COMPLETED",
+      progress: 100,
+      currentStep: "Transcript saved",
+    },
+    {
+      id: "job_002",
+      jobType: "CHAPTERS",
+      status: "COMPLETED",
+      progress: 100,
+      currentStep: "Chapters generated from transcript v3",
+    },
+    {
+      id: "job_003",
+      jobType: "CLIPS",
+      status: "RUNNING",
+      progress: 62,
+      currentStep: "Rendering vertical exports",
+    },
+  ],
   sourceMedia: {
     id: "source-media",
     name: "Keynote_source_v3.mp4",
@@ -79,6 +240,7 @@ export const studioEditorProject: StudioEditorProject = {
           tone: "base",
           selectionId: "source-media",
           summary: "Main interview clip on the primary video track",
+          startTime: 0,
         },
       ],
     },
@@ -95,6 +257,7 @@ export const studioEditorProject: StudioEditorProject = {
           tone: "accent",
           selectionId: "captions",
           summary: "Caption block for the opening hook",
+          startTime: 8.2,
         },
         {
           id: "caption-b",
@@ -104,6 +267,7 @@ export const studioEditorProject: StudioEditorProject = {
           tone: "accent",
           selectionId: "captions",
           summary: "Caption block covering the first talking point",
+          startTime: 15.6,
         },
       ],
     },
@@ -120,6 +284,7 @@ export const studioEditorProject: StudioEditorProject = {
           tone: "muted",
           selectionId: "brand-mark",
           summary: "Brand mark entrance layer",
+          startTime: 0,
         },
         {
           id: "overlay-title",
@@ -129,6 +294,7 @@ export const studioEditorProject: StudioEditorProject = {
           tone: "muted",
           selectionId: "hook-copy",
           summary: "Headline text layer timing",
+          startTime: 8.2,
         },
       ],
     },
@@ -145,6 +311,7 @@ export const studioEditorProject: StudioEditorProject = {
           tone: "base",
           selectionId: "audio-bed",
           summary: "English guide track",
+          startTime: 0,
         },
       ],
     },
@@ -240,6 +407,27 @@ export const studioToolPanels: Record<StudioToolId, StudioToolPanelContent> = {
       },
     ],
   },
+  chapters: {
+    title: "Chapters",
+    sections: [
+      {
+        id: "outline",
+        title: "Outline",
+        items: [
+          { id: "chapter-item-1", label: "Why transcript quality matters", meta: "0:00-1:32" },
+          { id: "chapter-item-2", label: "Reusable content pipeline", meta: "1:32-3:44" },
+        ],
+      },
+      {
+        id: "status",
+        title: "Status",
+        items: [
+          { id: "chapter-status", label: "Transcript version", meta: "v4" },
+          { id: "chapter-stale", label: "Needs regenerate", meta: "Generated from v3" },
+        ],
+      },
+    ],
+  },
   audio: {
     title: "Audio",
     sections: [
@@ -268,8 +456,8 @@ export const studioToolPanels: Record<StudioToolId, StudioToolPanelContent> = {
         id: "candidates",
         title: "Candidates",
         items: [
-          { id: "clip-1", label: "Hook opener", meta: "0:12", selectionId: "overlay-title" },
-          { id: "clip-2", label: "Objection answer", meta: "0:29" },
+          { id: "clip-1", label: "Hook opener", meta: "0:12-0:42" },
+          { id: "clip-2", label: "Objection answer", meta: "1:44-2:18" },
         ],
       },
       {
@@ -305,17 +493,20 @@ export const studioToolPanels: Record<StudioToolId, StudioToolPanelContent> = {
   },
 }
 
-export function getStudioSelectionById(selectionId: string): StudioSelection {
-  if (selectionId === studioEditorProject.sourceMedia.id) {
+export function getStudioSelectionById(
+  project: StudioEditorProject,
+  selectionId: string
+): StudioSelection {
+  if (selectionId === project.sourceMedia.id) {
     return {
-      id: studioEditorProject.sourceMedia.id,
+      id: project.sourceMedia.id,
       kind: "source",
-      label: studioEditorProject.sourceMedia.name,
-      summary: studioEditorProject.sourceMedia.summary,
+      label: project.sourceMedia.name,
+      summary: project.sourceMedia.summary,
     }
   }
 
-  const layer = studioEditorProject.layers.find((item) => item.id === selectionId)
+  const layer = project.layers.find((item) => item.id === selectionId)
 
   if (layer) {
     return {
@@ -332,7 +523,7 @@ export function getStudioSelectionById(selectionId: string): StudioSelection {
     }
   }
 
-  for (const track of studioEditorProject.timelineTracks) {
+  for (const track of project.timelineTracks) {
     const segment = track.segments.find((item) => item.id === selectionId)
 
     if (segment) {
@@ -349,9 +540,9 @@ export function getStudioSelectionById(selectionId: string): StudioSelection {
   }
 
   return {
-    id: studioEditorProject.sourceMedia.id,
+    id: project.sourceMedia.id,
     kind: "source",
-    label: studioEditorProject.sourceMedia.name,
-    summary: studioEditorProject.sourceMedia.summary,
+    label: project.sourceMedia.name,
+    summary: project.sourceMedia.summary,
   }
 }

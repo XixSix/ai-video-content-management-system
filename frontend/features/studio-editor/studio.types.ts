@@ -5,6 +5,7 @@ export type StudioToolId =
   | "assets"
   | "text"
   | "captions"
+  | "chapters"
   | "audio"
   | "clips"
   | "ai"
@@ -36,6 +37,7 @@ export type StudioTimelineSegment = {
   tone: StudioTimelineTone
   selectionId: string
   summary: string
+  startTime?: number
 }
 
 export type StudioTimelineTrack = {
@@ -52,6 +54,95 @@ export type StudioSourceMedia = {
   resolutionLabel: string
   summary: string
 }
+
+export type StudioMediaDetail = {
+  id: string
+  title: string
+  thumbnailUrl: string
+  durationSeconds: number
+  durationLabel: string
+  status: "UPLOADED" | "PROCESSING" | "FAILED"
+  type: "VIDEO" | "AUDIO"
+  width: number
+  height: number
+  streamUrl: string
+}
+
+export type StudioTranscript = {
+  id: string
+  language: string
+  version: number
+  wordCount: number
+  isEdited: boolean
+  fullText: string
+  source: string
+  createdAt: string
+}
+
+export type StudioTranscriptSegment = {
+  id: string
+  segmentIndex: number
+  startTime: number
+  endTime: number
+  text: string
+  speakerLabel: string
+  confidence: number
+}
+
+export type StudioChapter = {
+  id: string
+  chapterIndex: number
+  startTime: number
+  endTime: number
+  title: string
+  summary: string
+  transcriptVersion: number
+  score: number
+}
+
+export type StudioClipCandidateStatus = "CANDIDATE" | "SELECTED" | "REJECTED"
+
+export type StudioClipCandidate = {
+  id: string
+  startTime: number
+  endTime: number
+  duration: number
+  text: string
+  finalScore: number
+  hookScore: number
+  status: StudioClipCandidateStatus
+  transcriptVersion: number
+}
+
+export type StudioShortClip = {
+  id: string
+  title: string
+  caption: string
+  duration: number
+  status: "DRAFT" | "READY" | "FAILED"
+  videoPath: string
+  thumbnailPath: string
+  aspectRatio: "9:16" | "1:1" | "16:9"
+  transcriptVersion: number
+}
+
+export type StudioGeneratedAsset = {
+  id: string
+  assetType: "SRT" | "VTT" | "BURNED_SUBTITLE_VIDEO" | "THUMBNAIL"
+  label: string
+  status: "READY" | "GENERATING" | "FAILED"
+  transcriptVersion: number
+}
+
+export type StudioProcessingJob = {
+  id: string
+  jobType: "TRANSCRIPT" | "CHAPTERS" | "CLIPS" | "SUBTITLES"
+  status: "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED"
+  progress: number
+  currentStep: string
+}
+
+export type StudioStaleOutputType = "chapters" | "clips" | "assets"
 
 export type StudioToolPanelItem = {
   id: string
@@ -96,6 +187,14 @@ export type StudioSelection =
     }
 
 export type StudioEditorProject = {
+  media: StudioMediaDetail
+  transcript: StudioTranscript
+  transcriptSegments: StudioTranscriptSegment[]
+  chapters: StudioChapter[]
+  clipCandidates: StudioClipCandidate[]
+  shortClips: StudioShortClip[]
+  generatedAssets: StudioGeneratedAsset[]
+  processingJobs: StudioProcessingJob[]
   sourceMedia: StudioSourceMedia
   layers: StudioCanvasLayer[]
   timelineTracks: StudioTimelineTrack[]
