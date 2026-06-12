@@ -9,6 +9,10 @@ import {
   studioToolPanels,
 } from "./studio.data"
 import {
+  DEFAULT_CAPTION_STROKE_WIDTH,
+  studioCaptionPresets,
+} from "./studio-caption-presets"
+import {
   rebuildTranscriptMeta,
   rebuildTranscriptSegmentsFromWords,
 } from "./studio-captions"
@@ -29,6 +33,7 @@ function clampTime(timeSeconds: number, durationSeconds: number) {
 
 type StudioEditorContextValue = {
   activeTool: StudioToolId
+  addChapterToEnd: () => void
   canRedo: boolean
   canUndo: boolean
   currentTime: number
@@ -57,7 +62,45 @@ type StudioEditorContextValue = {
   toolPanel: (typeof studioToolPanels)[StudioToolId]
   redoEditorChange: () => void
   undoEditorChange: () => void
+  applyCaptionPreset: (presetId: string) => void
+  updateChapterTiming: (
+    chapterId: string,
+    timing: {
+      endTime?: number
+      startTime?: number
+    }
+  ) => void
+  updateChapterTitle: (chapterId: string, title: string) => void
   updateTranscriptWordText: (wordId: string, text: string) => void
+  updateCaptionLayerStyle: (
+    style: Partial<
+      Pick<
+        StudioCanvasLayer,
+        | "animationBy"
+        | "animationDuration"
+        | "animationName"
+        | "backgroundEnabled"
+        | "backgroundColor"
+        | "backgroundRadius"
+        | "enabled"
+        | "fontFamily"
+        | "fontSize"
+        | "fontStyle"
+        | "fontWeight"
+        | "highlightColor"
+        | "highlightEnabled"
+        | "presetId"
+        | "shadowEnabled"
+        | "shadowStyle"
+        | "strokeColor"
+        | "strokeEnabled"
+        | "strokeWidth"
+        | "textColor"
+        | "textDecoration"
+        | "textTransform"
+      >
+    >
+  ) => void
   updateTextLayerContent: (layerId: string, content: string) => void
   updateTextLayerStyle: (
     layerId: string,
@@ -67,6 +110,7 @@ type StudioEditorContextValue = {
         | "animationBy"
         | "animationDuration"
         | "animationName"
+        | "backgroundEnabled"
         | "backgroundColor"
         | "backgroundRadius"
         | "backgroundStyle"
@@ -236,6 +280,41 @@ export function StudioEditorProvider({
     setCurrentTime(clampTime(timeSeconds, project.media.durationSeconds))
   }
 
+  const addChapterToEnd = () => {
+    const lastChapter = [...project.chapters].sort(
+      (left, right) => left.endTime - right.endTime
+    ).at(-1)
+    const nextStartTime = lastChapter?.endTime ?? 0
+
+    if (nextStartTime >= project.media.durationSeconds) {
+      return
+    }
+
+    recordEditorHistory()
+
+    const nextChapterId = `chapter_${Date.now()}`
+    const nextChapter = {
+      id: nextChapterId,
+      chapterIndex: project.chapters.length + 1,
+      startTime: nextStartTime,
+      endTime: project.media.durationSeconds,
+      title: "Untitled chapter",
+      summary: "",
+      transcriptVersion: project.transcript.version,
+      score: 0,
+    }
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      chapters: [...currentProject.chapters, nextChapter],
+    }))
+    setActiveTool("chapters")
+    setSelectedChapterId(nextChapterId)
+    setSelectedTranscriptSegmentId(null)
+    setSelectedClipCandidateId(null)
+    setCurrentTime(nextStartTime)
+  }
+
   const addTextLayerFromPreset = (presetId: string) => {
     const preset = studioTextPresets.find((item) => item.id === presetId)
 
@@ -326,6 +405,86 @@ export function StudioEditorProvider({
     }))
   }
 
+  const updateCaptionLayerStyle = (
+    style: Partial<
+      Pick<
+        StudioCanvasLayer,
+        | "animationBy"
+        | "animationDuration"
+        | "animationName"
+        | "backgroundColor"
+        | "backgroundRadius"
+        | "enabled"
+        | "fontFamily"
+        | "fontSize"
+        | "fontStyle"
+        | "fontWeight"
+        | "highlightColor"
+        | "highlightEnabled"
+        | "presetId"
+        | "shadowEnabled"
+        | "shadowStyle"
+        | "strokeColor"
+        | "strokeEnabled"
+        | "strokeWidth"
+        | "textColor"
+        | "textDecoration"
+        | "textTransform"
+      >
+    >
+  ) => {
+    const captionLayer = project.layers.find((layer) => layer.kind === "captions")
+
+    if (!captionLayer) {
+      return
+    }
+
+    const normalizedStyle =
+      style.strokeEnabled === true &&
+      style.strokeWidth === undefined &&
+      !captionLayer.strokeWidth
+        ? {
+            ...style,
+            strokeWidth: DEFAULT_CAPTION_STROKE_WIDTH,
+          }
+        : style
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: currentProject.layers.map((layer) =>
+        layer.kind === "captions" ? { ...layer, ...normalizedStyle } : layer
+      ),
+    }))
+  }
+
+  const applyCaptionPreset = (presetId: string) => {
+    const preset = studioCaptionPresets.find((item) => item.id === presetId)
+    const captionLayer = project.layers.find((layer) => layer.kind === "captions")
+
+    if (!preset || !captionLayer) {
+      return
+    }
+
+    const isUnchanged = Object.entries(preset.style).every(([key, value]) => {
+      return captionLayer[key as keyof typeof preset.style] === value
+    })
+
+    if (isUnchanged) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: currentProject.layers.map((layer) =>
+        layer.kind === "captions" ? { ...layer, ...preset.style, presetId } : layer
+      ),
+    }))
+  }
+
   const selectTranscriptSegment = (segmentId: string) => {
     const segment = project.transcriptSegments.find((item) => item.id === segmentId)
 
@@ -352,6 +511,88 @@ export function StudioEditorProvider({
     setSelectedTranscriptSegmentId(null)
     setSelectedClipCandidateId(null)
     setCurrentTime(chapter.startTime)
+  }
+
+  const updateChapterTitle = (chapterId: string, title: string) => {
+    const nextTitle = title
+    const chapter = project.chapters.find((item) => item.id === chapterId)
+
+    if (!chapter || chapter.title === nextTitle) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      chapters: currentProject.chapters.map((item) =>
+        item.id === chapterId ? { ...item, title: nextTitle } : item
+      ),
+    }))
+  }
+
+  const updateChapterTiming = (
+    chapterId: string,
+    timing: {
+      endTime?: number
+      startTime?: number
+    }
+  ) => {
+    const chapter = project.chapters.find((item) => item.id === chapterId)
+
+    if (!chapter) {
+      return
+    }
+
+    const minimumChapterDurationSeconds =
+      project.media.durationSeconds >= 1 ? 1 : 0
+    const startTimeLimit = Math.max(
+      0,
+      chapter.endTime - minimumChapterDurationSeconds
+    )
+    const nextStartTime =
+      typeof timing.startTime === "number"
+        ? clampTime(timing.startTime, startTimeLimit)
+        : chapter.startTime
+    const endTimeFloor = Math.min(
+      project.media.durationSeconds,
+      nextStartTime + minimumChapterDurationSeconds
+    )
+    const nextEndTime =
+      typeof timing.endTime === "number"
+        ? Math.max(
+            endTimeFloor,
+            clampTime(timing.endTime, project.media.durationSeconds)
+          )
+        : chapter.endTime
+
+    if (
+      nextStartTime === chapter.startTime &&
+      nextEndTime === chapter.endTime
+    ) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      chapters: currentProject.chapters.map((item) =>
+        item.id === chapterId
+          ? {
+              ...item,
+              startTime: nextStartTime,
+              endTime: nextEndTime,
+            }
+          : item
+      ),
+    }))
+
+    if (selectedChapterId === chapterId) {
+      setCurrentTime((currentTimeValue) =>
+        clampTime(currentTimeValue, nextEndTime)
+      )
+    }
   }
 
   const selectClipCandidate = (clipCandidateId: string) => {
@@ -468,6 +709,8 @@ export function StudioEditorProvider({
   const value: StudioEditorContextValue = {
     addTextLayerFromPreset,
     activeTool,
+    addChapterToEnd,
+    applyCaptionPreset,
     canRedo: historyFuture.length > 0,
     canUndo: historyPast.length > 0,
     commitTranscriptWordText,
@@ -500,6 +743,9 @@ export function StudioEditorProvider({
     toolPanel: studioToolPanels[activeTool],
     redoEditorChange,
     undoEditorChange,
+    updateChapterTiming,
+    updateChapterTitle,
+    updateCaptionLayerStyle,
     updateTranscriptWordText,
     updateTextLayerContent,
     updateTextLayerStyle,

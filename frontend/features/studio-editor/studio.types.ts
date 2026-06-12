@@ -32,6 +32,9 @@ export type StudioTextFontFamily =
   | "playfair-display"
   | "caveat"
   | "roboto-mono"
+  | "oswald"
+  | "teko"
+  | "poppins"
 
 export type StudioTextFontWeight = "regular" | "bold"
 
@@ -56,6 +59,12 @@ export type StudioTextAnimationName =
   | "scaleUp"
   | "scaleDown"
 
+export type StudioCaptionTextDecoration = "none" | "underline"
+
+export type StudioCaptionTextTransform = "none" | "uppercase"
+
+export type StudioCaptionShadowStyle = "soft" | "hard"
+
 export type StudioCanvasLayer = {
   id: string
   kind: StudioLayerKind
@@ -66,6 +75,7 @@ export type StudioCanvasLayer = {
   animationBy?: StudioTextAnimationBy
   animationDuration?: number
   animationName?: StudioTextAnimationName
+  backgroundEnabled?: boolean
   backgroundColor?: string
   backgroundRadius?: number
   backgroundStyle?: StudioTextBackgroundStyle
@@ -76,8 +86,18 @@ export type StudioCanvasLayer = {
   fontStyle?: StudioTextFontStyle
   fontWeight?: StudioTextFontWeight
   presetId?: string
+  enabled?: boolean
+  highlightColor?: string
+  highlightEnabled?: boolean
+  shadowEnabled?: boolean
+  shadowStyle?: StudioCaptionShadowStyle
+  strokeColor?: string
+  strokeEnabled?: boolean
+  strokeWidth?: number
   textAlign?: StudioTextAlign
   textColor?: string
+  textDecoration?: StudioCaptionTextDecoration
+  textTransform?: StudioCaptionTextTransform
 }
 
 export type StudioTextPreset = {
@@ -228,6 +248,37 @@ export type StudioCaptionCue = {
   speakerLabel: string
   sourceSegmentIds: string[]
   wordGroups: StudioCaptionWordGroup[]
+}
+
+export type StudioCaptionPreset = {
+  id: string
+  label: string
+  previewText: string
+  style: Pick<
+    StudioCanvasLayer,
+    | "animationBy"
+    | "animationDuration"
+    | "animationName"
+    | "backgroundEnabled"
+    | "backgroundColor"
+    | "backgroundRadius"
+    | "enabled"
+    | "fontFamily"
+    | "fontSize"
+    | "fontStyle"
+    | "fontWeight"
+    | "highlightColor"
+    | "highlightEnabled"
+    | "presetId"
+    | "shadowEnabled"
+    | "shadowStyle"
+    | "strokeColor"
+    | "strokeEnabled"
+    | "strokeWidth"
+    | "textColor"
+    | "textDecoration"
+    | "textTransform"
+  >
 }
 
 export type StudioChapter = {

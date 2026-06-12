@@ -6,8 +6,11 @@ import {
   Geist,
   Geist_Mono,
   Montserrat,
+  Oswald,
   Playfair_Display,
+  Poppins,
   Roboto_Mono,
+  Teko,
 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -26,6 +29,24 @@ const geistMono = Geist_Mono({
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
+const teko = Teko({
+  variable: "--font-teko",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 const bebasNeue = Bebas_Neue({
@@ -70,7 +91,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${bebasNeue.variable} ${anton.variable} ${playfairDisplay.variable} ${caveat.variable} ${robotoMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${poppins.variable} ${oswald.variable} ${teko.variable} ${bebasNeue.variable} ${anton.variable} ${playfairDisplay.variable} ${caveat.variable} ${robotoMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider
