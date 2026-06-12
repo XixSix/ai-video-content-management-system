@@ -1,11 +1,12 @@
 "use client"
 
 import type { CSSProperties } from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import {
   AlignCenter,
   AlignLeft,
   AlignRight,
+  Clapperboard,
   Captions,
   Check,
   ChevronDown,
@@ -38,9 +39,11 @@ import {
 } from "@/features/studio-editor/studio.data"
 import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
 import type {
+  StudioChapter,
   StudioProjectMediaItem,
   StudioProjectMediaType,
   StudioSelection,
+  StudioTranscriptSegment,
 } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
@@ -74,6 +77,211 @@ function MediaTypeIcon({ type }: { type: StudioProjectMediaType }) {
   }
 
   return <Film className="size-4" />
+}
+
+function formatChapterTime(timeSeconds: number) {
+  const totalSeconds = Math.max(0, Math.floor(timeSeconds))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  }
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`
+}
+
+function getChapterTimeParts(timeSeconds: number) {
+  const totalSeconds = Math.max(0, Math.floor(timeSeconds))
+
+  return {
+    hours: Math.floor(totalSeconds / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
+  }
+}
+
+function formatChapterRange(chapter: StudioChapter) {
+  return `${formatChapterTime(chapter.startTime)} - ${formatChapterTime(chapter.endTime)}`
+}
+
+function getChapterDuration(chapter: StudioChapter) {
+  return formatChapterTime(Math.max(0, chapter.endTime - chapter.startTime))
+}
+
+function getChapterTranscriptPreview(
+  chapter: StudioChapter,
+  segments: StudioTranscriptSegment[]
+) {
+  return segments
+    .filter((segment) => {
+      return segment.startTime < chapter.endTime && segment.endTime > chapter.startTime
+    })
+    .map((segment) => segment.text.trim())
+    .filter(Boolean)
+    .join(" ")
+}
+
+type ChapterTimeParts = {
+  hours: string
+  minutes: string
+  seconds: string
+}
+
+function SegmentedTimeInput({
+  label,
+  maxSeconds,
+  minSeconds,
+  onCommit,
+  valueSeconds,
+}: {
+  label: string
+  maxSeconds: number
+  minSeconds: number
+  onCommit: (valueSeconds: number) => void
+  valueSeconds: number
+}) {
+  const initialParts = getChapterTimeParts(valueSeconds)
+  const [parts, setParts] = useState<ChapterTimeParts>({
+    hours: String(initialParts.hours),
+    minutes: String(initialParts.minutes).padStart(2, "0"),
+    seconds: String(initialParts.seconds).padStart(2, "0"),
+  })
+  const hoursRef = useRef<HTMLInputElement>(null)
+  const minutesRef = useRef<HTMLInputElement>(null)
+  const secondsRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLLabelElement>(null)
+
+  const resetParts = () => {
+    const nextParts = getChapterTimeParts(valueSeconds)
+
+    setParts({
+      hours: String(nextParts.hours),
+      minutes: String(nextParts.minutes).padStart(2, "0"),
+      seconds: String(nextParts.seconds).padStart(2, "0"),
+    })
+  }
+
+  const commitParts = () => {
+    const nextHours = Number(parts.hours || "0")
+    const nextMinutes = Number(parts.minutes || "0")
+    const nextSeconds = Number(parts.seconds || "0")
+
+    if (
+      !Number.isFinite(nextHours) ||
+      !Number.isFinite(nextMinutes) ||
+      !Number.isFinite(nextSeconds)
+    ) {
+      resetParts()
+      return
+    }
+
+    const normalizedSeconds = Math.min(
+      maxSeconds,
+      Math.max(
+        minSeconds,
+        Math.max(0, nextHours) * 3600 +
+          Math.max(0, nextMinutes) * 60 +
+          Math.max(0, nextSeconds)
+      )
+    )
+
+    onCommit(normalizedSeconds)
+
+    const normalizedParts = getChapterTimeParts(normalizedSeconds)
+
+    setParts({
+      hours: String(normalizedParts.hours),
+      minutes: String(normalizedParts.minutes).padStart(2, "0"),
+      seconds: String(normalizedParts.seconds).padStart(2, "0"),
+    })
+  }
+
+  const updatePart = (
+    key: keyof ChapterTimeParts,
+    value: string,
+    nextRef?: React.RefObject<HTMLInputElement | null>
+  ) => {
+    const digitsOnly = value.replace(/\D/g, "")
+    const nextValue = key === "hours" ? digitsOnly.slice(0, 3) : digitsOnly.slice(0, 2)
+
+    setParts((currentParts) => ({
+      ...currentParts,
+      [key]: nextValue,
+    }))
+
+    if (key !== "hours" && nextValue.length === 2 && nextRef?.current) {
+      nextRef.current.focus()
+      nextRef.current.select()
+    }
+  }
+
+  return (
+    <label
+      ref={containerRef}
+      className="flex min-h-10 min-w-0 items-center rounded-xl border border-border bg-background px-3 py-2"
+      onBlur={(event) => {
+        if (containerRef.current?.contains(event.relatedTarget as Node | null)) {
+          return
+        }
+
+        commitParts()
+      }}
+    >
+      <div className="flex w-full min-w-0 items-center justify-between gap-2">
+        <span className="shrink-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+          {label}
+        </span>
+        <div className="flex shrink-0 items-center gap-0.5 font-mono text-xs font-semibold tabular-nums text-foreground">
+          <input
+            ref={hoursRef}
+            type="text"
+            inputMode="numeric"
+            value={parts.hours}
+            onChange={(event) => updatePart("hours", event.target.value, minutesRef)}
+            onFocus={(event) => event.currentTarget.select()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur()
+              }
+            }}
+            className="h-5 w-[1.35rem] bg-transparent text-center outline-none"
+          />
+          <span className="text-muted-foreground">:</span>
+          <input
+            ref={minutesRef}
+            type="text"
+            inputMode="numeric"
+            value={parts.minutes}
+            onChange={(event) => updatePart("minutes", event.target.value, secondsRef)}
+            onFocus={(event) => event.currentTarget.select()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur()
+              }
+            }}
+            className="h-5 w-[1.15rem] bg-transparent text-center outline-none"
+          />
+          <span className="text-muted-foreground">:</span>
+          <input
+            ref={secondsRef}
+            type="text"
+            inputMode="numeric"
+            value={parts.seconds}
+            onChange={(event) => updatePart("seconds", event.target.value)}
+            onFocus={(event) => event.currentTarget.select()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur()
+              }
+            }}
+            className="h-5 w-[1.15rem] bg-transparent text-center outline-none"
+          />
+        </div>
+      </div>
+    </label>
+  )
 }
 
 function ControlRow({
@@ -1197,6 +1405,142 @@ function CaptionInspector({
   )
 }
 
+function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
+  const {
+    project,
+    seekToTime,
+    updateChapterTiming,
+    updateChapterTitle,
+  } = useStudioEditor()
+  const [titleDraft, setTitleDraft] = useState(chapter.title)
+  const transcriptPreview = getChapterTranscriptPreview(
+    chapter,
+    project.transcriptSegments
+  )
+
+  const commitTitle = () => {
+    const nextTitle = titleDraft.trim()
+
+    setTitleDraft(nextTitle)
+    updateChapterTitle(chapter.id, nextTitle)
+  }
+  const minimumChapterDurationSeconds =
+    project.media.durationSeconds >= 1 ? 1 : 0
+
+  return (
+    <>
+      <section className="rounded-xl border border-border bg-surface-muted px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          Selection
+        </p>
+        <div className="mt-2 flex items-center gap-3">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
+            <Clapperboard className="size-4" />
+          </span>
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="shrink-0 text-sm font-medium text-foreground">
+                Chapter {String(chapter.chapterIndex).padStart(2, "0")}:
+              </span>
+              <input
+                type="text"
+                value={titleDraft}
+                placeholder="Title goes here"
+                onChange={(event) => setTitleDraft(event.target.value)}
+                onBlur={commitTitle}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter") {
+                    return
+                  }
+
+                  event.currentTarget.blur()
+                }}
+                className="min-w-0 flex-1 bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {formatChapterRange(chapter)}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-surface-muted">
+        <div className="border-b border-border px-4 py-3">
+          <p className="text-sm font-semibold text-foreground">Transcript preview</p>
+        </div>
+
+        <div className="p-4">
+          <div className="max-h-40 overflow-y-auto rounded-xl border border-border bg-background/85 px-3 py-3 text-xs leading-6 text-muted-foreground">
+            {transcriptPreview || "No transcript text overlaps this chapter yet."}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-surface-muted">
+        <div className="border-b border-border px-4 py-3">
+          <p className="text-sm font-semibold text-foreground">Timing</p>
+        </div>
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-2 p-4">
+          <SegmentedTimeInput
+            key={`start-${chapter.id}-${chapter.startTime}-${chapter.endTime}`}
+            label="Start"
+            valueSeconds={chapter.startTime}
+            minSeconds={0}
+            maxSeconds={Math.max(0, chapter.endTime - minimumChapterDurationSeconds)}
+            onCommit={(valueSeconds) =>
+              updateChapterTiming(chapter.id, { startTime: valueSeconds })
+            }
+          />
+          <SegmentedTimeInput
+            key={`end-${chapter.id}-${chapter.startTime}-${chapter.endTime}`}
+            label="End"
+            valueSeconds={chapter.endTime}
+            minSeconds={Math.min(
+              project.media.durationSeconds,
+              chapter.startTime + minimumChapterDurationSeconds
+            )}
+            maxSeconds={project.media.durationSeconds}
+            onCommit={(valueSeconds) =>
+              updateChapterTiming(chapter.id, { endTime: valueSeconds })
+            }
+          />
+          <div className="flex min-h-10 min-w-0 items-center rounded-xl border border-border bg-background px-3 py-2">
+            <div className="flex w-full min-w-0 items-center justify-between gap-2">
+              <span className="shrink-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                Duration
+              </span>
+              <div className="inline-flex h-5 shrink-0 items-center font-mono text-xs font-semibold tabular-nums text-foreground">
+                {getChapterDuration(chapter)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-surface-muted p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          Actions
+        </p>
+        <div className="mt-3 grid gap-2">
+          <Button
+            type="button"
+            size="sm"
+            className="justify-start"
+            onClick={() => seekToTime(chapter.startTime)}
+          >
+            Seek to chapter
+          </Button>
+          <Button type="button" variant="outline" size="sm" className="justify-start">
+            Create clip from chapter
+          </Button>
+        </div>
+      </section>
+    </>
+  )
+}
+
 function DefaultInspector({ selectedItem }: { selectedItem: StudioSelection }) {
   return (
     <>
@@ -1242,7 +1586,9 @@ function DefaultInspector({ selectedItem }: { selectedItem: StudioSelection }) {
 }
 
 export function StudioInspector() {
-  const { selectedItem } = useStudioEditor()
+  const { activeTool, project, selectedChapterId, selectedItem } = useStudioEditor()
+  const selectedChapter =
+    project.chapters.find((chapter) => chapter.id === selectedChapterId) ?? null
 
   return (
     <aside className="flex h-full min-h-0 w-full flex-col overflow-hidden border-l border-border bg-background">
@@ -1251,7 +1597,9 @@ export function StudioInspector() {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 overflow-auto p-4">
-        {selectedItem.kind === "layer" && selectedItem.layer.kind === "text" ? (
+        {activeTool === "chapters" && selectedChapter ? (
+          <ChapterInspector key={selectedChapter.id} chapter={selectedChapter} />
+        ) : selectedItem.kind === "layer" && selectedItem.layer.kind === "text" ? (
           <TextInspector layer={selectedItem.layer} />
         ) : selectedItem.kind === "layer" && selectedItem.layer.kind === "captions" ? (
           <CaptionInspector layer={selectedItem.layer} />
