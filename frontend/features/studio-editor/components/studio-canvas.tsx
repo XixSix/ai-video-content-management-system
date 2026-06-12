@@ -1,15 +1,34 @@
 "use client"
 
 import type { CSSProperties } from "react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { TextAnimate } from "@/components/ui/text-animate"
+import { buildCaptionCues } from "@/features/studio-editor/studio-captions"
 import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import type { StudioCanvasLayer, StudioCaptionWordGroup } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
 const VIDEO_ASPECT_RATIO = 16 / 9
 const CANVAS_HORIZONTAL_PADDING = 56
 const CANVAS_VERTICAL_PADDING = 48
+
+function getFontFamilyValue(fontFamily?: string) {
+  const fontFamilyMap: Record<string, string> = {
+    geist: "var(--font-geist-sans)",
+    montserrat: "var(--font-montserrat)",
+    poppins: "var(--font-poppins)",
+    oswald: "var(--font-oswald)",
+    teko: "var(--font-teko)",
+    "bebas-neue": "var(--font-bebas-neue)",
+    anton: "var(--font-anton)",
+    "playfair-display": "var(--font-playfair-display)",
+    caveat: "var(--font-caveat)",
+    "roboto-mono": "var(--font-roboto-mono)",
+  }
+
+  return fontFamily ? fontFamilyMap[fontFamily] : undefined
+}
 
 function getTextLayerClassName(backgroundStyle?: string) {
   if (backgroundStyle === "none") {
@@ -23,36 +42,15 @@ function getTextLayerClassName(backgroundStyle?: string) {
   return ""
 }
 
-function getTextLayerStyle(layer: {
-  backgroundColor?: string
-  backgroundRadius?: number
-  backgroundStyle?: string
-  boxWidth?: number
-  fontFamily?: string
-  fontSize?: number
-  fontStyle?: "normal" | "italic"
-  fontWeight?: "regular" | "bold"
-  textAlign?: "left" | "center" | "right"
-  textColor?: string
-}): CSSProperties {
+function getTextLayerStyle(layer: StudioCanvasLayer): CSSProperties {
   const backgroundColor =
     layer.backgroundStyle === "none" ? "transparent" : layer.backgroundColor
-
-  const fontFamilyMap: Record<string, string> = {
-    geist: "var(--font-geist-sans)",
-    montserrat: "var(--font-montserrat)",
-    "bebas-neue": "var(--font-bebas-neue)",
-    anton: "var(--font-anton)",
-    "playfair-display": "var(--font-playfair-display)",
-    caveat: "var(--font-caveat)",
-    "roboto-mono": "var(--font-roboto-mono)",
-  }
 
   return {
     backgroundColor,
     borderRadius: layer.backgroundRadius,
     color: layer.textColor,
-    fontFamily: layer.fontFamily ? fontFamilyMap[layer.fontFamily] : undefined,
+    fontFamily: getFontFamilyValue(layer.fontFamily),
     fontSize: layer.fontSize,
     fontStyle: layer.fontStyle,
     fontWeight: layer.fontWeight === "bold" ? 700 : 500,
@@ -61,15 +59,128 @@ function getTextLayerStyle(layer: {
   }
 }
 
+function getCaptionContainerStyle(layer: StudioCanvasLayer): CSSProperties {
+  return {
+    backgroundColor: layer.backgroundEnabled === false ? "transparent" : layer.backgroundColor,
+    borderRadius: layer.backgroundRadius,
+    color: layer.textColor,
+    fontFamily: getFontFamilyValue(layer.fontFamily),
+    fontSize: layer.fontSize,
+    fontStyle: layer.fontStyle,
+    fontWeight: layer.fontWeight === "bold" ? 700 : 500,
+    textDecoration: layer.textDecoration,
+    textTransform: layer.textTransform,
+  }
+}
+
+function getCaptionWordStyle(
+  layer: StudioCanvasLayer,
+  isActive: boolean
+): CSSProperties {
+  const strokeWidth = layer.strokeEnabled ? `${layer.strokeWidth ?? 0}px` : undefined
+  const textShadow = layer.shadowEnabled
+    ? layer.shadowStyle === "hard"
+      ? "0 2px 0 rgba(0,0,0,0.45), 0 0 16px rgba(0,0,0,0.32)"
+      : "0 1px 10px rgba(0,0,0,0.3)"
+    : undefined
+
+  return {
+    WebkitTextStroke: strokeWidth ? `${strokeWidth} ${layer.strokeColor ?? "#000000"}` : undefined,
+    backgroundColor:
+      isActive && layer.highlightEnabled ? `${layer.highlightColor ?? "#3bff68"}20` : undefined,
+    borderBottom:
+      layer.textDecoration === "underline"
+        ? `2px solid ${isActive && layer.highlightEnabled ? layer.highlightColor ?? layer.textColor ?? "#ffffff" : layer.textColor ?? "#ffffff"}`
+        : undefined,
+    borderRadius: isActive && layer.highlightEnabled ? 10 : undefined,
+    boxDecorationBreak: isActive && layer.highlightEnabled ? "clone" : undefined,
+    color: isActive && layer.highlightEnabled ? layer.highlightColor : layer.textColor,
+    fontStyle: layer.fontStyle,
+    paddingBottom: layer.textDecoration === "underline" ? "0.06em" : undefined,
+    paddingInline: isActive && layer.highlightEnabled ? "0.18em" : undefined,
+    textShadow,
+  }
+}
+
+function isCueActive(
+  cue: ReturnType<typeof buildCaptionCues>[number],
+  currentTime: number
+) {
+  return currentTime >= cue.startTime && currentTime <= cue.endTime
+}
+
+function isWordGroupActive(wordGroup: StudioCaptionWordGroup, currentTime: number) {
+  return currentTime >= wordGroup.startTime && currentTime <= wordGroup.endTime
+}
+
+function CaptionWord({
+  index,
+  isActive,
+  layer,
+  wordGroup,
+}: {
+  index: number
+  isActive: boolean
+  layer: StudioCanvasLayer
+  wordGroup: StudioCaptionWordGroup
+}) {
+  const displayText =
+    layer.textTransform === "uppercase"
+      ? wordGroup.text.toUpperCase()
+      : wordGroup.text
+
+  if (layer.animationName && layer.animationName !== "none") {
+    return (
+      <span
+        className={cn("inline-block", index === 0 ? "" : "ml-[0.28em]")}
+        style={getCaptionWordStyle(layer, isActive)}
+      >
+        <TextAnimate
+          key={`${wordGroup.id}-${layer.animationName}-${layer.animationBy}-${layer.animationDuration}-${displayText}`}
+          animation={layer.animationName}
+          by={layer.animationBy}
+          duration={layer.animationDuration}
+          as="span"
+          startOnView={false}
+          className="inline-block"
+          segmentClassName="inline-block whitespace-pre-wrap"
+        >
+          {displayText}
+        </TextAnimate>
+      </span>
+    )
+  }
+
+  return (
+    <span
+      className={cn("inline-block", index === 0 ? "" : "ml-[0.28em]")}
+      style={getCaptionWordStyle(layer, isActive)}
+    >
+      {displayText}
+    </span>
+  )
+}
+
 export function StudioCanvas() {
-  const { project, selectedItem, selectedTargetId, setSelectedItemId, setActiveTool } =
-    useStudioEditor()
+  const {
+    currentTime,
+    project,
+    selectedItem,
+    selectedTargetId,
+    setActiveTool,
+    setSelectedItemId,
+  } = useStudioEditor()
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
   const canvasAreaRef = useRef<HTMLDivElement>(null)
   const [previewSize, setPreviewSize] = useState<{
     height: number
     width: number
   } | null>(null)
+
+  const captionCues = useMemo(
+    () => buildCaptionCues(project.transcriptSegments, project.transcriptWords),
+    [project.transcriptSegments, project.transcriptWords]
+  )
 
   useEffect(() => {
     const canvasArea = canvasAreaRef.current
@@ -94,7 +205,7 @@ export function StudioCanvas() {
 
         if (
           currentSize?.width === roundedWidth &&
-          currentSize.height === roundedHeight
+          currentSize?.height === roundedHeight
         ) {
           return currentSize
         }
@@ -146,6 +257,14 @@ export function StudioCanvas() {
 
             {project.layers.map((layer) => {
               const isSelected = selectedTargetId === layer.id
+              const activeCue =
+                layer.kind === "captions"
+                  ? captionCues.find((cue) => isCueActive(cue, currentTime)) ?? null
+                  : null
+
+              if (layer.kind === "captions" && !layer.enabled) {
+                return null
+              }
 
               return (
                 <button
@@ -154,7 +273,13 @@ export function StudioCanvas() {
                   aria-label={layer.label}
                   onClick={(event) => {
                     event.stopPropagation()
-                    setActiveTool(layer.kind === "text" ? "text" : layer.kind === "captions" ? "captions" : "assets")
+                    setActiveTool(
+                      layer.kind === "text"
+                        ? "text"
+                        : layer.kind === "captions"
+                          ? "captions"
+                          : "assets"
+                    )
                     setSelectedItemId(layer.id)
                   }}
                   className={cn(
@@ -162,12 +287,20 @@ export function StudioCanvas() {
                     "text-left",
                     layer.kind === "text"
                       ? getTextLayerClassName(layer.backgroundStyle)
-                      : null,
+                      : layer.kind === "captions"
+                        ? "flex items-center justify-center"
+                        : null,
                     isSelected
                       ? "ring-2 ring-sky-300/75 ring-offset-0"
                       : "hover:ring-2 hover:ring-white/20"
                   )}
-                  style={layer.kind === "text" ? getTextLayerStyle(layer) : undefined}
+                  style={
+                    layer.kind === "text"
+                      ? getTextLayerStyle(layer)
+                      : layer.kind === "captions"
+                        ? getCaptionContainerStyle(layer)
+                        : undefined
+                  }
                 >
                   {layer.kind === "text" ? (
                     layer.animationName && layer.animationName !== "none" ? (
@@ -188,6 +321,20 @@ export function StudioCanvas() {
                         {layer.content ?? layer.label}
                       </span>
                     )
+                  ) : layer.kind === "captions" ? (
+                    activeCue ? (
+                      <span className="block max-w-full text-center leading-[1.02]">
+                        {activeCue.wordGroups.map((wordGroup, index) => (
+                          <CaptionWord
+                            key={wordGroup.id}
+                            index={index}
+                            isActive={isWordGroupActive(wordGroup, currentTime)}
+                            layer={layer}
+                            wordGroup={wordGroup}
+                          />
+                        ))}
+                      </span>
+                    ) : null
                   ) : (
                     layer.label
                   )}
@@ -199,10 +346,7 @@ export function StudioCanvas() {
               ? project.layers
                   .filter((layer) => layer.id === selectedTargetId)
                   .map((layer) => (
-                    <div
-                      key={`${layer.id}-frame`}
-                      className={layer.frameClassName}
-                    >
+                    <div key={`${layer.id}-frame`} className={layer.frameClassName}>
                       <div className="absolute -left-1.5 -top-1.5 size-3 rounded-full border border-sky-200 bg-sky-400" />
                       <div className="absolute -right-1.5 -top-1.5 size-3 rounded-full border border-sky-200 bg-sky-400" />
                       <div className="absolute -left-1.5 -bottom-1.5 size-3 rounded-full border border-sky-200 bg-sky-400" />

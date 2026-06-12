@@ -9,6 +9,10 @@ import {
   studioToolPanels,
 } from "./studio.data"
 import {
+  DEFAULT_CAPTION_STROKE_WIDTH,
+  studioCaptionPresets,
+} from "./studio-caption-presets"
+import {
   rebuildTranscriptMeta,
   rebuildTranscriptSegmentsFromWords,
 } from "./studio-captions"
@@ -57,7 +61,37 @@ type StudioEditorContextValue = {
   toolPanel: (typeof studioToolPanels)[StudioToolId]
   redoEditorChange: () => void
   undoEditorChange: () => void
+  applyCaptionPreset: (presetId: string) => void
   updateTranscriptWordText: (wordId: string, text: string) => void
+  updateCaptionLayerStyle: (
+    style: Partial<
+      Pick<
+        StudioCanvasLayer,
+        | "animationBy"
+        | "animationDuration"
+        | "animationName"
+        | "backgroundEnabled"
+        | "backgroundColor"
+        | "backgroundRadius"
+        | "enabled"
+        | "fontFamily"
+        | "fontSize"
+        | "fontStyle"
+        | "fontWeight"
+        | "highlightColor"
+        | "highlightEnabled"
+        | "presetId"
+        | "shadowEnabled"
+        | "shadowStyle"
+        | "strokeColor"
+        | "strokeEnabled"
+        | "strokeWidth"
+        | "textColor"
+        | "textDecoration"
+        | "textTransform"
+      >
+    >
+  ) => void
   updateTextLayerContent: (layerId: string, content: string) => void
   updateTextLayerStyle: (
     layerId: string,
@@ -67,6 +101,7 @@ type StudioEditorContextValue = {
         | "animationBy"
         | "animationDuration"
         | "animationName"
+        | "backgroundEnabled"
         | "backgroundColor"
         | "backgroundRadius"
         | "backgroundStyle"
@@ -326,6 +361,86 @@ export function StudioEditorProvider({
     }))
   }
 
+  const updateCaptionLayerStyle = (
+    style: Partial<
+      Pick<
+        StudioCanvasLayer,
+        | "animationBy"
+        | "animationDuration"
+        | "animationName"
+        | "backgroundColor"
+        | "backgroundRadius"
+        | "enabled"
+        | "fontFamily"
+        | "fontSize"
+        | "fontStyle"
+        | "fontWeight"
+        | "highlightColor"
+        | "highlightEnabled"
+        | "presetId"
+        | "shadowEnabled"
+        | "shadowStyle"
+        | "strokeColor"
+        | "strokeEnabled"
+        | "strokeWidth"
+        | "textColor"
+        | "textDecoration"
+        | "textTransform"
+      >
+    >
+  ) => {
+    const captionLayer = project.layers.find((layer) => layer.kind === "captions")
+
+    if (!captionLayer) {
+      return
+    }
+
+    const normalizedStyle =
+      style.strokeEnabled === true &&
+      style.strokeWidth === undefined &&
+      !captionLayer.strokeWidth
+        ? {
+            ...style,
+            strokeWidth: DEFAULT_CAPTION_STROKE_WIDTH,
+          }
+        : style
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: currentProject.layers.map((layer) =>
+        layer.kind === "captions" ? { ...layer, ...normalizedStyle } : layer
+      ),
+    }))
+  }
+
+  const applyCaptionPreset = (presetId: string) => {
+    const preset = studioCaptionPresets.find((item) => item.id === presetId)
+    const captionLayer = project.layers.find((layer) => layer.kind === "captions")
+
+    if (!preset || !captionLayer) {
+      return
+    }
+
+    const isUnchanged = Object.entries(preset.style).every(([key, value]) => {
+      return captionLayer[key as keyof typeof preset.style] === value
+    })
+
+    if (isUnchanged) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: currentProject.layers.map((layer) =>
+        layer.kind === "captions" ? { ...layer, ...preset.style, presetId } : layer
+      ),
+    }))
+  }
+
   const selectTranscriptSegment = (segmentId: string) => {
     const segment = project.transcriptSegments.find((item) => item.id === segmentId)
 
@@ -468,6 +583,7 @@ export function StudioEditorProvider({
   const value: StudioEditorContextValue = {
     addTextLayerFromPreset,
     activeTool,
+    applyCaptionPreset,
     canRedo: historyFuture.length > 0,
     canUndo: historyPast.length > 0,
     commitTranscriptWordText,
@@ -500,6 +616,7 @@ export function StudioEditorProvider({
     toolPanel: studioToolPanels[activeTool],
     redoEditorChange,
     undoEditorChange,
+    updateCaptionLayerStyle,
     updateTranscriptWordText,
     updateTextLayerContent,
     updateTextLayerStyle,
