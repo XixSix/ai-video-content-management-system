@@ -5,6 +5,7 @@ export type StudioToolId =
   | "assets"
   | "text"
   | "captions"
+  | "chapters"
   | "audio"
   | "clips"
   | "ai"
@@ -17,6 +18,44 @@ export type StudioRailItem = {
 
 export type StudioLayerKind = "image" | "text" | "captions"
 
+export type StudioTextPresetCategory =
+  | "TITLES"
+  | "SOCIAL"
+  | "LOWER_THIRDS"
+  | "CALLOUTS"
+
+export type StudioTextFontFamily =
+  | "geist"
+  | "montserrat"
+  | "bebas-neue"
+  | "anton"
+  | "playfair-display"
+  | "caveat"
+  | "roboto-mono"
+
+export type StudioTextFontWeight = "regular" | "bold"
+
+export type StudioTextFontStyle = "normal" | "italic"
+
+export type StudioTextAlign = "left" | "center" | "right"
+
+export type StudioTextBackgroundStyle = "none" | "shadow" | "box"
+
+export type StudioTextAnimationBy = "text" | "word" | "character" | "line"
+
+export type StudioTextAnimationName =
+  | "none"
+  | "fadeIn"
+  | "blurIn"
+  | "blurInUp"
+  | "blurInDown"
+  | "slideUp"
+  | "slideDown"
+  | "slideLeft"
+  | "slideRight"
+  | "scaleUp"
+  | "scaleDown"
+
 export type StudioCanvasLayer = {
   id: string
   kind: StudioLayerKind
@@ -24,6 +63,46 @@ export type StudioCanvasLayer = {
   className: string
   summary: string
   frameClassName: string
+  animationBy?: StudioTextAnimationBy
+  animationDuration?: number
+  animationName?: StudioTextAnimationName
+  backgroundColor?: string
+  backgroundRadius?: number
+  backgroundStyle?: StudioTextBackgroundStyle
+  boxWidth?: number
+  content?: string
+  fontFamily?: StudioTextFontFamily
+  fontSize?: number
+  fontStyle?: StudioTextFontStyle
+  fontWeight?: StudioTextFontWeight
+  presetId?: string
+  textAlign?: StudioTextAlign
+  textColor?: string
+}
+
+export type StudioTextPreset = {
+  id: string
+  category: StudioTextPresetCategory
+  label: string
+  previewText: string
+  styleSummary: string
+  className: string
+  frameClassName: string
+  defaultStyle: {
+    animationBy: StudioTextAnimationBy
+    animationDuration: number
+    animationName: StudioTextAnimationName
+    backgroundColor: string
+    backgroundRadius: number
+    backgroundStyle: StudioTextBackgroundStyle
+    boxWidth: number
+    fontFamily: StudioTextFontFamily
+    fontSize: number
+    fontStyle: StudioTextFontStyle
+    fontWeight: StudioTextFontWeight
+    textAlign: StudioTextAlign
+    textColor: string
+  }
 }
 
 export type StudioTimelineTone = "base" | "accent" | "muted"
@@ -36,6 +115,7 @@ export type StudioTimelineSegment = {
   tone: StudioTimelineTone
   selectionId: string
   summary: string
+  startTime?: number
 }
 
 export type StudioTimelineTrack = {
@@ -52,6 +132,158 @@ export type StudioSourceMedia = {
   resolutionLabel: string
   summary: string
 }
+
+export type StudioMediaDetail = {
+  id: string
+  title: string
+  thumbnailUrl: string
+  durationSeconds: number
+  durationLabel: string
+  status: "UPLOADED" | "PROCESSING" | "FAILED"
+  type: "VIDEO" | "AUDIO"
+  width: number
+  height: number
+  streamUrl: string
+}
+
+export type StudioProjectMediaType = "VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE"
+
+export type StudioProjectMediaStatus =
+  | "READY"
+  | "UPLOADING"
+  | "PROCESSING"
+  | "FAILED"
+
+export type StudioProjectMediaOrigin = "SOURCE" | "LIBRARY" | "UPLOAD"
+
+export type StudioProjectMediaItem = {
+  id: string
+  type: StudioProjectMediaType
+  name: string
+  summary: string
+  origin: StudioProjectMediaOrigin
+  status: StudioProjectMediaStatus
+  format: string
+  metadata: string
+  usageLabel: string
+  durationLabel?: string
+  resolutionLabel?: string
+  dimensionsLabel?: string
+  sizeLabel?: string
+  language?: string
+  linkedMediaName?: string
+  linkedSelectionId?: string
+  startTime?: number
+}
+
+export type StudioTranscript = {
+  id: string
+  language: string
+  version: number
+  wordCount: number
+  isEdited: boolean
+  fullText: string
+  source: string
+  createdAt: string
+}
+
+export type StudioTranscriptSegment = {
+  id: string
+  segmentIndex: number
+  startTime: number
+  endTime: number
+  text: string
+  speakerLabel: string
+  confidence: number
+}
+
+export type StudioTranscriptWord = {
+  id: string
+  segmentId: string
+  wordIndex: number
+  startTime: number
+  endTime: number
+  sourceText: string
+  text: string
+  confidence: number
+}
+
+export type StudioCaptionWordGroup = {
+  id: string
+  sourceWordId: string
+  sourceSegmentId: string
+  startTime: number
+  endTime: number
+  sourceText: string
+  text: string
+  confidence: number
+  isEdited: boolean
+  isOmitted: boolean
+}
+
+export type StudioCaptionCue = {
+  id: string
+  startTime: number
+  endTime: number
+  speakerLabel: string
+  sourceSegmentIds: string[]
+  wordGroups: StudioCaptionWordGroup[]
+}
+
+export type StudioChapter = {
+  id: string
+  chapterIndex: number
+  startTime: number
+  endTime: number
+  title: string
+  summary: string
+  transcriptVersion: number
+  score: number
+}
+
+export type StudioClipCandidateStatus = "CANDIDATE" | "SELECTED" | "REJECTED"
+
+export type StudioClipCandidate = {
+  id: string
+  startTime: number
+  endTime: number
+  duration: number
+  text: string
+  finalScore: number
+  hookScore: number
+  status: StudioClipCandidateStatus
+  transcriptVersion: number
+}
+
+export type StudioShortClip = {
+  id: string
+  title: string
+  caption: string
+  duration: number
+  status: "DRAFT" | "READY" | "FAILED"
+  videoPath: string
+  thumbnailPath: string
+  aspectRatio: "9:16" | "1:1" | "16:9"
+  transcriptVersion: number
+}
+
+export type StudioGeneratedAsset = {
+  id: string
+  assetType: "SRT" | "VTT" | "BURNED_SUBTITLE_VIDEO" | "THUMBNAIL"
+  label: string
+  status: "READY" | "GENERATING" | "FAILED"
+  transcriptVersion: number
+}
+
+export type StudioProcessingJob = {
+  id: string
+  jobType: "TRANSCRIPT" | "CHAPTERS" | "CLIPS" | "SUBTITLES"
+  status: "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED"
+  progress: number
+  currentStep: string
+}
+
+export type StudioStaleOutputType = "chapters" | "clips" | "assets"
 
 export type StudioToolPanelItem = {
   id: string
@@ -84,6 +316,7 @@ export type StudioSelection =
       label: string
       summary: string
       detail: string
+      layer: StudioCanvasLayer
     }
   | {
       id: string
@@ -94,8 +327,27 @@ export type StudioSelection =
       linkedSelectionId: string
       trackLabel: string
     }
+  | {
+      id: string
+      kind: "media"
+      label: string
+      summary: string
+      detail: string
+      media: StudioProjectMediaItem
+      linkedSelectionId?: string
+    }
 
 export type StudioEditorProject = {
+  media: StudioMediaDetail
+  projectMedia: StudioProjectMediaItem[]
+  transcript: StudioTranscript
+  transcriptSegments: StudioTranscriptSegment[]
+  transcriptWords: StudioTranscriptWord[]
+  chapters: StudioChapter[]
+  clipCandidates: StudioClipCandidate[]
+  shortClips: StudioShortClip[]
+  generatedAssets: StudioGeneratedAsset[]
+  processingJobs: StudioProcessingJob[]
   sourceMedia: StudioSourceMedia
   layers: StudioCanvasLayer[]
   timelineTracks: StudioTimelineTrack[]

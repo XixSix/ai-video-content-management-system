@@ -1,7 +1,9 @@
 "use client"
 
+import type { CSSProperties } from "react"
 import { useEffect, useRef, useState } from "react"
 
+import { TextAnimate } from "@/components/ui/text-animate"
 import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
 import { cn } from "@/lib/utils"
 
@@ -9,9 +11,60 @@ const VIDEO_ASPECT_RATIO = 16 / 9
 const CANVAS_HORIZONTAL_PADDING = 56
 const CANVAS_VERTICAL_PADDING = 48
 
+function getTextLayerClassName(backgroundStyle?: string) {
+  if (backgroundStyle === "none") {
+    return "shadow-none"
+  }
+
+  if (backgroundStyle === "shadow") {
+    return "backdrop-blur-sm"
+  }
+
+  return ""
+}
+
+function getTextLayerStyle(layer: {
+  backgroundColor?: string
+  backgroundRadius?: number
+  backgroundStyle?: string
+  boxWidth?: number
+  fontFamily?: string
+  fontSize?: number
+  fontStyle?: "normal" | "italic"
+  fontWeight?: "regular" | "bold"
+  textAlign?: "left" | "center" | "right"
+  textColor?: string
+}): CSSProperties {
+  const backgroundColor =
+    layer.backgroundStyle === "none" ? "transparent" : layer.backgroundColor
+
+  const fontFamilyMap: Record<string, string> = {
+    geist: "var(--font-geist-sans)",
+    montserrat: "var(--font-montserrat)",
+    "bebas-neue": "var(--font-bebas-neue)",
+    anton: "var(--font-anton)",
+    "playfair-display": "var(--font-playfair-display)",
+    caveat: "var(--font-caveat)",
+    "roboto-mono": "var(--font-roboto-mono)",
+  }
+
+  return {
+    backgroundColor,
+    borderRadius: layer.backgroundRadius,
+    color: layer.textColor,
+    fontFamily: layer.fontFamily ? fontFamilyMap[layer.fontFamily] : undefined,
+    fontSize: layer.fontSize,
+    fontStyle: layer.fontStyle,
+    fontWeight: layer.fontWeight === "bold" ? 700 : 500,
+    textAlign: layer.textAlign,
+    width: layer.boxWidth ? `${layer.boxWidth}%` : undefined,
+  }
+}
+
 export function StudioCanvas() {
   const { project, selectedItem, selectedTargetId, setSelectedItemId, setActiveTool } =
     useStudioEditor()
+  const isSourceSelected = selectedTargetId === project.sourceMedia.id
   const canvasAreaRef = useRef<HTMLDivElement>(null)
   const [previewSize, setPreviewSize] = useState<{
     height: number
@@ -76,7 +129,10 @@ export function StudioCanvas() {
               setActiveTool("media")
               setSelectedItemId(project.sourceMedia.id)
             }}
-            className="relative aspect-video max-h-full max-w-full overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,#1e7397,#0c4364_55%,#092c43)] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.55)]"
+            className={cn(
+              "relative aspect-video max-h-full max-w-full overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,#1e7397,#0c4364_55%,#092c43)] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.55)]",
+              isSourceSelected ? "ring-2 ring-sky-300/75 ring-offset-0" : null
+            )}
             style={{
               height: previewSize?.height,
               width: previewSize?.width ?? "100%",
@@ -104,12 +160,37 @@ export function StudioCanvas() {
                   className={cn(
                     layer.className,
                     "text-left",
+                    layer.kind === "text"
+                      ? getTextLayerClassName(layer.backgroundStyle)
+                      : null,
                     isSelected
                       ? "ring-2 ring-sky-300/75 ring-offset-0"
                       : "hover:ring-2 hover:ring-white/20"
                   )}
+                  style={layer.kind === "text" ? getTextLayerStyle(layer) : undefined}
                 >
-                  {layer.label}
+                  {layer.kind === "text" ? (
+                    layer.animationName && layer.animationName !== "none" ? (
+                      <TextAnimate
+                        key={`${layer.id}-${layer.animationName}-${layer.animationBy}-${layer.animationDuration}-${layer.content ?? ""}`}
+                        animation={layer.animationName}
+                        by={layer.animationBy}
+                        duration={layer.animationDuration}
+                        as="span"
+                        startOnView={false}
+                        className="block whitespace-pre-wrap"
+                        segmentClassName="whitespace-pre-wrap"
+                      >
+                        {layer.content ?? layer.label}
+                      </TextAnimate>
+                    ) : (
+                      <span className="block whitespace-pre-wrap">
+                        {layer.content ?? layer.label}
+                      </span>
+                    )
+                  ) : (
+                    layer.label
+                  )}
                 </button>
               )
             })}
