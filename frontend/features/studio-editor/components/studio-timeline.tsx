@@ -12,7 +12,8 @@ import {
   ZoomOut,
 } from "lucide-react"
 
-import { studioTimelineTracks } from "@/features/studio-editor/studio.data"
+import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import type { StudioTimelineTrack } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -22,33 +23,51 @@ const timelineToneClassName = {
   muted: "border-amber-500/25 bg-amber-500/12 text-amber-700 dark:text-amber-300",
 } as const
 
-export const TIMELINE_MIN_HEIGHT = 120
-export const TIMELINE_MAX_HEIGHT = 220
-export const TIMELINE_DEFAULT_HEIGHT = 144
+export const TIMELINE_MIN_HEIGHT = 128
+export const TIMELINE_MAX_HEIGHT = 420
+export const TIMELINE_DEFAULT_HEIGHT = 168
 
-type StudioTimelineProps = {
-  isDragging: boolean
-  onResizeStart: (event: React.PointerEvent<HTMLButtonElement>) => void
+function getTrackToolId(trackId: StudioTimelineTrack["id"]) {
+  if (trackId === "captions") {
+    return "captions"
+  }
+
+  if (trackId === "audio") {
+    return "audio"
+  }
+
+  if (trackId === "overlays") {
+    return "text"
+  }
+
+  return "media"
 }
 
-export function StudioTimeline({
-  isDragging,
-  onResizeStart,
-}: StudioTimelineProps) {
+function getSelectionToolId(trackId: StudioTimelineTrack["id"], selectionId: string) {
+  if (selectionId === "brand-mark") {
+    return "assets"
+  }
+
+  if (selectionId === "hook-copy") {
+    return "text"
+  }
+
+  if (selectionId === "captions") {
+    return "captions"
+  }
+
+  if (selectionId === "audio-bed") {
+    return "audio"
+  }
+
+  return getTrackToolId(trackId)
+}
+
+export function StudioTimeline() {
+  const { project, selectedItem, setActiveTool, setSelectedItemId } = useStudioEditor()
+
   return (
     <footer className="flex h-full min-h-0 flex-col border-t border-border bg-[#0b0b0c] text-white">
-      <button
-        type="button"
-        aria-label="Resize timeline"
-        onPointerDown={onResizeStart}
-        className={cn(
-          "group flex h-3 shrink-0 cursor-row-resize items-center justify-center border-b border-white/8 bg-[#0b0b0c] transition-colors",
-          isDragging ? "bg-white/8" : "hover:bg-white/6"
-        )}
-      >
-        <span className="h-1 w-12 rounded-full bg-white/14 transition-colors group-hover:bg-white/24" />
-      </button>
-
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/8 px-4 text-sm">
           <div className="flex items-center gap-2">
@@ -144,7 +163,7 @@ export function StudioTimeline({
               </div>
 
               <div className="space-y-3">
-                {studioTimelineTracks.map((track, trackIndex) => (
+                {project.timelineTracks.map((track, trackIndex) => (
                   <div key={track.id} className="rounded-xl bg-white/[0.04] px-3 py-2">
                     {trackIndex === 0 ? (
                       <div className="mb-1 flex items-center justify-between">
@@ -155,83 +174,97 @@ export function StudioTimeline({
                     ) : null}
 
                     <div className="flex min-w-0 items-center gap-2">
-                      {track.segments.map((segment, segmentIndex) => (
-                        <div
-                          key={segment.id}
-                          className={cn(
-                            "relative h-8 rounded-lg border px-3 text-xs font-medium leading-8",
-                            segment.widthClassName,
-                            segment.offsetClassName,
-                            timelineToneClassName[segment.tone]
-                          )}
-                        >
-                          {trackIndex === 0 && segmentIndex === 0 ? (
-                            <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
-                              <div className="flex h-full w-[190%] items-stretch">
-                                {Array.from({ length: 24 }).map((_, thumbnailIndex) => (
-                                  <div
-                                    key={thumbnailIndex}
-                                    className={cn(
-                                      "relative h-full flex-1 border-r border-black/30",
-                                      thumbnailIndex % 3 === 0
-                                        ? "bg-[linear-gradient(135deg,#1f3648,#31576f)]"
-                                        : thumbnailIndex % 3 === 1
-                                          ? "bg-[linear-gradient(135deg,#73402d,#2b1b17)]"
-                                          : "bg-[linear-gradient(135deg,#1d4b41,#183326)]"
-                                    )}
-                                  >
-                                    <div className="absolute inset-x-[12%] bottom-[18%] h-[16%] rounded bg-black/60" />
-                                    <div className="absolute right-[10%] top-[14%] h-[26%] w-[18%] rounded-full bg-white/22 blur-[1px]" />
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ) : null}
+                      {track.segments.map((segment, segmentIndex) => {
+                        const isSelected =
+                          selectedItem.id === segment.id ||
+                          selectedItem.id === segment.selectionId
 
-                          {trackIndex !== 0 ? (
-                            track.id === "audio" ? (
-                              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-[linear-gradient(180deg,rgba(173,216,230,0.28),rgba(173,216,230,0.18))]">
-                                <div className="flex h-full items-center gap-[2px] px-2">
-                                  {Array.from({ length: 120 }).map((_, barIndex) => (
-                                    <span
-                                      key={barIndex}
-                                      className="w-[2px] rounded-full bg-white/35"
-                                      style={{
-                                        height: `${22 + ((barIndex * 17) % 55)}%`,
-                                      }}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-white/[0.05]">
-                                <div className="flex h-full items-center gap-[2px] px-2">
-                                  {Array.from({ length: 110 }).map((_, barIndex) => (
-                                    <span
-                                      key={barIndex}
-                                      className="w-[2px] rounded-full bg-white/22"
-                                      style={{
-                                        height: `${18 + ((barIndex * 13) % 48)}%`,
-                                      }}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            )
-                          ) : null}
-
-                          <span className="relative z-10 truncate">
-                            {track.id === "audio" ? (
-                              <span className="inline-flex items-center gap-1.5 rounded bg-black/28 px-1.5 py-0.5 leading-none text-[11px] text-white/85">
-                                <AudioLines className="size-3" />
-                                Audio: english.m4a
-                              </span>
-                            ) : (
-                              segment.label
+                        return (
+                          <button
+                            key={segment.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveTool(getSelectionToolId(track.id, segment.selectionId))
+                              setSelectedItemId(segment.id)
+                            }}
+                            className={cn(
+                              "relative h-8 rounded-lg border px-3 text-left text-xs font-medium leading-8 transition",
+                              segment.widthClassName,
+                              segment.offsetClassName,
+                              timelineToneClassName[segment.tone],
+                              isSelected
+                                ? "shadow-[0_0_0_1px_rgba(125,211,252,0.8)] ring-1 ring-sky-300/80"
+                                : "hover:ring-1 hover:ring-white/22"
                             )}
-                          </span>
-                        </div>
-                      ))}
+                          >
+                            {trackIndex === 0 && segmentIndex === 0 ? (
+                              <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                                <div className="flex h-full w-[190%] items-stretch">
+                                  {Array.from({ length: 24 }).map((_, thumbnailIndex) => (
+                                    <div
+                                      key={thumbnailIndex}
+                                      className={cn(
+                                        "relative h-full flex-1 border-r border-black/30",
+                                        thumbnailIndex % 3 === 0
+                                          ? "bg-[linear-gradient(135deg,#1f3648,#31576f)]"
+                                          : thumbnailIndex % 3 === 1
+                                            ? "bg-[linear-gradient(135deg,#73402d,#2b1b17)]"
+                                            : "bg-[linear-gradient(135deg,#1d4b41,#183326)]"
+                                      )}
+                                    >
+                                      <div className="absolute inset-x-[12%] bottom-[18%] h-[16%] rounded bg-black/60" />
+                                      <div className="absolute right-[10%] top-[14%] h-[26%] w-[18%] rounded-full bg-white/22 blur-[1px]" />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : null}
+
+                            {trackIndex !== 0 ? (
+                              track.id === "audio" ? (
+                                <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-[linear-gradient(180deg,rgba(173,216,230,0.28),rgba(173,216,230,0.18))]">
+                                  <div className="flex h-full items-center gap-[2px] px-2">
+                                    {Array.from({ length: 120 }).map((_, barIndex) => (
+                                      <span
+                                        key={barIndex}
+                                        className="w-[2px] rounded-full bg-white/35"
+                                        style={{
+                                          height: `${22 + ((barIndex * 17) % 55)}%`,
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-white/[0.05]">
+                                  <div className="flex h-full items-center gap-[2px] px-2">
+                                    {Array.from({ length: 110 }).map((_, barIndex) => (
+                                      <span
+                                        key={barIndex}
+                                        className="w-[2px] rounded-full bg-white/22"
+                                        style={{
+                                          height: `${18 + ((barIndex * 13) % 48)}%`,
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              )
+                            ) : null}
+
+                            <span className="relative z-10 truncate">
+                              {track.id === "audio" ? (
+                                <span className="inline-flex items-center gap-1.5 rounded bg-black/28 px-1.5 py-0.5 leading-none text-[11px] text-white/85">
+                                  <AudioLines className="size-3" />
+                                  Audio: english.m4a
+                                </span>
+                              ) : (
+                                segment.label
+                              )}
+                            </span>
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 ))}
