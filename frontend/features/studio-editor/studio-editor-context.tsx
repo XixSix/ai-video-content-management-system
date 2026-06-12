@@ -5,9 +5,11 @@ import { createContext, useContext, useState } from "react"
 import {
   getStudioSelectionById,
   studioEditorProject,
+  studioTextPresets,
   studioToolPanels,
 } from "./studio.data"
 import type {
+  StudioCanvasLayer,
   StudioEditorProject,
   StudioSelection,
   StudioStaleOutputType,
@@ -32,6 +34,7 @@ type StudioEditorContextValue = {
   selectedTranscriptSegmentId: string | null
   selectedTargetId: string
   staleOutputTypes: StudioStaleOutputType[]
+  addTextLayerFromPreset: (presetId: string) => void
   markTranscriptDirty: () => void
   saveTranscriptMock: () => void
   seekToTime: (timeSeconds: number) => void
@@ -41,6 +44,28 @@ type StudioEditorContextValue = {
   selectClipCandidate: (clipCandidateId: string) => void
   selectTranscriptSegment: (segmentId: string) => void
   toolPanel: (typeof studioToolPanels)[StudioToolId]
+  updateTextLayerContent: (layerId: string, content: string) => void
+  updateTextLayerStyle: (
+    layerId: string,
+    style: Partial<
+      Pick<
+        StudioCanvasLayer,
+        | "animationBy"
+        | "animationDuration"
+        | "animationName"
+        | "backgroundColor"
+        | "backgroundRadius"
+        | "backgroundStyle"
+        | "boxWidth"
+        | "fontFamily"
+        | "fontSize"
+        | "fontStyle"
+        | "fontWeight"
+        | "textAlign"
+        | "textColor"
+      >
+    >
+  ) => void
 }
 
 const StudioEditorContext = createContext<StudioEditorContextValue | null>(null)
@@ -89,6 +114,84 @@ export function StudioEditorProvider({
 
   const seekToTime = (timeSeconds: number) => {
     setCurrentTime(clampTime(timeSeconds, project.media.durationSeconds))
+  }
+
+  const addTextLayerFromPreset = (presetId: string) => {
+    const preset = studioTextPresets.find((item) => item.id === presetId)
+
+    if (!preset) {
+      return
+    }
+
+    const layerId = `text-${Date.now()}`
+    const nextLayer: StudioCanvasLayer = {
+      id: layerId,
+      kind: "text",
+      label: preset.label,
+      summary: preset.styleSummary,
+      animationBy: preset.defaultStyle.animationBy,
+      animationDuration: preset.defaultStyle.animationDuration,
+      animationName: preset.defaultStyle.animationName,
+      backgroundColor: preset.defaultStyle.backgroundColor,
+      backgroundRadius: preset.defaultStyle.backgroundRadius,
+      backgroundStyle: preset.defaultStyle.backgroundStyle,
+      boxWidth: preset.defaultStyle.boxWidth,
+      className: preset.className,
+      content: preset.previewText,
+      fontFamily: preset.defaultStyle.fontFamily,
+      fontSize: preset.defaultStyle.fontSize,
+      fontStyle: preset.defaultStyle.fontStyle,
+      fontWeight: preset.defaultStyle.fontWeight,
+      frameClassName: preset.frameClassName,
+      presetId: preset.id,
+      textAlign: preset.defaultStyle.textAlign,
+      textColor: preset.defaultStyle.textColor,
+    }
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: [...currentProject.layers, nextLayer],
+    }))
+    setActiveTool("text")
+    setSelectedItemId(layerId)
+  }
+
+  const updateTextLayerContent = (layerId: string, content: string) => {
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: currentProject.layers.map((layer) =>
+        layer.id === layerId && layer.kind === "text" ? { ...layer, content } : layer
+      ),
+    }))
+  }
+
+  const updateTextLayerStyle = (
+    layerId: string,
+    style: Partial<
+      Pick<
+        StudioCanvasLayer,
+        | "animationBy"
+        | "animationDuration"
+        | "animationName"
+        | "backgroundColor"
+        | "backgroundRadius"
+        | "backgroundStyle"
+        | "boxWidth"
+        | "fontFamily"
+        | "fontSize"
+        | "fontStyle"
+        | "fontWeight"
+        | "textAlign"
+        | "textColor"
+      >
+    >
+  ) => {
+    setProject((currentProject) => ({
+      ...currentProject,
+      layers: currentProject.layers.map((layer) =>
+        layer.id === layerId && layer.kind === "text" ? { ...layer, ...style } : layer
+      ),
+    }))
   }
 
   const selectTranscriptSegment = (segmentId: string) => {
@@ -150,6 +253,7 @@ export function StudioEditorProvider({
   }
 
   const value: StudioEditorContextValue = {
+    addTextLayerFromPreset,
     activeTool,
     currentTime,
     hasStaleAssets,
@@ -177,6 +281,8 @@ export function StudioEditorProvider({
     setActiveTool,
     setSelectedItemId,
     toolPanel: studioToolPanels[activeTool],
+    updateTextLayerContent,
+    updateTextLayerStyle,
   }
 
   return (

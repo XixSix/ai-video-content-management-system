@@ -18,6 +18,44 @@ export type StudioRailItem = {
 
 export type StudioLayerKind = "image" | "text" | "captions"
 
+export type StudioTextPresetCategory =
+  | "TITLES"
+  | "SOCIAL"
+  | "LOWER_THIRDS"
+  | "CALLOUTS"
+
+export type StudioTextFontFamily =
+  | "geist"
+  | "montserrat"
+  | "bebas-neue"
+  | "anton"
+  | "playfair-display"
+  | "caveat"
+  | "roboto-mono"
+
+export type StudioTextFontWeight = "regular" | "bold"
+
+export type StudioTextFontStyle = "normal" | "italic"
+
+export type StudioTextAlign = "left" | "center" | "right"
+
+export type StudioTextBackgroundStyle = "none" | "shadow" | "box"
+
+export type StudioTextAnimationBy = "text" | "word" | "character" | "line"
+
+export type StudioTextAnimationName =
+  | "none"
+  | "fadeIn"
+  | "blurIn"
+  | "blurInUp"
+  | "blurInDown"
+  | "slideUp"
+  | "slideDown"
+  | "slideLeft"
+  | "slideRight"
+  | "scaleUp"
+  | "scaleDown"
+
 export type StudioCanvasLayer = {
   id: string
   kind: StudioLayerKind
@@ -25,6 +63,46 @@ export type StudioCanvasLayer = {
   className: string
   summary: string
   frameClassName: string
+  animationBy?: StudioTextAnimationBy
+  animationDuration?: number
+  animationName?: StudioTextAnimationName
+  backgroundColor?: string
+  backgroundRadius?: number
+  backgroundStyle?: StudioTextBackgroundStyle
+  boxWidth?: number
+  content?: string
+  fontFamily?: StudioTextFontFamily
+  fontSize?: number
+  fontStyle?: StudioTextFontStyle
+  fontWeight?: StudioTextFontWeight
+  presetId?: string
+  textAlign?: StudioTextAlign
+  textColor?: string
+}
+
+export type StudioTextPreset = {
+  id: string
+  category: StudioTextPresetCategory
+  label: string
+  previewText: string
+  styleSummary: string
+  className: string
+  frameClassName: string
+  defaultStyle: {
+    animationBy: StudioTextAnimationBy
+    animationDuration: number
+    animationName: StudioTextAnimationName
+    backgroundColor: string
+    backgroundRadius: number
+    backgroundStyle: StudioTextBackgroundStyle
+    boxWidth: number
+    fontFamily: StudioTextFontFamily
+    fontSize: number
+    fontStyle: StudioTextFontStyle
+    fontWeight: StudioTextFontWeight
+    textAlign: StudioTextAlign
+    textColor: string
+  }
 }
 
 export type StudioTimelineTone = "base" | "accent" | "muted"
@@ -205,6 +283,7 @@ export type StudioSelection =
       label: string
       summary: string
       detail: string
+      layer: StudioCanvasLayer
     }
   | {
       id: string
