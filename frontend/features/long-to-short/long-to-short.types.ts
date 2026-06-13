@@ -1,6 +1,11 @@
 export type LongToShortSourceStatus = "READY" | "PROCESSING" | "NEEDS_TRANSCRIPT"
 export type LongToShortJobStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED"
 export type LongToShortAspectRatio = "9:16" | "1:1" | "16:9"
+export type LongToShortSpeechLanguage = "AUTO" | "ENGLISH" | "VIETNAMESE"
+export type LongToShortClipModel = "AUTO" | "BALANCED" | "VIRAL_HOOKS"
+export type LongToShortGenre = "AUTO" | "PODCAST" | "INTERVIEW" | "TUTORIAL" | "WEBINAR"
+export type LongToShortClipLength = "AUTO" | "15_30" | "30_60" | "60_90"
+export type LongToShortMode = "AI_CLIPPING" | "MANUAL_MOMENTS"
 export type LongToShortPlatform =
   | "TIKTOK"
   | "YOUTUBE_SHORTS"
@@ -18,19 +23,36 @@ export type LongToShortSource = {
   title: string
   sourceFileName: string
   type: "VIDEO" | "AUDIO"
+  durationSeconds: number
   durationLabel: string
+  resolutionLabel: string
   transcriptStatus: "READY" | "MISSING"
   chapterStatus: "READY" | "MISSING"
   status: LongToShortSourceStatus
 }
 
 export type LongToShortSettings = {
-  clipCount: number
-  minDuration: number
-  maxDuration: number
+  mode: LongToShortMode
+  speechLanguage: LongToShortSpeechLanguage
+  clipModel: LongToShortClipModel
+  genre: LongToShortGenre
+  clipLength: LongToShortClipLength
+  autoHook: boolean
+  prompt: string
+  captionPresetId: string
   aspectRatio: LongToShortAspectRatio
-  platform: LongToShortPlatform
-  burnSubtitles: boolean
+  processingStartTime: number
+  processingEndTime: number
+}
+
+export type LongToShortCaptionPreset = {
+  id: string
+  label: string
+  samplePrimary: string
+  sampleSecondary: string
+  tone: "neutral" | "lime" | "amber" | "violet"
+  isNew?: boolean
+  isNoCaption?: boolean
 }
 
 export type LongToShortCandidate = {
