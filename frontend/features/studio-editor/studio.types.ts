@@ -293,28 +293,46 @@ export type StudioChapter = {
 }
 
 export type StudioClipCandidateStatus = "CANDIDATE" | "SELECTED" | "REJECTED"
+export type StudioAspectRatio = "9:16" | "1:1" | "16:9"
+export type StudioClipPlatform =
+  | "TIKTOK"
+  | "YOUTUBE_SHORTS"
+  | "INSTAGRAM_REELS"
+export type StudioShortClipStatus = "DRAFT" | "READY" | "FAILED"
 
 export type StudioClipCandidate = {
   id: string
+  title: string
+  caption: string
   startTime: number
   endTime: number
   duration: number
   text: string
+  reviewNotes: string[]
+  sourceChapterId?: string
   finalScore: number
   hookScore: number
+  aspectRatio: StudioAspectRatio
+  platform: StudioClipPlatform
+  burnSubtitles: boolean
   status: StudioClipCandidateStatus
   transcriptVersion: number
 }
 
 export type StudioShortClip = {
   id: string
+  sourceCandidateId?: string
   title: string
   caption: string
+  startTime: number
+  endTime: number
   duration: number
-  status: "DRAFT" | "READY" | "FAILED"
+  status: StudioShortClipStatus
   videoPath: string
   thumbnailPath: string
-  aspectRatio: "9:16" | "1:1" | "16:9"
+  aspectRatio: StudioAspectRatio
+  platform: StudioClipPlatform
+  burnSubtitles: boolean
   transcriptVersion: number
 }
 

@@ -40,7 +40,7 @@ export function MediaLibraryEmptyState({
             </h2>
             <p className="text-sm leading-6 text-muted-foreground">
               {isEmpty
-                ? "Bring in your first source file here, then continue through transcript, chapter, subtitle, and clip workflows from the same workspace."
+                ? "Bring in your first source file here, then continue through transcript, chapter, subtitle, and long-to-short workflows from the same workspace."
                 : "Try a different search term or clear the current filters to bring your library items back into view."}
             </p>
           </div>
@@ -86,4 +86,3 @@ export function MediaLibraryEmptyState({
     </Card>
   )
 }
-

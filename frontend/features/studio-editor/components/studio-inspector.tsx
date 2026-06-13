@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import type { CSSProperties } from "react"
 import { useRef, useState } from "react"
 import {
@@ -1532,8 +1533,13 @@ function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
           >
             Seek to chapter
           </Button>
-          <Button type="button" variant="outline" size="sm" className="justify-start">
-            Create clip from chapter
+          <Button
+            variant="outline"
+            size="sm"
+            className="justify-start"
+            asChild
+          >
+            <Link href="/long-to-short">Open in Long to Short</Link>
           </Button>
         </div>
       </section>
@@ -1586,7 +1592,12 @@ function DefaultInspector({ selectedItem }: { selectedItem: StudioSelection }) {
 }
 
 export function StudioInspector() {
-  const { activeTool, project, selectedChapterId, selectedItem } = useStudioEditor()
+  const {
+    activeTool,
+    project,
+    selectedChapterId,
+    selectedItem,
+  } = useStudioEditor()
   const selectedChapter =
     project.chapters.find((chapter) => chapter.id === selectedChapterId) ?? null
 

@@ -1,8 +1,8 @@
 import {
-  AudioLines,
   Clapperboard,
   FileText,
   Mic,
+  Scissors,
   Upload,
 } from "lucide-react"
 
@@ -24,16 +24,16 @@ export const homeQuickActions: QuickAction[] = [
   {
     id: "open-studio",
     label: "Open Studio",
-    description: "Review transcripts, chapters, subtitles, and clip candidates.",
+    description: "Review transcripts, chapters, subtitles, and edit layers in the main workspace.",
     href: "/studio",
     icon: Clapperboard,
   },
   {
     id: "generate-clips",
-    label: "Generate Clips",
-    description: "Surface short-form moments from your long-form uploads.",
-    href: "/studio",
-    icon: AudioLines,
+    label: "Long to Short",
+    description: "Review short-form moments and turn them into publishable drafts.",
+    href: "/long-to-short",
+    icon: Scissors,
   },
   {
     id: "create-transcript",

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 const heroSignals = [
   "Transcript-ready",
   "Chapter generation",
-  "Short clip extraction",
+  "Long-to-short drafts",
   "Publishing workflow",
 ]
 
@@ -32,8 +32,8 @@ export function UploadHero() {
               </h2>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
                 Start with a clean source file, then move into transcripts,
-                chapters, subtitles, clip discovery, and publishing without
-                leaving the workspace.
+                chapters, subtitles, long-to-short generation, and publishing
+                without leaving the workspace.
               </p>
             </div>
           </div>
@@ -77,7 +77,7 @@ export function UploadHero() {
                 </h3>
                 <p className="text-sm leading-6 text-muted-foreground">
                   Video and audio uploads land in Media Library, then become
-                  available for transcript, chapter, subtitle, and clip
+                  available for transcript, chapter, subtitle, and long-to-short
                   workflows.
                 </p>
               </div>
