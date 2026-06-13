@@ -289,7 +289,7 @@ export default function MediaLibraryPage() {
             <p className="text-xs text-muted-foreground">
               {hasLibraryItems
                 ? `${items.length} source items in the library${lastUpdatedLabel ? ` • last updated ${lastUpdatedLabel}` : ""}`
-                : "Video and audio uploads stay here before transcript, chapter, and clip workflows."}
+                : "Video and audio uploads stay here before transcript, chapter, subtitle, and long-to-short workflows."}
             </p>
           </div>
         </div>

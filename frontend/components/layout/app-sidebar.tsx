@@ -18,9 +18,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const primaryNav = navigationConfig.slice(0, 3);
-const workflowNav = navigationConfig.slice(3, 6);
-const accountNav = navigationConfig.slice(6);
+const primaryNav = navigationConfig.filter((item) => item.section === "primary");
+const workflowNav = navigationConfig.filter((item) => item.section === "create");
+const accountNav = navigationConfig.filter((item) => item.section === "account");
 
 export function AppSidebar() {
   const pathname = usePathname();

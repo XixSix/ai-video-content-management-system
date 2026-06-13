@@ -36,7 +36,7 @@ export default function Home() {
       <section className="space-y-4">
         <SectionHeader
           title="Recent media"
-          description="Source uploads stay front and center so you can continue transcript, chapter, clip, and subtitle work without hunting for the original file."
+          description="Source uploads stay front and center so you can continue transcript, chapter, long-to-short, and subtitle work without hunting for the original file."
           actionLabel="View library"
           actionHref="/media-library"
         />
@@ -64,9 +64,9 @@ export default function Home() {
       <section className="space-y-4">
         <SectionHeader
           title="Recent outputs"
-          description="Keep an eye on the latest transcript, chapter, clip, and subtitle artifacts without turning Home into a job console."
-          actionLabel="Open Studio"
-          actionHref="/studio"
+          description="Keep an eye on the latest transcript, chapter, long-to-short, and subtitle artifacts without turning Home into a job console."
+          actionLabel="Open Long to Short"
+          actionHref="/long-to-short"
         />
         {recentOutputs.length > 0 ? (
           <div className="grid gap-4 lg:grid-cols-2">
@@ -81,8 +81,8 @@ export default function Home() {
                 No recent outputs yet.
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Generated transcripts, chapters, clips, and subtitles will show
-                up here as they become available.
+                Generated transcripts, chapters, long-to-short outputs, and
+                subtitles will show up here as they become available.
               </p>
             </CardContent>
           </Card>

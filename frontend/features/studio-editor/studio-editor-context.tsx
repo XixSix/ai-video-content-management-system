@@ -17,6 +17,9 @@ import {
   rebuildTranscriptSegmentsFromWords,
 } from "./studio-captions"
 import type {
+  StudioClipCandidate,
+  StudioClipCandidateStatus,
+  StudioShortClip,
   StudioCanvasLayer,
   StudioEditorProject,
   StudioSelection,
@@ -37,6 +40,7 @@ type StudioEditorContextValue = {
   canRedo: boolean
   canUndo: boolean
   currentTime: number
+  createDraftClipFromCandidate: (clipCandidateId: string) => void
   discardTranscriptChanges: () => void
   hasStaleAssets: boolean
   hasStaleChapters: boolean
@@ -45,6 +49,7 @@ type StudioEditorContextValue = {
   project: StudioEditorProject
   selectedChapterId: string | null
   selectedClipCandidateId: string | null
+  selectedShortClipId: string | null
   selectedItem: StudioSelection
   selectedTranscriptSegmentId: string | null
   selectedTargetId: string
@@ -55,9 +60,14 @@ type StudioEditorContextValue = {
   saveTranscriptMock: () => void
   seekToTime: (timeSeconds: number) => void
   setActiveTool: (toolId: StudioToolId) => void
+  setClipCandidateStatus: (
+    clipCandidateId: string,
+    status: StudioClipCandidateStatus
+  ) => void
   setSelectedItemId: (selectionId: string) => void
   selectChapter: (chapterId: string) => void
   selectClipCandidate: (clipCandidateId: string) => void
+  selectShortClip: (shortClipId: string) => void
   selectTranscriptSegment: (segmentId: string) => void
   toolPanel: (typeof studioToolPanels)[StudioToolId]
   redoEditorChange: () => void
@@ -71,7 +81,39 @@ type StudioEditorContextValue = {
     }
   ) => void
   updateChapterTitle: (chapterId: string, title: string) => void
+  updateClipCandidateDetails: (
+    clipCandidateId: string,
+    details: Partial<
+      Pick<
+        StudioClipCandidate,
+        "aspectRatio" | "burnSubtitles" | "caption" | "platform" | "title"
+      >
+    >
+  ) => void
+  updateClipCandidateTiming: (
+    clipCandidateId: string,
+    timing: {
+      endTime?: number
+      startTime?: number
+    }
+  ) => void
   updateTranscriptWordText: (wordId: string, text: string) => void
+  updateShortClipDetails: (
+    shortClipId: string,
+    details: Partial<
+      Pick<
+        StudioShortClip,
+        "aspectRatio" | "burnSubtitles" | "caption" | "platform" | "status" | "title"
+      >
+    >
+  ) => void
+  updateShortClipTiming: (
+    shortClipId: string,
+    timing: {
+      endTime?: number
+      startTime?: number
+    }
+  ) => void
   updateCaptionLayerStyle: (
     style: Partial<
       Pick<
@@ -199,6 +241,7 @@ export function StudioEditorProvider({
   )
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null)
   const [selectedClipCandidateId, setSelectedClipCandidateId] = useState<string | null>(null)
+  const [selectedShortClipId, setSelectedShortClipId] = useState<string | null>(null)
   const [hasUnsavedTranscriptChanges, setHasUnsavedTranscriptChanges] = useState(false)
   const selectedItem = getStudioSelectionById(project, selectedItemId)
   const transcriptVersion = project.transcript.version
@@ -312,6 +355,7 @@ export function StudioEditorProvider({
     setSelectedChapterId(nextChapterId)
     setSelectedTranscriptSegmentId(null)
     setSelectedClipCandidateId(null)
+    setSelectedShortClipId(null)
     setCurrentTime(nextStartTime)
   }
 
@@ -496,6 +540,7 @@ export function StudioEditorProvider({
     setSelectedTranscriptSegmentId(segmentId)
     setSelectedChapterId(null)
     setSelectedClipCandidateId(null)
+    setSelectedShortClipId(null)
     setCurrentTime(segment.startTime)
   }
 
@@ -510,6 +555,7 @@ export function StudioEditorProvider({
     setSelectedChapterId(chapterId)
     setSelectedTranscriptSegmentId(null)
     setSelectedClipCandidateId(null)
+    setSelectedShortClipId(null)
     setCurrentTime(chapter.startTime)
   }
 
@@ -604,8 +650,285 @@ export function StudioEditorProvider({
 
     setActiveTool("clips")
     setSelectedClipCandidateId(clipCandidateId)
+    setSelectedShortClipId(null)
     setSelectedTranscriptSegmentId(null)
     setSelectedChapterId(null)
+    setSelectedItemId(project.sourceMedia.id)
+    setCurrentTime(clipCandidate.startTime)
+  }
+
+  const selectShortClip = (shortClipId: string) => {
+    const shortClip = project.shortClips.find((item) => item.id === shortClipId)
+
+    if (!shortClip) {
+      return
+    }
+
+    setActiveTool("clips")
+    setSelectedShortClipId(shortClipId)
+    setSelectedClipCandidateId(null)
+    setSelectedTranscriptSegmentId(null)
+    setSelectedChapterId(null)
+    setSelectedItemId(project.sourceMedia.id)
+    setCurrentTime(shortClip.startTime)
+  }
+
+  const setClipCandidateStatus = (
+    clipCandidateId: string,
+    status: StudioClipCandidateStatus
+  ) => {
+    const clipCandidate = project.clipCandidates.find((item) => item.id === clipCandidateId)
+
+    if (!clipCandidate || clipCandidate.status === status) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      clipCandidates: currentProject.clipCandidates.map((item) =>
+        item.id === clipCandidateId ? { ...item, status } : item
+      ),
+    }))
+  }
+
+  const updateClipCandidateDetails = (
+    clipCandidateId: string,
+    details: Partial<
+      Pick<
+        StudioClipCandidate,
+        "aspectRatio" | "burnSubtitles" | "caption" | "platform" | "title"
+      >
+    >
+  ) => {
+    const clipCandidate = project.clipCandidates.find((item) => item.id === clipCandidateId)
+
+    if (!clipCandidate) {
+      return
+    }
+
+    const hasChanges = Object.entries(details).some(([key, value]) => {
+      return clipCandidate[key as keyof typeof details] !== value
+    })
+
+    if (!hasChanges) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      clipCandidates: currentProject.clipCandidates.map((item) =>
+        item.id === clipCandidateId ? { ...item, ...details } : item
+      ),
+    }))
+  }
+
+  const updateClipCandidateTiming = (
+    clipCandidateId: string,
+    timing: {
+      endTime?: number
+      startTime?: number
+    }
+  ) => {
+    const clipCandidate = project.clipCandidates.find((item) => item.id === clipCandidateId)
+
+    if (!clipCandidate) {
+      return
+    }
+
+    const minimumClipDurationSeconds = project.media.durationSeconds >= 1 ? 1 : 0
+    const startTimeLimit = Math.max(0, clipCandidate.endTime - minimumClipDurationSeconds)
+    const nextStartTime =
+      typeof timing.startTime === "number"
+        ? clampTime(timing.startTime, startTimeLimit)
+        : clipCandidate.startTime
+    const endTimeFloor = Math.min(
+      project.media.durationSeconds,
+      nextStartTime + minimumClipDurationSeconds
+    )
+    const nextEndTime =
+      typeof timing.endTime === "number"
+        ? Math.max(
+            endTimeFloor,
+            clampTime(timing.endTime, project.media.durationSeconds)
+          )
+        : clipCandidate.endTime
+    const nextDuration = Number(Math.max(0, nextEndTime - nextStartTime).toFixed(2))
+
+    if (
+      nextStartTime === clipCandidate.startTime &&
+      nextEndTime === clipCandidate.endTime &&
+      nextDuration === clipCandidate.duration
+    ) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      clipCandidates: currentProject.clipCandidates.map((item) =>
+        item.id === clipCandidateId
+          ? {
+              ...item,
+              startTime: nextStartTime,
+              endTime: nextEndTime,
+              duration: nextDuration,
+            }
+          : item
+      ),
+    }))
+
+    if (selectedClipCandidateId === clipCandidateId) {
+      setCurrentTime((currentTimeValue) => clampTime(currentTimeValue, nextEndTime))
+    }
+  }
+
+  const updateShortClipDetails = (
+    shortClipId: string,
+    details: Partial<
+      Pick<
+        StudioShortClip,
+        "aspectRatio" | "burnSubtitles" | "caption" | "platform" | "status" | "title"
+      >
+    >
+  ) => {
+    const shortClip = project.shortClips.find((item) => item.id === shortClipId)
+
+    if (!shortClip) {
+      return
+    }
+
+    const hasChanges = Object.entries(details).some(([key, value]) => {
+      return shortClip[key as keyof typeof details] !== value
+    })
+
+    if (!hasChanges) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      shortClips: currentProject.shortClips.map((item) =>
+        item.id === shortClipId ? { ...item, ...details } : item
+      ),
+    }))
+  }
+
+  const updateShortClipTiming = (
+    shortClipId: string,
+    timing: {
+      endTime?: number
+      startTime?: number
+    }
+  ) => {
+    const shortClip = project.shortClips.find((item) => item.id === shortClipId)
+
+    if (!shortClip) {
+      return
+    }
+
+    const minimumClipDurationSeconds = project.media.durationSeconds >= 1 ? 1 : 0
+    const startTimeLimit = Math.max(0, shortClip.endTime - minimumClipDurationSeconds)
+    const nextStartTime =
+      typeof timing.startTime === "number"
+        ? clampTime(timing.startTime, startTimeLimit)
+        : shortClip.startTime
+    const endTimeFloor = Math.min(
+      project.media.durationSeconds,
+      nextStartTime + minimumClipDurationSeconds
+    )
+    const nextEndTime =
+      typeof timing.endTime === "number"
+        ? Math.max(
+            endTimeFloor,
+            clampTime(timing.endTime, project.media.durationSeconds)
+          )
+        : shortClip.endTime
+    const nextDuration = Number(Math.max(0, nextEndTime - nextStartTime).toFixed(2))
+
+    if (
+      nextStartTime === shortClip.startTime &&
+      nextEndTime === shortClip.endTime &&
+      nextDuration === shortClip.duration
+    ) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      shortClips: currentProject.shortClips.map((item) =>
+        item.id === shortClipId
+          ? {
+              ...item,
+              startTime: nextStartTime,
+              endTime: nextEndTime,
+              duration: nextDuration,
+            }
+          : item
+      ),
+    }))
+
+    if (selectedShortClipId === shortClipId) {
+      setCurrentTime((currentTimeValue) => clampTime(currentTimeValue, nextEndTime))
+    }
+  }
+
+  const createDraftClipFromCandidate = (clipCandidateId: string) => {
+    const clipCandidate = project.clipCandidates.find((item) => item.id === clipCandidateId)
+
+    if (!clipCandidate) {
+      return
+    }
+
+    const existingDraft = project.shortClips.find(
+      (item) => item.sourceCandidateId === clipCandidateId
+    )
+    const nextClipId = existingDraft?.id ?? `short_clip_${Date.now()}`
+    const nextDraft: StudioShortClip = {
+      id: nextClipId,
+      sourceCandidateId: clipCandidateId,
+      title: clipCandidate.title,
+      caption: clipCandidate.caption,
+      startTime: clipCandidate.startTime,
+      endTime: clipCandidate.endTime,
+      duration: clipCandidate.duration,
+      status: "DRAFT",
+      videoPath: `short-clips/launch-keynote/${nextClipId}.mp4`,
+      thumbnailPath: `short-clips/launch-keynote/${nextClipId}.jpg`,
+      aspectRatio: clipCandidate.aspectRatio,
+      platform: clipCandidate.platform,
+      burnSubtitles: clipCandidate.burnSubtitles,
+      transcriptVersion: project.transcript.version,
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      clipCandidates: currentProject.clipCandidates.map((item) =>
+        item.id === clipCandidateId ? { ...item, status: "SELECTED" } : item
+      ),
+      shortClips: existingDraft
+        ? currentProject.shortClips.map((item) =>
+            item.id === existingDraft.id ? nextDraft : item
+          )
+        : [nextDraft, ...currentProject.shortClips],
+    }))
+
+    setActiveTool("clips")
+    setSelectedShortClipId(nextClipId)
+    setSelectedClipCandidateId(null)
+    setSelectedTranscriptSegmentId(null)
+    setSelectedChapterId(null)
+    setSelectedItemId(project.sourceMedia.id)
     setCurrentTime(clipCandidate.startTime)
   }
 
@@ -715,6 +1038,7 @@ export function StudioEditorProvider({
     canUndo: historyPast.length > 0,
     commitTranscriptWordText,
     currentTime,
+    createDraftClipFromCandidate,
     discardTranscriptChanges,
     hasStaleAssets,
     hasStaleChapters,
@@ -726,8 +1050,10 @@ export function StudioEditorProvider({
     seekToTime,
     selectChapter,
     selectClipCandidate,
+    selectShortClip,
     selectedChapterId,
     selectedClipCandidateId,
+    selectedShortClipId,
     selectedItem,
     selectedTranscriptSegmentId,
     selectedTargetId:
@@ -739,14 +1065,19 @@ export function StudioEditorProvider({
     selectTranscriptSegment,
     staleOutputTypes,
     setActiveTool,
+    setClipCandidateStatus,
     setSelectedItemId,
     toolPanel: studioToolPanels[activeTool],
     redoEditorChange,
     undoEditorChange,
     updateChapterTiming,
     updateChapterTitle,
+    updateClipCandidateDetails,
+    updateClipCandidateTiming,
     updateCaptionLayerStyle,
     updateTranscriptWordText,
+    updateShortClipDetails,
+    updateShortClipTiming,
     updateTextLayerContent,
     updateTextLayerStyle,
   }
