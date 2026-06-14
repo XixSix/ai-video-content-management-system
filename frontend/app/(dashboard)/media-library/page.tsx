@@ -2,7 +2,8 @@
 
 import { Suspense, useEffect, useRef, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { CheckCircle2, UploadCloud, X } from "lucide-react"
+import { UploadCloud } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -77,10 +78,6 @@ function MediaLibraryPageContent() {
   const [typeFilter, setTypeFilter] = useState<MediaTypeFilter>("ALL")
   const [statusFilter, setStatusFilter] = useState<MediaStatusFilter>("ALL")
   const [sortKey, setSortKey] = useState<MediaLibrarySortKey>("newest")
-  const [uploadNotice, setUploadNotice] = useState<{
-    id: string
-    message: string
-  } | null>(null)
   const [selectedPreviewItem, setSelectedPreviewItem] =
     useState<MediaLibraryItem | null>(null)
 
@@ -240,9 +237,8 @@ function MediaLibraryPageContent() {
               : currentItem
           )
         )
-        setUploadNotice({
-          id: item.id,
-          message: `${item.title} uploaded successfully`,
+        toast.success("Upload complete", {
+          description: `${item.title} uploaded successfully.`,
         })
       }, 1800)
 
@@ -251,24 +247,6 @@ function MediaLibraryPageContent() {
 
     event.target.value = ""
   }
-
-  useEffect(() => {
-    if (!uploadNotice) {
-      return
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setUploadNotice((currentNotice) =>
-        currentNotice?.id === uploadNotice.id ? null : currentNotice
-      )
-    }, 3200)
-
-    timeoutIdsRef.current.push(timeoutId)
-
-    return () => {
-      window.clearTimeout(timeoutId)
-    }
-  }, [uploadNotice])
 
   const visibleItems = filterAndSortMediaItems(items, {
     searchQuery,
@@ -367,30 +345,6 @@ function MediaLibraryPageContent() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 py-6 lg:gap-8">
-      {uploadNotice ? (
-        <div className="fixed right-4 top-18 z-50 w-[min(92vw,360px)] rounded-xl border border-emerald-500/20 bg-background/95 p-3 shadow-[var(--shadow-panel)] backdrop-blur">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 inline-flex size-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
-              <CheckCircle2 className="size-4" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-foreground">Upload complete</p>
-              <p className="text-sm text-muted-foreground">{uploadNotice.message}</p>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="rounded-full"
-              onClick={() => setUploadNotice(null)}
-              aria-label="Dismiss upload notice"
-            >
-              <X className="size-4" />
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
       <input
         ref={fileInputRef}
         type="file"

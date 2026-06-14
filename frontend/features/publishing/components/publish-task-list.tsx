@@ -154,7 +154,7 @@ function PublishTaskRow({
       role="button"
       tabIndex={0}
       className={cn(
-        "grid w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_11rem_9rem_auto] items-center gap-4 rounded-xl border border-border/70 bg-card/95 p-3 text-left shadow-[var(--shadow-natural-xs)] transition hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
+        "grid w-full cursor-pointer grid-cols-[auto_minmax(13rem,1fr)_10rem_auto] items-center gap-4 rounded-xl border border-border/70 bg-card/95 p-3 text-left shadow-[var(--shadow-natural-xs)] transition hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
         selected && "border-foreground/25 bg-muted/50"
       )}
       onClick={() => onSelectTask(task)}
@@ -168,12 +168,8 @@ function PublishTaskRow({
       <PublishThumbnail task={task} />
 
       <div className="min-w-0 space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <StatusBadge status={task.status} />
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-            <PublishingPlatformIcon platform={task.platform} size={14} />
-            {formatPlatform(task.platform)}
-          </span>
         </div>
         <div className="space-y-1">
           <p className="truncate text-sm font-semibold text-foreground">
@@ -185,11 +181,17 @@ function PublishTaskRow({
         </div>
       </div>
 
-      <div className="min-w-0 space-y-1">
-        <p className="truncate text-sm font-medium text-foreground">
+      <div className="min-w-0 space-y-1.5">
+        <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium leading-none text-muted-foreground">
+          <PublishingPlatformIcon platform={task.platform} size={14} />
+          <span className="truncate">{formatPlatform(task.platform)}</span>
+        </span>
+        <p className="truncate text-sm font-semibold leading-5 text-foreground">
           {task.platformAccountName}
         </p>
-        <p className="text-xs text-muted-foreground">{getDateLabel(task)}</p>
+        <p className="truncate text-xs leading-4 text-muted-foreground">
+          {getDateLabel(task)}
+        </p>
       </div>
 
       <div>

@@ -142,59 +142,63 @@ export function PublishingToolbar({
         </div>
       </div>
 
-      <div className="space-y-3 overflow-x-auto pb-1">
-        <div className="flex min-w-max flex-nowrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-            Status
-          </span>
-          {publishStatusFilterOptions.map((option) => {
-            const isActive = option.value === statusFilter
+      <div className="overflow-x-auto pb-1">
+        <div className="flex min-w-max flex-nowrap items-center gap-3">
+          <div className="flex flex-nowrap items-center gap-2">
+            <span className="mr-1 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+              Status
+            </span>
+            {publishStatusFilterOptions.map((option) => {
+              const isActive = option.value === statusFilter
 
-            return (
-              <Button
-                key={option.value}
-                type="button"
-                variant={isActive ? "secondary" : "outline"}
-                size="sm"
-                className={cn(
-                  "rounded-full px-3",
-                  isActive && "shadow-[inset_0_0_0_1px_var(--border)]"
-                )}
-                onClick={() => onStatusFilterChange(option.value)}
-              >
-                {isActive ? <Check className="size-3.5" /> : null}
-                {option.label}
-              </Button>
-            )
-          })}
-        </div>
+              return (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={isActive ? "secondary" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "rounded-full px-3",
+                    isActive && "shadow-[inset_0_0_0_1px_var(--border)]"
+                  )}
+                  onClick={() => onStatusFilterChange(option.value)}
+                >
+                  {isActive ? <Check className="size-3.5" /> : null}
+                  {option.label}
+                </Button>
+              )
+            })}
+          </div>
 
-        <div className="flex min-w-max flex-nowrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-            Platform
-          </span>
-          {publishPlatformFilterOptions.map((option) => {
-            const isActive = option.value === platformFilter
+          <div className="h-5 w-px shrink-0 bg-border" />
 
-            return (
-              <Button
-                key={option.value}
-                type="button"
-                variant={isActive ? "secondary" : "outline"}
-                size="sm"
-                className={cn(
-                  "rounded-full px-3",
-                  isActive && "shadow-[inset_0_0_0_1px_var(--border)]"
-                )}
-                onClick={() => onPlatformFilterChange(option.value)}
-              >
-                {option.value !== "ALL" ? (
-                  <PublishingPlatformIcon platform={option.value} size={14} />
-                ) : null}
-                {option.label}
-              </Button>
-            )
-          })}
+          <div className="flex flex-nowrap items-center gap-2">
+            <span className="mr-1 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+              Platform
+            </span>
+            {publishPlatformFilterOptions.map((option) => {
+              const isActive = option.value === platformFilter
+
+              return (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={isActive ? "secondary" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "rounded-full px-3",
+                    isActive && "shadow-[inset_0_0_0_1px_var(--border)]"
+                  )}
+                  onClick={() => onPlatformFilterChange(option.value)}
+                >
+                  {option.value !== "ALL" ? (
+                    <PublishingPlatformIcon platform={option.value} size={14} />
+                  ) : null}
+                  {option.label}
+                </Button>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>

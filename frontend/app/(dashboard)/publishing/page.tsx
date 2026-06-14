@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Link2, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import { PublishCalendarView } from "@/features/publishing/components/publish-calendar-view"
 import { PublishFormSheet } from "@/features/publishing/components/publish-form-sheet"
@@ -146,6 +147,9 @@ export default function PublishingPage() {
   const handleTaskAction = (task: PublishTask, action: PublishTaskAction) => {
     if (action === "view-platform" && task.platformPostUrl) {
       window.open(task.platformPostUrl, "_blank", "noopener,noreferrer")
+      toast.info("Opening platform post", {
+        description: task.title ?? task.sourceTitle,
+      })
       return
     }
 
@@ -156,6 +160,9 @@ export default function PublishingPage() {
         progress: null,
       })
       setSelectedTaskId(task.id)
+      toast.success("Publish cancelled", {
+        description: `${task.sourceTitle} moved back to drafts.`,
+      })
       return
     }
 
@@ -167,6 +174,9 @@ export default function PublishingPage() {
         scheduledAt: new Date().toISOString(),
       })
       setSelectedTaskId(task.id)
+      toast.loading("Retrying publish", {
+        description: task.title ?? task.sourceTitle,
+      })
       return
     }
 
@@ -177,6 +187,9 @@ export default function PublishingPage() {
         scheduledAt: new Date().toISOString(),
       })
       setSelectedTaskId(task.id)
+      toast.loading("Publishing started", {
+        description: task.title ?? task.sourceTitle,
+      })
       return
     }
 
@@ -187,6 +200,9 @@ export default function PublishingPage() {
         progress: null,
       })
       setSelectedTaskId(task.id)
+      toast.success("Publish scheduled", {
+        description: `${task.sourceTitle} is queued for June 14, 2026.`,
+      })
       return
     }
 
@@ -202,6 +218,24 @@ export default function PublishingPage() {
     if (payload.status !== "DRAFT") {
       setSelectedCalendarDate(payload.scheduledDate ?? new Date())
     }
+
+    if (payload.status === "DRAFT") {
+      toast.success("Draft saved", {
+        description: task.sourceTitle,
+      })
+      return
+    }
+
+    if (payload.status === "SCHEDULED") {
+      toast.success("Publish scheduled", {
+        description: task.sourceTitle,
+      })
+      return
+    }
+
+    toast.loading("Publishing started", {
+      description: task.sourceTitle,
+    })
   }
 
   return (
