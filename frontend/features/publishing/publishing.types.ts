@@ -65,12 +65,23 @@ export type PublishStatusCount = {
   value: number
 }
 
-export type NewPublishPayload = {
-  source: PublishSourceOption
+export type NewPublishTarget = {
   account: PublishAccountOption
   title: string
   caption: string
   hashtags: string[]
+}
+
+export type PublishPlatformContent = {
+  title: string
+  caption: string
+  hashtags: string
+}
+
+export type NewPublishPayload = {
+  source: PublishSourceOption
+  targets: NewPublishTarget[]
   scheduledDate: Date | undefined
+  scheduledTime: string
   status: "DRAFT" | "SCHEDULED" | "PUBLISHING"
 }

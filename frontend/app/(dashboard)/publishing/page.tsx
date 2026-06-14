@@ -10,17 +10,14 @@ import {
   PublishTaskList,
   type PublishTaskAction,
 } from "@/features/publishing/components/publish-task-list"
-import { PublishTaskDetail } from "@/features/publishing/components/publish-task-detail"
+import {
+  PublishTaskDetail,
+  type PublishTaskContentUpdate,
+  type PublishTaskDetailMode,
+} from "@/features/publishing/components/publish-task-detail"
 import { PublishingStatusStrip } from "@/features/publishing/components/publishing-status-strip"
 import { PublishingToolbar } from "@/features/publishing/components/publishing-toolbar"
 import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { useSocialAccountsStore } from "@/features/social-accounts/social-accounts.store"
 import { publishTasksSeed } from "@/features/publishing/publishing.data"
 import type {
@@ -32,27 +29,22 @@ import type {
   PublishViewMode,
 } from "@/features/publishing/publishing.types"
 import {
+  buildScheduledIso,
   filterAndSortPublishTasks,
   getPublishedThisWeekCount,
   getPublishStatusCounts,
+  isFutureScheduledTime,
 } from "@/features/publishing/publishing.utils"
 
-function getScheduledIso(date: Date) {
-  const scheduledDate = new Date(date)
-  scheduledDate.setHours(9, 0, 0, 0)
-
-  return scheduledDate.toISOString()
-}
-
-function buildPublishTask(payload: NewPublishPayload): PublishTask {
+function buildPublishTasks(payload: NewPublishPayload): PublishTask[] {
   const now = new Date()
   const scheduledAt =
     payload.status === "DRAFT" || !payload.scheduledDate
       ? null
-      : getScheduledIso(payload.scheduledDate)
+      : buildScheduledIso(payload.scheduledDate, payload.scheduledTime)
 
-  return {
-    id: `publish-${now.getTime()}`,
+  return payload.targets.map((target, index) => ({
+    id: `publish-${now.getTime()}-${index}`,
     mediaId: payload.source.mediaId,
     shortClipId: payload.source.shortClipId,
     sourceType: payload.source.sourceType,
@@ -61,11 +53,11 @@ function buildPublishTask(payload: NewPublishPayload): PublishTask {
     sourceMeta: payload.source.meta,
     aspectRatio: payload.source.aspectRatio,
     durationLabel: payload.source.durationLabel,
-    platform: payload.account.platform,
-    platformAccountName: payload.account.accountName,
-    title: payload.title || null,
-    caption: payload.caption || null,
-    hashtags: payload.hashtags,
+    platform: target.account.platform,
+    platformAccountName: target.account.accountName,
+    title: target.title || null,
+    caption: target.caption || null,
+    hashtags: target.hashtags,
     status: payload.status,
     progress: payload.status === "PUBLISHING" ? 18 : null,
     scheduledAt,
@@ -73,7 +65,7 @@ function buildPublishTask(payload: NewPublishPayload): PublishTask {
     platformPostUrl: null,
     errorMessage: null,
     createdAt: now.toISOString(),
-  }
+  }))
 }
 
 export default function PublishingPage() {
@@ -91,7 +83,7 @@ export default function PublishingPage() {
     new Date("2026-06-13T00:00:00.000Z")
   )
   const [isPublishSheetOpen, setIsPublishSheetOpen] = useState(false)
-  const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false)
+  const [detailMode, setDetailMode] = useState<PublishTaskDetailMode>("view")
   const setSocialAccountsOpen = useSocialAccountsStore(
     (state) => state.setManagerOpen
   )
@@ -125,10 +117,7 @@ export default function PublishingPage() {
 
   const selectTask = (task: PublishTask) => {
     setSelectedTaskId(task.id)
-
-    if (window.matchMedia("(max-width: 1023px)").matches) {
-      setIsDetailSheetOpen(true)
-    }
+    setDetailMode("view")
   }
 
   const updateTask = (taskId: string, nextTask: Partial<PublishTask>) => {
@@ -160,6 +149,7 @@ export default function PublishingPage() {
         progress: null,
       })
       setSelectedTaskId(task.id)
+      setDetailMode("view")
       toast.success("Publish cancelled", {
         description: `${task.sourceTitle} moved back to drafts.`,
       })
@@ -174,6 +164,7 @@ export default function PublishingPage() {
         scheduledAt: new Date().toISOString(),
       })
       setSelectedTaskId(task.id)
+      setDetailMode("view")
       toast.loading("Retrying publish", {
         description: task.title ?? task.sourceTitle,
       })
@@ -187,6 +178,7 @@ export default function PublishingPage() {
         scheduledAt: new Date().toISOString(),
       })
       setSelectedTaskId(task.id)
+      setDetailMode("view")
       toast.loading("Publishing started", {
         description: task.title ?? task.sourceTitle,
       })
@@ -194,26 +186,63 @@ export default function PublishingPage() {
     }
 
     if (action === "schedule") {
+      if (!task.scheduledAt) {
+        setSelectedTaskId(task.id)
+        setDetailMode("edit")
+        toast.error("Schedule missing", {
+          description: "Choose a publish date and time before scheduling.",
+        })
+        return
+      }
+
+      if (!isFutureScheduledTime(task.scheduledAt)) {
+        setSelectedTaskId(task.id)
+        setDetailMode("edit")
+        toast.error("Schedule is in the past", {
+          description: "Choose a future publish date and time.",
+        })
+        return
+      }
+
       updateTask(task.id, {
         status: "SCHEDULED",
-        scheduledAt: getScheduledIso(new Date("2026-06-14T00:00:00.000Z")),
         progress: null,
       })
       setSelectedTaskId(task.id)
+      setDetailMode("view")
       toast.success("Publish scheduled", {
-        description: `${task.sourceTitle} is queued for June 14, 2026.`,
+        description: task.title ?? task.sourceTitle,
       })
       return
     }
 
     setSelectedTaskId(task.id)
-    setIsDetailSheetOpen(true)
+    setDetailMode(action === "edit" ? "edit" : "view")
+  }
+
+  const handleSaveTaskContent = (
+    task: PublishTask,
+    update: PublishTaskContentUpdate
+  ) => {
+    updateTask(task.id, update)
+    setSelectedTaskId(task.id)
+    setDetailMode("view")
+    toast.success("Publish copy updated", {
+      description: task.sourceTitle,
+    })
   }
 
   const handleCreateTask = (payload: NewPublishPayload) => {
-    const task = buildPublishTask(payload)
-    setTasks((currentTasks) => [task, ...currentTasks])
-    setSelectedTaskId(task.id)
+    const nextTasks = buildPublishTasks(payload)
+    const firstTask = nextTasks[0]
+
+    if (!firstTask) {
+      return
+    }
+
+    setTasks((currentTasks) => [...nextTasks, ...currentTasks])
+    setSelectedTaskId(firstTask.id)
+    setDetailMode("view")
 
     if (payload.status !== "DRAFT") {
       setSelectedCalendarDate(payload.scheduledDate ?? new Date())
@@ -221,20 +250,20 @@ export default function PublishingPage() {
 
     if (payload.status === "DRAFT") {
       toast.success("Draft saved", {
-        description: task.sourceTitle,
+        description: `${payload.source.title} for ${nextTasks.length} account${nextTasks.length > 1 ? "s" : ""}.`,
       })
       return
     }
 
     if (payload.status === "SCHEDULED") {
       toast.success("Publish scheduled", {
-        description: task.sourceTitle,
+        description: `${payload.source.title} for ${nextTasks.length} account${nextTasks.length > 1 ? "s" : ""}.`,
       })
       return
     }
 
     toast.loading("Publishing started", {
-      description: task.sourceTitle,
+      description: `${payload.source.title} for ${nextTasks.length} account${nextTasks.length > 1 ? "s" : ""}.`,
     })
   }
 
@@ -313,20 +342,31 @@ export default function PublishingPage() {
           onSelectTask={selectTask}
         />
       ) : (
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <section className="grid gap-4 lg:grid-cols-[minmax(24rem,0.95fr)_minmax(24rem,1.05fr)]">
           <PublishTaskList
             tasks={visibleTasks}
             selectedTaskId={selectedTaskId}
             onSelectTask={selectTask}
-            onTaskAction={handleTaskAction}
             onResetFilters={resetFilters}
           />
 
-          <aside className="hidden lg:block">
+          <aside>
             <div className="sticky top-24">
               <PublishTaskDetail
                 task={selectedTask}
+                mode={detailMode}
                 onTaskAction={handleTaskAction}
+                onEditRequest={(task) => {
+                  setSelectedTaskId(task.id)
+                  setDetailMode("edit")
+                }}
+                onCancelEdit={() => setDetailMode("view")}
+                onSaveContent={handleSaveTaskContent}
+                onInvalidSchedule={() => {
+                  toast.error("Schedule is in the past", {
+                    description: "Choose a future publish date and time.",
+                  })
+                }}
               />
             </div>
           </aside>
@@ -338,24 +378,6 @@ export default function PublishingPage() {
         onOpenChange={setIsPublishSheetOpen}
         onCreate={handleCreateTask}
       />
-
-      <Sheet open={isDetailSheetOpen} onOpenChange={setIsDetailSheetOpen}>
-        <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-md">
-          <SheetHeader className="border-b border-border/70 p-4 pr-12">
-            <SheetTitle>Publish details</SheetTitle>
-            <SheetDescription className="sr-only">
-              Review the selected publish task, platform copy, schedule,
-              publishing status, and available recovery actions.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="p-4">
-            <PublishTaskDetail
-              task={selectedTask}
-              onTaskAction={handleTaskAction}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   )
 }

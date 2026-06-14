@@ -54,6 +54,11 @@ export const publishAccountOptions: PublishAccountOption[] = [
     accountName: "VidPilot Studio",
   },
   {
+    id: "pa-youtube-2",
+    platform: "YOUTUBE",
+    accountName: "VidPilot Shorts",
+  },
+  {
     id: "pa-tiktok-1",
     platform: "TIKTOK",
     accountName: "vidpilot_creator",
@@ -62,6 +67,11 @@ export const publishAccountOptions: PublishAccountOption[] = [
     id: "pa-facebook-1",
     platform: "FACEBOOK",
     accountName: "VidPilot",
+  },
+  {
+    id: "pa-facebook-2",
+    platform: "FACEBOOK",
+    accountName: "VidPilot Community",
   },
   {
     id: "pa-instagram-1",

@@ -2,21 +2,19 @@
 
 import {
   CalendarClock,
-  ExternalLink,
-  Pencil,
-  RefreshCcw,
-  Send,
-  XCircle,
+  FileVideo2,
 } from "lucide-react"
 
-import { StatusBadge } from "@/components/shared/status-badge"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import type { PublishTask } from "../publishing.types"
-import { formatDateTime, formatPlatform } from "../publishing.utils"
-import { PublishThumbnail } from "./publish-thumbnail"
-import { PublishingPlatformIcon } from "./publishing-platform-icon"
 
 export type PublishTaskAction =
   | "edit"
@@ -30,257 +28,72 @@ type PublishTaskListProps = {
   tasks: PublishTask[]
   selectedTaskId: string | null
   onSelectTask: (task: PublishTask) => void
-  onTaskAction: (task: PublishTask, action: PublishTaskAction) => void
   onResetFilters: () => void
 }
 
-function getDateLabel(task: PublishTask) {
-  if (task.status === "PUBLISHED") {
-    return `Published ${formatDateTime(task.publishedAt)}`
+function getPublishPreviewBackground(task: PublishTask) {
+  if (task.sourceType === "SHORT_CLIP") {
+    return "linear-gradient(135deg, color-mix(in srgb, var(--surface-inset) 94%, transparent), color-mix(in srgb, var(--surface-muted) 88%, transparent))"
   }
 
-  if (task.status === "DRAFT") {
-    return "No schedule"
-  }
-
-  return `Scheduled ${formatDateTime(task.scheduledAt)}`
-}
-
-function ProgressBar({ value }: { value: number }) {
-  return (
-    <div className="space-y-1">
-      <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full rounded-full bg-sky-500 transition-all"
-          style={{ width: `${value}%` }}
-        />
-      </div>
-      <p className="text-xs text-muted-foreground">{value}% publishing</p>
-    </div>
-  )
-}
-
-function PublishTaskActions({
-  task,
-  onTaskAction,
-}: {
-  task: PublishTask
-  onTaskAction: (task: PublishTask, action: PublishTaskAction) => void
-}) {
-  if (task.status === "DRAFT") {
-    return (
-      <>
-        <Button variant="outline" size="sm" onClick={() => onTaskAction(task, "edit")}>
-          <Pencil className="size-3.5" />
-          Edit
-        </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => onTaskAction(task, "schedule")}
-        >
-          <CalendarClock className="size-3.5" />
-          Schedule
-        </Button>
-        <Button size="sm" onClick={() => onTaskAction(task, "publish-now")}>
-          <Send className="size-3.5" />
-          Publish
-        </Button>
-      </>
-    )
-  }
-
-  if (task.status === "SCHEDULED") {
-    return (
-      <>
-        <Button variant="outline" size="sm" onClick={() => onTaskAction(task, "edit")}>
-          <Pencil className="size-3.5" />
-          Edit
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => onTaskAction(task, "cancel")}
-        >
-          <XCircle className="size-3.5" />
-          Cancel
-        </Button>
-      </>
-    )
-  }
-
-  if (task.status === "FAILED") {
-    return (
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={() => onTaskAction(task, "retry")}
-      >
-        <RefreshCcw className="size-3.5" />
-        Retry
-      </Button>
-    )
-  }
-
-  if (task.status === "PUBLISHED" && task.platformPostUrl) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onTaskAction(task, "view-platform")}
-      >
-        <ExternalLink className="size-3.5" />
-        View
-      </Button>
-    )
-  }
-
-  return null
-}
-
-function PublishTaskRow({
-  task,
-  selected,
-  onSelectTask,
-  onTaskAction,
-}: {
-  task: PublishTask
-  selected: boolean
-  onSelectTask: (task: PublishTask) => void
-  onTaskAction: (task: PublishTask, action: PublishTaskAction) => void
-}) {
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      className={cn(
-        "grid w-full cursor-pointer grid-cols-[auto_minmax(13rem,1fr)_10rem_auto] items-center gap-4 rounded-xl border border-border/70 bg-card/95 p-3 text-left shadow-[var(--shadow-natural-xs)] transition hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-        selected && "border-foreground/25 bg-muted/50"
-      )}
-      onClick={() => onSelectTask(task)}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault()
-          onSelectTask(task)
-        }
-      }}
-    >
-      <PublishThumbnail task={task} />
-
-      <div className="min-w-0 space-y-2">
-        <div className="flex items-center gap-2">
-          <StatusBadge status={task.status} />
-        </div>
-        <div className="space-y-1">
-          <p className="truncate text-sm font-semibold text-foreground">
-            {task.title ?? task.sourceTitle}
-          </p>
-          <p className="line-clamp-2 text-sm leading-5 text-muted-foreground">
-            {task.caption ?? "No caption yet."}
-          </p>
-        </div>
-      </div>
-
-      <div className="min-w-0 space-y-1.5">
-        <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium leading-none text-muted-foreground">
-          <PublishingPlatformIcon platform={task.platform} size={14} />
-          <span className="truncate">{formatPlatform(task.platform)}</span>
-        </span>
-        <p className="truncate text-sm font-semibold leading-5 text-foreground">
-          {task.platformAccountName}
-        </p>
-        <p className="truncate text-xs leading-4 text-muted-foreground">
-          {getDateLabel(task)}
-        </p>
-      </div>
-
-      <div>
-        {task.status === "PUBLISHING" && task.progress ? (
-          <ProgressBar value={task.progress} />
-        ) : task.status === "FAILED" ? (
-          <p className="line-clamp-2 text-xs text-destructive">
-            {task.errorMessage}
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            {task.sourceType === "SHORT_CLIP" ? "Short clip" : "Source media"}
-          </p>
-        )}
-      </div>
-
-      <div
-        className="flex flex-wrap justify-end gap-2"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <PublishTaskActions task={task} onTaskAction={onTaskAction} />
-      </div>
-    </div>
-  )
+  return "linear-gradient(135deg, color-mix(in srgb, var(--surface-raised) 86%, transparent), color-mix(in srgb, var(--surface-inset) 92%, transparent))"
 }
 
 function PublishTaskCard({
   task,
   selected,
   onSelectTask,
-  onTaskAction,
 }: {
   task: PublishTask
   selected: boolean
   onSelectTask: (task: PublishTask) => void
-  onTaskAction: (task: PublishTask, action: PublishTaskAction) => void
 }) {
   return (
     <Card
       className={cn(
-        "border-border/70 bg-card/95 shadow-[var(--shadow-natural-xs)]",
-        selected && "ring-foreground/25"
+        "border-border/70 bg-card/95 py-0 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-panel)]",
+        selected && "ring-2 ring-foreground/25"
       )}
     >
-      <CardContent className="space-y-4 p-4">
-        <button
-          type="button"
-          className="flex w-full cursor-pointer gap-3 text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
-          onClick={() => onSelectTask(task)}
+      <button
+        type="button"
+        className="block w-full border-b border-border/60 text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+        onClick={() => onSelectTask(task)}
+      >
+        <div
+          className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
+          style={{ backgroundImage: getPublishPreviewBackground(task) }}
         >
-          <PublishThumbnail task={task} compact />
-          <div className="min-w-0 flex-1 space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge status={task.status} />
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                <PublishingPlatformIcon platform={task.platform} size={14} />
-                {formatPlatform(task.platform)}
+          <div className="absolute inset-0 flex flex-col justify-between p-3">
+            <div className="flex items-start justify-between gap-3">
+              <Badge variant="neutral">
+                {task.sourceType === "SHORT_CLIP" ? "SHORT CLIP" : "MEDIA"}
+              </Badge>
+            </div>
+
+            <div className="flex items-end justify-between gap-3 text-foreground">
+              <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
+                <FileVideo2 className="size-4" />
+              </span>
+              <span className="rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-medium text-white">
+                {task.durationLabel}
               </span>
             </div>
-            <div className="space-y-1">
-              <p className="line-clamp-2 text-sm font-semibold text-foreground">
-                {task.title ?? task.sourceTitle}
-              </p>
-              <p className="line-clamp-2 text-sm text-muted-foreground">
-                {task.caption ?? "No caption yet."}
-              </p>
-            </div>
           </div>
-        </button>
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground">{getDateLabel(task)}</p>
-          {task.status === "PUBLISHING" && task.progress ? (
-            <div className="w-32">
-              <ProgressBar value={task.progress} />
-            </div>
-          ) : null}
         </div>
+      </button>
 
-        {task.status === "FAILED" ? (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive">
-            {task.errorMessage}
-          </div>
-        ) : null}
-
-        <div className="flex flex-wrap justify-end gap-2">
-          <PublishTaskActions task={task} onTaskAction={onTaskAction} />
-        </div>
-      </CardContent>
+      <CardHeader className="gap-2 pb-4">
+        <CardTitle className="line-clamp-2 text-[15px]">
+          <button
+            type="button"
+            className="text-left hover:text-foreground-subtle"
+            onClick={() => onSelectTask(task)}
+          >
+            {task.title ?? task.sourceTitle}
+          </button>
+        </CardTitle>
+      </CardHeader>
     </Card>
   )
 }
@@ -289,7 +102,6 @@ export function PublishTaskList({
   tasks,
   selectedTaskId,
   onSelectTask,
-  onTaskAction,
   onResetFilters,
 }: PublishTaskListProps) {
   if (tasks.length < 1) {
@@ -318,25 +130,23 @@ export function PublishTaskList({
 
   return (
     <>
-      <div className="hidden space-y-3 lg:block">
-        {tasks.map((task) => (
-          <PublishTaskRow
-            key={task.id}
-            task={task}
-            selected={task.id === selectedTaskId}
-            onSelectTask={onSelectTask}
-            onTaskAction={onTaskAction}
-          />
-        ))}
-      </div>
-      <div className="space-y-3 lg:hidden">
+      <div className="hidden grid-cols-2 gap-4 lg:grid">
         {tasks.map((task) => (
           <PublishTaskCard
             key={task.id}
             task={task}
             selected={task.id === selectedTaskId}
             onSelectTask={onSelectTask}
-            onTaskAction={onTaskAction}
+          />
+        ))}
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
+        {tasks.map((task) => (
+          <PublishTaskCard
+            key={task.id}
+            task={task}
+            selected={task.id === selectedTaskId}
+            onSelectTask={onSelectTask}
           />
         ))}
       </div>
