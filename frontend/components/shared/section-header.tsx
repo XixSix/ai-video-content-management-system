@@ -1,6 +1,7 @@
 import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { LongToShortTrigger } from "@/features/long-to-short/components/long-to-short-trigger"
 
 type SectionHeaderProps = {
   title: string
@@ -28,7 +29,11 @@ export function SectionHeader({
         ) : null}
       </div>
 
-      {actionLabel && actionHref ? (
+      {actionLabel && actionHref === "/long-to-short" ? (
+        <LongToShortTrigger className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          {actionLabel}
+        </LongToShortTrigger>
+      ) : actionLabel && actionHref ? (
         <Button variant="ghost" size="sm" asChild>
           <Link href={actionHref}>{actionLabel}</Link>
         </Button>

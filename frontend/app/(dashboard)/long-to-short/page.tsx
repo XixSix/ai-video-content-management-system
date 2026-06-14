@@ -1,5 +1,5 @@
-import { LongToShortWorkspace } from "@/features/long-to-short/components/long-to-short-workspace"
+import { redirect } from "next/navigation"
 
 export default function LongToShortPage() {
-  return <LongToShortWorkspace />
+  redirect("/")
 }

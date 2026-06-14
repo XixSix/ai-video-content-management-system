@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import type { CSSProperties } from "react"
 import { useRef, useState } from "react"
 import {
@@ -23,6 +22,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1407,6 +1407,7 @@ function CaptionInspector({
 }
 
 function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
+  const openLongToShort = useLongToShortStore((state) => state.openManager)
   const {
     project,
     seekToTime,
@@ -1537,9 +1538,9 @@ function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
             variant="outline"
             size="sm"
             className="justify-start"
-            asChild
+            onClick={openLongToShort}
           >
-            <Link href="/long-to-short">Open in Long to Short</Link>
+            Open in Long to Short
           </Button>
         </div>
       </section>
