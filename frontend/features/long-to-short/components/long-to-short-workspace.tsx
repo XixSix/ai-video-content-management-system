@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from "react"
 import { useEffect, useId, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   ArrowRight,
@@ -365,6 +366,7 @@ export function LongToShortWorkspace({
   open = true,
   onOpenChange,
 }: LongToShortWorkspaceProps = {}) {
+  const router = useRouter()
   const srtInputId = useId()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const srtInputRef = useRef<HTMLInputElement | null>(null)
@@ -544,15 +546,15 @@ export function LongToShortWorkspace({
     onOpenChange?.(false)
   }
 
-  const openGeneratedResults = () => {
+  const openGeneratedResultsInLibrary = () => {
     if (!selectedSource) {
       return
     }
 
-    setWorkspaceView("RESULTS")
     setSelectedCandidateId(null)
     setNotification(null)
-    onOpenChange?.(true)
+    onOpenChange?.(false)
+    router.push(`/media-library?tab=long-to-short&source=${selectedSource.id}`)
   }
 
   const selectCandidate = (candidateId: string) => {
@@ -1523,7 +1525,7 @@ export function LongToShortWorkspace({
             <button
               type="button"
               className="w-full rounded-2xl border border-emerald-500/30 bg-card p-4 text-left text-card-foreground shadow-[0_18px_60px_rgba(0,0,0,0.26)] transition hover:border-emerald-500/50 hover:bg-muted/30"
-              onClick={openGeneratedResults}
+              onClick={openGeneratedResultsInLibrary}
             >
               <span className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">

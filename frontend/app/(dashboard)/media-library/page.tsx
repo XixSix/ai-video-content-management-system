@@ -1,34 +1,75 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { CheckCircle2, UploadCloud, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
   mediaLibraryItems,
+  mediaLibraryTabOptions,
   mediaSortOptions,
   mediaStatusFilterOptions,
   mediaTypeFilterOptions,
 } from "@/features/media-library/media-library.data"
+import { LongToShortResultsDrawer } from "@/features/media-library/components/long-to-short-results-drawer"
 import { MediaFilterBar } from "@/features/media-library/components/media-filter-bar"
 import { MediaLibraryCard } from "@/features/media-library/components/media-library-card"
 import { MediaLibraryEmptyState } from "@/features/media-library/components/media-library-empty-state"
 import { MediaLibraryLoading } from "@/features/media-library/components/media-library-loading"
 import { MediaLibraryRow } from "@/features/media-library/components/media-library-row"
+import { MediaLibraryTabs } from "@/features/media-library/components/media-library-tabs"
 import { MediaLibraryToolbar } from "@/features/media-library/components/media-library-toolbar"
 import {
   filterAndSortMediaItems,
   formatShortDate,
 } from "@/features/media-library/media-library.utils"
+import { longToShortCandidatesBySourceId } from "@/features/long-to-short/long-to-short.data"
 import type {
   MediaLibraryItem,
   MediaLibrarySortKey,
+  MediaLibraryTab,
   MediaLibraryViewMode,
   MediaStatusFilter,
   MediaTypeFilter,
 } from "@/features/media-library/media-library.types"
 
-export default function MediaLibraryPage() {
+function parseMediaLibraryTab(value: string | null): MediaLibraryTab {
+  if (value === "original") {
+    return "ORIGINAL"
+  }
+
+  if (value === "editor-outputs") {
+    return "EDITOR_OUTPUTS"
+  }
+
+  if (value === "long-to-short") {
+    return "LONG_TO_SHORT"
+  }
+
+  return "ALL"
+}
+
+function formatMediaLibraryTabParam(tab: MediaLibraryTab) {
+  if (tab === "ORIGINAL") {
+    return "original"
+  }
+
+  if (tab === "EDITOR_OUTPUTS") {
+    return "editor-outputs"
+  }
+
+  if (tab === "LONG_TO_SHORT") {
+    return "long-to-short"
+  }
+
+  return null
+}
+
+function MediaLibraryPageContent() {
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [items, setItems] = useState<MediaLibraryItem[]>(mediaLibraryItems)
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
@@ -43,6 +84,8 @@ export default function MediaLibraryPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const timeoutIdsRef = useRef<number[]>([])
+  const activeTab = parseMediaLibraryTab(searchParams.get("tab"))
+  const selectedLongToShortSourceId = searchParams.get("source")
 
   useEffect(() => {
     const timeoutIds = timeoutIdsRef.current
@@ -66,6 +109,48 @@ export default function MediaLibraryPage() {
     setTypeFilter("ALL")
     setStatusFilter("ALL")
     setSortKey("newest")
+    updateLibraryUrl("ALL")
+  }
+
+  const updateLibraryUrl = (
+    nextTab: MediaLibraryTab,
+    nextSourceId?: string | null
+  ) => {
+    const nextParams = new URLSearchParams(searchParams.toString())
+    const tabParam = formatMediaLibraryTabParam(nextTab)
+
+    if (tabParam) {
+      nextParams.set("tab", tabParam)
+    } else {
+      nextParams.delete("tab")
+    }
+
+    if (nextTab === "LONG_TO_SHORT" && nextSourceId) {
+      nextParams.set("source", nextSourceId)
+    } else {
+      nextParams.delete("source")
+    }
+
+    const queryString = nextParams.toString()
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    })
+  }
+
+  const handleTabChange = (nextTab: MediaLibraryTab) => {
+    updateLibraryUrl(nextTab)
+  }
+
+  const openLongToShortSource = (item: MediaLibraryItem) => {
+    if (!item.longToShortSourceId) {
+      return
+    }
+
+    updateLibraryUrl("LONG_TO_SHORT", item.longToShortSourceId)
+  }
+
+  const closeLongToShortDrawer = () => {
+    updateLibraryUrl("LONG_TO_SHORT")
   }
 
   const handleUploadSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +183,7 @@ export default function MediaLibraryPage() {
         hasClips: false,
         hasSubtitles: false,
         activeJobCount: 0,
+        libraryGroup: "ORIGINAL" as const,
         uploadProgress: 12,
       }
     })
@@ -164,10 +250,22 @@ export default function MediaLibraryPage() {
 
   const visibleItems = filterAndSortMediaItems(items, {
     searchQuery,
+    activeTab,
     typeFilter,
     statusFilter,
     sortKey,
   })
+  const selectedLongToShortSource =
+    activeTab === "LONG_TO_SHORT" && selectedLongToShortSourceId
+      ? items.find(
+          (item) =>
+            item.longToShortSourceId === selectedLongToShortSourceId &&
+            item.libraryGroup === "ORIGINAL"
+        ) ?? null
+      : null
+  const selectedCandidates = selectedLongToShortSource?.longToShortSourceId
+    ? longToShortCandidatesBySourceId[selectedLongToShortSource.longToShortSourceId] ?? []
+    : []
 
   const hasLibraryItems = items.length > 0
   const shouldShowEmptyState = !isLoading && !hasLibraryItems
@@ -207,7 +305,12 @@ export default function MediaLibraryPage() {
       return (
         <div className="space-y-3">
           {visibleItems.map((item) => (
-            <MediaLibraryRow key={item.id} item={item} />
+            <MediaLibraryRow
+              key={item.id}
+              item={item}
+              onOpen={activeTab === "LONG_TO_SHORT" ? openLongToShortSource : undefined}
+              actionLabel={activeTab === "LONG_TO_SHORT" ? "View clips" : "Open Studio"}
+            />
           ))}
         </div>
       )
@@ -216,7 +319,11 @@ export default function MediaLibraryPage() {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {visibleItems.map((item) => (
-          <MediaLibraryCard key={item.id} item={item} />
+          <MediaLibraryCard
+            key={item.id}
+            item={item}
+            onOpen={activeTab === "LONG_TO_SHORT" ? openLongToShortSource : undefined}
+          />
         ))}
       </div>
     )
@@ -297,6 +404,11 @@ export default function MediaLibraryPage() {
 
       {!shouldShowEmptyState ? (
         <section className="space-y-4">
+          <MediaLibraryTabs
+            activeTab={activeTab}
+            options={mediaLibraryTabOptions}
+            onTabChange={handleTabChange}
+          />
           <MediaLibraryToolbar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -318,6 +430,24 @@ export default function MediaLibraryPage() {
       ) : null}
 
       <section>{renderContent()}</section>
+      <LongToShortResultsDrawer
+        source={selectedLongToShortSource}
+        candidates={selectedCandidates}
+        open={Boolean(selectedLongToShortSource)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            closeLongToShortDrawer()
+          }
+        }}
+      />
     </div>
+  )
+}
+
+export default function MediaLibraryPage() {
+  return (
+    <Suspense fallback={<MediaLibraryLoading viewMode="grid" />}>
+      <MediaLibraryPageContent />
+    </Suspense>
   )
 }
