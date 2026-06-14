@@ -18,7 +18,7 @@ type RouteNavigationItem = {
 
 type ActionNavigationItem = {
   title: string
-  action: "open-social-accounts"
+  action: "open-social-accounts" | "open-long-to-short"
   icon: typeof Home
   section: "primary" | "create" | "account"
 }
@@ -46,7 +46,7 @@ export const navigationConfig: NavigationItem[] = [
   },
   {
     title: "Long to Short",
-    href: "/long-to-short",
+    action: "open-long-to-short",
     icon: Scissors,
     section: "create",
   },

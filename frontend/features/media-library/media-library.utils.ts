@@ -1,12 +1,14 @@
 import type {
   MediaLibraryItem,
   MediaLibrarySortKey,
+  MediaLibraryTab,
   MediaStatusFilter,
   MediaTypeFilter,
 } from "./media-library.types"
 
 type MediaLibraryFilterState = {
   searchQuery: string
+  activeTab: MediaLibraryTab
   typeFilter: MediaTypeFilter
   statusFilter: MediaStatusFilter
   sortKey: MediaLibrarySortKey
@@ -69,7 +71,16 @@ export function filterAndSortMediaItems(
     const matchesStatus =
       filters.statusFilter === "ALL" || item.status === filters.statusFilter
 
-    return matchesQuery && matchesType && matchesStatus
+    const matchesTab =
+      filters.activeTab === "ALL" ||
+      (filters.activeTab === "ORIGINAL" && item.libraryGroup === "ORIGINAL") ||
+      (filters.activeTab === "EDITOR_OUTPUTS" &&
+        item.libraryGroup === "EDITOR_OUTPUT") ||
+      (filters.activeTab === "LONG_TO_SHORT" &&
+        item.libraryGroup === "ORIGINAL" &&
+        Boolean(item.longToShortSourceId))
+
+    return matchesQuery && matchesType && matchesStatus && matchesTab
   })
 
   return filteredItems.sort((left, right) => {

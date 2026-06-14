@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from "react"
 import { useEffect, useId, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   ArrowRight,
@@ -65,6 +66,12 @@ type PresetTab = "QUICK_PRESETS" | "MY_TEMPLATES"
 type UploadState = "IDLE" | "UPLOADING"
 type RunState = "IDLE" | "GENERATING" | "COMPLETED"
 type WorkspaceView = "SETUP" | "RESULTS"
+type LongToShortNotification = {
+  id: string
+  status: "PROCESSING" | "SUCCESS"
+  title: string
+  description: string
+}
 type SelectOption = {
   label: string
   value: string
@@ -81,18 +88,6 @@ function formatSecondsAsClock(totalSeconds: number) {
   }
 
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
-}
-
-function getSourceStatusBadge(status: LongToShortSource["status"]) {
-  if (status === "PROCESSING") {
-    return { label: "Processing", variant: "info" as const }
-  }
-
-  if (status === "NEEDS_TRANSCRIPT") {
-    return { label: "Needs transcript", variant: "warning" as const }
-  }
-
-  return { label: "Ready", variant: "success" as const }
 }
 
 function getCandidateStatusBadge(status: LongToShortCandidate["status"]) {
@@ -362,7 +357,16 @@ function CandidateThumbnail({
   )
 }
 
-export function LongToShortWorkspace() {
+type LongToShortWorkspaceProps = {
+  open?: boolean
+  onOpenChange?: (isOpen: boolean) => void
+}
+
+export function LongToShortWorkspace({
+  open = true,
+  onOpenChange,
+}: LongToShortWorkspaceProps = {}) {
+  const router = useRouter()
   const srtInputId = useId()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const srtInputRef = useRef<HTMLInputElement | null>(null)
@@ -370,7 +374,6 @@ export function LongToShortWorkspace() {
   const [sources, setSources] = useState(longToShortSources)
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null)
   const [settings, setSettings] = useState<LongToShortSettings>(defaultLongToShortSettings)
-  const [isSourceDialogOpen, setIsSourceDialogOpen] = useState(true)
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false)
   const [uploadState, setUploadState] = useState<UploadState>("IDLE")
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -379,6 +382,7 @@ export function LongToShortWorkspace() {
   const [presetTab, setPresetTab] = useState<PresetTab>("QUICK_PRESETS")
   const [runState, setRunState] = useState<RunState>("IDLE")
   const [workspaceView, setWorkspaceView] = useState<WorkspaceView>("SETUP")
+  const [notification, setNotification] = useState<LongToShortNotification | null>(null)
   const [candidatesBySource, setCandidatesBySource] = useState(
     longToShortCandidatesBySourceId
   )
@@ -425,7 +429,6 @@ export function LongToShortWorkspace() {
     setUploadState("IDLE")
     setUploadProgress(0)
     setPendingSource(null)
-    setIsSourceDialogOpen(false)
     setIsLibraryPickerOpen(false)
     setWorkspaceView("SETUP")
     setRunState("IDLE")
@@ -463,9 +466,13 @@ export function LongToShortWorkspace() {
 
     const timeoutId = window.setTimeout(() => {
       setRunState("COMPLETED")
-      setWorkspaceView("RESULTS")
-      setSelectedCandidateId(null)
-    }, 1800)
+      setNotification({
+        id: `clips-ready-${Date.now()}`,
+        status: "SUCCESS",
+        title: "Clips are ready",
+        description: "Open the generated long-to-short candidates for review.",
+      })
+    }, 2800)
 
     return () => {
       window.clearTimeout(timeoutId)
@@ -483,7 +490,7 @@ export function LongToShortWorkspace() {
     setWorkspaceView("SETUP")
     setSelectedCandidateId(null)
     setCandidateSearch("")
-    setIsSourceDialogOpen(false)
+    setIsLibraryPickerOpen(false)
   }
 
   const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
@@ -520,6 +527,34 @@ export function LongToShortWorkspace() {
     setSelectedCandidateId(null)
     setCandidateSearch("")
     setIsLibraryPickerOpen(false)
+    setNotification(null)
+  }
+
+  const handleStartGeneration = () => {
+    if (!selectedSource) {
+      return
+    }
+
+    setRunState("GENERATING")
+    setSelectedCandidateId(null)
+    setNotification({
+      id: `clips-processing-${Date.now()}`,
+      status: "PROCESSING",
+      title: "Generating clips",
+      description: `${selectedSource.sourceFileName} is processing in the background.`,
+    })
+    onOpenChange?.(false)
+  }
+
+  const openGeneratedResultsInLibrary = () => {
+    if (!selectedSource) {
+      return
+    }
+
+    setSelectedCandidateId(null)
+    setNotification(null)
+    onOpenChange?.(false)
+    router.push(`/media-library?tab=long-to-short&source=${selectedSource.id}`)
   }
 
   const selectCandidate = (candidateId: string) => {
@@ -554,25 +589,33 @@ export function LongToShortWorkspace() {
   }
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
-    if (!selectedSourceId || uploadState === "UPLOADING") {
-      setIsSourceDialogOpen(true)
+    if (uploadState === "UPLOADING") {
+      onOpenChange?.(true)
       return
     }
 
-    setIsSourceDialogOpen(nextOpen)
+    onOpenChange?.(nextOpen)
     if (!nextOpen) {
       setIsLibraryPickerOpen(false)
+      setSelectedCandidateId(null)
     }
   }
 
   return (
     <>
-      <Dialog open={isSourceDialogOpen} onOpenChange={handleDialogOpenChange}>
+      <Dialog open={open} onOpenChange={handleDialogOpenChange}>
         <DialogContent
-          className="!max-w-[calc(100vw-1.5rem)] max-h-[calc(100vh-3rem)] gap-0 overflow-hidden rounded-2xl border-border/80 bg-card p-0 sm:!max-w-[44rem] md:!max-w-[52rem]"
-          showCloseButton={Boolean(selectedSourceId) && uploadState !== "UPLOADING"}
+          className={cn(
+            "!max-w-[calc(100vw-1.5rem)] max-h-[calc(100vh-3rem)] gap-0 overflow-y-auto rounded-2xl border-border/80 bg-card p-0",
+            selectedSource && workspaceView === "RESULTS"
+              ? "sm:!max-w-[96rem]"
+              : "sm:!max-w-[44rem] md:!max-w-[52rem]"
+          )}
+          showCloseButton={uploadState !== "UPLOADING"}
         >
-          <DialogHeader className="px-6 pb-4 pr-14 pt-6 sm:px-8 sm:pt-7">
+          {!selectedSource ? (
+            <>
+              <DialogHeader className="px-6 pb-4 pr-14 pt-6 sm:px-8 sm:pt-7">
               <DialogTitle className="text-[1.7rem] font-semibold tracking-normal">
                 Long to shorts
               </DialogTitle>
@@ -580,9 +623,9 @@ export function LongToShortWorkspace() {
                 AI finds hooks, highlights, and turns your long-form video into
                 short-form cuts.
               </DialogDescription>
-          </DialogHeader>
+              </DialogHeader>
 
-          <div className="space-y-5 px-6 pb-6 sm:px-8 sm:pb-8">
+              <div className="space-y-5 px-6 pb-6 sm:px-8 sm:pb-8">
             <div className="rounded-xl border border-border/70 bg-background/50 p-4">
               <div className="grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
                 <div className="overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,rgba(27,39,51,0.96),rgba(11,17,24,0.98))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
@@ -716,7 +759,6 @@ export function LongToShortWorkspace() {
 
                 <div className="grid gap-3">
                   {sources.map((source) => {
-                    const statusBadge = getSourceStatusBadge(source.status)
                     const SourceIcon =
                       source.type === "VIDEO" ? Clapperboard : AudioLines
 
@@ -725,7 +767,7 @@ export function LongToShortWorkspace() {
                         key={source.id}
                         type="button"
                         onClick={() => selectSource(source)}
-                        className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-background/60 px-4 py-3 text-left transition hover:border-foreground/18 hover:bg-muted/30"
+                        className="flex items-center rounded-xl border border-border/70 bg-background/60 px-4 py-3 text-left transition hover:border-foreground/18 hover:bg-muted/30"
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/60 text-muted-foreground">
@@ -740,7 +782,6 @@ export function LongToShortWorkspace() {
                             </p>
                           </div>
                         </div>
-                        <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
                       </button>
                     )
                   })}
@@ -748,8 +789,23 @@ export function LongToShortWorkspace() {
               </div>
             </div>
           ) : null}
-        </DialogContent>
-      </Dialog>
+            </>
+          ) : null}
+
+          {selectedSource ? (
+            <DialogHeader className="sr-only">
+              <DialogTitle>
+                {workspaceView === "RESULTS"
+                  ? "Generated long-to-short clips"
+                  : "Long to short setup"}
+              </DialogTitle>
+              <DialogDescription>
+                {workspaceView === "RESULTS"
+                  ? "Review generated clip candidates, search moments, select clips, or export results."
+                  : "Configure clipping settings, captions, aspect ratio, and generation options for the selected source media."}
+              </DialogDescription>
+            </DialogHeader>
+          ) : null}
 
       {selectedSource && workspaceView === "SETUP" ? (
         <div className="mx-auto flex w-full max-w-[34rem] flex-col items-stretch gap-4 py-8 sm:py-12">
@@ -775,7 +831,7 @@ export function LongToShortWorkspace() {
             type="button"
             size="lg"
             className="h-11 w-full rounded-lg text-[14px] font-semibold"
-            onClick={() => setRunState("GENERATING")}
+            onClick={handleStartGeneration}
             disabled={runState === "GENERATING"}
           >
             {runState === "GENERATING" ? (
@@ -1107,19 +1163,10 @@ export function LongToShortWorkspace() {
       ) : null}
 
       {selectedSource && workspaceView === "RESULTS" ? (
-        <div className="mx-auto flex w-full max-w-[96rem] flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
-          <section className="rounded-xl border border-border/70 bg-card shadow-[var(--shadow-card)]">
+        <div className="mx-auto flex w-full max-w-[96rem] flex-col gap-6">
+          <section className="bg-card">
             <div className="flex flex-col gap-4 border-b border-border/70 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex min-w-0 items-center gap-3">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => setWorkspaceView("SETUP")}
-                >
-                  <span className="sr-only">Back to setup</span>
-                  <ArrowLeft className="size-4" />
-                </Button>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-foreground">
                     {selectedSource.sourceFileName}
@@ -1468,6 +1515,55 @@ export function LongToShortWorkspace() {
               </aside>
             </div>
           </div>
+        </div>
+      ) : null}
+        </DialogContent>
+      </Dialog>
+      {notification ? (
+        <div className="fixed bottom-4 right-4 z-[70] w-[min(22rem,calc(100vw-2rem))]">
+          {notification.status === "SUCCESS" ? (
+            <button
+              type="button"
+              className="w-full rounded-2xl border border-emerald-500/30 bg-card p-4 text-left text-card-foreground shadow-[0_18px_60px_rgba(0,0,0,0.26)] transition hover:border-emerald-500/50 hover:bg-muted/30"
+              onClick={openGeneratedResultsInLibrary}
+            >
+              <span className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+                  <CheckCircle2 className="size-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-foreground">
+                    {notification.title}
+                  </span>
+                  <span className="mt-1 block text-sm leading-5 text-muted-foreground">
+                    {notification.description}
+                  </span>
+                  <span className="mt-3 inline-flex text-xs font-semibold text-foreground">
+                    View results
+                  </span>
+                </span>
+              </span>
+            </button>
+          ) : (
+            <div
+              role="status"
+              className="rounded-2xl border border-sky-500/25 bg-card p-4 text-card-foreground shadow-[0_18px_60px_rgba(0,0,0,0.26)]"
+            >
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-300">
+                  <CircleDashed className="size-4 animate-spin" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground">
+                    {notification.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                    {notification.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
     </>

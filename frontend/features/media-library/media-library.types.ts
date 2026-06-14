@@ -4,7 +4,17 @@ export type MediaLibraryViewMode = "grid" | "list"
 
 export type MediaLibrarySortKey = "newest" | "oldest" | "name" | "duration"
 
-export type MediaTypeFilter = "ALL" | "VIDEO" | "AUDIO"
+export type MediaLibraryTab =
+  | "ALL"
+  | "ORIGINAL"
+  | "EDITOR_OUTPUTS"
+  | "LONG_TO_SHORT"
+
+export type MediaLibraryGroup = "ORIGINAL" | "EDITOR_OUTPUT"
+
+export type MediaAssetType = "VIDEO" | "AUDIO" | "IMAGE" | "TRANSCRIPT"
+
+export type MediaTypeFilter = "ALL" | MediaAssetType
 
 export type MediaStatusFilter = "ALL" | "UPLOADING" | "UPLOADED" | "FAILED"
 
@@ -16,7 +26,8 @@ export type MediaLibraryItem = {
   duration: number | null
   fileSizeBytes: number
   mimeType: string
-  type: "VIDEO" | "AUDIO"
+  type: MediaAssetType
+  libraryGroup: MediaLibraryGroup
   status: MediaFileStatus
   width: number | null
   height: number | null
@@ -27,6 +38,7 @@ export type MediaLibraryItem = {
   hasClips: boolean
   hasSubtitles: boolean
   activeJobCount: number
+  longToShortSourceId?: string
   uploadProgress?: number
 }
 
