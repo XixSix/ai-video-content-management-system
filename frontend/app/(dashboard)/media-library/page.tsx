@@ -12,11 +12,11 @@ import {
   mediaStatusFilterOptions,
   mediaTypeFilterOptions,
 } from "@/features/media-library/media-library.data"
-import { LongToShortResultsDrawer } from "@/features/media-library/components/long-to-short-results-drawer"
 import { MediaFilterBar } from "@/features/media-library/components/media-filter-bar"
 import { MediaLibraryCard } from "@/features/media-library/components/media-library-card"
 import { MediaLibraryEmptyState } from "@/features/media-library/components/media-library-empty-state"
 import { MediaLibraryLoading } from "@/features/media-library/components/media-library-loading"
+import { MediaLibraryPreviewDialog } from "@/features/media-library/components/media-library-preview-dialog"
 import { MediaLibraryRow } from "@/features/media-library/components/media-library-row"
 import { MediaLibraryTabs } from "@/features/media-library/components/media-library-tabs"
 import { MediaLibraryToolbar } from "@/features/media-library/components/media-library-toolbar"
@@ -81,6 +81,8 @@ function MediaLibraryPageContent() {
     id: string
     message: string
   } | null>(null)
+  const [selectedPreviewItem, setSelectedPreviewItem] =
+    useState<MediaLibraryItem | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const timeoutIdsRef = useRef<number[]>([])
@@ -141,16 +143,36 @@ function MediaLibraryPageContent() {
     updateLibraryUrl(nextTab)
   }
 
-  const openLongToShortSource = (item: MediaLibraryItem) => {
-    if (!item.longToShortSourceId) {
+  const openMediaPreview = (item: MediaLibraryItem) => {
+    if (item.status === "UPLOADING") {
+      return
+    }
+
+    setSelectedPreviewItem(item)
+
+    if (activeTab !== "LONG_TO_SHORT" || !item.longToShortSourceId) {
       return
     }
 
     updateLibraryUrl("LONG_TO_SHORT", item.longToShortSourceId)
   }
 
-  const closeLongToShortDrawer = () => {
-    updateLibraryUrl("LONG_TO_SHORT")
+  const openLongToShortSource = (item: MediaLibraryItem) => {
+    if (!item.longToShortSourceId) {
+      setSelectedPreviewItem(item)
+      return
+    }
+
+    setSelectedPreviewItem(item)
+    updateLibraryUrl("LONG_TO_SHORT", item.longToShortSourceId)
+  }
+
+  const closeMediaPreview = () => {
+    setSelectedPreviewItem(null)
+
+    if (activeTab === "LONG_TO_SHORT" && selectedLongToShortSourceId) {
+      updateLibraryUrl("LONG_TO_SHORT")
+    }
   }
 
   const handleUploadSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,8 +285,10 @@ function MediaLibraryPageContent() {
             item.libraryGroup === "ORIGINAL"
         ) ?? null
       : null
-  const selectedCandidates = selectedLongToShortSource?.longToShortSourceId
-    ? longToShortCandidatesBySourceId[selectedLongToShortSource.longToShortSourceId] ?? []
+  const previewItem = selectedPreviewItem ?? selectedLongToShortSource
+  const previewCandidates =
+    activeTab === "LONG_TO_SHORT" && previewItem?.longToShortSourceId
+      ? longToShortCandidatesBySourceId[previewItem.longToShortSourceId] ?? []
     : []
 
   const hasLibraryItems = items.length > 0
@@ -308,8 +332,14 @@ function MediaLibraryPageContent() {
             <MediaLibraryRow
               key={item.id}
               item={item}
-              onOpen={activeTab === "LONG_TO_SHORT" ? openLongToShortSource : undefined}
-              actionLabel={activeTab === "LONG_TO_SHORT" ? "View clips" : "Open Studio"}
+              onOpen={
+                item.status === "UPLOADING"
+                  ? undefined
+                  : activeTab === "LONG_TO_SHORT"
+                    ? openLongToShortSource
+                    : openMediaPreview
+              }
+              actionLabel={activeTab === "LONG_TO_SHORT" ? "View clips" : "Preview"}
             />
           ))}
         </div>
@@ -322,7 +352,13 @@ function MediaLibraryPageContent() {
           <MediaLibraryCard
             key={item.id}
             item={item}
-            onOpen={activeTab === "LONG_TO_SHORT" ? openLongToShortSource : undefined}
+            onOpen={
+              item.status === "UPLOADING"
+                ? undefined
+                : activeTab === "LONG_TO_SHORT"
+                  ? openLongToShortSource
+                  : openMediaPreview
+            }
           />
         ))}
       </div>
@@ -430,13 +466,14 @@ function MediaLibraryPageContent() {
       ) : null}
 
       <section>{renderContent()}</section>
-      <LongToShortResultsDrawer
-        source={selectedLongToShortSource}
-        candidates={selectedCandidates}
-        open={Boolean(selectedLongToShortSource)}
+      <MediaLibraryPreviewDialog
+        item={previewItem}
+        activeTab={activeTab}
+        candidates={previewCandidates}
+        open={Boolean(previewItem)}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) {
-            closeLongToShortDrawer()
+            closeMediaPreview()
           }
         }}
       />

@@ -107,6 +107,26 @@ export function MediaLibraryRow({
       </div>
     </>
   )
+  const primaryContent = isUploading ? (
+    <div className="flex min-w-0 flex-1 items-start gap-4 rounded-lg">
+      {content}
+    </div>
+  ) : onOpen ? (
+    <button
+      type="button"
+      className="flex min-w-0 flex-1 items-start gap-4 rounded-lg text-left"
+      onClick={() => onOpen(item)}
+    >
+      {content}
+    </button>
+  ) : (
+    <Link
+      href="/studio"
+      className="flex min-w-0 flex-1 items-start gap-4 rounded-lg"
+    >
+      {content}
+    </Link>
+  )
 
   return (
     <Card
@@ -116,25 +136,15 @@ export function MediaLibraryRow({
     >
       <CardContent className="p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          {onOpen ? (
-            <button
-              type="button"
-              className="flex min-w-0 flex-1 items-start gap-4 rounded-lg text-left"
-              onClick={() => onOpen(item)}
-            >
-              {content}
-            </button>
-          ) : (
-            <Link
-              href="/studio"
-              className="flex min-w-0 flex-1 items-start gap-4 rounded-lg"
-            >
-              {content}
-            </Link>
-          )}
+          {primaryContent}
 
           <div className="flex items-center justify-between gap-3 lg:w-auto">
-            {onOpen ? (
+            {isUploading ? (
+              <Button size="sm" disabled>
+                <UploadCloud className="size-4" />
+                Uploading
+              </Button>
+            ) : onOpen ? (
               <Button size="sm" onClick={() => onOpen(item)}>
                 <PlayCircle className="size-4" />
                 {actionLabel}
