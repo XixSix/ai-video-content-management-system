@@ -64,6 +64,22 @@ export function formatPlatform(platform: PublishPlatform) {
   return labels[platform]
 }
 
+export function buildScheduledIso(date: Date | undefined, time: string) {
+  if (!date) {
+    return null
+  }
+
+  const [hours = "9", minutes = "0"] = time.split(":")
+  const scheduledDate = new Date(date)
+  scheduledDate.setHours(Number(hours), Number(minutes), 0, 0)
+
+  return scheduledDate.toISOString()
+}
+
+export function isFutureScheduledTime(value: string | null) {
+  return value ? new Date(value).getTime() > Date.now() : false
+}
+
 export function formatStatus(status: PublishTaskStatus) {
   const labels: Record<PublishTaskStatus, string> = {
     DRAFT: "Draft",

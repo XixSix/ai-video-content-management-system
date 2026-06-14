@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react"
 import {
   CalendarClock,
   AudioLines,
+  Check,
   Clapperboard,
   Hash,
   Library,
@@ -24,6 +25,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import {
   publishAccountOptions,
@@ -33,8 +39,13 @@ import {
 import type {
   NewPublishPayload,
   PublishPlatform,
+  PublishPlatformContent,
   PublishSourceOption,
 } from "../publishing.types"
+import {
+  buildScheduledIso,
+  isFutureScheduledTime,
+} from "../publishing.utils"
 import { PublishingPlatformIcon } from "./publishing-platform-icon"
 
 type PublishFormSheetProps = {
@@ -69,6 +80,35 @@ function buildUploadedPublishSource(file: File): PublishSourceOption {
 
 function getSourceMeta(source: PublishSourceOption) {
   return `${source.meta} · ${source.durationLabel} · ${source.aspectRatio}`
+}
+
+function formatScheduleDate(date: Date | undefined) {
+  if (!date) {
+    return "Select date"
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date)
+}
+
+function buildDefaultPlatformContent(): PublishPlatformContent {
+  return {
+    title: "",
+    caption: "",
+    hashtags: "#aivideo #contentworkflow",
+  }
+}
+
+function buildDefaultPlatformContentMap(): Record<PublishPlatform, PublishPlatformContent> {
+  return {
+    YOUTUBE: buildDefaultPlatformContent(),
+    TIKTOK: buildDefaultPlatformContent(),
+    FACEBOOK: buildDefaultPlatformContent(),
+    INSTAGRAM: buildDefaultPlatformContent(),
+  }
 }
 
 function SourceOptionRow({
@@ -119,15 +159,16 @@ export function PublishFormSheet({
     null
   )
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false)
-  const [selectedAccountId, setSelectedAccountId] = useState(
-    publishAccountOptions[0]?.id ?? ""
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(
+    publishAccountOptions[0] ? [publishAccountOptions[0].id] : []
   )
-  const [title, setTitle] = useState("")
-  const [caption, setCaption] = useState("")
-  const [hashtags, setHashtags] = useState("#aivideo #contentworkflow")
+  const [platformContent, setPlatformContent] = useState<
+    Record<PublishPlatform, PublishPlatformContent>
+  >(buildDefaultPlatformContentMap)
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(
     new Date("2026-06-14T09:00:00.000Z")
   )
+  const [scheduledTime, setScheduledTime] = useState("09:00")
   const [formError, setFormError] = useState<string | null>(null)
   const sourceOptions = useMemo(
     () => (uploadedSource ? [uploadedSource, ...publishSourceOptions] : publishSourceOptions),
@@ -140,13 +181,13 @@ export function PublishFormSheet({
       sourceOptions[0],
     [selectedSourceId, sourceOptions]
   )
-  const selectedAccount = useMemo(
+  const selectedAccounts = useMemo(
     () =>
-      publishAccountOptions.find((account) => account.id === selectedAccountId) ??
-      publishAccountOptions[0],
-    [selectedAccountId]
+      publishAccountOptions.filter((account) =>
+        selectedAccountIds.includes(account.id)
+      ),
+    [selectedAccountIds]
   )
-  const selectedPlatform = selectedAccount?.platform ?? publishAccountOptions[0]?.platform
   const platformOptions = useMemo(
     () =>
       Array.from(
@@ -154,34 +195,65 @@ export function PublishFormSheet({
       ) as PublishPlatform[],
     []
   )
-  const accountOptions = useMemo(
-    () =>
-      publishAccountOptions.filter(
-        (account) => account.platform === selectedPlatform
-      ),
-    [selectedPlatform]
+  const selectedPlatforms = useMemo(
+    () => new Set(selectedAccounts.map((account) => account.platform)),
+    [selectedAccounts]
+  )
+  const selectedPlatformList = useMemo(
+    () => platformOptions.filter((platform) => selectedPlatforms.has(platform)),
+    [platformOptions, selectedPlatforms]
   )
 
   const resetForm = () => {
     setSelectedSourceId(publishSourceOptions[0]?.id ?? "")
     setUploadedSource(null)
     setIsLibraryPickerOpen(false)
-    setSelectedAccountId(publishAccountOptions[0]?.id ?? "")
-    setTitle("")
-    setCaption("")
-    setHashtags("#aivideo #contentworkflow")
+    setSelectedAccountIds(publishAccountOptions[0] ? [publishAccountOptions[0].id] : [])
+    setPlatformContent(buildDefaultPlatformContentMap())
     setScheduledDate(new Date("2026-06-14T09:00:00.000Z"))
+    setScheduledTime("09:00")
     setFormError(null)
   }
 
-  const selectPlatform = (platform: PublishPlatform) => {
-    const firstAccount = publishAccountOptions.find(
-      (account) => account.platform === platform
-    )
+  const togglePlatform = (platform: PublishPlatform) => {
+    const platformAccountIds = publishAccountOptions
+      .filter((account) => account.platform === platform)
+      .map((account) => account.id)
 
-    if (firstAccount) {
-      setSelectedAccountId(firstAccount.id)
-    }
+    setSelectedAccountIds((currentIds) => {
+      const hasPlatformSelected = platformAccountIds.some((id) =>
+        currentIds.includes(id)
+      )
+
+      if (hasPlatformSelected) {
+        return currentIds.filter((id) => !platformAccountIds.includes(id))
+      }
+
+      const firstAccountId = platformAccountIds[0]
+      return firstAccountId ? [...currentIds, firstAccountId] : currentIds
+    })
+  }
+
+  const toggleAccount = (accountId: string) => {
+    setSelectedAccountIds((currentIds) =>
+      currentIds.includes(accountId)
+        ? currentIds.filter((id) => id !== accountId)
+        : [...currentIds, accountId]
+    )
+  }
+
+  const updatePlatformContent = (
+    platform: PublishPlatform,
+    field: keyof PublishPlatformContent,
+    value: string
+  ) => {
+    setPlatformContent((currentContent) => ({
+      ...currentContent,
+      [platform]: {
+        ...currentContent[platform],
+        [field]: value,
+      },
+    }))
   }
 
   const handleUploadSelection = (event: ChangeEvent<HTMLInputElement>) => {
@@ -200,23 +272,37 @@ export function PublishFormSheet({
   }
 
   const submit = (status: NewPublishPayload["status"]) => {
-    if (!selectedSource || !selectedAccount) {
-      setFormError("Choose a source and platform account before continuing.")
+    if (!selectedSource || selectedAccounts.length < 1) {
+      setFormError("Choose a source and at least one platform account.")
       return
     }
 
-    if (status !== "DRAFT" && !scheduledDate) {
-      setFormError("Choose a date before scheduling or publishing.")
+    if (status !== "DRAFT" && (!scheduledDate || !scheduledTime)) {
+      setFormError("Choose a date and time before scheduling or publishing.")
+      return
+    }
+
+    const scheduledAt = buildScheduledIso(scheduledDate, scheduledTime)
+
+    if (status !== "DRAFT" && !isFutureScheduledTime(scheduledAt)) {
+      setFormError("Choose a future date and time before scheduling.")
       return
     }
 
     onCreate({
       source: selectedSource,
-      account: selectedAccount,
-      title: title.trim(),
-      caption: caption.trim(),
-      hashtags: parseHashtags(hashtags),
+      targets: selectedAccounts.map((account) => {
+        const content = platformContent[account.platform]
+
+        return {
+          account,
+          title: content.title.trim(),
+          caption: content.caption.trim(),
+          hashtags: parseHashtags(content.hashtags),
+        }
+      }),
       scheduledDate,
+      scheduledTime,
       status,
     })
     resetForm()
@@ -234,9 +320,9 @@ export function PublishFormSheet({
       }}
     >
       <DialogContent
-        className="max-h-[90vh] max-w-[min(96vw,64rem)] gap-0 overflow-hidden p-0 sm:max-w-[min(96vw,64rem)]"
+        className="flex max-h-[90dvh] max-w-[min(96vw,64rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-[min(96vw,64rem)]"
       >
-        <DialogHeader className="border-b border-border/70 px-6 pb-4 pr-14 pt-6 sm:px-8 sm:pt-7">
+        <DialogHeader className="shrink-0 border-b border-border/70 px-6 pb-4 pr-14 pt-6 sm:px-8 sm:pt-7">
           <DialogTitle className="text-[1.7rem] font-semibold tracking-normal">
             New publish task
           </DialogTitle>
@@ -246,7 +332,7 @@ export function PublishFormSheet({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[calc(90vh-11rem)] space-y-6 overflow-y-auto p-6">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6 sm:px-8">
           <section className="space-y-3">
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-foreground">
@@ -360,59 +446,81 @@ export function PublishFormSheet({
           <section className="space-y-3">
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-foreground">
-                2. Platform
+                2. Platform and accounts
               </h3>
               <p className="text-sm text-muted-foreground">
-                Select a platform, then choose the account that will publish this post.
+                Choose each platform, then select the connected account or accounts for it.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="space-y-2">
               {platformOptions.map((platform) => {
-                const isSelected = platform === selectedPlatform
+                const isSelected = selectedPlatforms.has(platform)
+                const platformAccounts = publishAccountOptions.filter(
+                  (account) => account.platform === platform
+                )
 
                 return (
-                  <button
+                  <div
                     key={platform}
-                    type="button"
                     className={cn(
-                      "flex min-h-20 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-border/70 bg-background px-3 py-3 text-center transition hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                      isSelected && "border-foreground/30 bg-muted/50"
+                      "grid gap-3 rounded-xl border border-border/70 bg-background p-3 sm:grid-cols-[11rem_minmax(0,1fr)]",
+                      isSelected && "border-foreground/30 bg-muted/35"
                     )}
-                    onClick={() => selectPlatform(platform)}
                   >
-                    <PublishingPlatformIcon platform={platform} size={22} />
-                    <span className="text-sm font-semibold text-foreground">
-                      {publishPlatformLabels[platform]}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="space-y-2">
-              <span className="text-sm font-medium text-foreground">Account</span>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {accountOptions.map((account) => {
-                  const isSelected = account.id === selectedAccountId
-
-                  return (
                     <button
-                      key={account.id}
                       type="button"
-                      className={cn(
-                        "flex cursor-pointer items-center gap-3 rounded-xl border border-border/70 bg-background p-3 text-left transition hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                        isSelected && "border-foreground/30 bg-muted/50"
-                      )}
-                      onClick={() => setSelectedAccountId(account.id)}
+                      className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+                      onClick={() => togglePlatform(platform)}
                     >
-                      <PublishingPlatformIcon platform={account.platform} size={18} />
-                      <span className="min-w-0 truncate text-sm font-semibold text-foreground">
-                        {account.accountName}
+                      <span
+                        className={cn(
+                          "flex size-5 shrink-0 items-center justify-center rounded-md border border-border text-transparent",
+                          isSelected && "border-primary bg-primary text-primary-foreground"
+                        )}
+                      >
+                        <Check className="size-3.5" />
+                      </span>
+                      <PublishingPlatformIcon platform={platform} size={20} />
+                      <span className="text-sm font-semibold text-foreground">
+                        {publishPlatformLabels[platform]}
                       </span>
                     </button>
-                  )
-                })}
-              </div>
+
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {platformAccounts.map((account) => {
+                        const isAccountSelected = selectedAccountIds.includes(
+                          account.id
+                        )
+
+                        return (
+                          <button
+                            key={account.id}
+                            type="button"
+                            className={cn(
+                              "flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 bg-card px-3 py-2 text-left transition hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
+                              isAccountSelected && "border-foreground/30 bg-muted/50"
+                            )}
+                            onClick={() => toggleAccount(account.id)}
+                          >
+                            <span
+                              className={cn(
+                                "flex size-4 shrink-0 items-center justify-center rounded border border-border text-transparent",
+                                isAccountSelected &&
+                                  "border-primary bg-primary text-primary-foreground"
+                              )}
+                            >
+                              <Check className="size-3" />
+                            </span>
+                            <span className="min-w-0 truncate text-sm font-medium text-foreground">
+                              {account.accountName}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </section>
 
@@ -422,62 +530,136 @@ export function PublishFormSheet({
                 3. Post content
               </h3>
               <p className="text-sm text-muted-foreground">
-                Draft platform copy and choose a schedule date.
+                Draft separate copy for each selected platform and choose when it should publish.
               </p>
             </div>
 
             <div className="space-y-3">
-              <label className="space-y-1.5">
-                <span className="text-sm font-medium text-foreground">Title</span>
-                <Input
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder="Add a platform title..."
-                  className="h-10 rounded-xl"
-                />
-              </label>
+              {selectedPlatformList.length > 0 ? (
+                selectedPlatformList.map((platform) => {
+                  const content = platformContent[platform]
 
-              <label className="space-y-1.5">
-                <span className="text-sm font-medium text-foreground">Caption</span>
-                <textarea
-                  value={caption}
-                  onChange={(event) => setCaption(event.target.value)}
-                  placeholder="Write the post caption..."
-                  className="min-h-28 w-full resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground shadow-xs outline-none transition placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                />
-              </label>
+                  return (
+                    <div
+                      key={platform}
+                      className="space-y-3 rounded-xl border border-border/70 bg-background p-4"
+                    >
+                      <div className="flex items-center gap-2">
+                        <PublishingPlatformIcon platform={platform} size={18} />
+                        <span className="text-sm font-semibold text-foreground">
+                          {publishPlatformLabels[platform]}
+                        </span>
+                      </div>
 
-              <label className="space-y-1.5">
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
-                  <Hash className="size-3.5 text-muted-foreground" />
-                  Hashtags
-                </span>
-                <Input
-                  value={hashtags}
-                  onChange={(event) => setHashtags(event.target.value)}
-                  placeholder="#videoworkflow #shorts"
-                  className="h-10 rounded-xl"
-                />
-              </label>
+                      <label className="space-y-1.5">
+                        <span className="text-sm font-medium text-foreground">
+                          Title
+                        </span>
+                        <Input
+                          value={content.title}
+                          onChange={(event) =>
+                            updatePlatformContent(
+                              platform,
+                              "title",
+                              event.target.value
+                            )
+                          }
+                          placeholder={`Add a ${publishPlatformLabels[platform]} title...`}
+                          className="h-10 rounded-xl"
+                        />
+                      </label>
+
+                      <label className="space-y-1.5">
+                        <span className="text-sm font-medium text-foreground">
+                          Caption
+                        </span>
+                        <textarea
+                          value={content.caption}
+                          onChange={(event) =>
+                            updatePlatformContent(
+                              platform,
+                              "caption",
+                              event.target.value
+                            )
+                          }
+                          placeholder={`Write the ${publishPlatformLabels[platform]} caption...`}
+                          className="min-h-28 w-full resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground shadow-xs outline-none transition placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                        />
+                      </label>
+
+                      <label className="space-y-1.5">
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+                          <Hash className="size-3.5 text-muted-foreground" />
+                          Hashtags
+                        </span>
+                        <Input
+                          value={content.hashtags}
+                          onChange={(event) =>
+                            updatePlatformContent(
+                              platform,
+                              "hashtags",
+                              event.target.value
+                            )
+                          }
+                          placeholder="#videoworkflow #shorts"
+                          className="h-10 rounded-xl"
+                        />
+                      </label>
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="rounded-xl border border-dashed border-border/80 bg-background p-4 text-sm text-muted-foreground">
+                  Select at least one account above to write platform-specific copy.
+                </div>
+              )}
 
               <div className="space-y-2">
                 <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
                   <CalendarClock className="size-3.5 text-muted-foreground" />
-                  Schedule date
+                  Schedule
                 </span>
-                <div className="rounded-xl border border-border/70 bg-background p-2">
-                  <Calendar
-                    mode="single"
-                    selected={scheduledDate}
-                    onSelect={setScheduledDate}
-                    className="mx-auto max-w-sm"
-                    classNames={{
-                      root: "relative w-full",
-                      months: "w-full",
-                      month: "w-full",
-                      month_grid: "w-full",
-                    }}
-                  />
+                <div className="grid gap-3 rounded-xl border border-border/70 bg-background p-3 sm:grid-cols-[minmax(0,1fr)_10rem]">
+                  <label className="space-y-1.5">
+                    <span className="text-sm font-medium text-foreground">
+                      Publish date
+                    </span>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          data-empty={!scheduledDate}
+                          className="h-10 w-full justify-start rounded-xl text-left font-normal data-[empty=true]:text-muted-foreground"
+                        >
+                          <CalendarClock className="size-4" />
+                          {formatScheduleDate(scheduledDate)}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        className="z-[60] w-auto p-0"
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={scheduledDate}
+                          onSelect={setScheduledDate}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </label>
+
+                  <label className="space-y-1.5">
+                    <span className="text-sm font-medium text-foreground">
+                      Publish time
+                    </span>
+                    <Input
+                      type="time"
+                      value={scheduledTime}
+                      onChange={(event) => setScheduledTime(event.target.value)}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
                 </div>
               </div>
             </div>
@@ -490,8 +672,8 @@ export function PublishFormSheet({
           ) : null}
         </div>
 
-        <DialogFooter className="m-0 rounded-none border-t border-border/70 bg-background/95 p-4">
-          <div className="grid gap-2 sm:grid-cols-3">
+        <DialogFooter className="m-0 shrink-0 rounded-none border-t border-border/70 bg-background/95 px-6 py-4 sm:px-8">
+          <div className="grid w-full gap-2 sm:grid-cols-3">
             <Button
               type="button"
               variant="outline"

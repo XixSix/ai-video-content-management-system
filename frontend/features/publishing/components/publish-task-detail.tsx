@@ -1,29 +1,62 @@
+"use client"
+
+import { useState } from "react"
 import {
   AlertCircle,
   CalendarClock,
+  Check,
   ExternalLink,
   Hash,
+  Pencil,
   Send,
+  X,
+  XCircle,
 } from "lucide-react"
 
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import type { PublishTask } from "../publishing.types"
-import { formatDateTime, formatPlatform } from "../publishing.utils"
+import {
+  buildScheduledIso,
+  formatDateTime,
+  formatPlatform,
+  isFutureScheduledTime,
+} from "../publishing.utils"
 import type { PublishTaskAction } from "./publish-task-list"
 import { PublishThumbnail } from "./publish-thumbnail"
 import { PublishingPlatformIcon } from "./publishing-platform-icon"
 
+export type PublishTaskDetailMode = "view" | "edit"
+
+export type PublishTaskContentUpdate = {
+  title: string | null
+  caption: string | null
+  hashtags: string[]
+  scheduledAt: string | null
+}
+
 type PublishTaskDetailProps = {
   task: PublishTask | null
+  mode?: PublishTaskDetailMode
   onTaskAction: (task: PublishTask, action: PublishTaskAction) => void
+  onEditRequest?: (task: PublishTask) => void
+  onCancelEdit?: () => void
+  onSaveContent?: (task: PublishTask, update: PublishTaskContentUpdate) => void
+  onInvalidSchedule?: () => void
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {
@@ -37,7 +70,192 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function PublishTaskDetail({ task, onTaskAction }: PublishTaskDetailProps) {
+function parseHashtags(value: string) {
+  return value
+    .split(/[\s,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => (item.startsWith("#") ? item : `#${item}`))
+}
+
+function formatScheduleDate(date: Date | undefined) {
+  if (!date) {
+    return "Select date"
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date)
+}
+
+function parseScheduledDate(value: string | null) {
+  return value ? new Date(value) : undefined
+}
+
+function parseScheduledTime(value: string | null) {
+  if (!value) {
+    return "09:00"
+  }
+
+  const date = new Date(value)
+  const hours = `${date.getHours()}`.padStart(2, "0")
+  const minutes = `${date.getMinutes()}`.padStart(2, "0")
+
+  return `${hours}:${minutes}`
+}
+
+function PublishTaskEditPanel({
+  task,
+  onCancelEdit,
+  onSaveContent,
+  onInvalidSchedule,
+}: {
+  task: PublishTask
+  onCancelEdit?: () => void
+  onSaveContent?: (task: PublishTask, update: PublishTaskContentUpdate) => void
+  onInvalidSchedule?: () => void
+}) {
+  const [title, setTitle] = useState(task.title ?? task.sourceTitle)
+  const [caption, setCaption] = useState(task.caption ?? "")
+  const [hashtags, setHashtags] = useState(task.hashtags.join(" "))
+  const [scheduledDate, setScheduledDate] = useState(
+    parseScheduledDate(task.scheduledAt)
+  )
+  const [scheduledTime, setScheduledTime] = useState(
+    parseScheduledTime(task.scheduledAt)
+  )
+
+  return (
+    <CardContent className="space-y-5 p-4">
+      <div className="rounded-xl border border-border/70 bg-muted/30 p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+            <PublishingPlatformIcon platform={task.platform} size={18} />
+            {formatPlatform(task.platform)}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {task.platformAccountName}
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          <label className="space-y-1.5">
+            <span className="text-sm font-medium text-foreground">Title</span>
+            <Input
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Add a platform title..."
+              className="h-10 rounded-xl bg-background"
+            />
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-sm font-medium text-foreground">Caption</span>
+            <textarea
+              value={caption}
+              onChange={(event) => setCaption(event.target.value)}
+              placeholder="Write the post caption..."
+              className="min-h-32 w-full resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground shadow-xs outline-none transition placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            />
+          </label>
+          <label className="space-y-1.5">
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+              <Hash className="size-3.5 text-muted-foreground" />
+              Hashtags
+            </span>
+            <Input
+              value={hashtags}
+              onChange={(event) => setHashtags(event.target.value)}
+              placeholder="#videoworkflow #shorts"
+              className="h-10 rounded-xl bg-background"
+            />
+          </label>
+          <div className="space-y-1.5">
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+              <CalendarClock className="size-3.5 text-muted-foreground" />
+              Schedule
+            </span>
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_8.5rem]">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    data-empty={!scheduledDate}
+                    className="h-10 justify-start rounded-xl bg-background text-left font-normal data-[empty=true]:text-muted-foreground"
+                  >
+                    <CalendarClock className="size-4" />
+                    {formatScheduleDate(scheduledDate)}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="z-[60] w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={scheduledDate}
+                    onSelect={setScheduledDate}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Input
+                type="time"
+                value={scheduledTime}
+                onChange={(event) => setScheduledTime(event.target.value)}
+                className="h-10 rounded-xl bg-background"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border/70 px-4">
+        <DetailRow label="Scheduled" value={formatDateTime(task.scheduledAt)} />
+        <DetailRow label="Published" value={formatDateTime(task.publishedAt)} />
+        <DetailRow label="Created" value={formatDateTime(task.createdAt)} />
+      </div>
+
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button variant="outline" onClick={onCancelEdit}>
+          <X className="size-4" />
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            const scheduledAt = buildScheduledIso(scheduledDate, scheduledTime)
+
+            if (scheduledAt && !isFutureScheduledTime(scheduledAt)) {
+              onInvalidSchedule?.()
+              return
+            }
+
+            onSaveContent?.(task, {
+              title: title.trim() || null,
+              caption: caption.trim() || null,
+              hashtags: parseHashtags(hashtags),
+              scheduledAt,
+            })
+          }}
+        >
+          <Check className="size-4" />
+          Save changes
+        </Button>
+      </div>
+    </CardContent>
+  )
+}
+
+export function PublishTaskDetail({
+  task,
+  mode = "view",
+  onTaskAction,
+  onEditRequest,
+  onCancelEdit,
+  onSaveContent,
+  onInvalidSchedule,
+}: PublishTaskDetailProps) {
+  const isEditable = task?.status === "DRAFT" || task?.status === "SCHEDULED"
+  const isEditing = mode === "edit" && isEditable
+
   if (!task) {
     return (
       <Card className="border-border/70 bg-card/95">
@@ -76,6 +294,15 @@ export function PublishTaskDetail({ task, onTaskAction }: PublishTaskDetailProps
         </div>
       </CardHeader>
 
+      {isEditing ? (
+        <PublishTaskEditPanel
+          key={task.id}
+          task={task}
+          onCancelEdit={onCancelEdit}
+          onSaveContent={onSaveContent}
+          onInvalidSchedule={onInvalidSchedule}
+        />
+      ) : (
       <CardContent className="space-y-5 p-4">
         <div className="rounded-xl border border-border/70 bg-muted/30 p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
@@ -87,6 +314,7 @@ export function PublishTaskDetail({ task, onTaskAction }: PublishTaskDetailProps
               {task.platformAccountName}
             </span>
           </div>
+
           <p className="text-sm leading-6 text-foreground">
             {task.caption ?? "No caption has been drafted for this publish task."}
           </p>
@@ -146,6 +374,10 @@ export function PublishTaskDetail({ task, onTaskAction }: PublishTaskDetailProps
         <div className="flex flex-wrap justify-end gap-2">
           {task.status === "DRAFT" ? (
             <>
+              <Button variant="outline" onClick={() => onEditRequest?.(task)}>
+                <Pencil className="size-4" />
+                Edit
+              </Button>
               <Button
                 variant="secondary"
                 onClick={() => onTaskAction(task, "schedule")}
@@ -156,6 +388,21 @@ export function PublishTaskDetail({ task, onTaskAction }: PublishTaskDetailProps
               <Button onClick={() => onTaskAction(task, "publish-now")}>
                 <Send className="size-4" />
                 Publish now
+              </Button>
+            </>
+          ) : null}
+          {task.status === "SCHEDULED" ? (
+            <>
+              <Button variant="outline" onClick={() => onEditRequest?.(task)}>
+                <Pencil className="size-4" />
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => onTaskAction(task, "cancel")}
+              >
+                <XCircle className="size-4" />
+                Cancel
               </Button>
             </>
           ) : null}
@@ -175,6 +422,7 @@ export function PublishTaskDetail({ task, onTaskAction }: PublishTaskDetailProps
           ) : null}
         </div>
       </CardContent>
+      )}
     </Card>
   )
 }
