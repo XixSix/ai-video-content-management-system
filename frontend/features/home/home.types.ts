@@ -9,6 +9,20 @@ export type QuickAction = {
   isSoon?: boolean
 }
 
+export type FeaturedTool = {
+  id: string
+  title: string
+  description: string
+  href: string
+}
+
+export type ToolShortcut = {
+  id: string
+  label: string
+  href: string
+  icon: LucideIcon
+}
+
 export type ProcessingSummary = {
   activeCount: number
   queuedCount: number

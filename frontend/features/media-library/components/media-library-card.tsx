@@ -16,8 +16,10 @@ import type { MediaLibraryItem } from "../media-library.types"
 import { MediaLibraryActionsMenu } from "./media-library-actions-menu"
 
 type MediaLibraryCardProps = {
+  href?: string
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
+  showActions?: boolean
 }
 
 function renderMediaIcon(type: MediaLibraryItem["type"]) {
@@ -44,9 +46,15 @@ function getMediaBackground(type: MediaLibraryItem["type"]) {
   return "linear-gradient(135deg, color-mix(in srgb, var(--surface-raised) 86%, transparent), color-mix(in srgb, var(--surface-inset) 92%, transparent))"
 }
 
-export function MediaLibraryCard({ item, onOpen }: MediaLibraryCardProps) {
+export function MediaLibraryCard({
+  href,
+  item,
+  onOpen,
+  showActions = true,
+}: MediaLibraryCardProps) {
   const isUploading = item.status === "UPLOADING"
   const openItem = () => onOpen?.(item)
+  const defaultHref = href ?? "/studio"
 
   if (isUploading) {
     return (
@@ -77,7 +85,7 @@ export function MediaLibraryCard({ item, onOpen }: MediaLibraryCardProps) {
             <CardTitle className="line-clamp-2 text-[15px]">
               {item.title}
             </CardTitle>
-            <MediaLibraryActionsMenu />
+            {showActions ? <MediaLibraryActionsMenu /> : null}
           </div>
         </CardHeader>
       </Card>
@@ -86,7 +94,26 @@ export function MediaLibraryCard({ item, onOpen }: MediaLibraryCardProps) {
 
   return (
     <Card className="border-border/70 bg-card/95 py-0 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-panel)]">
-      {onOpen ? (
+      {href ? (
+        <Link href={href} className="block border-b border-border/60">
+          <div
+            className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
+            style={{ backgroundImage: getMediaBackground(item.type) }}
+          >
+            <div className="absolute inset-0 flex flex-col justify-between p-3">
+              <div className="flex items-start justify-between gap-3">
+                <Badge variant="neutral">{item.type}</Badge>
+              </div>
+
+              <div className="flex items-end justify-start gap-3 text-foreground">
+                <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
+                  {renderMediaIcon(item.type)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      ) : onOpen ? (
         <button
           type="button"
           className="block w-full border-b border-border/60 text-left"
@@ -110,7 +137,7 @@ export function MediaLibraryCard({ item, onOpen }: MediaLibraryCardProps) {
           </div>
         </button>
       ) : (
-        <Link href="/studio" className="block border-b border-border/60">
+        <Link href={defaultHref} className="block border-b border-border/60">
           <div
             className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
             style={{ backgroundImage: getMediaBackground(item.type) }}
@@ -133,7 +160,11 @@ export function MediaLibraryCard({ item, onOpen }: MediaLibraryCardProps) {
       <CardHeader className="gap-2 pb-4">
         <div className="flex items-start justify-between gap-3">
           <CardTitle className="line-clamp-2 text-[15px]">
-            {onOpen ? (
+            {href ? (
+              <Link href={href} className="hover:text-foreground-subtle">
+                {item.title}
+              </Link>
+            ) : onOpen ? (
               <button
                 type="button"
                 className="text-left hover:text-foreground-subtle"
@@ -142,12 +173,12 @@ export function MediaLibraryCard({ item, onOpen }: MediaLibraryCardProps) {
                 {item.title}
               </button>
             ) : (
-              <Link href="/studio" className="hover:text-foreground-subtle">
+              <Link href={defaultHref} className="hover:text-foreground-subtle">
                 {item.title}
               </Link>
             )}
           </CardTitle>
-          <MediaLibraryActionsMenu />
+          {showActions ? <MediaLibraryActionsMenu /> : null}
         </div>
       </CardHeader>
     </Card>

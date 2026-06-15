@@ -88,6 +88,7 @@ function MediaLibraryPageContent() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const timeoutIdsRef = useRef<number[]>([])
   const activeTab = parseMediaLibraryTab(searchParams.get("tab"))
+  const previewMediaId = searchParams.get("preview")
   const selectedLongToShortSourceId = searchParams.get("source")
 
   useEffect(() => {
@@ -134,6 +135,7 @@ function MediaLibraryPageContent() {
     } else {
       nextParams.delete("source")
     }
+    nextParams.delete("preview")
 
     const queryString = nextParams.toString()
     router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
@@ -175,6 +177,17 @@ function MediaLibraryPageContent() {
 
     if (activeTab === "LONG_TO_SHORT" && selectedLongToShortSourceId) {
       updateLibraryUrl("LONG_TO_SHORT")
+      return
+    }
+
+    if (previewMediaId) {
+      const nextParams = new URLSearchParams(searchParams.toString())
+      nextParams.delete("preview")
+
+      const queryString = nextParams.toString()
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      })
     }
   }
 
@@ -279,7 +292,12 @@ function MediaLibraryPageContent() {
             item.libraryGroup === "ORIGINAL"
         ) ?? null
       : null
-  const previewItem = selectedPreviewItem ?? selectedLongToShortSource
+  const queryPreviewItem = previewMediaId
+    ? items.find(
+        (item) => item.id === previewMediaId && item.status !== "UPLOADING"
+      ) ?? null
+    : null
+  const previewItem = selectedPreviewItem ?? queryPreviewItem ?? selectedLongToShortSource
   const previewCandidates =
     activeTab === "LONG_TO_SHORT" && previewItem?.longToShortSourceId
       ? longToShortCandidatesBySourceId[previewItem.longToShortSourceId] ?? []
