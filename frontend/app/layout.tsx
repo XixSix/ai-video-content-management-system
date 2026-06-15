@@ -92,7 +92,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${poppins.variable} ${oswald.variable} ${teko.variable} ${bebasNeue.variable} ${anton.variable} ${playfairDisplay.variable} ${caveat.variable} ${robotoMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${poppins.variable} ${oswald.variable} ${teko.variable} ${bebasNeue.variable} ${anton.variable} ${playfairDisplay.variable} ${caveat.variable} ${robotoMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider defaultTheme="dark">
