@@ -14,5 +14,6 @@ export type StudioProject = {
   updatedAt: string
   sourceType: "VIDEO" | "AUDIO"
   status: StudioProjectStatus
+  thumbnailUrl: string | null
   thumbnailVariant: "teal" | "slate" | "olive" | "ember"
 }

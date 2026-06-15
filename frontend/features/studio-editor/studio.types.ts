@@ -151,6 +151,7 @@ export type StudioSourceMedia = {
   durationLabel: string
   resolutionLabel: string
   summary: string
+  thumbnailUrl: string | null
 }
 
 export type StudioMediaDetail = {
@@ -183,6 +184,8 @@ export type StudioProjectMediaItem = {
   summary: string
   origin: StudioProjectMediaOrigin
   status: StudioProjectMediaStatus
+  assetUrl: string | null
+  thumbnailUrl: string | null
   format: string
   metadata: string
   usageLabel: string

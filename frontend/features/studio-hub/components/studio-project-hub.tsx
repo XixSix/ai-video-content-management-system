@@ -10,12 +10,13 @@ import { StudioProjectCard } from "@/features/studio-hub/components/studio-proje
 import { StudioProjectToolbar } from "@/features/studio-hub/components/studio-project-toolbar"
 import { studioProjects } from "@/features/studio-hub/studio-projects.data"
 import type {
+  StudioProject,
   StudioProjectSortKey,
   StudioProjectStatus,
 } from "@/features/studio-hub/studio-projects.types"
 
 function sortProjects(
-  projects: typeof studioProjects,
+  projects: StudioProject[],
   sortKey: StudioProjectSortKey
 ) {
   const items = [...projects]
@@ -32,6 +33,7 @@ function sortProjects(
 }
 
 export function StudioProjectHub() {
+  const [projects, setProjects] = useState<StudioProject[]>(studioProjects)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<StudioProjectStatus | "ALL">(
     "ALL"
@@ -41,7 +43,7 @@ export function StudioProjectHub() {
   const filteredProjects = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase()
 
-    const matchingProjects = studioProjects.filter((project) => {
+    const matchingProjects = projects.filter((project) => {
       const matchesStatus =
         statusFilter === "ALL" ? true : project.status === statusFilter
       const matchesQuery =
@@ -54,9 +56,16 @@ export function StudioProjectHub() {
     })
 
     return sortProjects(matchingProjects, sortKey)
-  }, [searchQuery, sortKey, statusFilter])
+  }, [projects, searchQuery, sortKey, statusFilter])
 
   const featuredProject = filteredProjects[0] ?? null
+  const renameProject = (projectId: string, name: string) => {
+    setProjects((currentProjects) =>
+      currentProjects.map((project) =>
+        project.id === projectId ? { ...project, name } : project
+      )
+    )
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 py-6 lg:gap-10">
@@ -105,7 +114,11 @@ export function StudioProjectHub() {
             title="Continue editing"
             description="Jump back into the project you were shaping most recently."
           />
-          <StudioProjectCard project={featuredProject} featured />
+          <StudioProjectCard
+            project={featuredProject}
+            featured
+            onRename={renameProject}
+          />
         </section>
       ) : null}
 
@@ -115,7 +128,7 @@ export function StudioProjectHub() {
           description="Browse every active workspace without dropping straight into the editor."
         />
 
-        {studioProjects.length < 1 ? (
+        {projects.length < 1 ? (
           <Card className="border-border/70 bg-card/95">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-foreground">
@@ -129,7 +142,11 @@ export function StudioProjectHub() {
         ) : filteredProjects.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredProjects.map((project) => (
-              <StudioProjectCard key={project.id} project={project} />
+              <StudioProjectCard
+                key={project.id}
+                project={project}
+                onRename={renameProject}
+              />
             ))}
           </div>
         ) : (

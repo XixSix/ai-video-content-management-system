@@ -1,14 +1,45 @@
+"use client"
+
 import Link from "next/link"
-import { AudioWaveform, Clapperboard, MoreHorizontal, PlayCircle } from "lucide-react"
+import Image from "next/image"
+import {
+  type FormEvent,
+  useState,
+} from "react"
+import {
+  AudioWaveform,
+  Clapperboard,
+  Download,
+  MoreHorizontal,
+  PencilLine,
+  Send,
+  Trash2,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { formatShortDate } from "@/features/home/home.utils"
 import type { StudioProject } from "@/features/studio-hub/studio-projects.types"
@@ -16,6 +47,7 @@ import type { StudioProject } from "@/features/studio-hub/studio-projects.types"
 type StudioProjectCardProps = {
   project: StudioProject
   featured?: boolean
+  onRename?: (projectId: string, name: string) => void
 }
 
 const thumbnailVariantClassName = {
@@ -28,6 +60,7 @@ const thumbnailVariantClassName = {
 export function StudioProjectCard({
   project,
   featured = false,
+  onRename,
 }: StudioProjectCardProps) {
   const SourceIcon =
     project.sourceType === "VIDEO" ? Clapperboard : AudioWaveform
@@ -52,21 +85,28 @@ export function StudioProjectCard({
             featured ? "aspect-[16/8.5] lg:h-full lg:min-h-[252px]" : "aspect-video"
           )}
         >
-          <div
-            className={cn(
-              "absolute inset-0 bg-gradient-to-br",
-              thumbnailVariantClassName[project.thumbnailVariant]
-            )}
-          />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.15),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.14))]" />
+          {project.thumbnailUrl ? (
+            <Image
+              src={project.thumbnailUrl}
+              alt=""
+              fill
+              sizes={featured ? "(min-width: 1024px) 46vw, 100vw" : "(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"}
+              className="absolute inset-0 object-cover"
+            />
+          ) : (
+            <div
+              className={cn(
+                "absolute inset-0 bg-gradient-to-br",
+                thumbnailVariantClassName[project.thumbnailVariant]
+              )}
+            />
+          )}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.28))]" />
           <div className="absolute inset-0 flex flex-col justify-end p-4">
             <div className="flex items-end justify-between gap-3">
               <span className="inline-flex size-11 items-center justify-center rounded-lg border border-white/14 bg-black/18 text-white">
                 <SourceIcon className="size-4" />
               </span>
-              <div className="rounded-full bg-black/32 px-3 py-1 text-[11px] font-medium text-white/80">
-                Updated {formatShortDate(project.updatedAt)}
-              </div>
             </div>
           </div>
         </div>
@@ -88,14 +128,7 @@ export function StudioProjectCard({
                 {project.name}
               </Link>
             </CardTitle>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="shrink-0"
-              aria-label="Project actions"
-            >
-              <MoreHorizontal className="size-4" />
-            </Button>
+            <StudioProjectActionsMenu project={project} onRename={onRename} />
           </div>
         </CardHeader>
 
@@ -112,16 +145,106 @@ export function StudioProjectCard({
             </p>
           </div>
         </CardContent>
-
-        <CardFooter className={cn("justify-end gap-2", featured ? "lg:px-6" : "")}>
-          <Button size="sm" asChild>
-            <Link href={`/editor/${project.slug}`}>
-              <PlayCircle className="size-4" />
-              Open Studio
-            </Link>
-          </Button>
-        </CardFooter>
       </div>
     </Card>
+  )
+}
+
+function StudioProjectActionsMenu({
+  project,
+  onRename,
+}: {
+  project: StudioProject
+  onRename?: (projectId: string, name: string) => void
+}) {
+  const [isRenameOpen, setIsRenameOpen] = useState(false)
+  const [nameDraft, setNameDraft] = useState(project.name)
+
+  const preventMenuAction = (event: Event) => {
+    event.preventDefault()
+  }
+
+  const openRenameDialog = (event: Event) => {
+    event.preventDefault()
+    setNameDraft(project.name)
+    setIsRenameOpen(true)
+  }
+
+  const submitRename = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const nextName = nameDraft.trim()
+
+    if (nextName) {
+      onRename?.(project.id, nextName)
+      setIsRenameOpen(false)
+    }
+  }
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="shrink-0"
+            aria-label="Project actions"
+          >
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44 min-w-44">
+          <DropdownMenuItem onSelect={openRenameDialog}>
+            <PencilLine className="size-4" />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={preventMenuAction}>
+            <Download className="size-4" />
+            Download
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={preventMenuAction}>
+            <Send className="size-4" />
+            Publish
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={preventMenuAction} variant="destructive">
+            <Trash2 className="size-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={isRenameOpen} onOpenChange={setIsRenameOpen}>
+        <DialogContent>
+          <form onSubmit={submitRename} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>Rename project</DialogTitle>
+              <DialogDescription>
+                Update the workspace name shown across Studio.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Input
+              autoFocus
+              value={nameDraft}
+              onChange={(event) => setNameDraft(event.target.value)}
+              placeholder="Project name"
+            />
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={!nameDraft.trim()}>
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
