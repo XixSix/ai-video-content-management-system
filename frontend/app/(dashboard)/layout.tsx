@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { AuthManager } from "@/features/auth/components/auth-manager";
 import { LongToShortManager } from "@/features/long-to-short/components/long-to-short-manager";
 import { SocialAccountsManager } from "@/features/social-accounts/components/social-accounts-manager";
 
@@ -17,6 +18,7 @@ export default function DashboardLayout({
         <main className="flex-1 p-4 lg:p-6 bg-background">
           {children}
         </main>
+        <AuthManager />
         <LongToShortManager />
         <SocialAccountsManager />
       </div>

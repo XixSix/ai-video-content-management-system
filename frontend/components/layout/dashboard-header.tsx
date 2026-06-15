@@ -1,12 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { LogIn, UserPlus } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { navigationConfig } from "./dashboard-nav";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/features/auth/auth.store";
 
 export function DashboardHeader() {
   const pathname = usePathname();
+  const openAuth = useAuthStore((state) => state.openManager);
   
   // Find current route title or default to "Home" if matched "/"
   const currentNav = navigationConfig.find(
@@ -20,11 +23,20 @@ export function DashboardHeader() {
       <div className="flex-1">
         <h1 className="text-lg font-semibold">{title}</h1>
       </div>
-      <div className="flex items-center gap-4">
-        {/* Placeholder for User Profile Menu */}
-        <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarFallback className="bg-primary/10 text-primary text-xs">U</AvatarFallback>
-        </Avatar>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => openAuth("login")}
+        >
+          <LogIn className="size-4" />
+          <span className="hidden sm:inline">Sign in</span>
+        </Button>
+        <Button type="button" size="sm" onClick={() => openAuth("signup")}>
+          <UserPlus className="size-4" />
+          <span className="hidden sm:inline">Sign up</span>
+        </Button>
       </div>
     </header>
   );
