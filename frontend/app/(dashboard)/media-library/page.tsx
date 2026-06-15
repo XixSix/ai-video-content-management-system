@@ -6,6 +6,7 @@ import { UploadCloud } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { DataPagination } from "@/components/shared/data-pagination"
 import {
   mediaLibraryItems,
   mediaLibraryTabOptions,
@@ -34,6 +35,8 @@ import type {
   MediaStatusFilter,
   MediaTypeFilter,
 } from "@/features/media-library/media-library.types"
+
+const MEDIA_LIBRARY_PAGE_SIZE = 6
 
 function parseMediaLibraryTab(value: string | null): MediaLibraryTab {
   if (value === "original") {
@@ -78,6 +81,7 @@ function MediaLibraryPageContent() {
   const [typeFilter, setTypeFilter] = useState<MediaTypeFilter>("ALL")
   const [statusFilter, setStatusFilter] = useState<MediaStatusFilter>("ALL")
   const [sortKey, setSortKey] = useState<MediaLibrarySortKey>("newest")
+  const [currentPage, setCurrentPage] = useState(1)
   const [selectedPreviewItem, setSelectedPreviewItem] =
     useState<MediaLibraryItem | null>(null)
 
@@ -108,6 +112,7 @@ function MediaLibraryPageContent() {
     setTypeFilter("ALL")
     setStatusFilter("ALL")
     setSortKey("newest")
+    setCurrentPage(1)
     updateLibraryUrl("ALL")
   }
 
@@ -137,6 +142,7 @@ function MediaLibraryPageContent() {
   }
 
   const handleTabChange = (nextTab: MediaLibraryTab) => {
+    setCurrentPage(1)
     updateLibraryUrl(nextTab)
   }
 
@@ -255,6 +261,16 @@ function MediaLibraryPageContent() {
     statusFilter,
     sortKey,
   })
+  const pageCount = Math.max(
+    1,
+    Math.ceil(visibleItems.length / MEDIA_LIBRARY_PAGE_SIZE)
+  )
+  const safeCurrentPage = Math.min(currentPage, pageCount)
+  const paginatedItems = visibleItems.slice(
+    (safeCurrentPage - 1) * MEDIA_LIBRARY_PAGE_SIZE,
+    safeCurrentPage * MEDIA_LIBRARY_PAGE_SIZE
+  )
+
   const selectedLongToShortSource =
     activeTab === "LONG_TO_SHORT" && selectedLongToShortSourceId
       ? items.find(
@@ -306,7 +322,7 @@ function MediaLibraryPageContent() {
     if (viewMode === "list") {
       return (
         <div className="space-y-3">
-          {visibleItems.map((item) => (
+          {paginatedItems.map((item) => (
             <MediaLibraryRow
               key={item.id}
               item={item}
@@ -326,7 +342,7 @@ function MediaLibraryPageContent() {
 
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {visibleItems.map((item) => (
+        {paginatedItems.map((item) => (
           <MediaLibraryCard
             key={item.id}
             item={item}
@@ -401,25 +417,50 @@ function MediaLibraryPageContent() {
           />
           <MediaLibraryToolbar
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={(value) => {
+              setSearchQuery(value)
+              setCurrentPage(1)
+            }}
             sortKey={sortKey}
-            onSortChange={setSortKey}
+            onSortChange={(value) => {
+              setSortKey(value)
+              setCurrentPage(1)
+            }}
             sortOptions={mediaSortOptions}
             viewMode={viewMode}
-            onViewModeChange={setViewMode}
+            onViewModeChange={(value) => {
+              setViewMode(value)
+              setCurrentPage(1)
+            }}
           />
           <MediaFilterBar
             typeFilter={typeFilter}
-            onTypeFilterChange={setTypeFilter}
+            onTypeFilterChange={(value) => {
+              setTypeFilter(value)
+              setCurrentPage(1)
+            }}
             statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
+            onStatusFilterChange={(value) => {
+              setStatusFilter(value)
+              setCurrentPage(1)
+            }}
             typeOptions={mediaTypeFilterOptions}
             statusOptions={mediaStatusFilterOptions}
           />
         </section>
       ) : null}
 
-      <section>{renderContent()}</section>
+      <section className="space-y-4">
+        {renderContent()}
+        {!isLoading && !shouldShowEmptyState && !shouldShowNoResults ? (
+          <DataPagination
+            page={safeCurrentPage}
+            pageSize={MEDIA_LIBRARY_PAGE_SIZE}
+            totalItems={visibleItems.length}
+            onPageChange={setCurrentPage}
+          />
+        ) : null}
+      </section>
       <MediaLibraryPreviewDialog
         item={previewItem}
         activeTab={activeTab}
