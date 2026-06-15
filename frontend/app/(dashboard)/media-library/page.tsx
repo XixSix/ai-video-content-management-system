@@ -88,6 +88,7 @@ function MediaLibraryPageContent() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const timeoutIdsRef = useRef<number[]>([])
   const activeTab = parseMediaLibraryTab(searchParams.get("tab"))
+  const previewMediaId = searchParams.get("preview")
   const selectedLongToShortSourceId = searchParams.get("source")
 
   useEffect(() => {
@@ -134,6 +135,7 @@ function MediaLibraryPageContent() {
     } else {
       nextParams.delete("source")
     }
+    nextParams.delete("preview")
 
     const queryString = nextParams.toString()
     router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
@@ -175,7 +177,35 @@ function MediaLibraryPageContent() {
 
     if (activeTab === "LONG_TO_SHORT" && selectedLongToShortSourceId) {
       updateLibraryUrl("LONG_TO_SHORT")
+      return
     }
+
+    if (previewMediaId) {
+      const nextParams = new URLSearchParams(searchParams.toString())
+      nextParams.delete("preview")
+
+      const queryString = nextParams.toString()
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      })
+    }
+  }
+
+  const renameMediaItem = (itemId: string, title: string) => {
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              title,
+              updatedAt: new Date().toISOString(),
+            }
+          : item
+      )
+    )
+    toast.success("Media renamed", {
+      description: title,
+    })
   }
 
   const handleUploadSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,6 +223,7 @@ function MediaLibraryPageContent() {
         id: uploadId,
         title: file.name.replace(/\.[^/.]+$/, ""),
         originalFilename: file.name,
+        assetUrl: null,
         thumbnailUrl: null,
         duration: null,
         fileSizeBytes: file.size,
@@ -279,11 +310,55 @@ function MediaLibraryPageContent() {
             item.libraryGroup === "ORIGINAL"
         ) ?? null
       : null
-  const previewItem = selectedPreviewItem ?? selectedLongToShortSource
+  const queryPreviewItem = previewMediaId
+    ? items.find(
+        (item) => item.id === previewMediaId && item.status !== "UPLOADING"
+      ) ?? null
+    : null
+  const previewItem = selectedPreviewItem ?? queryPreviewItem ?? selectedLongToShortSource
+  const navigablePreviewItems = visibleItems.filter(
+    (item) => item.status !== "UPLOADING"
+  )
+  const previewItemIndex = previewItem
+    ? navigablePreviewItems.findIndex((item) => item.id === previewItem.id)
+    : -1
+  const hasPreviousPreviewItem = previewItemIndex > 0
+  const hasNextPreviewItem =
+    previewItemIndex >= 0 && previewItemIndex < navigablePreviewItems.length - 1
   const previewCandidates =
     activeTab === "LONG_TO_SHORT" && previewItem?.longToShortSourceId
       ? longToShortCandidatesBySourceId[previewItem.longToShortSourceId] ?? []
-    : []
+      : []
+
+  const openPreviewFromNavigation = (item: MediaLibraryItem) => {
+    setSelectedPreviewItem(item)
+
+    if (activeTab === "LONG_TO_SHORT" && item.longToShortSourceId) {
+      updateLibraryUrl("LONG_TO_SHORT", item.longToShortSourceId)
+      return
+    }
+
+    const nextParams = new URLSearchParams(searchParams.toString())
+    nextParams.set("preview", item.id)
+    nextParams.delete("source")
+
+    const queryString = nextParams.toString()
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    })
+  }
+
+  const openPreviousPreviewItem = () => {
+    if (hasPreviousPreviewItem) {
+      openPreviewFromNavigation(navigablePreviewItems[previewItemIndex - 1])
+    }
+  }
+
+  const openNextPreviewItem = () => {
+    if (hasNextPreviewItem) {
+      openPreviewFromNavigation(navigablePreviewItems[previewItemIndex + 1])
+    }
+  }
 
   const hasLibraryItems = items.length > 0
   const shouldShowEmptyState = !isLoading && !hasLibraryItems
@@ -334,6 +409,7 @@ function MediaLibraryPageContent() {
                     : openMediaPreview
               }
               actionLabel={activeTab === "LONG_TO_SHORT" ? "View clips" : "Preview"}
+              onRename={renameMediaItem}
             />
           ))}
         </div>
@@ -353,6 +429,7 @@ function MediaLibraryPageContent() {
                   ? openLongToShortSource
                   : openMediaPreview
             }
+            onRename={renameMediaItem}
           />
         ))}
       </div>
@@ -465,12 +542,16 @@ function MediaLibraryPageContent() {
         item={previewItem}
         activeTab={activeTab}
         candidates={previewCandidates}
+        hasNextItem={hasNextPreviewItem}
+        hasPreviousItem={hasPreviousPreviewItem}
         open={Boolean(previewItem)}
+        onNextItem={openNextPreviewItem}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) {
             closeMediaPreview()
           }
         }}
+        onPreviousItem={openPreviousPreviewItem}
       />
     </div>
   )

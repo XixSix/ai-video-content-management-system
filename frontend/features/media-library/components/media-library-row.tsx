@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import {
   AudioWaveform,
   Clapperboard,
@@ -22,6 +23,7 @@ import { MediaLibraryActionsMenu } from "./media-library-actions-menu"
 type MediaLibraryRowProps = {
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
+  onRename?: (itemId: string, title: string) => void
   actionLabel?: string
 }
 
@@ -49,23 +51,43 @@ function getMediaBackground(type: MediaLibraryItem["type"]) {
   return "linear-gradient(135deg, color-mix(in srgb, var(--surface-raised) 86%, transparent), color-mix(in srgb, var(--surface-inset) 92%, transparent))"
 }
 
-export function MediaLibraryRow({
-  item,
-  onOpen,
-  actionLabel = "Open Studio",
-}: MediaLibraryRowProps) {
-  const isUploading = item.status === "UPLOADING"
-  const content = (
-    <>
-      <div
-        className="relative flex aspect-video w-full max-w-48 shrink-0 items-end justify-between overflow-hidden rounded-xl border border-border/60 p-3 lg:w-48"
-        style={{ backgroundImage: getMediaBackground(item.type) }}
-      >
+function MediaRowPreview({ item }: { item: MediaLibraryItem }) {
+  const thumbnailUrl = item.thumbnailUrl ?? (item.type === "IMAGE" ? item.assetUrl : null)
+
+  return (
+    <div
+      className="relative flex aspect-video w-full max-w-48 shrink-0 items-end justify-between overflow-hidden rounded-xl border border-border/60 p-3 lg:w-48"
+      style={{ backgroundImage: thumbnailUrl ? undefined : getMediaBackground(item.type) }}
+    >
+      {thumbnailUrl ? (
+        <Image
+          src={thumbnailUrl}
+          alt=""
+          fill
+          sizes="12rem"
+          className="absolute inset-0 object-cover"
+        />
+      ) : null}
+      <div className="relative z-10 flex w-full items-end justify-between gap-3">
         <Badge variant="neutral">{item.type}</Badge>
         <span className="inline-flex size-10 items-center justify-center rounded-xl border border-border/60 bg-background/85">
           {renderMediaIcon(item.type)}
         </span>
       </div>
+    </div>
+  )
+}
+
+export function MediaLibraryRow({
+  item,
+  onOpen,
+  onRename,
+  actionLabel = "Open Studio",
+}: MediaLibraryRowProps) {
+  const isUploading = item.status === "UPLOADING"
+  const content = (
+    <>
+      <MediaRowPreview item={item} />
 
       <div className="min-w-0 flex-1 space-y-3">
         <div className="min-w-0 space-y-1">
@@ -157,7 +179,10 @@ export function MediaLibraryRow({
                 </Link>
               </Button>
             )}
-            <MediaLibraryActionsMenu />
+            <MediaLibraryActionsMenu
+              itemTitle={item.title}
+              onRename={(title) => onRename?.(item.id, title)}
+            />
           </div>
         </div>
       </CardContent>

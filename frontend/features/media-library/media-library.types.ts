@@ -22,6 +22,7 @@ export type MediaLibraryItem = {
   id: string
   title: string
   originalFilename: string
+  assetUrl: string | null
   thumbnailUrl: string | null
   duration: number | null
   fileSizeBytes: number
