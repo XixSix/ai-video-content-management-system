@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { useTheme } from "next-themes"
 import {
   CloudCheck,
   Menu,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { useTheme } from "@/components/providers/theme-provider"
 import {
   DropdownMenu,
   DropdownMenuContent,

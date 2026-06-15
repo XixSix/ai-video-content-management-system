@@ -1,5 +1,8 @@
 "use client"
 
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,21 +22,45 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-
-type AuthFormMode = "login" | "signup"
+import type { AuthMode } from "../auth.store"
+import { useAuthStore } from "../auth.store"
+import { getSafeRedirectPath } from "../auth.utils"
 
 export function AuthForm({
   className,
   mode = "login",
-  onModeChange,
   ...props
 }: React.ComponentProps<"div"> & {
-  mode?: AuthFormMode
-  onModeChange: (mode: AuthFormMode) => void
+  mode?: AuthMode
 }) {
   const isSignup = mode === "signup"
   const actionLabel = isSignup ? "Create account" : "Login"
   const providerActionLabel = isSignup ? "Sign up" : "Login"
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const login = useAuthStore((state) => state.login)
+  const signup = useAuthStore((state) => state.signup)
+  const nextPath = getSafeRedirectPath(searchParams.get("next"))
+  const authSwitchQuery = `?next=${encodeURIComponent(nextPath)}`
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
+    const email = String(formData.get("email") ?? "")
+
+    if (isSignup) {
+      signup({
+        name: String(formData.get("name") ?? ""),
+        email,
+      })
+    } else {
+      login(email)
+    }
+
+    router.replace(nextPath)
+    router.refresh()
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -49,7 +76,7 @@ export function AuthForm({
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6">
-          <form>
+          <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -79,6 +106,7 @@ export function AuthForm({
                   <FieldLabel htmlFor="name">Name</FieldLabel>
                   <Input
                     id="name"
+                    name="name"
                     type="text"
                     placeholder="Your name"
                     autoComplete="name"
@@ -90,6 +118,7 @@ export function AuthForm({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   autoComplete="email"
@@ -121,24 +150,22 @@ export function AuthForm({
                   {isSignup ? (
                     <>
                       Already have an account?{" "}
-                      <button
-                        type="button"
+                      <Link
+                        href={`/login${authSwitchQuery}`}
                         className="underline underline-offset-4 hover:text-primary"
-                        onClick={() => onModeChange("login")}
                       >
                         Sign in
-                      </button>
+                      </Link>
                     </>
                   ) : (
                     <>
                       Don&apos;t have an account?{" "}
-                      <button
-                        type="button"
+                      <Link
+                        href={`/signup${authSwitchQuery}`}
                         className="underline underline-offset-4 hover:text-primary"
-                        onClick={() => onModeChange("signup")}
                       >
                         Sign up
-                      </button>
+                      </Link>
                     </>
                   )}
                 </FieldDescription>
