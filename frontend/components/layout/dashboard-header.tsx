@@ -3,7 +3,9 @@
 import { usePathname } from "next/navigation";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { navigationConfig } from "./dashboard-nav";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { HeaderAccountMenu } from "./header-account-menu";
+import { HeaderNotifications } from "./header-notifications";
+import { ThemeToggle } from "./theme-toggle";
 
 export function DashboardHeader() {
   const pathname = usePathname();
@@ -20,11 +22,10 @@ export function DashboardHeader() {
       <div className="flex-1">
         <h1 className="text-lg font-semibold">{title}</h1>
       </div>
-      <div className="flex items-center gap-4">
-        {/* Placeholder for User Profile Menu */}
-        <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarFallback className="bg-primary/10 text-primary text-xs">U</AvatarFallback>
-        </Avatar>
+      <div className="flex items-center gap-1 sm:gap-2">
+        <ThemeToggle />
+        <HeaderNotifications />
+        <HeaderAccountMenu />
       </div>
     </header>
   );

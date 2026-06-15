@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { Link2, Plus } from "lucide-react"
 import { toast } from "sonner"
 
+import { DataPagination } from "@/components/shared/data-pagination"
 import { PublishCalendarView } from "@/features/publishing/components/publish-calendar-view"
 import { PublishFormSheet } from "@/features/publishing/components/publish-form-sheet"
 import {
@@ -35,6 +36,8 @@ import {
   getPublishStatusCounts,
   isFutureScheduledTime,
 } from "@/features/publishing/publishing.utils"
+
+const PUBLISHING_PAGE_SIZE = 4
 
 function buildPublishTasks(payload: NewPublishPayload): PublishTask[] {
   const now = new Date()
@@ -76,6 +79,7 @@ export default function PublishingPage() {
     useState<PublishPlatformFilter>("ALL")
   const [sortKey, setSortKey] = useState<PublishSortKey>("newest")
   const [viewMode, setViewMode] = useState<PublishViewMode>("list")
+  const [currentPage, setCurrentPage] = useState(1)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(
     publishTasksSeed[0]?.id ?? null
   )
@@ -99,8 +103,23 @@ export default function PublishingPage() {
     [platformFilter, searchQuery, sortKey, statusFilter, tasks]
   )
 
+  const pageCount = Math.max(
+    1,
+    Math.ceil(visibleTasks.length / PUBLISHING_PAGE_SIZE)
+  )
+  const safeCurrentPage = Math.min(currentPage, pageCount)
+  const paginatedTasks = useMemo(
+    () =>
+      visibleTasks.slice(
+        (safeCurrentPage - 1) * PUBLISHING_PAGE_SIZE,
+        safeCurrentPage * PUBLISHING_PAGE_SIZE
+      ),
+    [safeCurrentPage, visibleTasks]
+  )
   const selectedTask =
-    tasks.find((task) => task.id === selectedTaskId) ?? visibleTasks[0] ?? null
+    paginatedTasks.find((task) => task.id === selectedTaskId) ??
+    paginatedTasks[0] ??
+    null
 
   const statusCounts = useMemo(() => getPublishStatusCounts(tasks), [tasks])
   const publishedThisWeek = useMemo(
@@ -113,6 +132,7 @@ export default function PublishingPage() {
     setStatusFilter("ALL")
     setPlatformFilter("ALL")
     setSortKey("newest")
+    setCurrentPage(1)
   }
 
   const selectTask = (task: PublishTask) => {
@@ -322,15 +342,30 @@ export default function PublishingPage() {
 
       <PublishingToolbar
         searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
+        onSearchQueryChange={(value) => {
+          setSearchQuery(value)
+          setCurrentPage(1)
+        }}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(value) => {
+          setStatusFilter(value)
+          setCurrentPage(1)
+        }}
         platformFilter={platformFilter}
-        onPlatformFilterChange={setPlatformFilter}
+        onPlatformFilterChange={(value) => {
+          setPlatformFilter(value)
+          setCurrentPage(1)
+        }}
         sortKey={sortKey}
-        onSortKeyChange={setSortKey}
+        onSortKeyChange={(value) => {
+          setSortKey(value)
+          setCurrentPage(1)
+        }}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        onViewModeChange={(value) => {
+          setViewMode(value)
+          setCurrentPage(1)
+        }}
       />
 
       {viewMode === "calendar" ? (
@@ -343,12 +378,20 @@ export default function PublishingPage() {
         />
       ) : (
         <section className="grid gap-4 lg:grid-cols-[minmax(24rem,0.95fr)_minmax(24rem,1.05fr)]">
-          <PublishTaskList
-            tasks={visibleTasks}
-            selectedTaskId={selectedTaskId}
-            onSelectTask={selectTask}
-            onResetFilters={resetFilters}
-          />
+          <div className="space-y-4">
+            <PublishTaskList
+              tasks={paginatedTasks}
+              selectedTaskId={selectedTask?.id ?? selectedTaskId}
+              onSelectTask={selectTask}
+              onResetFilters={resetFilters}
+            />
+            <DataPagination
+              page={safeCurrentPage}
+              pageSize={PUBLISHING_PAGE_SIZE}
+              totalItems={visibleTasks.length}
+              onPageChange={setCurrentPage}
+            />
+          </div>
 
           <aside>
             <div className="sticky top-24">
