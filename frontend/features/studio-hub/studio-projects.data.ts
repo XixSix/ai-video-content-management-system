@@ -3,56 +3,78 @@ import type {
   StudioProjectSortKey,
   StudioProjectStatus,
 } from "./studio-projects.types"
+import { mediaLibraryItems } from "@/features/media-library/media-library.data"
+
+function getMediaLibraryItem(itemId: string) {
+  const item = mediaLibraryItems.find((mediaItem) => mediaItem.id === itemId)
+
+  if (!item) {
+    throw new Error(`Missing mock media library item: ${itemId}`)
+  }
+
+  return item
+}
+
+const launchSource = getMediaLibraryItem("media-library-1")
+const founderSource = getMediaLibraryItem("media-library-2")
+const retailSource = getMediaLibraryItem("media-library-3")
+const summerSource = getMediaLibraryItem("media-library-editor-1")
+const recapSource = getMediaLibraryItem("media-library-editor-3")
 
 export const studioProjects: StudioProject[] = [
   {
     id: "project-1",
     slug: "project-launch-campaign",
     name: "Project Launch Campaign",
-    mainSourceMedia: "launch-keynote-v3.mp4",
-    updatedAt: "2026-06-11T08:45:00.000Z",
+    mainSourceMedia: launchSource.originalFilename,
+    updatedAt: launchSource.updatedAt,
     sourceType: "VIDEO",
     status: "NEEDS_REVIEW",
+    thumbnailUrl: launchSource.thumbnailUrl,
     thumbnailVariant: "teal",
   },
   {
     id: "project-2",
     slug: "founder-ama",
     name: "Founder AMA",
-    mainSourceMedia: "founder-ama-ep42.wav",
-    updatedAt: "2026-06-10T15:12:00.000Z",
+    mainSourceMedia: founderSource.originalFilename,
+    updatedAt: founderSource.updatedAt,
     sourceType: "AUDIO",
     status: "PROCESSING",
+    thumbnailUrl: founderSource.thumbnailUrl,
     thumbnailVariant: "slate",
   },
   {
     id: "project-3",
     slug: "retail-customer-story",
     name: "Retail Customer Story",
-    mainSourceMedia: "retail-story-master.mov",
-    updatedAt: "2026-06-09T11:26:00.000Z",
+    mainSourceMedia: retailSource.originalFilename,
+    updatedAt: retailSource.updatedAt,
     sourceType: "VIDEO",
     status: "READY",
+    thumbnailUrl: retailSource.thumbnailUrl,
     thumbnailVariant: "olive",
   },
   {
     id: "project-4",
     slug: "summer-shorts-batch",
     name: "Summer Shorts Batch",
-    mainSourceMedia: "summer-social-cutdowns.mp4",
-    updatedAt: "2026-06-08T09:40:00.000Z",
+    mainSourceMedia: summerSource.originalFilename,
+    updatedAt: summerSource.updatedAt,
     sourceType: "VIDEO",
     status: "DRAFT",
+    thumbnailUrl: summerSource.thumbnailUrl,
     thumbnailVariant: "ember",
   },
   {
     id: "project-5",
     slug: "weekly-product-recap",
     name: "Weekly Product Recap",
-    mainSourceMedia: "weekly-recap-take-2.mp4",
-    updatedAt: "2026-06-07T17:18:00.000Z",
+    mainSourceMedia: recapSource.originalFilename,
+    updatedAt: recapSource.updatedAt,
     sourceType: "VIDEO",
     status: "READY",
+    thumbnailUrl: recapSource.thumbnailUrl,
     thumbnailVariant: "teal",
   },
 ]

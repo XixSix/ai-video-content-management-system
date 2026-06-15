@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import type {
   StudioEditorProject,
+  StudioProjectMediaItem,
   StudioRailItem,
   StudioSelection,
   StudioTextAnimationBy,
@@ -20,6 +21,12 @@ import type {
   StudioToolId,
   StudioToolPanelContent,
 } from "./studio.types"
+import { mediaLibraryItems } from "@/features/media-library/media-library.data"
+import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
+import {
+  formatDuration,
+  formatFileSize,
+} from "@/features/media-library/media-library.utils"
 
 export const studioRailItems: StudioRailItem[] = [
   { id: "media", label: "Media", icon: Clapperboard },
@@ -309,105 +316,153 @@ const transcriptSegments: StudioTranscriptSegment[] = [
 const transcriptWords = createTranscriptWords(transcriptSegments)
 const transcriptFullText = transcriptSegments.map((segment) => segment.text).join(" ")
 
+function getMediaLibraryItem(itemId: string) {
+  const item = mediaLibraryItems.find((mediaItem) => mediaItem.id === itemId)
+
+  if (!item) {
+    throw new Error(`Missing mock media library item: ${itemId}`)
+  }
+
+  return item
+}
+
+function getStudioMediaType(item: MediaLibraryItem): StudioProjectMediaItem["type"] {
+  if (item.type === "VIDEO" || item.type === "AUDIO" || item.type === "IMAGE") {
+    return item.type
+  }
+
+  return "SUBTITLE"
+}
+
+function getFormatLabel(mimeType: string) {
+  const subtype = mimeType.split("/")[1] ?? mimeType
+  return subtype.split(";")[0].toUpperCase()
+}
+
+function getResolutionLabel(item: MediaLibraryItem) {
+  if (typeof item.width === "number" && typeof item.height === "number") {
+    return `${item.width}x${item.height}`
+  }
+
+  return undefined
+}
+
+function getMediaMetadata(item: MediaLibraryItem) {
+  const parts = [
+    item.duration !== null ? formatDuration(item.duration) : null,
+    getResolutionLabel(item),
+    formatFileSize(item.fileSizeBytes),
+  ].filter(Boolean)
+
+  return parts.join(" · ")
+}
+
+function getStudioMediaStatus(
+  item: MediaLibraryItem
+): StudioProjectMediaItem["status"] {
+  if (item.status === "UPLOADED") {
+    return "READY"
+  }
+
+  if (item.status === "UPLOADING") {
+    return "UPLOADING"
+  }
+
+  return "FAILED"
+}
+
+function createStudioMediaItem(
+  item: MediaLibraryItem,
+  overrides: Partial<StudioProjectMediaItem> = {}
+): StudioProjectMediaItem {
+  const studioType = getStudioMediaType(item)
+  const resolutionLabel = getResolutionLabel(item)
+
+  return {
+    id: item.id,
+    type: studioType,
+    name: item.originalFilename,
+    summary:
+      studioType === "VIDEO"
+        ? "Video from the media library ready for timeline work."
+        : studioType === "AUDIO"
+          ? "Audio from the media library ready for editing."
+          : studioType === "IMAGE"
+            ? "Image asset from the media library ready for overlays."
+            : "Text-based generated asset from the media library.",
+    origin: item.libraryGroup === "ORIGINAL" ? "LIBRARY" : "UPLOAD",
+    status: getStudioMediaStatus(item),
+    assetUrl: item.assetUrl,
+    thumbnailUrl: item.thumbnailUrl,
+    format: getFormatLabel(item.mimeType),
+    metadata: getMediaMetadata(item),
+    usageLabel: item.libraryGroup === "ORIGINAL" ? "Media Library" : "Generated output",
+    durationSeconds: item.duration ?? undefined,
+    durationLabel: item.duration !== null ? formatDuration(item.duration) : undefined,
+    resolutionLabel,
+    dimensionsLabel: studioType === "IMAGE" ? resolutionLabel : undefined,
+    sizeLabel: formatFileSize(item.fileSizeBytes),
+    ...overrides,
+  }
+}
+
+const sourceMediaItem = getMediaLibraryItem("media-library-1")
+const bRollMediaItem = getMediaLibraryItem("media-library-3")
+const guideAudioItem = getMediaLibraryItem("media-library-2")
+const captionedMasterItem = getMediaLibraryItem("media-library-editor-1")
+const brandMarkItem = getMediaLibraryItem("media-library-editor-3")
+const stillFrameItem = getMediaLibraryItem("media-library-5")
+
 export const studioEditorProject: StudioEditorProject = {
   media: {
-    id: "media_001",
-    title: "Launch Keynote Full Session",
-    thumbnailUrl: "/window.svg",
-    durationSeconds: 1864,
-    durationLabel: "31:04",
-    status: "UPLOADED",
-    type: "VIDEO",
-    width: 1920,
-    height: 1080,
-    streamUrl: "https://example.com/media/launch-keynote.m3u8",
+    id: sourceMediaItem.id,
+    title: sourceMediaItem.title,
+    thumbnailUrl: sourceMediaItem.thumbnailUrl ?? "/window.svg",
+    durationSeconds: sourceMediaItem.duration ?? 0,
+    durationLabel: formatDuration(sourceMediaItem.duration),
+    status: sourceMediaItem.status === "UPLOADED" ? "UPLOADED" : "FAILED",
+    type: sourceMediaItem.type === "AUDIO" ? "AUDIO" : "VIDEO",
+    width: sourceMediaItem.width ?? 1920,
+    height: sourceMediaItem.height ?? 1080,
+    streamUrl: sourceMediaItem.assetUrl ?? "",
   },
   projectMedia: [
-    {
+    createStudioMediaItem(sourceMediaItem, {
       id: "source-media",
-      type: "VIDEO",
-      name: "Keynote_source_v3.mp4",
-      summary: "Main interview source for the current edit.",
       origin: "SOURCE",
-      status: "READY",
-      format: "MP4",
-      metadata: "31:04 · 1920x1080 · 24 fps",
+      summary: "Main source imported from Media Library for the current edit.",
       usageLabel: "Main source",
-      durationLabel: "31:04",
-      resolutionLabel: "1920x1080",
-      sizeLabel: "1.8 GB",
       linkedSelectionId: "source-media",
       startTime: 0,
-    },
-    {
+    }),
+    createStudioMediaItem(bRollMediaItem, {
       id: "media-b-roll",
-      type: "VIDEO",
-      name: "product-demo-broll.mov",
-      summary: "Secondary product footage available for overlays or inserts.",
-      origin: "LIBRARY",
-      status: "READY",
-      format: "MOV",
-      metadata: "01:12 · 1080p",
+      summary: "Secondary video from Media Library available for inserts.",
       usageLabel: "Project media",
-      durationLabel: "01:12",
-      resolutionLabel: "1920x1080",
-      sizeLabel: "420 MB",
-    },
-    {
+    }),
+    createStudioMediaItem(guideAudioItem, {
       id: "media-guide-audio",
-      type: "AUDIO",
-      name: "english-guide-track.m4a",
-      summary: "Clean guide audio linked to the timeline audio bed.",
-      origin: "UPLOAD",
-      status: "READY",
-      format: "M4A",
-      metadata: "31:04 · stereo · -3 dB",
+      summary: "Audio source linked to the timeline audio bed.",
       usageLabel: "Audio bed",
-      durationLabel: "31:04",
-      sizeLabel: "74 MB",
       linkedSelectionId: "audio-bed",
       startTime: 0,
-    },
-    {
-      id: "media-music-bed",
-      type: "AUDIO",
-      name: "soft-launch-bed.wav",
-      summary: "Background music ready for the Audio tab.",
-      origin: "LIBRARY",
-      status: "READY",
-      format: "WAV",
-      metadata: "02:40 · loopable · -18 dB",
-      usageLabel: "Music",
-      durationLabel: "02:40",
-      sizeLabel: "48 MB",
-    },
-    {
+    }),
+    createStudioMediaItem(captionedMasterItem, {
+      id: "media-captioned-master",
+      summary: "Generated captioned master available as an editor output.",
+      usageLabel: "Rendered output",
+    }),
+    createStudioMediaItem(brandMarkItem, {
       id: "media-brand-mark",
-      type: "IMAGE",
-      name: "brand-mark-white.png",
-      summary: "Logo image already placed on the canvas.",
-      origin: "UPLOAD",
-      status: "READY",
-      format: "PNG",
-      metadata: "Transparent · 1200x400",
+      summary: "Thumbnail image already placed on the canvas.",
       usageLabel: "Canvas layer",
-      dimensionsLabel: "1200x400",
-      sizeLabel: "820 KB",
       linkedSelectionId: "brand-mark",
-    },
-    {
+    }),
+    createStudioMediaItem(stillFrameItem, {
       id: "media-still-desk",
-      type: "IMAGE",
-      name: "desk-close-up.jpg",
-      summary: "Marked still frame available for thumbnail or overlay use.",
-      origin: "LIBRARY",
-      status: "READY",
-      format: "JPG",
-      metadata: "3840x2160 · marked",
+      summary: "Still image from Media Library available for thumbnail work.",
       usageLabel: "Still frame",
-      dimensionsLabel: "3840x2160",
-      sizeLabel: "2.4 MB",
-    },
+    }),
   ],
   transcript: {
     id: "transcript_001",
@@ -564,10 +619,11 @@ export const studioEditorProject: StudioEditorProject = {
   ],
   sourceMedia: {
     id: "source-media",
-    name: "Keynote_source_v3.mp4",
-    durationLabel: "31:04",
-    resolutionLabel: "1080p",
-    summary: "Main interview source",
+    name: sourceMediaItem.originalFilename,
+    durationLabel: formatDuration(sourceMediaItem.duration),
+    resolutionLabel: getResolutionLabel(sourceMediaItem) ?? "Source media",
+    summary: sourceMediaItem.title,
+    thumbnailUrl: sourceMediaItem.thumbnailUrl,
   },
   layers: [
     {

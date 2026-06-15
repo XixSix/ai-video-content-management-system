@@ -40,6 +40,7 @@ export type MediaLibraryItem = {
   hasSubtitles: boolean
   activeJobCount: number
   longToShortSourceId?: string
+  ownerName?: string
   uploadProgress?: number
 }
 

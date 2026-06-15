@@ -83,17 +83,17 @@ function TimelineResizeDivider({
       aria-label="Resize timeline"
       className={cn(
         "group flex cursor-row-resize touch-none items-center justify-center border-y border-border bg-background outline-none transition-colors",
-        isCollapsed ? "h-4" : "h-3",
-        "hover:bg-muted/70"
+        isCollapsed ? "h-4" : "h-4",
+        "hover:bg-muted/70 active:bg-muted/80"
       )}
     >
       <span
         className={cn(
-          "rounded-full transition-colors",
+          "rounded-full transition-all",
           isCollapsed
             ? "h-2 w-16 border border-muted-foreground/20 bg-surface-muted shadow-[0_4px_14px_rgba(0,0,0,0.2)]"
-            : "h-1 w-12 bg-muted-foreground/35",
-          "group-hover:bg-muted-foreground/60",
+            : "h-1.5 w-14 bg-muted-foreground/50 shadow-[0_0_0_1px_color-mix(in_srgb,var(--background)_70%,transparent),0_4px_12px_rgba(0,0,0,0.22)]",
+          "group-hover:h-2 group-hover:w-16 group-hover:bg-muted-foreground/70",
         )}
       />
     </PanelResizeHandle>

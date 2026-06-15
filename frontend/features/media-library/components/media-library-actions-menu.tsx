@@ -1,10 +1,20 @@
 "use client"
 
+import Image from "next/image"
 import {
   useState,
   type FormEvent,
 } from "react"
-import { Download, MoreHorizontal, PencilLine, Trash2 } from "lucide-react"
+import {
+  Download,
+  FileText,
+  HardDrive,
+  Info,
+  MoreHorizontal,
+  PencilLine,
+  Trash2,
+  UserRound,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,18 +34,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import type { MediaLibraryItem } from "../media-library.types"
+import {
+  formatFileSize,
+  formatFullDateTime,
+} from "../media-library.utils"
 
 type MediaLibraryActionsMenuProps = {
-  itemTitle?: string
+  item: MediaLibraryItem
   onRename?: (title: string) => void
 }
 
 export function MediaLibraryActionsMenu({
-  itemTitle = "",
+  item,
   onRename,
 }: MediaLibraryActionsMenuProps) {
   const [isRenameOpen, setIsRenameOpen] = useState(false)
-  const [titleDraft, setTitleDraft] = useState(itemTitle)
+  const [isPropertiesOpen, setIsPropertiesOpen] = useState(false)
+  const [titleDraft, setTitleDraft] = useState(item.title)
 
   const preventMenuAction = (event: Event) => {
     event.preventDefault()
@@ -43,7 +66,7 @@ export function MediaLibraryActionsMenu({
 
   const openRenameDialog = (event: Event) => {
     event.preventDefault()
-    setTitleDraft(itemTitle)
+    setTitleDraft(item.title)
     setIsRenameOpen(true)
   }
 
@@ -80,6 +103,10 @@ export function MediaLibraryActionsMenu({
           <DropdownMenuItem onSelect={preventMenuAction}>
             <Download className="size-4" />
             Download
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setIsPropertiesOpen(true)}>
+            <Info className="size-4" />
+            Properties
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={preventMenuAction} variant="destructive">
@@ -119,6 +146,96 @@ export function MediaLibraryActionsMenu({
           </form>
         </DialogContent>
       </Dialog>
+
+      <Sheet open={isPropertiesOpen} onOpenChange={setIsPropertiesOpen}>
+        <SheetContent className="w-[min(92vw,26rem)] p-0 sm:max-w-[26rem]">
+          <SheetHeader className="border-b border-border/70 px-5 py-4">
+            <SheetTitle>Properties</SheetTitle>
+            <SheetDescription className="line-clamp-1">
+              {item.title}
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+            <div className="space-y-5 py-5">
+              <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/35">
+                <div className="flex aspect-video items-center justify-center bg-background/60">
+                  {item.thumbnailUrl ? (
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={item.thumbnailUrl}
+                        alt=""
+                        fill
+                        sizes="26rem"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <FileText className="size-10 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="space-y-1 border-t border-border/70 p-3">
+                  <p className="line-clamp-2 text-sm font-semibold text-foreground">
+                    {item.title}
+                  </p>
+                  <p className="line-clamp-1 text-xs text-muted-foreground">
+                    {item.originalFilename}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Details
+                </p>
+                <dl className="divide-y divide-border/70 rounded-xl border border-border/70 bg-background/70">
+                  <PropertyRow label="Filename" value={item.originalFilename} />
+                  <PropertyRow
+                    label="File size"
+                    value={formatFileSize(item.fileSizeBytes)}
+                  />
+                  <PropertyRow label="File type" value={item.mimeType} />
+                  <PropertyRow
+                    label="Created"
+                    value={formatFullDateTime(item.createdAt)}
+                  />
+                  <PropertyRow
+                    label="Updated"
+                    value={formatFullDateTime(item.updatedAt)}
+                  />
+                  <PropertyRow label="Owner" value={item.ownerName ?? "You"} />
+                </dl>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-muted/35 px-3 py-2">
+                  <HardDrive className="size-4" />
+                  {item.libraryGroup === "ORIGINAL" ? "Original" : "Output"}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-muted/35 px-3 py-2">
+                  <UserRound className="size-4" />
+                  {item.status}
+                </span>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
+  )
+}
+
+function PropertyRow({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 px-3 py-2.5 text-sm">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="min-w-0 break-words font-medium text-foreground">{value}</dd>
+    </div>
   )
 }

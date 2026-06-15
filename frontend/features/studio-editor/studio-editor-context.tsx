@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState } from "react"
+import { createContext, useCallback, useContext, useState } from "react"
 
 import {
   getStudioSelectionById,
@@ -22,6 +22,8 @@ import type {
   StudioShortClip,
   StudioCanvasLayer,
   StudioEditorProject,
+  StudioProjectMediaItem,
+  StudioTimelineSegment,
   StudioSelection,
   StudioStaleOutputType,
   StudioTranscript,
@@ -34,6 +36,59 @@ function clampTime(timeSeconds: number, durationSeconds: number) {
   return Math.min(durationSeconds, Math.max(0, timeSeconds))
 }
 
+function getWidthPercentFromClassName(widthClassName: string) {
+  const arbitraryWidthMatch = widthClassName.match(/w-\[(\d+(?:\.\d+)?)%\]/)
+
+  if (!arbitraryWidthMatch) {
+    return null
+  }
+
+  return Number(arbitraryWidthMatch[1])
+}
+
+function getTimelineSegmentDuration({
+  media,
+  projectDurationSeconds,
+  segment,
+}: {
+  media: StudioProjectMediaItem | null
+  projectDurationSeconds: number
+  segment: StudioTimelineSegment
+}) {
+  const widthPercent = getWidthPercentFromClassName(segment.widthClassName)
+  const widthDuration =
+    widthPercent !== null ? (widthPercent / 100) * projectDurationSeconds : null
+
+  return Math.max(0, media?.durationSeconds ?? widthDuration ?? projectDurationSeconds)
+}
+
+function getProjectTimelineDuration(project: StudioEditorProject) {
+  const segmentEndTimes = project.timelineTracks.flatMap((track) =>
+    track.segments.map((segment) => {
+      const segmentMedia =
+        segment.selectionId === project.sourceMedia.id
+          ? project.projectMedia.find(
+              (item) =>
+                item.linkedSelectionId === project.sourceMedia.id ||
+                item.origin === "SOURCE"
+            ) ?? null
+          : project.projectMedia.find(
+              (item) => item.linkedSelectionId === segment.selectionId
+            ) ?? null
+      const startTime = Math.max(0, segment.startTime ?? segmentMedia?.startTime ?? 0)
+      const durationSeconds = getTimelineSegmentDuration({
+        media: segmentMedia,
+        projectDurationSeconds: project.media.durationSeconds,
+        segment,
+      })
+
+      return startTime + durationSeconds
+    })
+  )
+
+  return Math.max(project.media.durationSeconds, ...segmentEndTimes)
+}
+
 type StudioEditorContextValue = {
   activeTool: StudioToolId
   addChapterToEnd: () => void
@@ -41,11 +96,17 @@ type StudioEditorContextValue = {
   canUndo: boolean
   currentTime: number
   createDraftClipFromCandidate: (clipCandidateId: string) => void
+  deleteTimelineSegment: (segmentId: string) => void
   discardTranscriptChanges: () => void
+  duplicateTimelineSegment: (segmentId: string) => void
   hasStaleAssets: boolean
   hasStaleChapters: boolean
   hasStaleClips: boolean
   hasUnsavedTranscriptChanges: boolean
+  isPlaying: boolean
+  mutedTrackIds: string[]
+  pausePlayback: () => void
+  playPlayback: () => void
   project: StudioEditorProject
   selectedChapterId: string | null
   selectedClipCandidateId: string | null
@@ -65,6 +126,8 @@ type StudioEditorContextValue = {
     status: StudioClipCandidateStatus
   ) => void
   setSelectedItemId: (selectionId: string) => void
+  togglePlayback: () => void
+  toggleTrackMute: (trackId: string) => void
   selectChapter: (chapterId: string) => void
   selectClipCandidate: (clipCandidateId: string) => void
   selectShortClip: (shortClipId: string) => void
@@ -236,6 +299,7 @@ export function StudioEditorProvider({
   const [activeTool, setActiveTool] = useState<StudioToolId>("media")
   const [selectedItemId, setSelectedItemId] = useState("source-media")
   const [currentTime, setCurrentTime] = useState(18.22)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [selectedTranscriptSegmentId, setSelectedTranscriptSegmentId] = useState<string | null>(
     null
   )
@@ -243,7 +307,9 @@ export function StudioEditorProvider({
   const [selectedClipCandidateId, setSelectedClipCandidateId] = useState<string | null>(null)
   const [selectedShortClipId, setSelectedShortClipId] = useState<string | null>(null)
   const [hasUnsavedTranscriptChanges, setHasUnsavedTranscriptChanges] = useState(false)
+  const [mutedTrackIds, setMutedTrackIds] = useState<string[]>([])
   const selectedItem = getStudioSelectionById(project, selectedItemId)
+  const timelineDurationSeconds = getProjectTimelineDuration(project)
   const transcriptVersion = project.transcript.version
   const hasStaleChapters = project.chapters.some(
     (chapter) => chapter.transcriptVersion < transcriptVersion
@@ -319,8 +385,132 @@ export function StudioEditorProvider({
     setHasUnsavedTranscriptChanges(nextSnapshot.hasUnsavedTranscriptChanges)
   }
 
-  const seekToTime = (timeSeconds: number) => {
-    setCurrentTime(clampTime(timeSeconds, project.media.durationSeconds))
+  const playPlayback = useCallback(() => {
+    setCurrentTime((currentTimeValue) =>
+      currentTimeValue >= timelineDurationSeconds
+        ? 0
+        : clampTime(currentTimeValue, timelineDurationSeconds)
+    )
+    setIsPlaying(true)
+  }, [timelineDurationSeconds])
+
+  const pausePlayback = useCallback(() => {
+    setIsPlaying(false)
+  }, [])
+
+  const togglePlayback = useCallback(() => {
+    if (isPlaying) {
+      pausePlayback()
+      return
+    }
+
+    playPlayback()
+  }, [isPlaying, pausePlayback, playPlayback])
+
+  const seekToTime = useCallback((timeSeconds: number) => {
+    const nextTime = clampTime(timeSeconds, timelineDurationSeconds)
+
+    setCurrentTime(nextTime)
+
+    if (nextTime >= timelineDurationSeconds) {
+      setIsPlaying(false)
+    }
+  }, [timelineDurationSeconds])
+
+  const toggleTrackMute = useCallback((trackId: string) => {
+    setMutedTrackIds((currentMutedTrackIds) =>
+      currentMutedTrackIds.includes(trackId)
+        ? currentMutedTrackIds.filter((mutedTrackId) => mutedTrackId !== trackId)
+        : [...currentMutedTrackIds, trackId]
+    )
+  }, [])
+
+  const deleteTimelineSegment = (segmentId: string) => {
+    const track = project.timelineTracks.find((track) =>
+      track.segments.some((segment) => segment.id === segmentId)
+    )
+
+    if (!track) {
+      return
+    }
+
+    recordEditorHistory()
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      timelineTracks: currentProject.timelineTracks.map((track) => ({
+        ...track,
+        segments: track.segments.filter((segment) => segment.id !== segmentId),
+      })),
+    }))
+
+    if (selectedItemId === segmentId) {
+      setSelectedItemId(project.sourceMedia.id)
+    }
+  }
+
+  const duplicateTimelineSegment = (segmentId: string) => {
+    const sourceTrack = project.timelineTracks.find((track) =>
+      track.segments.some((segment) => segment.id === segmentId)
+    )
+    const sourceSegment = sourceTrack?.segments.find((segment) => segment.id === segmentId)
+
+    if (!sourceTrack || !sourceSegment) {
+      return
+    }
+
+    recordEditorHistory()
+
+    const nextSegmentId = `${sourceSegment.id}-copy-${Date.now()}`
+    const sourceMedia =
+      sourceSegment.selectionId === project.sourceMedia.id
+        ? project.projectMedia.find(
+            (item) =>
+              item.linkedSelectionId === project.sourceMedia.id ||
+              item.origin === "SOURCE"
+          ) ?? null
+        : project.projectMedia.find(
+            (item) => item.linkedSelectionId === sourceSegment.selectionId
+          ) ?? null
+    const widthPercent = getWidthPercentFromClassName(sourceSegment.widthClassName)
+    const estimatedSegmentDuration =
+      sourceMedia?.durationSeconds ??
+      (widthPercent !== null
+        ? (widthPercent / 100) * project.media.durationSeconds
+        : 1)
+    const sourceStartTime = sourceSegment.startTime ?? sourceMedia?.startTime ?? 0
+    const nextStartTime = Math.max(0, sourceStartTime + estimatedSegmentDuration)
+    const sourceSegmentIndex = sourceTrack.segments.findIndex(
+      (segment) => segment.id === segmentId
+    )
+    const nextSegment = {
+      ...sourceSegment,
+      id: nextSegmentId,
+      label: `${sourceSegment.label} copy`,
+      offsetClassName:
+        sourceTrack.id === "video" || sourceTrack.id === "audio"
+          ? sourceSegment.offsetClassName
+          : undefined,
+      startTime: nextStartTime,
+    }
+
+    setProject((currentProject) => ({
+      ...currentProject,
+      timelineTracks: currentProject.timelineTracks.map((track) =>
+        track.id === sourceTrack.id
+          ? {
+              ...track,
+              segments: [
+                ...track.segments.slice(0, sourceSegmentIndex + 1),
+                nextSegment,
+                ...track.segments.slice(sourceSegmentIndex + 1),
+              ],
+            }
+          : track
+      ),
+    }))
+
+    setSelectedItemId(nextSegmentId)
   }
 
   const addChapterToEnd = () => {
@@ -1039,12 +1229,18 @@ export function StudioEditorProvider({
     commitTranscriptWordText,
     currentTime,
     createDraftClipFromCandidate,
+    deleteTimelineSegment,
     discardTranscriptChanges,
+    duplicateTimelineSegment,
     hasStaleAssets,
     hasStaleChapters,
     hasStaleClips,
     hasUnsavedTranscriptChanges,
+    isPlaying,
     markTranscriptDirty,
+    mutedTrackIds,
+    pausePlayback,
+    playPlayback,
     project,
     saveTranscriptMock,
     seekToTime,
@@ -1067,6 +1263,8 @@ export function StudioEditorProvider({
     setActiveTool,
     setClipCandidateStatus,
     setSelectedItemId,
+    togglePlayback,
+    toggleTrackMute,
     toolPanel: studioToolPanels[activeTool],
     redoEditorChange,
     undoEditorChange,

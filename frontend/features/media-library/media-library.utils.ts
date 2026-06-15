@@ -39,6 +39,13 @@ export function formatShortDate(date: string) {
   }).format(new Date(date))
 }
 
+export function formatFullDateTime(date: string) {
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(date))
+}
+
 export function formatFileSize(bytes: number) {
   if (bytes < 1024 * 1024) {
     return `${Math.round(bytes / 1024)} KB`

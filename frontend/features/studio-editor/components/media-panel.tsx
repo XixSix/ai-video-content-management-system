@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useMemo, useState } from "react"
 import { CloudUpload, FileMusic, ImageIcon, Library, Video } from "lucide-react"
 
@@ -41,6 +42,18 @@ function MediaFileIcon({ type }: { type: StudioProjectMediaType }) {
 }
 
 function MediaThumbnail({ item }: { item: StudioProjectMediaItem }) {
+  if (item.thumbnailUrl) {
+    return (
+      <Image
+        src={item.thumbnailUrl}
+        alt=""
+        fill
+        sizes="12rem"
+        className="absolute inset-0 object-cover"
+      />
+    )
+  }
+
   if (item.type === "VIDEO") {
     return (
       <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-[linear-gradient(135deg,#273749,#16202f)]">

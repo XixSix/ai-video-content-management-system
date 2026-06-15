@@ -39,9 +39,10 @@ export default function Home() {
         />
         {recentMediaItems.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {recentMediaItems.map((item) => (
+            {recentMediaItems.map((item, index) => (
               <MediaLibraryCard
                 key={item.id}
+                eagerThumbnail={index < 4}
                 item={item}
                 href={`/media-library?preview=${item.id}`}
                 showActions={false}

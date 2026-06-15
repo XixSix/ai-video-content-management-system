@@ -37,7 +37,7 @@ export const longToShortSources: LongToShortSource[] = [
       "YTDown_Shorts_Gau-Khong-Lang-Phi-Nhu-Ban-Nghi_Media_307SMR9ERs_009_128k.mp3",
     assetUrl:
       "/YTDown_Shorts_Gau-Khong-Lang-Phi-Nhu-Ban-Nghi_Media_307SMR9ERs_009_128k.mp3",
-    thumbnailUrl: null,
+    thumbnailUrl: "/pexels-francesco-ungaro-16771889.jpg",
     type: "AUDIO",
     durationSeconds: 55,
     durationLabel: "00:55",
