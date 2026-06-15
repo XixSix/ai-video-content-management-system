@@ -24,6 +24,12 @@
 .DS_Store
 *.pem
 
+# local mock media assets
+/public/*.mp3
+/public/*.mp4
+/public/*.jpg
+/public/mock-transcript-export.txt
+
 # debug
 npm-debug.log*
 yarn-debug.log*

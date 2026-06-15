@@ -22,6 +22,8 @@ export type LongToShortSource = {
   projectSlug: string
   title: string
   sourceFileName: string
+  assetUrl?: string | null
+  thumbnailUrl?: string | null
   type: "VIDEO" | "AUDIO"
   durationSeconds: number
   durationLabel: string
@@ -61,6 +63,7 @@ export type LongToShortCandidate = {
   sourceChapterLabel?: string
   title: string
   caption: string
+  thumbnailUrl?: string | null
   startTime: number
   endTime: number
   duration: number

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import {
   AudioWaveform,
   Clapperboard,
@@ -19,6 +20,7 @@ type MediaLibraryCardProps = {
   href?: string
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
+  onRename?: (itemId: string, title: string) => void
   showActions?: boolean
 }
 
@@ -46,10 +48,43 @@ function getMediaBackground(type: MediaLibraryItem["type"]) {
   return "linear-gradient(135deg, color-mix(in srgb, var(--surface-raised) 86%, transparent), color-mix(in srgb, var(--surface-inset) 92%, transparent))"
 }
 
+function MediaPreviewFrame({ item }: { item: MediaLibraryItem }) {
+  const thumbnailUrl = item.thumbnailUrl ?? (item.type === "IMAGE" ? item.assetUrl : null)
+
+  return (
+    <div
+      className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
+      style={{ backgroundImage: thumbnailUrl ? undefined : getMediaBackground(item.type) }}
+    >
+      {thumbnailUrl ? (
+        <Image
+          src={thumbnailUrl}
+          alt=""
+          fill
+          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : null}
+      <div className="absolute inset-0 flex flex-col justify-between p-3">
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="neutral">{item.type}</Badge>
+        </div>
+
+        <div className="flex items-end justify-start gap-3 text-foreground">
+          <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
+            {renderMediaIcon(item.type)}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function MediaLibraryCard({
   href,
   item,
   onOpen,
+  onRename,
   showActions = true,
 }: MediaLibraryCardProps) {
   const isUploading = item.status === "UPLOADING"
@@ -85,7 +120,12 @@ export function MediaLibraryCard({
             <CardTitle className="line-clamp-2 text-[15px]">
               {item.title}
             </CardTitle>
-            {showActions ? <MediaLibraryActionsMenu /> : null}
+            {showActions ? (
+              <MediaLibraryActionsMenu
+                itemTitle={item.title}
+                onRename={(title) => onRename?.(item.id, title)}
+              />
+            ) : null}
           </div>
         </CardHeader>
       </Card>
@@ -96,22 +136,7 @@ export function MediaLibraryCard({
     <Card className="border-border/70 bg-card/95 py-0 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-panel)]">
       {href ? (
         <Link href={href} className="block border-b border-border/60">
-          <div
-            className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
-            style={{ backgroundImage: getMediaBackground(item.type) }}
-          >
-            <div className="absolute inset-0 flex flex-col justify-between p-3">
-              <div className="flex items-start justify-between gap-3">
-                <Badge variant="neutral">{item.type}</Badge>
-              </div>
-
-              <div className="flex items-end justify-start gap-3 text-foreground">
-                <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
-                  {renderMediaIcon(item.type)}
-                </span>
-              </div>
-            </div>
-          </div>
+          <MediaPreviewFrame item={item} />
         </Link>
       ) : onOpen ? (
         <button
@@ -119,41 +144,11 @@ export function MediaLibraryCard({
           className="block w-full border-b border-border/60 text-left"
           onClick={openItem}
         >
-          <div
-            className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
-            style={{ backgroundImage: getMediaBackground(item.type) }}
-          >
-            <div className="absolute inset-0 flex flex-col justify-between p-3">
-              <div className="flex items-start justify-between gap-3">
-                <Badge variant="neutral">{item.type}</Badge>
-              </div>
-
-              <div className="flex items-end justify-start gap-3 text-foreground">
-                <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
-                  {renderMediaIcon(item.type)}
-                </span>
-              </div>
-            </div>
-          </div>
+          <MediaPreviewFrame item={item} />
         </button>
       ) : (
         <Link href={defaultHref} className="block border-b border-border/60">
-          <div
-            className="relative aspect-video overflow-hidden rounded-t-[inherit] border-b border-border/60 bg-muted"
-            style={{ backgroundImage: getMediaBackground(item.type) }}
-          >
-            <div className="absolute inset-0 flex flex-col justify-between p-3">
-              <div className="flex items-start justify-between gap-3">
-                <Badge variant="neutral">{item.type}</Badge>
-              </div>
-
-              <div className="flex items-end justify-start gap-3 text-foreground">
-                <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
-                  {renderMediaIcon(item.type)}
-                </span>
-              </div>
-            </div>
-          </div>
+          <MediaPreviewFrame item={item} />
         </Link>
       )}
 
@@ -178,7 +173,12 @@ export function MediaLibraryCard({
               </Link>
             )}
           </CardTitle>
-          {showActions ? <MediaLibraryActionsMenu /> : null}
+          {showActions ? (
+            <MediaLibraryActionsMenu
+              itemTitle={item.title}
+              onRename={(title) => onRename?.(item.id, title)}
+            />
+          ) : null}
         </div>
       </CardHeader>
     </Card>

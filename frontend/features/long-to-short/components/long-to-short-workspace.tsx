@@ -184,6 +184,8 @@ function buildMockUploadSource(fileName: string, type: LongToShortSource["type"]
     projectSlug: slug || `uploaded-${Date.now()}`,
     title: fileName.replace(/\.[^/.]+$/, ""),
     sourceFileName: fileName,
+    assetUrl: null,
+    thumbnailUrl: null,
     type,
     durationSeconds,
     durationLabel: formatSecondsAsClock(durationSeconds),
@@ -246,17 +248,37 @@ function PreviewMock({
   source: LongToShortSource
 }) {
   const presetTone = getPresetToneClasses(preset.tone)
+  const previewStyle = source.thumbnailUrl
+    ? { backgroundImage: `url(${source.thumbnailUrl})` }
+    : undefined
 
   return (
     <div className="mx-auto w-[min(22rem,84vw)]">
-      <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-[linear-gradient(135deg,rgba(18,29,38,0.96),rgba(8,12,18,0.98))] shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+      <div
+        className={cn(
+          "relative aspect-video overflow-hidden rounded-xl border border-border bg-[linear-gradient(135deg,rgba(18,29,38,0.96),rgba(8,12,18,0.98))] bg-cover bg-center shadow-[0_18px_40px_rgba(0,0,0,0.18)]",
+          source.thumbnailUrl ? "bg-black" : null
+        )}
+        style={previewStyle}
+      >
         <div className="absolute left-2 top-2 rounded-md bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground shadow-sm">
           {source.resolutionLabel === "Audio only" ? "AUDIO" : aspectRatio}
         </div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_36%_34%,rgba(60,130,150,0.58),transparent_30%),radial-gradient(circle_at_72%_28%,rgba(180,92,55,0.45),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.07),transparent_45%)]" />
+        <div
+          className={cn(
+            "absolute inset-0",
+            source.thumbnailUrl
+              ? "bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.52))]"
+              : "bg-[radial-gradient(circle_at_36%_34%,rgba(60,130,150,0.58),transparent_30%),radial-gradient(circle_at_72%_28%,rgba(180,92,55,0.45),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.07),transparent_45%)]"
+          )}
+        />
         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.62))]" />
-        <div className="absolute left-[12%] top-[28%] size-12 rounded-full border border-white/20 bg-white/12" />
-        <div className="absolute right-[12%] top-[18%] h-16 w-24 rounded-xl border border-white/15 bg-white/10" />
+        {!source.thumbnailUrl ? (
+          <>
+            <div className="absolute left-[12%] top-[28%] size-12 rounded-full border border-white/20 bg-white/12" />
+            <div className="absolute right-[12%] top-[18%] h-16 w-24 rounded-xl border border-white/15 bg-white/10" />
+          </>
+        ) : null}
 
         {!preset.isNoCaption ? (
           <div className="absolute inset-x-[22%] bottom-2 rounded-md bg-black/70 px-2 py-1 text-center shadow-sm">
@@ -299,15 +321,19 @@ function CandidateThumbnail({
     "left-[28%] top-[20%]",
     "right-[24%] top-[25%]",
   ]
+  const thumbnailStyle = candidate.thumbnailUrl
+    ? { backgroundImage: `url(${candidate.thumbnailUrl})` }
+    : undefined
 
   return (
     <div
       className={cn(
-        "relative mx-auto w-full overflow-hidden rounded-xl border border-border/80 shadow-[0_16px_40px_rgba(0,0,0,0.18)]",
+        "relative mx-auto w-full overflow-hidden rounded-xl border border-border/80 bg-cover bg-center shadow-[0_16px_40px_rgba(0,0,0,0.18)]",
         getAspectClass(aspectRatio),
-        backgrounds[index % backgrounds.length],
+        candidate.thumbnailUrl ? "bg-black" : backgrounds[index % backgrounds.length],
         size === "preview" ? "max-h-[70vh] max-w-[23rem]" : "max-w-[14rem]"
       )}
+      style={thumbnailStyle}
     >
       <div className="absolute left-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[10px] font-semibold text-white">
         {aspectRatio}
@@ -316,14 +342,23 @@ function CandidateThumbnail({
         {formatSecondsAsClock(candidate.duration)}
       </div>
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_38%_25%,rgba(255,255,255,0.22),transparent_26%),radial-gradient(circle_at_72%_18%,rgba(125,211,252,0.22),transparent_26%)]" />
       <div
         className={cn(
-          "absolute size-20 rounded-full border border-white/20 bg-white/15",
-          figurePositions[index % figurePositions.length],
-          size === "preview" ? "size-28" : "size-20"
+          "absolute inset-0",
+          candidate.thumbnailUrl
+            ? "bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.7))]"
+            : "bg-[radial-gradient(circle_at_38%_25%,rgba(255,255,255,0.22),transparent_26%),radial-gradient(circle_at_72%_18%,rgba(125,211,252,0.22),transparent_26%)]"
         )}
       />
+      {!candidate.thumbnailUrl ? (
+        <div
+          className={cn(
+            "absolute size-20 rounded-full border border-white/20 bg-white/15",
+            figurePositions[index % figurePositions.length],
+            size === "preview" ? "size-28" : "size-20"
+          )}
+        />
+      ) : null}
       <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.72))]" />
 
       {!preset.isNoCaption ? (
@@ -354,6 +389,68 @@ function CandidateThumbnail({
         </div>
       ) : null}
     </div>
+  )
+}
+
+function CandidatePreviewMedia({
+  aspectRatio,
+  candidate,
+  candidateIndex,
+  preset,
+  source,
+}: {
+  aspectRatio: LongToShortSettings["aspectRatio"]
+  candidate: LongToShortCandidate
+  candidateIndex: number
+  preset: LongToShortCaptionPreset
+  source: LongToShortSource
+}) {
+  if (source.assetUrl && source.type === "VIDEO") {
+    return (
+      <video
+        src={`${source.assetUrl}#t=${candidate.startTime},${candidate.endTime}`}
+        poster={candidate.thumbnailUrl ?? source.thumbnailUrl ?? undefined}
+        controls
+        playsInline
+        preload="metadata"
+        className={cn(
+          "mx-auto rounded-xl bg-black shadow-[0_24px_80px_rgba(0,0,0,0.45)]",
+          getAspectClass(aspectRatio),
+          aspectRatio === "9:16"
+            ? "max-h-[70vh] max-w-[23rem]"
+            : "max-h-[70vh] w-full max-w-[48rem]"
+        )}
+      />
+    )
+  }
+
+  if (source.assetUrl && source.type === "AUDIO") {
+    return (
+      <div className="mx-auto flex w-full max-w-[30rem] flex-col items-center justify-center gap-5 rounded-xl border border-white/12 bg-zinc-950/78 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+        <div className="space-y-1 text-center">
+          <p className="text-sm font-semibold text-white">{candidate.title}</p>
+          <p className="text-xs text-white/55">
+            {formatSecondsAsClock(candidate.startTime)}-{formatSecondsAsClock(candidate.endTime)}
+          </p>
+        </div>
+        <audio
+          src={`${source.assetUrl}#t=${candidate.startTime},${candidate.endTime}`}
+          controls
+          preload="metadata"
+          className="w-full"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <CandidateThumbnail
+      aspectRatio={aspectRatio}
+      candidate={candidate}
+      index={candidateIndex}
+      preset={preset}
+      size="preview"
+    />
   )
 }
 
@@ -1378,12 +1475,12 @@ export function LongToShortWorkspace({
 
             <div className="m-auto grid w-full gap-4 lg:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_11rem] lg:items-start">
               <div className="flex justify-center">
-                <CandidateThumbnail
+                <CandidatePreviewMedia
                   aspectRatio={settings.aspectRatio}
                   candidate={selectedCandidate}
-                  index={Math.max(selectedCandidateIndex, 0)}
+                  candidateIndex={Math.max(selectedCandidateIndex, 0)}
                   preset={selectedPreset}
-                  size="preview"
+                  source={selectedSource}
                 />
               </div>
 

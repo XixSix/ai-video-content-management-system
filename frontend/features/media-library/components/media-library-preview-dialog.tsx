@@ -1,7 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useState } from "react"
+import Image from "next/image"
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import {
   Clapperboard,
   Copy,
@@ -11,12 +17,15 @@ import {
   FileText,
   Maximize2,
   MoreHorizontal,
-  Pause,
   Play,
+  Pause,
   Send,
   Share2,
+  SkipBack,
+  SkipForward,
   Sparkles,
   Volume2,
+  VolumeX,
   Wand2,
   X,
 } from "lucide-react"
@@ -42,8 +51,12 @@ type MediaLibraryPreviewDialogProps = {
   item: MediaLibraryItem | null
   activeTab: MediaLibraryTab
   candidates: LongToShortCandidate[]
+  hasNextItem?: boolean
+  hasPreviousItem?: boolean
   open: boolean
+  onNextItem?: () => void
   onOpenChange: (open: boolean) => void
+  onPreviousItem?: () => void
 }
 
 function formatSecondsAsClock(totalSeconds: number | null) {
@@ -73,6 +86,175 @@ function getPreviewBackground(seed: number) {
   ]
 
   return backgrounds[seed % backgrounds.length]
+}
+
+function TranscriptAssetPreview({
+  assetUrl,
+  title,
+}: {
+  assetUrl: string
+  title: string
+}) {
+  const [content, setContent] = useState("Loading transcript preview...")
+
+  useEffect(() => {
+    let isActive = true
+
+    fetch(assetUrl)
+      .then((response) => (response.ok ? response.text() : "Unable to load transcript."))
+      .then((text) => {
+        if (isActive) {
+          setContent(text)
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          setContent("Unable to load transcript.")
+        }
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [assetUrl])
+
+  return (
+    <div className="mx-auto flex aspect-video max-h-[min(58vh,34rem)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border/70 bg-background shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+      <div className="border-b border-border/70 px-4 py-3">
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        <p className="text-xs text-muted-foreground">Transcript text preview</p>
+      </div>
+      <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap p-4 text-sm leading-6 text-foreground-subtle">
+        {content}
+      </pre>
+    </div>
+  )
+}
+
+function NativeAssetPreview({
+  item,
+}: {
+  item: MediaLibraryItem
+}) {
+  if (!item.assetUrl) {
+    return null
+  }
+
+  if (item.type === "VIDEO") {
+    const isVertical =
+      typeof item.width === "number" &&
+      typeof item.height === "number" &&
+      item.height > item.width
+
+    return (
+      <video
+        src={item.assetUrl}
+        controls
+        playsInline
+        preload="metadata"
+        poster={item.thumbnailUrl ?? undefined}
+        className={cn(
+          "mx-auto rounded-xl bg-black shadow-[0_24px_80px_rgba(0,0,0,0.28)]",
+          isVertical
+            ? "aspect-[9/16] max-h-[min(58vh,34rem)] max-w-[19rem]"
+            : "aspect-video max-h-[min(58vh,34rem)] w-full max-w-4xl"
+        )}
+      />
+    )
+  }
+
+  if (item.type === "AUDIO") {
+    return (
+      <div className="mx-auto flex aspect-video max-h-[min(58vh,34rem)] w-full max-w-4xl flex-col items-center justify-center gap-5 rounded-xl border border-border/70 bg-card p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className="space-y-1 text-center">
+          <p className="text-base font-semibold text-foreground">{item.title}</p>
+          <p className="text-sm text-muted-foreground">{item.originalFilename}</p>
+        </div>
+        <audio src={item.assetUrl} controls preload="metadata" className="w-full max-w-2xl" />
+      </div>
+    )
+  }
+
+  if (item.type === "IMAGE") {
+    const isVertical =
+      typeof item.width === "number" &&
+      typeof item.height === "number" &&
+      item.height > item.width
+
+    return (
+      <Image
+        src={item.assetUrl}
+        alt={item.title}
+        width={item.width ?? 1600}
+        height={item.height ?? 900}
+        className={cn(
+          "mx-auto rounded-xl bg-black object-contain shadow-[0_24px_80px_rgba(0,0,0,0.2)]",
+          isVertical
+            ? "max-h-[min(58vh,34rem)] max-w-[19rem]"
+            : "max-h-[min(58vh,34rem)] w-full max-w-4xl"
+        )}
+      />
+    )
+  }
+
+  if (item.type === "TRANSCRIPT") {
+    return <TranscriptAssetPreview assetUrl={item.assetUrl} title={item.title} />
+  }
+
+  return null
+}
+
+function CandidateNativeAssetPreview({
+  candidate,
+  item,
+}: {
+  candidate: LongToShortCandidate
+  item: MediaLibraryItem
+}) {
+  if (!item.assetUrl) {
+    return null
+  }
+
+  const mediaUrl = `${item.assetUrl}#t=${candidate.startTime},${candidate.endTime}`
+
+  if (item.type === "VIDEO") {
+    const isVertical =
+      typeof item.width === "number" &&
+      typeof item.height === "number" &&
+      item.height > item.width
+
+    return (
+      <video
+        src={mediaUrl}
+        controls
+        playsInline
+        preload="metadata"
+        poster={item.thumbnailUrl ?? candidate.thumbnailUrl ?? undefined}
+        className={cn(
+          "mx-auto rounded-xl bg-black shadow-[0_24px_80px_rgba(0,0,0,0.28)]",
+          isVertical
+            ? "aspect-[9/16] max-h-[min(58vh,34rem)] max-w-[19rem]"
+            : "aspect-video max-h-[min(58vh,34rem)] w-full max-w-4xl"
+        )}
+      />
+    )
+  }
+
+  if (item.type === "AUDIO") {
+    return (
+      <div className="mx-auto flex aspect-video max-h-[min(58vh,34rem)] w-full max-w-4xl flex-col items-center justify-center gap-5 rounded-xl border border-border/70 bg-card p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className="space-y-1 text-center">
+          <p className="text-base font-semibold text-foreground">{candidate.title}</p>
+          <p className="text-sm text-muted-foreground">
+            {formatSecondsAsClock(candidate.startTime)}-{formatSecondsAsClock(candidate.endTime)}
+          </p>
+        </div>
+        <audio src={mediaUrl} controls preload="metadata" className="w-full max-w-2xl" />
+      </div>
+    )
+  }
+
+  return null
 }
 
 function PreviewPoster({
@@ -131,40 +313,126 @@ function PreviewPoster({
 function PlayerControls({
   item,
   candidate,
+  hasNextItem,
+  hasPreviousItem,
+  onNextItem,
+  onPreviousItem,
+  onToggleFullscreen,
 }: {
   item: MediaLibraryItem
   candidate: LongToShortCandidate | null
+  hasNextItem: boolean
+  hasPreviousItem: boolean
+  onNextItem: () => void
+  onPreviousItem: () => void
+  onToggleFullscreen: () => void
 }) {
   const duration = candidate?.duration ?? item.duration
+  const safeDuration = Math.max(0, duration ?? 0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [isMuted, setIsMuted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [speedIndex, setSpeedIndex] = useState(1)
+  const speedOptions = [0.5, 1, 1.5, 2]
+  const speed = speedOptions[speedIndex]
+  const progress = safeDuration > 0 ? Math.min(100, (currentTime / safeDuration) * 100) : 0
+
+  useEffect(() => {
+    if (!isPlaying || safeDuration <= 0) {
+      return
+    }
+
+    const intervalId = window.setInterval(() => {
+      setCurrentTime((value) => {
+        const nextValue = Math.min(safeDuration, value + 0.5 * speed)
+
+        if (nextValue >= safeDuration) {
+          setIsPlaying(false)
+        }
+
+        return nextValue
+      })
+    }, 500)
+
+    return () => window.clearInterval(intervalId)
+  }, [isPlaying, safeDuration, speed])
 
   return (
     <div className="rounded-xl border border-border/70 bg-card/95 p-3 shadow-[var(--shadow-card)]">
       <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-muted">
-        <div className="h-full w-[18%] rounded-full bg-foreground" />
+        <div
+          className="h-full rounded-full bg-foreground transition-[width]"
+          style={{ width: `${progress}%` }}
+        />
       </div>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Button type="button" size="icon-lg" className="rounded-full">
-            <Play className="ml-0.5 size-4 fill-current" />
-            <span className="sr-only">Play preview</span>
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            disabled={!hasPreviousItem}
+            onClick={onPreviousItem}
+          >
+            <SkipBack className="size-4" />
+            <span className="sr-only">Previous media</span>
           </Button>
-          <Button type="button" size="icon-sm" variant="ghost">
-            <Pause className="size-4" />
-            <span className="sr-only">Pause preview</span>
+          <Button
+            type="button"
+            size="icon-lg"
+            className="rounded-full"
+            onClick={() => setIsPlaying((value) => !value)}
+          >
+            {isPlaying ? (
+              <Pause className="size-4 fill-current" />
+            ) : (
+              <Play className="ml-0.5 size-4 fill-current" />
+            )}
+            <span className="sr-only">
+              {isPlaying ? "Pause preview" : "Play preview"}
+            </span>
+          </Button>
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            disabled={!hasNextItem}
+            onClick={onNextItem}
+          >
+            <SkipForward className="size-4" />
+            <span className="sr-only">Next media</span>
           </Button>
           <span className="text-xs font-medium text-muted-foreground">
-            00:00 / {formatSecondsAsClock(duration)}
+            {formatSecondsAsClock(currentTime)} / {formatSecondsAsClock(duration)}
           </span>
         </div>
         <div className="flex items-center gap-1 rounded-lg bg-muted/70 p-1">
-          <Button type="button" size="icon-sm" variant="ghost">
-            <Volume2 className="size-4" />
-            <span className="sr-only">Volume</span>
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            onClick={() => setIsMuted((value) => !value)}
+          >
+            {isMuted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+            <span className="sr-only">{isMuted ? "Unmute" : "Mute"}</span>
           </Button>
-          <Button type="button" size="sm" variant="ghost" className="px-2">
-            1x
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="min-w-10 px-2"
+            onClick={() =>
+              setSpeedIndex((value) => (value + 1) % speedOptions.length)
+            }
+          >
+            {speed}x
           </Button>
-          <Button type="button" size="icon-sm" variant="ghost">
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            onClick={onToggleFullscreen}
+          >
             <Maximize2 className="size-4" />
             <span className="sr-only">Open fullscreen</span>
           </Button>
@@ -178,21 +446,95 @@ function MediaPlayerPanel({
   item,
   candidate,
   candidateIndex,
+  hasNextItem,
+  hasPreviousItem,
+  onNextItem,
+  onPreviousItem,
 }: {
   item: MediaLibraryItem
   candidate: LongToShortCandidate | null
   candidateIndex: number
+  hasNextItem: boolean
+  hasPreviousItem: boolean
+  onNextItem: () => void
+  onPreviousItem: () => void
 }) {
+  const playerPanelRef = useRef<HTMLElement | null>(null)
+  const hasNativeAssetPreview = Boolean(item.assetUrl) && !candidate
+  const hasCandidateNativeAssetPreview =
+    Boolean(item.assetUrl) && Boolean(candidate) && (item.type === "VIDEO" || item.type === "AUDIO")
+
+  const toggleFullscreen = () => {
+    const panel = playerPanelRef.current
+
+    if (!panel) {
+      return
+    }
+
+    if (document.fullscreenElement) {
+      void document.exitFullscreen()
+      return
+    }
+
+    void panel.requestFullscreen()
+  }
+
   return (
-    <section className="flex min-h-0 flex-col gap-3 border-b border-border/70 bg-black/[0.03] p-4 dark:bg-black/25 lg:border-b-0 lg:border-r">
+    <section
+      ref={playerPanelRef}
+      className="flex min-h-0 flex-col gap-3 border-b border-border/70 bg-black/[0.03] p-4 dark:bg-black/25 lg:border-b-0 lg:border-r"
+    >
       <div className="flex min-h-0 flex-1 items-center justify-center">
-        <PreviewPoster
+        {candidate && hasCandidateNativeAssetPreview ? (
+          <CandidateNativeAssetPreview item={item} candidate={candidate} />
+        ) : hasNativeAssetPreview ? (
+          <NativeAssetPreview item={item} />
+        ) : (
+          <PreviewPoster
+            item={item}
+            candidate={candidate}
+            candidateIndex={candidateIndex}
+          />
+        )}
+      </div>
+      {hasNativeAssetPreview || hasCandidateNativeAssetPreview ? (
+        <div className="flex items-center justify-between rounded-xl border border-border/70 bg-card/95 p-3 shadow-[var(--shadow-card)]">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            disabled={!hasPreviousItem}
+            onClick={onPreviousItem}
+          >
+            <SkipBack className="size-4" />
+            Previous
+          </Button>
+          <span className="truncate px-3 text-xs font-medium text-muted-foreground">
+            {item.assetUrl ? "Native media controls are available in the preview." : null}
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            disabled={!hasNextItem}
+            onClick={onNextItem}
+          >
+            Next
+            <SkipForward className="size-4" />
+          </Button>
+        </div>
+      ) : (
+        <PlayerControls
+          key={`${item.id}-${candidate?.id ?? "source"}`}
           item={item}
           candidate={candidate}
-          candidateIndex={candidateIndex}
+          hasNextItem={hasNextItem}
+          hasPreviousItem={hasPreviousItem}
+          onNextItem={onNextItem}
+          onPreviousItem={onPreviousItem}
+          onToggleFullscreen={toggleFullscreen}
         />
-      </div>
-      <PlayerControls item={item} candidate={candidate} />
+      )}
     </section>
   )
 }
@@ -356,7 +698,7 @@ function ActionRail({
           const button = (
             <Button
               type="button"
-              variant={action.href ? "default" : "outline"}
+              variant="outline"
               size="icon-lg"
               className="rounded-xl"
               asChild={Boolean(action.href)}
@@ -428,11 +770,23 @@ function ClipSelector({
             >
               <div
                 className={cn(
-                  "relative aspect-video overflow-hidden rounded-lg border border-white/10",
-                  getPreviewBackground(index)
+                  "relative aspect-video overflow-hidden rounded-lg border border-white/10 bg-cover bg-center",
+                  candidate.thumbnailUrl ? "bg-black" : getPreviewBackground(index)
                 )}
+                style={
+                  candidate.thumbnailUrl
+                    ? { backgroundImage: `url(${candidate.thumbnailUrl})` }
+                    : undefined
+                }
               >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_22%,rgba(255,255,255,0.26),transparent_28%)]" />
+                <div
+                  className={cn(
+                    "absolute inset-0",
+                    candidate.thumbnailUrl
+                      ? "bg-[linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.62))]"
+                      : "bg-[radial-gradient(circle_at_35%_22%,rgba(255,255,255,0.26),transparent_28%)]"
+                  )}
+                />
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.82))]" />
               </div>
               <div className="min-w-0 self-center">
@@ -453,8 +807,12 @@ export function MediaLibraryPreviewDialog({
   item,
   activeTab,
   candidates,
+  hasNextItem = false,
+  hasPreviousItem = false,
   open,
+  onNextItem,
   onOpenChange,
+  onPreviousItem,
 }: MediaLibraryPreviewDialogProps) {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
 
@@ -515,6 +873,10 @@ export function MediaLibraryPreviewDialog({
             item={item}
             candidate={selectedCandidate}
             candidateIndex={selectedCandidateIndex}
+            hasNextItem={hasNextItem}
+            hasPreviousItem={hasPreviousItem}
+            onNextItem={onNextItem ?? (() => undefined)}
+            onPreviousItem={onPreviousItem ?? (() => undefined)}
           />
           <ContextPanel
             item={item}
