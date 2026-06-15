@@ -189,6 +189,7 @@ export type StudioProjectMediaItem = {
   format: string
   metadata: string
   usageLabel: string
+  durationSeconds?: number
   durationLabel?: string
   resolutionLabel?: string
   dimensionsLabel?: string

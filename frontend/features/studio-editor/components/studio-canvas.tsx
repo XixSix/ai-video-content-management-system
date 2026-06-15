@@ -165,7 +165,11 @@ function CaptionWord({
 export function StudioCanvas() {
   const {
     currentTime,
+    isPlaying,
+    mutedTrackIds,
+    pausePlayback,
     project,
+    seekToTime,
     selectedItem,
     selectedTargetId,
     setActiveTool,
@@ -173,15 +177,29 @@ export function StudioCanvas() {
   } = useStudioEditor()
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
   const canvasAreaRef = useRef<HTMLDivElement>(null)
+  const previewMediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null)
+  const guideAudioRef = useRef<HTMLAudioElement>(null)
+  const currentTimeRef = useRef(currentTime)
   const [previewSize, setPreviewSize] = useState<{
     height: number
     width: number
   } | null>(null)
+  const hasNativeMediaPreview = Boolean(project.media.streamUrl)
+  const guideAudioItem = useMemo(
+    () => project.projectMedia.find((item) => item.linkedSelectionId === "audio-bed") ?? null,
+    [project.projectMedia]
+  )
+  const sourceTrackMuted = mutedTrackIds.includes("video")
+  const audioTrackMuted = mutedTrackIds.includes("audio")
 
   const captionCues = useMemo(
     () => buildCaptionCues(project.transcriptSegments, project.transcriptWords),
     [project.transcriptSegments, project.transcriptWords]
   )
+
+  useEffect(() => {
+    currentTimeRef.current = currentTime
+  }, [currentTime])
 
   useEffect(() => {
     const canvasArea = canvasAreaRef.current
@@ -228,6 +246,117 @@ export function StudioCanvas() {
     }
   }, [])
 
+  useEffect(() => {
+    const previewMedia = previewMediaRef.current
+    const guideAudio = guideAudioRef.current
+
+    if (
+      previewMedia &&
+      currentTime <= project.media.durationSeconds &&
+      Math.abs(previewMedia.currentTime - currentTime) > 0.35
+    ) {
+      previewMedia.currentTime = currentTime
+    }
+
+    if (guideAudio && Math.abs(guideAudio.currentTime - currentTime) > 0.35) {
+      guideAudio.currentTime = currentTime
+    }
+  }, [currentTime, project.media.durationSeconds])
+
+  useEffect(() => {
+    const previewMedia = previewMediaRef.current
+    const guideAudio = guideAudioRef.current
+
+    if (!previewMedia && !guideAudio) {
+      return
+    }
+
+    if (isPlaying) {
+      const playbackTime = currentTimeRef.current
+      const playPromise =
+        previewMedia && playbackTime < project.media.durationSeconds
+          ? previewMedia.play()
+          : null
+      const guideAudioPlayPromise = guideAudio?.play()
+
+      if (playPromise) {
+        playPromise.catch(() => {
+          pausePlayback()
+        })
+      }
+
+      if (guideAudioPlayPromise) {
+        guideAudioPlayPromise.catch(() => {
+          // Audio-bed playback is optional in mock mode; source playback still drives time.
+        })
+      }
+
+      return
+    }
+
+    previewMedia?.pause()
+    guideAudio?.pause()
+  }, [isPlaying, pausePlayback, project.media.durationSeconds])
+
+  useEffect(() => {
+    const previewMedia = previewMediaRef.current
+    const guideAudio = guideAudioRef.current
+
+    if (previewMedia) {
+      previewMedia.muted = sourceTrackMuted
+    }
+
+    if (guideAudio) {
+      guideAudio.muted = audioTrackMuted
+    }
+  }, [audioTrackMuted, sourceTrackMuted])
+
+  useEffect(() => {
+    if (!isPlaying || hasNativeMediaPreview) {
+      return
+    }
+
+    const startedAt = performance.now()
+    const playbackStartedAt = currentTimeRef.current
+    const fallbackTimer = window.setInterval(() => {
+      seekToTime(playbackStartedAt + (performance.now() - startedAt) / 1000)
+    }, 250)
+
+    return () => {
+      window.clearInterval(fallbackTimer)
+    }
+  }, [hasNativeMediaPreview, isPlaying, seekToTime])
+
+  useEffect(() => {
+    const previewMedia = previewMediaRef.current
+    const guideAudio = guideAudioRef.current
+
+    if (!isPlaying || !hasNativeMediaPreview || (!previewMedia && !guideAudio)) {
+      return
+    }
+
+    let animationFrameId = 0
+
+    const syncPlaybackFrame = () => {
+      const shouldUsePreviewClock =
+        previewMedia &&
+        (!guideAudio || currentTimeRef.current < project.media.durationSeconds - 0.05)
+      const playbackClock = shouldUsePreviewClock ? previewMedia : guideAudio ?? previewMedia
+
+      if (playbackClock) {
+        seekToTime(playbackClock.currentTime)
+      }
+
+      animationFrameId = window.requestAnimationFrame(syncPlaybackFrame)
+    }
+
+    animationFrameId = window.requestAnimationFrame(syncPlaybackFrame)
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId)
+    }
+  }, [hasNativeMediaPreview, isPlaying, project.media.durationSeconds, seekToTime])
+
   return (
     <section className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-[radial-gradient(circle_at_top,rgba(125,125,125,0.1),transparent_42%),linear-gradient(180deg,color-mix(in_srgb,var(--background)_92%,black_8%),var(--background))]">
       <div
@@ -250,7 +379,62 @@ export function StudioCanvas() {
               width: previewSize?.width ?? "100%",
             }}
           >
-            {project.media.thumbnailUrl ? (
+            {project.media.type === "VIDEO" && project.media.streamUrl ? (
+              <video
+                ref={(element) => {
+                  previewMediaRef.current = element
+                }}
+                src={project.media.streamUrl}
+                poster={project.media.thumbnailUrl ?? undefined}
+                playsInline
+                muted={sourceTrackMuted}
+                preload="metadata"
+                onEnded={() => {
+                  if (!guideAudioItem?.assetUrl) {
+                    pausePlayback()
+                    seekToTime(project.media.durationSeconds)
+                  }
+                }}
+                onTimeUpdate={(event) => {
+                  if (currentTime <= project.media.durationSeconds) {
+                    seekToTime(event.currentTarget.currentTime)
+                  }
+                }}
+                className="absolute inset-0 size-full object-cover"
+              />
+            ) : project.media.type === "AUDIO" && project.media.streamUrl ? (
+              <>
+                {project.media.thumbnailUrl ? (
+                  <Image
+                    src={project.media.thumbnailUrl}
+                    alt=""
+                    fill
+                    sizes="70vw"
+                    className="absolute inset-0 object-cover"
+                    priority
+                  />
+                ) : null}
+                <audio
+                  ref={(element) => {
+                    previewMediaRef.current = element
+                  }}
+                  src={project.media.streamUrl}
+                  muted={sourceTrackMuted}
+                  preload="metadata"
+                  onEnded={() => {
+                    if (!guideAudioItem?.assetUrl) {
+                      pausePlayback()
+                      seekToTime(project.media.durationSeconds)
+                    }
+                  }}
+                  onTimeUpdate={(event) => {
+                    if (currentTime <= project.media.durationSeconds) {
+                      seekToTime(event.currentTarget.currentTime)
+                    }
+                  }}
+                />
+              </>
+            ) : project.media.thumbnailUrl ? (
               <Image
                 src={project.media.thumbnailUrl}
                 alt=""
@@ -268,6 +452,20 @@ export function StudioCanvas() {
                 <div className="absolute right-[10%] top-[34%] h-[48%] w-[20%] rounded-[22px] bg-[rgba(0,0,0,0.18)] blur-[2px]" />
               </>
             )}
+            {guideAudioItem?.assetUrl ? (
+              <audio
+                ref={(element) => {
+                  guideAudioRef.current = element
+                }}
+                src={guideAudioItem.assetUrl}
+                muted={audioTrackMuted}
+                preload="metadata"
+                onEnded={() => {
+                  pausePlayback()
+                  seekToTime(Math.max(currentTime, project.media.durationSeconds))
+                }}
+              />
+            ) : null}
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.18))]" />
 
             {project.layers.map((layer) => {

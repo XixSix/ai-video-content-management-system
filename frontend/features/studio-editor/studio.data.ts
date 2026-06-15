@@ -397,6 +397,7 @@ function createStudioMediaItem(
     format: getFormatLabel(item.mimeType),
     metadata: getMediaMetadata(item),
     usageLabel: item.libraryGroup === "ORIGINAL" ? "Media Library" : "Generated output",
+    durationSeconds: item.duration ?? undefined,
     durationLabel: item.duration !== null ? formatDuration(item.duration) : undefined,
     resolutionLabel,
     dimensionsLabel: studioType === "IMAGE" ? resolutionLabel : undefined,
