@@ -408,7 +408,7 @@ function CandidatePreviewMedia({
   if (source.assetUrl && source.type === "VIDEO") {
     return (
       <video
-        src={`${source.assetUrl}#t=${candidate.startTime},${candidate.endTime}`}
+        src={source.assetUrl}
         poster={candidate.thumbnailUrl ?? source.thumbnailUrl ?? undefined}
         controls
         playsInline
@@ -434,7 +434,7 @@ function CandidatePreviewMedia({
           </p>
         </div>
         <audio
-          src={`${source.assetUrl}#t=${candidate.startTime},${candidate.endTime}`}
+          src={source.assetUrl}
           controls
           preload="metadata"
           className="w-full"

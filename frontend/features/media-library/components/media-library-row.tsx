@@ -9,7 +9,6 @@ import {
   UploadCloud,
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { MediaLibraryItem } from "../media-library.types"
@@ -21,6 +20,7 @@ import {
 import { MediaLibraryActionsMenu } from "./media-library-actions-menu"
 
 type MediaLibraryRowProps = {
+  eagerThumbnail?: boolean
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
   onRename?: (itemId: string, title: string) => void
@@ -51,12 +51,18 @@ function getMediaBackground(type: MediaLibraryItem["type"]) {
   return "linear-gradient(135deg, color-mix(in srgb, var(--surface-raised) 86%, transparent), color-mix(in srgb, var(--surface-inset) 92%, transparent))"
 }
 
-function MediaRowPreview({ item }: { item: MediaLibraryItem }) {
+function MediaRowPreview({
+  eagerThumbnail,
+  item,
+}: {
+  eagerThumbnail?: boolean
+  item: MediaLibraryItem
+}) {
   const thumbnailUrl = item.thumbnailUrl ?? (item.type === "IMAGE" ? item.assetUrl : null)
 
   return (
     <div
-      className="relative flex aspect-video w-full max-w-48 shrink-0 items-end justify-between overflow-hidden rounded-xl border border-border/60 p-3 lg:w-48"
+      className="relative flex aspect-video w-full max-w-48 shrink-0 items-end justify-end overflow-hidden rounded-xl border border-border/60 p-3 lg:w-48"
       style={{ backgroundImage: thumbnailUrl ? undefined : getMediaBackground(item.type) }}
     >
       {thumbnailUrl ? (
@@ -64,21 +70,20 @@ function MediaRowPreview({ item }: { item: MediaLibraryItem }) {
           src={thumbnailUrl}
           alt=""
           fill
+          loading={eagerThumbnail ? "eager" : undefined}
           sizes="12rem"
           className="absolute inset-0 object-cover"
         />
       ) : null}
-      <div className="relative z-10 flex w-full items-end justify-between gap-3">
-        <Badge variant="neutral">{item.type}</Badge>
-        <span className="inline-flex size-10 items-center justify-center rounded-xl border border-border/60 bg-background/85">
-          {renderMediaIcon(item.type)}
-        </span>
-      </div>
+      <span className="relative z-10 inline-flex size-9 items-center justify-center rounded-lg border border-white/15 bg-neutral-950/55 text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur-md">
+        {renderMediaIcon(item.type)}
+      </span>
     </div>
   )
 }
 
 export function MediaLibraryRow({
+  eagerThumbnail = false,
   item,
   onOpen,
   onRename,
@@ -87,7 +92,7 @@ export function MediaLibraryRow({
   const isUploading = item.status === "UPLOADING"
   const content = (
     <>
-      <MediaRowPreview item={item} />
+      <MediaRowPreview eagerThumbnail={eagerThumbnail} item={item} />
 
       <div className="min-w-0 flex-1 space-y-3">
         <div className="min-w-0 space-y-1">
@@ -180,7 +185,7 @@ export function MediaLibraryRow({
               </Button>
             )}
             <MediaLibraryActionsMenu
-              itemTitle={item.title}
+              item={item}
               onRename={(title) => onRename?.(item.id, title)}
             />
           </div>

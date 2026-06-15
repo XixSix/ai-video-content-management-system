@@ -7,7 +7,6 @@ import {
   ImageIcon,
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardHeader,
@@ -17,6 +16,7 @@ import type { MediaLibraryItem } from "../media-library.types"
 import { MediaLibraryActionsMenu } from "./media-library-actions-menu"
 
 type MediaLibraryCardProps = {
+  eagerThumbnail?: boolean
   href?: string
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
@@ -48,7 +48,13 @@ function getMediaBackground(type: MediaLibraryItem["type"]) {
   return "linear-gradient(135deg, color-mix(in srgb, var(--surface-raised) 86%, transparent), color-mix(in srgb, var(--surface-inset) 92%, transparent))"
 }
 
-function MediaPreviewFrame({ item }: { item: MediaLibraryItem }) {
+function MediaPreviewFrame({
+  eagerThumbnail,
+  item,
+}: {
+  eagerThumbnail?: boolean
+  item: MediaLibraryItem
+}) {
   const thumbnailUrl = item.thumbnailUrl ?? (item.type === "IMAGE" ? item.assetUrl : null)
 
   return (
@@ -61,26 +67,22 @@ function MediaPreviewFrame({ item }: { item: MediaLibraryItem }) {
           src={thumbnailUrl}
           alt=""
           fill
+          loading={eagerThumbnail ? "eager" : undefined}
           sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : null}
-      <div className="absolute inset-0 flex flex-col justify-between p-3">
-        <div className="flex items-start justify-between gap-3">
-          <Badge variant="neutral">{item.type}</Badge>
-        </div>
-
-        <div className="flex items-end justify-start gap-3 text-foreground">
-          <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border/60 bg-background/85">
-            {renderMediaIcon(item.type)}
-          </span>
-        </div>
+      <div className="absolute inset-0 flex items-end justify-end p-3 text-foreground">
+        <span className="inline-flex size-9 items-center justify-center rounded-lg border border-white/15 bg-neutral-950/55 text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur-md">
+          {renderMediaIcon(item.type)}
+        </span>
       </div>
     </div>
   )
 }
 
 export function MediaLibraryCard({
+  eagerThumbnail = false,
   href,
   item,
   onOpen,
@@ -122,7 +124,7 @@ export function MediaLibraryCard({
             </CardTitle>
             {showActions ? (
               <MediaLibraryActionsMenu
-                itemTitle={item.title}
+                item={item}
                 onRename={(title) => onRename?.(item.id, title)}
               />
             ) : null}
@@ -136,7 +138,7 @@ export function MediaLibraryCard({
     <Card className="border-border/70 bg-card/95 py-0 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-panel)]">
       {href ? (
         <Link href={href} className="block border-b border-border/60">
-          <MediaPreviewFrame item={item} />
+          <MediaPreviewFrame eagerThumbnail={eagerThumbnail} item={item} />
         </Link>
       ) : onOpen ? (
         <button
@@ -144,11 +146,11 @@ export function MediaLibraryCard({
           className="block w-full border-b border-border/60 text-left"
           onClick={openItem}
         >
-          <MediaPreviewFrame item={item} />
+          <MediaPreviewFrame eagerThumbnail={eagerThumbnail} item={item} />
         </button>
       ) : (
         <Link href={defaultHref} className="block border-b border-border/60">
-          <MediaPreviewFrame item={item} />
+          <MediaPreviewFrame eagerThumbnail={eagerThumbnail} item={item} />
         </Link>
       )}
 
@@ -175,7 +177,7 @@ export function MediaLibraryCard({
           </CardTitle>
           {showActions ? (
             <MediaLibraryActionsMenu
-              itemTitle={item.title}
+              item={item}
               onRename={(title) => onRename?.(item.id, title)}
             />
           ) : null}

@@ -13,8 +13,6 @@ import {
   Copy,
   Download,
   Edit3,
-  Expand,
-  FileText,
   Maximize2,
   MoreHorizontal,
   Play,
@@ -187,6 +185,7 @@ function NativeAssetPreview({
         alt={item.title}
         width={item.width ?? 1600}
         height={item.height ?? 900}
+        loading="eager"
         className={cn(
           "mx-auto rounded-xl bg-black object-contain shadow-[0_24px_80px_rgba(0,0,0,0.2)]",
           isVertical
@@ -215,7 +214,7 @@ function CandidateNativeAssetPreview({
     return null
   }
 
-  const mediaUrl = `${item.assetUrl}#t=${candidate.startTime},${candidate.endTime}`
+  const mediaUrl = item.assetUrl
 
   if (item.type === "VIDEO") {
     const isVertical =
@@ -503,11 +502,12 @@ function MediaPlayerPanel({
             type="button"
             size="sm"
             variant="ghost"
+            className="min-w-24 justify-start gap-1.5 px-2 text-xs leading-none"
             disabled={!hasPreviousItem}
             onClick={onPreviousItem}
           >
-            <SkipBack className="size-4" />
-            Previous
+            <SkipBack className="size-4 shrink-0" />
+            <span className="leading-none">Previous</span>
           </Button>
           <span className="truncate px-3 text-xs font-medium text-muted-foreground">
             {item.assetUrl ? "Native media controls are available in the preview." : null}
@@ -516,11 +516,12 @@ function MediaPlayerPanel({
             type="button"
             size="sm"
             variant="ghost"
+            className="min-w-24 justify-end gap-1.5 px-2 text-xs leading-none"
             disabled={!hasNextItem}
             onClick={onNextItem}
           >
-            Next
-            <SkipForward className="size-4" />
+            <span className="leading-none">Next</span>
+            <SkipForward className="size-4 shrink-0" />
           </Button>
         </div>
       ) : (
@@ -540,11 +541,9 @@ function MediaPlayerPanel({
 }
 
 function ContextPanel({
-  item,
   activeTab,
   candidate,
 }: {
-  item: MediaLibraryItem
   activeTab: MediaLibraryTab
   candidate: LongToShortCandidate | null
 }) {
@@ -601,70 +600,7 @@ function ContextPanel({
     )
   }
 
-  if (activeTab === "EDITOR_OUTPUTS" || item.libraryGroup === "EDITOR_OUTPUT") {
-    return (
-      <section className="min-h-0 overflow-y-auto border-b border-border/70 p-4 lg:border-b-0 lg:border-r">
-        <div className="space-y-5">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              Output preview
-            </p>
-            <h2 className="text-xl font-semibold leading-tight text-foreground">
-              {item.title}
-            </h2>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Generated output from the source workspace. Full editing still
-              happens in Studio.
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-border/70 bg-muted/45 p-3">
-            <p className="text-sm font-semibold text-foreground">
-              Transcript/output notes
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Preview text and rendered output metadata will be wired here when
-              generated assets expose playable URLs and transcript snippets.
-            </p>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  return (
-    <section className="min-h-0 overflow-y-auto border-b border-border/70 p-4 lg:border-b-0 lg:border-r">
-      <div className="space-y-5">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Source media
-          </p>
-          <h2 className="text-xl font-semibold leading-tight text-foreground">
-            {item.title}
-          </h2>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Preview the original upload and launch the next workflow from the
-            action rail.
-          </p>
-        </div>
-
-        <div className="grid gap-2 text-sm text-muted-foreground">
-          <span className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/45 px-3 py-2">
-            <span>Transcript</span>
-            <span>{item.hasTranscript ? "Ready" : "Not generated"}</span>
-          </span>
-          <span className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/45 px-3 py-2">
-            <span>Chapters</span>
-            <span>{item.hasChapters ? "Ready" : "Not generated"}</span>
-          </span>
-          <span className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/45 px-3 py-2">
-            <span>Short clips</span>
-            <span>{item.hasClips ? "Ready" : "Not generated"}</span>
-          </span>
-        </div>
-      </div>
-    </section>
-  )
+  return null
 }
 
 function ActionRail({
@@ -683,7 +619,6 @@ function ActionRail({
       ]
     : [
         { label: "Open Studio", icon: Clapperboard, href: "/studio" },
-        { label: "Transcript", icon: FileText },
         { label: "Create clips", icon: Sparkles },
         { label: "Download", icon: Download },
         { label: "Share", icon: Share2 },
@@ -740,7 +675,7 @@ function ClipSelector({
 }) {
   return (
     <aside className="min-h-0 border-border/70 p-4 lg:border-l">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             Next clips
@@ -749,7 +684,6 @@ function ClipSelector({
             {candidates.length} candidates
           </p>
         </div>
-        <Expand className="size-4 text-muted-foreground" />
       </div>
 
       <div className="max-h-[18rem] space-y-2 overflow-y-auto pr-1 lg:max-h-full">
@@ -770,7 +704,7 @@ function ClipSelector({
             >
               <div
                 className={cn(
-                  "relative aspect-video overflow-hidden rounded-lg border border-white/10 bg-cover bg-center",
+                  "relative aspect-video self-center overflow-hidden rounded-lg border border-white/10 bg-cover bg-center",
                   candidate.thumbnailUrl ? "bg-black" : getPreviewBackground(index)
                 )}
                 style={
@@ -866,7 +800,7 @@ export function MediaLibraryPreviewDialog({
             "grid min-h-0 flex-1 overflow-y-auto lg:overflow-hidden",
             isLongToShortPreview
               ? "lg:grid-cols-[minmax(20rem,0.92fr)_minmax(20rem,0.82fr)_4.5rem_minmax(15rem,18rem)]"
-              : "lg:grid-cols-[minmax(20rem,1fr)_minmax(18rem,0.78fr)_4.5rem]"
+              : "lg:grid-cols-[minmax(20rem,1fr)_4.5rem]"
           )}
         >
           <MediaPlayerPanel
@@ -879,7 +813,6 @@ export function MediaLibraryPreviewDialog({
             onPreviousItem={onPreviousItem ?? (() => undefined)}
           />
           <ContextPanel
-            item={item}
             activeTab={activeTab}
             candidate={selectedCandidate}
           />

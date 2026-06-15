@@ -397,9 +397,10 @@ function MediaLibraryPageContent() {
     if (viewMode === "list") {
       return (
         <div className="space-y-3">
-          {paginatedItems.map((item) => (
+          {paginatedItems.map((item, index) => (
             <MediaLibraryRow
               key={item.id}
+              eagerThumbnail={index < 3}
               item={item}
               onOpen={
                 item.status === "UPLOADING"
@@ -418,9 +419,10 @@ function MediaLibraryPageContent() {
 
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {paginatedItems.map((item) => (
+        {paginatedItems.map((item, index) => (
           <MediaLibraryCard
             key={item.id}
+            eagerThumbnail={index < 4}
             item={item}
             onOpen={
               item.status === "UPLOADING"
