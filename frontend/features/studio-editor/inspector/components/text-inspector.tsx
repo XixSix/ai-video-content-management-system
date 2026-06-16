@@ -27,6 +27,7 @@ export function TextInspector({
   const content = layer.content ?? ""
   const fontSize = layer.fontSize ?? 16
   const backgroundColor = layer.backgroundColor ?? "#101010"
+  const backgroundEnabled = layer.backgroundEnabled === true
   const backgroundRadius = layer.backgroundRadius ?? 16
   const boxWidth = layer.boxWidth ?? 46
   const textColor = layer.textColor ?? "#ffffff"
@@ -145,28 +146,61 @@ export function TextInspector({
             value={textColor}
             onChange={(value) => updateStyle({ textColor: value })}
           />
-          <ColorField
-            label="Background"
-            value={backgroundColor}
-            onChange={(value) =>
-              updateStyle({
-                backgroundColor: value,
-                backgroundStyle: "box",
-              })
-            }
-          />
-          <SliderField
-            label="Radius"
-            min={0}
-            max={40}
-            value={backgroundRadius}
-            suffix="px"
-            onChange={(value) =>
-              updateStyle({
-                backgroundRadius: value,
-              })
-            }
-          />
+
+          <div className="grid grid-cols-[5.25rem_minmax(0,1fr)] items-center gap-3">
+            <span className="text-xs font-medium text-muted-foreground">Background</span>
+            <div className="grid grid-cols-2 gap-2 rounded-xl border border-border bg-background p-1">
+              <Button
+                type="button"
+                variant={backgroundEnabled ? "default" : "ghost"}
+                size="sm"
+                onClick={() =>
+                  updateStyle({
+                    backgroundEnabled: true,
+                    backgroundStyle: "box",
+                  })
+                }
+              >
+                On
+              </Button>
+              <Button
+                type="button"
+                variant={backgroundEnabled ? "ghost" : "default"}
+                size="sm"
+                onClick={() => updateStyle({ backgroundEnabled: false })}
+              >
+                Off
+              </Button>
+            </div>
+          </div>
+
+          {backgroundEnabled ? (
+            <>
+              <ColorField
+                label="Fill"
+                value={backgroundColor}
+                onChange={(value) =>
+                  updateStyle({
+                    backgroundColor: value,
+                    backgroundEnabled: true,
+                    backgroundStyle: "box",
+                  })
+                }
+              />
+              <SliderField
+                label="Radius"
+                min={0}
+                max={40}
+                value={backgroundRadius}
+                suffix="px"
+                onChange={(value) =>
+                  updateStyle({
+                    backgroundRadius: value,
+                  })
+                }
+              />
+            </>
+          ) : null}
           <SliderField
             label="Width"
             min={18}

@@ -98,6 +98,8 @@ export type StudioCanvasLayer = {
   textColor?: string
   textDecoration?: StudioCaptionTextDecoration
   textTransform?: StudioCaptionTextTransform
+  xPercent?: number
+  yPercent?: number
 }
 
 export type StudioTextPreset = {

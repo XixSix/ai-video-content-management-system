@@ -18,6 +18,7 @@ export function CanvasSelectionFrame({
 
   return layers
     .filter((layer) => layer.id === selectedTargetId)
+    .filter((layer) => layer.kind !== "text")
     .map((layer) => {
       const handleClassName =
         layer.kind === "captions"

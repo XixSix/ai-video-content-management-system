@@ -180,6 +180,7 @@ export function useStudioLayerActions() {
       applyCaptionPreset: state.applyCaptionPreset,
       updateCaptionLayerStyle: state.updateCaptionLayerStyle,
       updateTextLayerContent: state.updateTextLayerContent,
+      updateTextLayerPosition: state.updateTextLayerPosition,
       updateTextLayerStyle: state.updateTextLayerStyle,
     }))
   )

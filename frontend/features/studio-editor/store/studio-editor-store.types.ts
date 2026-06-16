@@ -59,6 +59,8 @@ export type TextLayerStyleUpdate = Partial<
     | "fontWeight"
     | "textAlign"
     | "textColor"
+    | "xPercent"
+    | "yPercent"
   >
 >
 
@@ -148,6 +150,16 @@ export type StudioEditorActions = {
   ) => void
   updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => void
   updateTextLayerContent: (layerId: string, content: string) => void
+  updateTextLayerPosition: (
+    layerId: string,
+    position: {
+      xPercent: number
+      yPercent: number
+    },
+    options?: {
+      recordHistory?: boolean
+    }
+  ) => void
   updateTextLayerStyle: (layerId: string, style: TextLayerStyleUpdate) => void
   updateTimelineSegmentTiming: (
     segmentId: string,
