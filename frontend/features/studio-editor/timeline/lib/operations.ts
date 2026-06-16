@@ -185,6 +185,49 @@ export function insertSegmentWithPush({
   }
 }
 
+export function getSmartTimelineInsertStartTime({
+  durationSeconds,
+  preferredStartTime,
+  project,
+  trackId,
+}: {
+  durationSeconds: number
+  preferredStartTime: number
+  project: StudioEditorProject
+  trackId: StudioTimelineTrackId
+}) {
+  const track = project.timelineTracks.find(
+    (timelineTrack) => timelineTrack.id === trackId
+  )
+  const clampedPreferredStartTime = Math.max(0, preferredStartTime)
+
+  if (!track) {
+    return clampedPreferredStartTime
+  }
+
+  const insertionEndTime = clampedPreferredStartTime + Math.max(0, durationSeconds)
+  const trackRanges = track.segments
+    .map((segment) => getSegmentRange({ project, segment }))
+    .sort((left, right) => left.startTime - right.startTime)
+  const touchedSegment = trackRanges.find(
+    (range) =>
+      clampedPreferredStartTime >= range.startTime &&
+      clampedPreferredStartTime <= range.endTime
+  )
+
+  if (touchedSegment) {
+    return touchedSegment.endTime
+  }
+
+  const overlappingSegment = trackRanges.find(
+    (range) =>
+      clampedPreferredStartTime < range.endTime &&
+      insertionEndTime > range.startTime
+  )
+
+  return overlappingSegment?.endTime ?? clampedPreferredStartTime
+}
+
 export function getDuplicatedTimelineSegment({
   project,
   sourceSegment,

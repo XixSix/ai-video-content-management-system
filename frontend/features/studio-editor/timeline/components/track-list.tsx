@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils"
 import { getSegmentTopStyle, TimelineSegment } from "./segment"
 
 const timelineLaneClassName =
-  "relative min-h-12 border-t border-border/70 py-2 last:border-b"
+  "relative min-h-12 border-t border-border/65 py-1.5 last:border-b"
 
 export function TimelineTrackList({
   didResizeSegmentRef,
@@ -89,17 +89,12 @@ export function TimelineTrackList({
             key={track.id}
             className={cn(
               timelineLaneClassName,
-              track.id === "SOURCE" ? "min-h-[88px]" : null
+              track.id === "SOURCE" ? "min-h-[88px]" : null,
+              track.id === "TEXT" ? "bg-blue-500/[0.025]" : null,
+              track.id === "SOURCE" ? "bg-amber-500/[0.025]" : null,
+              track.id === "AUDIO" ? "bg-cyan-500/[0.025]" : null
             )}
           >
-            {track.id === "SOURCE" ? (
-              <div className="mb-1 ml-3 flex h-4 items-center justify-between">
-                <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground-subtle">
-                  Fit
-                </span>
-              </div>
-            ) : null}
-
             <div
               className={cn(
                 "min-w-0 px-0 pl-3",

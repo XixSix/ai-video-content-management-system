@@ -155,11 +155,8 @@ export function StudioTimeline({
             className="relative min-h-0 flex-1 overflow-auto px-4 py-3"
           >
             <div
-              className="grid min-w-[980px] grid-cols-[72px_minmax(0,1fr)] pb-1"
-              style={{
-                minWidth: `${timelineGridWidth}px`,
-                width: `${timelineGridWidth}px`,
-              }}
+              className="grid w-full min-w-[980px] grid-cols-[72px_minmax(0,1fr)] pb-1"
+              style={{ minWidth: `${timelineGridWidth}px` }}
             >
               <TimelineTrackLabels
                 mutedTrackIds={mutedTrackIds}

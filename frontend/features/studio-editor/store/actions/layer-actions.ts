@@ -7,6 +7,7 @@ import {
 import { studioTextPresets } from "../../data/text-style.data"
 import type { StudioCanvasLayer } from "../../studio.types"
 import {
+  getSmartTimelineInsertStartTime,
   getTimelineWidthClassName,
   insertSegmentWithPush,
 } from "../../timeline/lib/operations"
@@ -62,8 +63,8 @@ export function createLayerActions(
         activeTool: "text",
         project: insertSegmentWithPush({
           project: {
-          ...state.project,
-          layers: [...state.project.layers, nextLayer],
+            ...state.project,
+            layers: [...state.project.layers, nextLayer],
           },
           segment: {
             id: `segment-${layerId}`,
@@ -71,7 +72,12 @@ export function createLayerActions(
             durationSeconds: segmentDurationSeconds,
             label: preset.label,
             selectionId: layerId,
-            startTime: state.currentTime,
+            startTime: getSmartTimelineInsertStartTime({
+              durationSeconds: segmentDurationSeconds,
+              preferredStartTime: state.currentTime,
+              project: state.project,
+              trackId: "TEXT",
+            }),
             summary: preset.styleSummary,
             tone: "muted",
             widthClassName: getTimelineWidthClassName(
