@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 
-import { buildCaptionCues } from "@/features/studio-editor/studio-captions"
+import { buildCaptionCues } from "@/features/studio-editor/lib/caption-cues"
 import {
   useStudioPlaybackState,
   useStudioProjectState,

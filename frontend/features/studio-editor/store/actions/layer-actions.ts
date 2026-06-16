@@ -3,7 +3,7 @@
 import {
   DEFAULT_CAPTION_STROKE_WIDTH,
   studioCaptionPresets,
-} from "../../studio-caption-presets"
+} from "../../data/caption-presets.data"
 import { studioTextPresets } from "../../data/text-style.data"
 import type { StudioCanvasLayer } from "../../studio.types"
 import { recordEditorHistory } from "./history-actions"

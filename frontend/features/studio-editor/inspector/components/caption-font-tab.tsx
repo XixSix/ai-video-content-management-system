@@ -6,7 +6,7 @@ import { FontSelect } from "@/features/studio-editor/inspector/components/fields
 import { SliderField } from "@/features/studio-editor/inspector/components/fields/slider-field"
 import { StyleSelect } from "@/features/studio-editor/inspector/components/fields/style-select"
 import type { CaptionLayerStyleUpdate } from "@/features/studio-editor/inspector/lib/style-types"
-import { DEFAULT_CAPTION_STROKE_WIDTH } from "@/features/studio-editor/studio-caption-presets"
+import { DEFAULT_CAPTION_STROKE_WIDTH } from "@/features/studio-editor/data/caption-presets.data"
 import { studioTextFontOptions } from "@/features/studio-editor/data/text-style.data"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 

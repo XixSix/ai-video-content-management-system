@@ -1,4 +1,4 @@
-import type { StudioCaptionPreset } from "./studio.types"
+import type { StudioCaptionPreset } from "../studio.types"
 
 export const DEFAULT_CAPTION_STROKE_WIDTH = 1.2
 

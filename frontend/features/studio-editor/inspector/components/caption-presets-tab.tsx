@@ -5,7 +5,7 @@ import {
   getCaptionPreviewTextStyle,
   getFontPreviewStyle,
 } from "@/features/studio-editor/inspector/lib/style-preview"
-import { studioCaptionPresets } from "@/features/studio-editor/studio-caption-presets"
+import { studioCaptionPresets } from "@/features/studio-editor/data/caption-presets.data"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 

@@ -3,7 +3,7 @@
 import {
   rebuildTranscriptMeta,
   rebuildTranscriptSegmentsFromWords,
-} from "../../studio-captions"
+} from "../../lib/caption-cues"
 import { cloneSavedTranscriptState } from "../studio-editor-state"
 import { recordEditorHistory } from "./history-actions"
 import type {

@@ -1,7 +1,7 @@
 import type { Ref } from "react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { formatCaptionTimestamp } from "@/features/studio-editor/studio-captions"
+import { formatCaptionTimestamp } from "@/features/studio-editor/lib/caption-cues"
 import { cn } from "@/lib/utils"
 
 import type { StudioCaptionCue } from "../../studio.types"

@@ -4,7 +4,7 @@ import type {
   StudioTranscript,
   StudioTranscriptSegment,
   StudioTranscriptWord,
-} from "./studio.types"
+} from "../studio.types"
 
 const MAX_CUE_DURATION_SECONDS = 16
 const MAX_CUE_WORD_GROUPS = 26

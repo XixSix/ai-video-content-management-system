@@ -158,20 +158,19 @@ Studio editor code lives under `features/studio-editor/`.
 Responsibilities:
 
 - `studio.types.ts`: editor domain types and UI state types.
-- `studio.data.ts`: legacy barrel only. Do not add new mock fixtures or config
-  here.
 - `data/`: typed editor mock fixtures and static config, such as
   `project.mock.ts`, `transcript.mock.ts`, `media.mock.ts`,
-  `navigation.data.ts`, `text-style.data.ts`, and `tool-panels.data.ts`.
-- `lib/selection.ts`: pure project selection lookup helpers.
+  `navigation.data.ts`, `text-style.data.ts`, `caption-presets.data.ts`, and
+  `tool-panels.data.ts`.
+- `lib/`: shared pure editor helpers, such as `selection.ts` and
+  `caption-cues.ts`.
 - `store/`: scoped Zustand editor state, domain action groups, selectors, and
   public hooks such as `useStudioProjectState`, `useStudioPlaybackState`, and
   `useStudioSelectionState`.
-- `components/studio-*.tsx`: editor shell pieces such as rail, topbar, sidebar,
-  and panel router.
-- Tool-specific panels should be separate files, for example
-  `chapters-panel.tsx`, `clips-panel.tsx`, or a full subfeature when the
-  workflow owns components, hooks, and helpers.
+- `shell/`: editor chrome such as topbar, sidebar, and rail.
+- `tool-panel/`: left panel router, shared panel frame, and generic tool panel.
+- `media-panel/`, `text-panel/`, and `chapters/`: left-panel tool workflows.
+  Keep workflow-specific components and helpers inside the owning folder.
 - Canvas is a full Studio Editor subfeature. Keep preview sizing, media sync,
   layer rendering, caption overlay rendering, and selection frame code under
   `features/studio-editor/canvas/`.
