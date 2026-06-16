@@ -11,7 +11,7 @@ import {
 } from "react-resizable-panels"
 import type { PanelSize } from "react-resizable-panels"
 
-import { StudioInspector } from "@/features/studio-editor/components/studio-inspector"
+import { StudioInspector } from "@/features/studio-editor/inspector/studio-inspector"
 import { StudioPanel } from "@/features/studio-editor/components/studio-panel"
 import { StudioSidebar } from "@/features/studio-editor/components/studio-sidebar"
 import { StudioEditorProvider } from "@/features/studio-editor/studio-editor-context"
