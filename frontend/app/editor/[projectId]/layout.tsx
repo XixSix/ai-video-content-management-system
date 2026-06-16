@@ -11,17 +11,17 @@ import {
 } from "react-resizable-panels"
 import type { PanelSize } from "react-resizable-panels"
 
-import { StudioInspector } from "@/features/studio-editor/components/studio-inspector"
-import { StudioPanel } from "@/features/studio-editor/components/studio-panel"
-import { StudioSidebar } from "@/features/studio-editor/components/studio-sidebar"
-import { StudioEditorProvider } from "@/features/studio-editor/studio-editor-context"
+import { StudioInspector } from "@/features/studio-editor/inspector/studio-inspector"
+import { StudioSidebar } from "@/features/studio-editor/shell/studio-sidebar"
+import { StudioEditorStoreProvider } from "@/features/studio-editor/store/studio-editor-store"
+import { StudioToolPanel } from "@/features/studio-editor/tool-panel/studio-tool-panel"
 import {
   TIMELINE_COLLAPSED_HEIGHT,
   StudioTimeline,
   TIMELINE_DEFAULT_HEIGHT,
   TIMELINE_MAX_HEIGHT,
-} from "@/features/studio-editor/components/studio-timeline"
-import { StudioTopbar } from "@/features/studio-editor/components/studio-topbar"
+} from "@/features/studio-editor/timeline/studio-timeline"
+import { StudioTopbar } from "@/features/studio-editor/shell/studio-topbar"
 import { getStudioProjectDisplayName } from "@/features/studio-hub/studio-projects.data"
 import { cn } from "@/lib/utils"
 
@@ -106,11 +106,12 @@ export default function StudioLayout({
   children: ReactNode
 }) {
   const params = useParams<{ projectId: string }>()
+  const projectId = params.projectId ?? "untitled-project"
   const timelinePanelRef = usePanelRef()
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false)
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false)
-  const projectName = getStudioProjectDisplayName(params.projectId ?? "untitled-project")
+  const projectName = getStudioProjectDisplayName(projectId)
 
   const syncLeftPanelCollapsed = (panelSize: PanelSize) => {
     setIsLeftPanelCollapsed(panelSize.inPixels <= SIDE_PANEL_COLLAPSED_HANDLE_WIDTH)
@@ -136,7 +137,7 @@ export default function StudioLayout({
   }
 
   return (
-    <StudioEditorProvider>
+    <StudioEditorStoreProvider key={projectId}>
       <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
         <StudioTopbar projectName={projectName} />
 
@@ -179,7 +180,7 @@ export default function StudioLayout({
                     )}
                     style={{ minWidth: LEFT_PANEL_MIN_WIDTH }}
                   >
-                    <StudioPanel />
+                    <StudioToolPanel />
                   </div>
                 </Panel>
 
@@ -249,6 +250,6 @@ export default function StudioLayout({
           </Panel>
         </PanelGroup>
       </div>
-    </StudioEditorProvider>
+    </StudioEditorStoreProvider>
   )
 }

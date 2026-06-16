@@ -29,22 +29,127 @@ components and layouts.
 
 Preferred ownership:
 
+- Keep the current direct `frontend/` layout. Do not migrate the app into a
+  `src/` folder unless the user explicitly asks for that structural refactor.
 - `app/`: route entrypoints, route groups, route layouts, metadata where needed.
-- `components/ui/`: installed or local shadcn-style primitives only.
-- `components/layout/`: reusable app shell, sidebar, header, navigation config.
+  Route files should be adapters that import and render feature page/container
+  components.
+- `components/ui/`: installed or local shadcn-style primitives only. Do not put
+  product-specific editor controls, workflow cards, or feature state here.
+- `components/layout/`: reusable app shell, sidebar, header, navigation config,
+  account menu, and active-route behavior.
 - `components/shared/`: small cross-feature UI helpers such as status badges,
   section headers, empty states, and common display primitives.
-- `features/<feature>/`: feature-specific UI, typed mock data, local helpers,
-  local state, and feature types.
+- `features/<feature>/`: one product domain or workflow. It owns feature-specific
+  UI, typed mock data, local helpers, local state, services, and feature types.
 - `features/<feature>/components/`: reusable feature components, not route pages.
+- `features/<feature>/data/`: larger typed mocks and fixtures when one data file
+  gets too large.
+- `features/<feature>/hooks/`: feature workflow, query, mutation, and state hooks.
+- `features/<feature>/lib/`: pure feature helpers and calculations.
+- `features/<feature>/pages/`: optional feature page containers used by thin app
+  route adapters when a route needs meaningful composition.
+- `features/<feature>/services/`: future API adapters for the feature.
+- `features/<feature>/store/`: feature client state when context/reducer/store is
+  needed.
 - `features/<feature>/*.types.ts`: feature/domain types.
-- `features/<feature>/*.data.ts` or `*.mock.ts`: typed mock data.
-- `features/<feature>/*.utils.ts`: pure helpers only.
+- `features/<feature>/*.data.ts` or `*.mock.ts`: small typed mock/config data.
+- `features/<feature>/*.utils.ts`: small pure helpers only.
 - `hooks/`: truly shared client hooks.
 - `lib/`: small framework/shared utilities only.
+- `public/`: files served directly by URL, including MVP mock video/audio/image
+  assets.
 
 Do not place large feature logic, mock arrays, or domain-specific state directly
 inside route files.
+
+If a route page starts to own layout state, queries, dialogs, or workflow
+composition, move that code into `features/<feature>/pages/<FeaturePage>.tsx` or
+a feature container component, and leave `app/**/page.tsx` as a thin adapter.
+
+Dependency boundaries:
+
+- `app` may import features, layout components, shared components, hooks, and
+  utilities, but should not own business logic.
+- `features/<feature>` may import shared code and its own internals. Avoid deep
+  imports into multiple other features from one UI component.
+- `components/shared`, `hooks`, and `lib` should not import feature-specific
+  code. If shared code needs feature types or business rules, it likely belongs
+  in that feature or in an explicit adapter.
+- If one feature needs another feature's behavior, prefer a small public
+  helper/hook from that feature, a screen-owned orchestration hook, or moving
+  genuinely generic code into shared.
+- Split large files by responsibility once they become hard to reason about. As
+  a rule of thumb, a component above roughly 300-400 lines, or a file mixing
+  rendering, state mutation, data shaping, and interaction math, should be split
+  before adding more behavior.
+
+## Subfeatures
+
+A subfeature is a smaller workflow inside a parent feature. Use one when a
+feature folder becomes crowded, files in a workflow change together, or the
+folder name describes a product area instead of a technical category.
+
+Use the lightweight pattern when the subfeature is mostly UI composition:
+
+```text
+features/<feature>/
+├── components/
+│   ├── <workflow-name>/
+│   │   ├── WorkflowPanel.tsx
+│   │   ├── WorkflowToolbar.tsx
+│   │   └── workflow.helpers.ts
+│   └── SharedFeatureCard.tsx
+├── hooks/
+├── lib/
+└── <feature>.types.ts
+```
+
+In this pattern, subfeature folders live under `components/`. Parent-level
+`hooks/`, `lib/`, `services/`, `data/`, and types still own shared feature logic.
+
+Use the full subfeature pattern when the workflow has its own components, hooks,
+pure helpers, local state, and several files:
+
+```text
+features/<feature>/
+├── <workflow-name>/
+│   ├── workflow-entry.tsx
+│   ├── components/
+│   ├── hooks/
+│   ├── lib/
+│   └── data/
+├── components/
+├── hooks/
+├── lib/
+└── <feature>.types.ts
+```
+
+This is the preferred pattern for a major workflow such as Studio Timeline.
+
+Subfeature rules:
+
+- Do not introduce a top-level `features/<workflow-name>/` just because a folder
+  is large. Promote to a top-level feature only when the workflow can stand as an
+  independent product area with its own route ownership, data boundary, and
+  little dependency on a parent feature.
+- Do not introduce a generic `subfeatures/` directory unless a feature has
+  several full subfeatures and the user approves that structural convention.
+  Prefer the simplest clear owner first.
+- Name subfeature folders in kebab-case with workflow names, for example
+  `project-list`, `project-detail`, `caption-editor`, or `timeline`.
+- Avoid vague names such as `misc`, `common`, `parts`, `new`, or `helpers`.
+- Inside one parent feature, sibling subfeatures may import each other only when
+  the relationship is intentional and easy to explain.
+- If two subfeatures need the same component or helper, move it up to the parent
+  feature's `components/` or `lib/`.
+- If multiple top-level features need the same code, move it to shared code only
+  when it is truly domain-neutral. Do not move feature business rules into shared
+  folders for convenience.
+- A full subfeature should have one obvious entry component or hook. Other code
+  should hang below it by responsibility: `components/` for rendering, `hooks/`
+  for interaction/state orchestration, `lib/` for pure helpers, `data/` for local
+  mocks, and `services/` for API adapters.
 
 ## Studio Editor Structure
 
@@ -53,12 +158,68 @@ Studio editor code lives under `features/studio-editor/`.
 Responsibilities:
 
 - `studio.types.ts`: editor domain types and UI state types.
-- `studio.data.ts`: typed mock editor project data and static panel config.
-- `studio-editor-context.tsx`: editor-wide client state and actions.
-- `components/studio-*.tsx`: editor shell pieces such as rail, topbar, canvas,
-  timeline, inspector, and panel router.
-- Tool-specific panels should be separate files, for example
-  `captions-panel.tsx`, `chapters-panel.tsx`, and `clips-panel.tsx`.
+- `data/`: typed editor mock fixtures and static config, such as
+  `project.mock.ts`, `transcript.mock.ts`, `media.mock.ts`,
+  `navigation.data.ts`, `text-style.data.ts`, `caption-presets.data.ts`, and
+  `tool-panels.data.ts`.
+- `lib/`: shared pure editor helpers, such as `selection.ts` and
+  `caption-cues.ts`.
+- `store/`: scoped Zustand editor state, domain action groups, selectors, and
+  public hooks such as `useStudioProjectState`, `useStudioPlaybackState`, and
+  `useStudioSelectionState`.
+- `shell/`: editor chrome such as topbar, sidebar, and rail.
+- `tool-panel/`: left panel router, shared panel frame, and generic tool panel.
+- `media-panel/`, `text-panel/`, and `chapters/`: left-panel tool workflows.
+  Keep workflow-specific components and helpers inside the owning folder.
+- Canvas is a full Studio Editor subfeature. Keep preview sizing, media sync,
+  layer rendering, caption overlay rendering, and selection frame code under
+  `features/studio-editor/canvas/`.
+- Canvas structure:
+
+```text
+features/studio-editor/canvas/
+├── studio-canvas.tsx   canvas entry component used by the editor route
+├── constants.ts        sizing and media sync constants
+├── components/         media preview, layer renderers, captions, selection frame
+├── hooks/              preview sizing and media sync hooks
+└── lib/                pure style, caption activity, and media sync helpers
+```
+
+- Captions is a full Studio Editor subfeature. Keep captions panel composition,
+  toolbar/search, cue list, word editing hooks, and caption filtering/activity
+  helpers under `features/studio-editor/captions/`.
+- Captions structure:
+
+```text
+features/studio-editor/captions/
+├── studio-captions-panel.tsx  captions panel entry component
+├── components/                toolbar, cue list, cue rows, word editor, empty state
+├── hooks/                     search debounce, active cue scroll, word edit drafts
+└── lib/                       caption activity and filtering helpers
+```
+
+- Timeline is a full Studio Editor subfeature, not a top-level
+  `features/studio-timeline` feature while it depends on `StudioEditorProject`,
+  editor store state, and editor selection state. Keep all timeline code under
+  `features/studio-editor/timeline/`.
+- Timeline structure:
+
+```text
+features/studio-editor/timeline/
+├── studio-timeline.tsx  timeline entry component used by editor layout
+├── constants.ts         timeline sizing, zoom, and ruler constants
+├── components/          toolbar, ruler, tracks, segments, waveform UI
+├── hooks/               focused timeline interaction and waveform hooks
+└── lib/                 pure time, layout, display, resize, and operation helpers
+```
+
+- Do not split one timeline behavior across both `components/timeline` and
+  `timeline`. If code belongs to the timeline feature, keep it inside
+  `features/studio-editor/timeline/`.
+- Inspector field primitives live under
+  `features/studio-editor/inspector/components/fields/`. Keep
+  text/caption/chapter/media inspectors importing the focused field component
+  they use instead of recreating a large combined fields file.
 
 Do not keep adding special cases to one giant panel file. If a tool needs its own
 workflow, give it a dedicated component and keep shared shell/panel primitives
