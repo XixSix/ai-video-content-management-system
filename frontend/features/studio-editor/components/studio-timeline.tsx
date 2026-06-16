@@ -18,12 +18,14 @@ import {
   SkipBack,
   SkipForward,
   Trash2,
+  Type,
   Volume2,
   VolumeX,
 } from "lucide-react"
 
 import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
 import type {
+  StudioEditorProject,
   StudioProjectMediaItem,
   StudioTimelineSegment,
   StudioTimelineTrack,
@@ -54,6 +56,9 @@ const TIMELINE_BUTTON_ZOOM_MULTIPLIER = 1.25
 const TIMELINE_PINCH_ZOOM_SENSITIVITY = 0.004
 const TIMELINE_BASE_WIDTH = 980
 const TIMELINE_TARGET_TICK_WIDTH = 140
+const TIMELINE_SEGMENT_MIN_DURATION = 0.5
+const TIMELINE_DEFAULT_LANE_HEIGHT = 32
+const TIMELINE_VIDEO_LANE_HEIGHT = 64
 const TIMELINE_MAJOR_INTERVALS = [
   5, 10, 15, 30, 60, 120, 180, 300, 600, 900, 1800,
 ] as const
@@ -336,6 +341,21 @@ function getSelectionToolId(trackId: StudioTimelineTrack["id"], selectionId: str
   return getTrackToolId(trackId)
 }
 
+function getTrackLaneCount(track: StudioTimelineTrack) {
+  return Math.max(
+    1,
+    ...track.segments.map((segment) => (segment.laneIndex ?? 0) + 1)
+  )
+}
+
+function getTrackLaneHeight(trackId: StudioTimelineTrack["id"]) {
+  return trackId === "video" ? TIMELINE_VIDEO_LANE_HEIGHT : TIMELINE_DEFAULT_LANE_HEIGHT
+}
+
+function getTrackContentHeight(track: StudioTimelineTrack) {
+  return getTrackLaneCount(track) * getTrackLaneHeight(track.id)
+}
+
 function getTimedSegmentStyle({
   media,
   projectDurationSeconds,
@@ -386,7 +406,23 @@ function getTimelineSegmentDuration({
       ? (Number(widthPercent[1]) / 100) * projectDurationSeconds
       : null
 
-  return Math.max(0, media?.durationSeconds ?? widthDuration ?? projectDurationSeconds)
+  return Math.max(
+    0,
+    segment.durationSeconds ??
+      media?.durationSeconds ??
+      widthDuration ??
+      projectDurationSeconds
+  )
+}
+
+function getTimelineSegmentStartTime({
+  media,
+  segment,
+}: {
+  media: StudioProjectMediaItem | null
+  segment: StudioTimelineSegment
+}) {
+  return Math.max(0, segment.startTime ?? media?.startTime ?? 0)
 }
 
 function getTimelineSegmentEndTime({
@@ -398,13 +434,75 @@ function getTimelineSegmentEndTime({
   projectDurationSeconds: number
   segment: StudioTimelineSegment
 }) {
-  const startTime = Math.max(0, segment.startTime ?? media?.startTime ?? 0)
+  const startTime = getTimelineSegmentStartTime({ media, segment })
 
   return startTime + getTimelineSegmentDuration({
     media,
     projectDurationSeconds,
     segment,
   })
+}
+
+function getCaptionSegmentText({
+  project,
+  segment,
+  segmentEndTime,
+  segmentStartTime,
+}: {
+  project: StudioEditorProject
+  segment: StudioTimelineSegment
+  segmentEndTime: number
+  segmentStartTime: number
+}) {
+  const overlappingSegments = project.transcriptSegments.filter(
+    (transcriptSegment) =>
+      transcriptSegment.startTime < segmentEndTime &&
+      transcriptSegment.endTime > segmentStartTime
+  )
+
+  return (
+    overlappingSegments.map((transcriptSegment) => transcriptSegment.text).join(" ") ||
+    segment.label
+  )
+}
+
+function getTimelineSegmentDisplayText({
+  project,
+  segment,
+  segmentEndTime,
+  segmentStartTime,
+}: {
+  project: StudioEditorProject
+  segment: StudioTimelineSegment
+  segmentEndTime: number
+  segmentStartTime: number
+}) {
+  if (segment.content) {
+    return segment.content
+  }
+
+  const linkedLayer = project.layers.find((layer) => layer.id === segment.selectionId)
+
+  if (linkedLayer?.kind === "text") {
+    return linkedLayer.content ?? linkedLayer.label
+  }
+
+  if (linkedLayer?.kind === "captions") {
+    return getCaptionSegmentText({
+      project,
+      segment,
+      segmentEndTime,
+      segmentStartTime,
+    })
+  }
+
+  return segment.label
+}
+
+function isTextTimelineSegment(project: StudioEditorProject, segment: StudioTimelineSegment) {
+  const linkedLayer = project.layers.find((layer) => layer.id === segment.selectionId)
+
+  return linkedLayer?.kind === "text" || linkedLayer?.kind === "captions"
 }
 
 export function StudioTimeline({
@@ -427,9 +525,11 @@ export function StudioTimeline({
     setSelectedItemId,
     togglePlayback,
     toggleTrackMute,
+    updateTimelineSegmentTiming,
   } = useStudioEditor()
   const timelineViewportRef = useRef<HTMLDivElement | null>(null)
   const timelineSurfaceRef = useRef<HTMLDivElement | null>(null)
+  const didResizeSegmentRef = useRef(false)
   const [zoomLevel, setZoomLevel] = useState(1)
   const [isPanningTimeline, setIsPanningTimeline] = useState(false)
   const sourceMediaItem = useMemo(
@@ -606,6 +706,121 @@ export function StudioTimeline({
 
   const seekToTimelineSegment = (event: ReactMouseEvent<HTMLButtonElement>) => {
     seekToTimelineClientX(event.clientX)
+  }
+
+  const handleSegmentResizePointerDown = ({
+    event,
+    media,
+    segment,
+    side,
+    trackId,
+  }: {
+    event: ReactPointerEvent<HTMLElement>
+    media: StudioProjectMediaItem | null
+    segment: StudioTimelineSegment
+    side: "left" | "right"
+    trackId: StudioTimelineTrack["id"]
+  }) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    didResizeSegmentRef.current = false
+    setActiveTool(getSelectionToolId(trackId, segment.selectionId))
+    setSelectedItemId(segment.id)
+
+    const initialStartTime = getTimelineSegmentStartTime({ media, segment })
+    const initialEndTime = getTimelineSegmentEndTime({
+      media,
+      projectDurationSeconds: project.media.durationSeconds,
+      segment,
+    })
+    const activeLaneIndex = segment.laneIndex ?? 0
+    const track = project.timelineTracks.find((timelineTrack) => timelineTrack.id === trackId)
+    const trackSegments =
+      track?.segments
+        .filter((trackSegment) => (trackSegment.laneIndex ?? 0) === activeLaneIndex)
+        .map((trackSegment) => {
+          const trackSegmentMedia =
+            trackSegment.selectionId === project.sourceMedia.id
+              ? sourceMediaItem
+              : project.projectMedia.find(
+                  (item) => item.linkedSelectionId === trackSegment.selectionId
+                ) ?? null
+          const startTime = getTimelineSegmentStartTime({
+            media: trackSegmentMedia,
+            segment: trackSegment,
+          })
+
+          return {
+            endTime: getTimelineSegmentEndTime({
+              media: trackSegmentMedia,
+              projectDurationSeconds: project.media.durationSeconds,
+              segment: trackSegment,
+            }),
+            id: trackSegment.id,
+            startTime,
+          }
+        })
+        .sort((left, right) => left.startTime - right.startTime) ?? []
+    const segmentIndex = trackSegments.findIndex(
+      (trackSegment) => trackSegment.id === segment.id
+    )
+    const previousSegmentEndTime =
+      segmentIndex > 0 ? trackSegments[segmentIndex - 1]?.endTime : undefined
+    const nextSegmentStartTime =
+      segmentIndex >= 0 ? trackSegments[segmentIndex + 1]?.startTime : undefined
+    const maxStartTime = initialEndTime - TIMELINE_SEGMENT_MIN_DURATION
+    const minStartTime =
+      typeof previousSegmentEndTime === "number"
+        ? Math.min(previousSegmentEndTime, maxStartTime)
+        : 0
+    const minEndTime = initialStartTime + TIMELINE_SEGMENT_MIN_DURATION
+    const maxEndTime =
+      typeof nextSegmentStartTime === "number"
+        ? Math.max(minEndTime, nextSegmentStartTime)
+        : timelineDurationSeconds
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const pointerTime = getTimelineTimeFromClientX(moveEvent.clientX)
+
+      if (pointerTime === null) {
+        return
+      }
+
+      moveEvent.preventDefault()
+      didResizeSegmentRef.current = true
+
+      if (side === "left") {
+        const nextStartTime = Math.min(
+          maxStartTime,
+          Math.max(minStartTime, pointerTime)
+        )
+
+        updateTimelineSegmentTiming(segment.id, {
+          durationSeconds: initialEndTime - nextStartTime,
+          startTime: nextStartTime,
+        })
+        return
+      }
+
+      const nextEndTime = Math.max(
+        minEndTime,
+        Math.min(maxEndTime, pointerTime)
+      )
+
+      updateTimelineSegmentTiming(segment.id, {
+        durationSeconds: nextEndTime - initialStartTime,
+        startTime: initialStartTime,
+      })
+    }
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove)
+      window.removeEventListener("pointerup", handlePointerUp)
+    }
+
+    window.addEventListener("pointermove", handlePointerMove)
+    window.addEventListener("pointerup", handlePointerUp)
   }
 
   const downloadTimelineSegment = ({
@@ -820,6 +1035,7 @@ export function StudioTimeline({
                   <div className="h-8 border-b border-border/70" />
                   {project.timelineTracks.map((track, trackIndex) => {
                     const trackIsMuted = mutedTrackIds.includes(track.id)
+                    const trackContentHeight = getTrackContentHeight(track)
 
                     return (
                       <div
@@ -831,10 +1047,8 @@ export function StudioTimeline({
                       >
                         {trackIndex === 0 ? <div className="mb-1 h-4" /> : null}
                         <div
-                          className={cn(
-                            "flex items-center justify-center",
-                            track.id === "video" ? "h-16" : "h-8"
-                          )}
+                          className="flex items-center justify-center"
+                          style={{ height: trackContentHeight }}
                         >
                           <Button
                             type="button"
@@ -906,6 +1120,7 @@ export function StudioTimeline({
                       track.id === "video" ||
                       track.id === "audio" ||
                       track.segments.some((segment) => typeof segment.startTime === "number")
+                    const trackContentHeight = getTrackContentHeight(track)
 
                     return (
                       <div
@@ -926,64 +1141,104 @@ export function StudioTimeline({
                         <div
                           className={cn(
                             "min-w-0 px-0 pl-3",
-                            trackUsesTimedLayout
-                              ? cn("relative", track.id === "video" ? "h-16" : "h-8")
-                              : "flex items-center gap-2"
+                            trackUsesTimedLayout ? "relative" : "flex items-center gap-2"
                           )}
+                          style={
+                            trackUsesTimedLayout
+                              ? { height: trackContentHeight }
+                              : undefined
+                          }
                         >
                           {track.segments.map((segment, segmentIndex) => {
-                          const isSelected =
-                            selectedItem.id === segment.id ||
-                            selectedItem.id === segment.selectionId
-                          const segmentMedia =
-                            segment.selectionId === project.sourceMedia.id
-                              ? sourceMediaItem
-                              : project.projectMedia.find(
-                                  (item) => item.linkedSelectionId === segment.selectionId
-                                ) ?? null
-                          const hasTimedSegmentLayout =
-                            trackUsesTimedLayout || typeof segment.startTime === "number"
+                            const isSelected =
+                              selectedItem.id === segment.id ||
+                              selectedItem.id === segment.selectionId
+                            const segmentMedia =
+                              segment.selectionId === project.sourceMedia.id
+                                ? sourceMediaItem
+                                : project.projectMedia.find(
+                                    (item) => item.linkedSelectionId === segment.selectionId
+                                  ) ?? null
+                            const hasTimedSegmentLayout =
+                              trackUsesTimedLayout || typeof segment.startTime === "number"
+                            const segmentStartTime = Math.max(
+                              0,
+                              segment.startTime ?? segmentMedia?.startTime ?? 0
+                            )
+                            const segmentEndTime = getTimelineSegmentEndTime({
+                              media: segmentMedia,
+                              projectDurationSeconds: project.media.durationSeconds,
+                              segment,
+                            })
+                            const segmentIsText = isTextTimelineSegment(project, segment)
+                            const segmentDisplayText = getTimelineSegmentDisplayText({
+                              project,
+                              segment,
+                              segmentEndTime,
+                              segmentStartTime,
+                            })
 
-                          return (
-                            <ContextMenu key={segment.id}>
-                              <ContextMenuTrigger asChild>
-                                <button
-                              data-timeline-segment="true"
-                              type="button"
-                              onPointerDown={(event) => event.stopPropagation()}
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                setActiveTool(getSelectionToolId(track.id, segment.selectionId))
-                                setSelectedItemId(segment.id)
-                                seekToTimelineSegment(event)
-                              }}
-                              onContextMenu={(event) => {
-                                event.stopPropagation()
-                                setActiveTool(getSelectionToolId(track.id, segment.selectionId))
-                                setSelectedItemId(segment.id)
-                              }}
-                              style={
-                                hasTimedSegmentLayout
-                                  ? getTimedSegmentStyle({
-                                      media: segmentMedia,
-                                      projectDurationSeconds: project.media.durationSeconds,
-                                      segment,
-                                      timelineDurationSeconds,
-                                    })
-                                  : undefined
-                              }
-                              className={cn(
-                                "relative cursor-pointer rounded-lg border px-3 text-left text-xs font-medium transition",
-                                track.id === "video" ? "h-16 leading-8" : "h-8 leading-8",
-                                hasTimedSegmentLayout ? "absolute top-0 min-w-10" : null,
-                                hasTimedSegmentLayout ? null : segment.widthClassName,
-                                hasTimedSegmentLayout ? null : segment.offsetClassName,
-                                timelineToneClassName[segment.tone],
-                                isSelected
-                                  ? "z-10 border-yellow-400 text-foreground shadow-[0_0_0_2px_rgba(250,204,21,0.95)] ring-0"
-                                  : "hover:ring-1 hover:ring-foreground/20"
-                              )}
-                                >
+                            return (
+                              <ContextMenu key={segment.id}>
+                                <ContextMenuTrigger asChild>
+                                  <button
+                                    data-timeline-segment="true"
+                                    type="button"
+                                    onPointerDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+
+                                      if (didResizeSegmentRef.current) {
+                                        didResizeSegmentRef.current = false
+                                        return
+                                      }
+
+                                      setActiveTool(
+                                        getSelectionToolId(track.id, segment.selectionId)
+                                      )
+                                      setSelectedItemId(segment.id)
+                                      seekToTimelineSegment(event)
+                                    }}
+                                    onContextMenu={(event) => {
+                                      event.stopPropagation()
+                                      setActiveTool(
+                                        getSelectionToolId(track.id, segment.selectionId)
+                                      )
+                                      setSelectedItemId(segment.id)
+                                      seekToTimelineSegment(event)
+                                    }}
+                                    style={
+                                      hasTimedSegmentLayout
+                                        ? {
+                                            ...getTimedSegmentStyle({
+                                              media: segmentMedia,
+                                              projectDurationSeconds:
+                                                project.media.durationSeconds,
+                                              segment,
+                                              timelineDurationSeconds,
+                                            }),
+                                            top:
+                                              (segment.laneIndex ?? 0) *
+                                              getTrackLaneHeight(track.id),
+                                          }
+                                        : undefined
+                                    }
+                                    className={cn(
+                                      "relative cursor-pointer overflow-hidden rounded-lg border px-3 text-left text-xs font-medium transition",
+                                      track.id === "video" ? "h-16 leading-8" : "h-8 leading-8",
+                                      hasTimedSegmentLayout ? "absolute top-0 min-w-10" : null,
+                                      hasTimedSegmentLayout ? null : segment.widthClassName,
+                                      hasTimedSegmentLayout ? null : segment.offsetClassName,
+                                      segmentIsText
+                                        ? "border-blue-600 bg-blue-100 text-slate-700 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.2)] hover:bg-blue-100 dark:border-blue-400 dark:bg-blue-500/18 dark:text-blue-50"
+                                        : timelineToneClassName[segment.tone],
+                                      isSelected
+                                        ? segmentIsText
+                                          ? "z-10 border-blue-600 shadow-[0_0_0_2px_rgba(37,99,235,0.45)] ring-0 dark:border-blue-300"
+                                          : "z-10 border-yellow-400 text-foreground shadow-[0_0_0_2px_rgba(250,204,21,0.95)] ring-0"
+                                        : "hover:ring-1 hover:ring-foreground/20"
+                                    )}
+                                  >
                               {trackIndex === 0 && segmentIndex === 0 ? (
                                 <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
                                   <TimelineThumbnailStrip
@@ -1002,7 +1257,7 @@ export function StudioTimeline({
                                 </div>
                               ) : null}
 
-                              {trackIndex !== 0 ? (
+                              {trackIndex !== 0 && !segmentIsText ? (
                                 track.id === "audio" ? (
                                   <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-blue-500/12">
                                     <WaveformBars
@@ -1023,17 +1278,55 @@ export function StudioTimeline({
                                 )
                               ) : null}
 
-                              <span className="relative z-10 truncate">
+                              {segmentIsText && hasTimedSegmentLayout ? (
+                                <>
+                                  <span
+                                    aria-hidden="true"
+                                    onPointerDown={(event) =>
+                                      handleSegmentResizePointerDown({
+                                        event,
+                                        media: segmentMedia,
+                                        segment,
+                                        side: "left",
+                                        trackId: track.id,
+                                      })
+                                    }
+                                    className="absolute inset-y-1 left-1 z-20 w-2 cursor-ew-resize rounded-full before:absolute before:left-1 before:top-1/2 before:h-4 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-blue-600 dark:before:bg-blue-300"
+                                  />
+                                  <span
+                                    aria-hidden="true"
+                                    onPointerDown={(event) =>
+                                      handleSegmentResizePointerDown({
+                                        event,
+                                        media: segmentMedia,
+                                        segment,
+                                        side: "right",
+                                        trackId: track.id,
+                                      })
+                                    }
+                                    className="absolute inset-y-1 right-1 z-20 w-2 cursor-ew-resize rounded-full before:absolute before:right-1 before:top-1/2 before:h-4 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-blue-600 dark:before:bg-blue-300"
+                                  />
+                                </>
+                              ) : null}
+
+                              <span className="relative z-10 flex min-w-0 items-center gap-1.5 truncate">
                                 {track.id === "audio" ? (
                                   <span className="inline-flex items-center gap-1.5 rounded bg-background/70 px-1.5 py-0.5 leading-none text-[11px] text-foreground-subtle shadow-sm dark:bg-black/28 dark:text-white/85">
                                     <AudioLines className="size-3" />
                                     Audio: {guideAudioItem?.name ?? segment.label}
                                   </span>
+                                ) : segmentIsText ? (
+                                  <>
+                                    <Type className="size-3 shrink-0 text-blue-700 dark:text-blue-200" />
+                                    <span className="min-w-0 truncate leading-none">
+                                      {segmentDisplayText}
+                                    </span>
+                                  </>
                                 ) : (
                                   segment.label
                                 )}
                               </span>
-                                </button>
+                                  </button>
                               </ContextMenuTrigger>
                               <ContextMenuContent className="w-44 min-w-44">
                                 <ContextMenuItem
