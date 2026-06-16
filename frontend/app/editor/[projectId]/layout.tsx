@@ -20,7 +20,7 @@ import {
   StudioTimeline,
   TIMELINE_DEFAULT_HEIGHT,
   TIMELINE_MAX_HEIGHT,
-} from "@/features/studio-editor/components/studio-timeline"
+} from "@/features/studio-editor/timeline/studio-timeline"
 import { StudioTopbar } from "@/features/studio-editor/components/studio-topbar"
 import { getStudioProjectDisplayName } from "@/features/studio-hub/studio-projects.data"
 import { cn } from "@/lib/utils"

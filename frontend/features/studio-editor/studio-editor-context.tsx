@@ -22,8 +22,6 @@ import type {
   StudioShortClip,
   StudioCanvasLayer,
   StudioEditorProject,
-  StudioProjectMediaItem,
-  StudioTimelineSegment,
   StudioSelection,
   StudioStaleOutputType,
   StudioTranscript,
@@ -31,104 +29,14 @@ import type {
   StudioTranscriptWord,
   StudioToolId,
 } from "./studio.types"
+import { getProjectTimelineDuration } from "./timeline/lib/layout"
+import {
+  getDuplicatedTimelineSegment,
+  updateTimelineSegmentTimingInProject,
+} from "./timeline/lib/operations"
 
 function clampTime(timeSeconds: number, durationSeconds: number) {
   return Math.min(durationSeconds, Math.max(0, timeSeconds))
-}
-
-function getWidthPercentFromClassName(widthClassName: string) {
-  const arbitraryWidthMatch = widthClassName.match(/w-\[(\d+(?:\.\d+)?)%\]/)
-
-  if (!arbitraryWidthMatch) {
-    return null
-  }
-
-  return Number(arbitraryWidthMatch[1])
-}
-
-function getTimelineWidthClassName(durationSeconds: number, projectDurationSeconds: number) {
-  const widthPercent =
-    projectDurationSeconds > 0 ? (durationSeconds / projectDurationSeconds) * 100 : 0
-
-  return `w-[${Number(widthPercent.toFixed(2))}%]`
-}
-
-function getTimelineSegmentDuration({
-  media,
-  projectDurationSeconds,
-  segment,
-}: {
-  media: StudioProjectMediaItem | null
-  projectDurationSeconds: number
-  segment: StudioTimelineSegment
-}) {
-  const widthPercent = getWidthPercentFromClassName(segment.widthClassName)
-  const widthDuration =
-    widthPercent !== null ? (widthPercent / 100) * projectDurationSeconds : null
-
-  return Math.max(
-    0,
-    segment.durationSeconds ??
-      media?.durationSeconds ??
-      widthDuration ??
-      projectDurationSeconds
-  )
-}
-
-function getProjectTimelineDuration(project: StudioEditorProject) {
-  const segmentEndTimes = project.timelineTracks.flatMap((track) =>
-    track.segments.map((segment) => {
-      const segmentMedia =
-        segment.selectionId === project.sourceMedia.id
-          ? project.projectMedia.find(
-              (item) =>
-                item.linkedSelectionId === project.sourceMedia.id ||
-                item.origin === "SOURCE"
-            ) ?? null
-          : project.projectMedia.find(
-              (item) => item.linkedSelectionId === segment.selectionId
-            ) ?? null
-      const startTime = Math.max(0, segment.startTime ?? segmentMedia?.startTime ?? 0)
-      const durationSeconds = getTimelineSegmentDuration({
-        media: segmentMedia,
-        projectDurationSeconds: project.media.durationSeconds,
-        segment,
-      })
-
-      return startTime + durationSeconds
-    })
-  )
-
-  return Math.max(project.media.durationSeconds, ...segmentEndTimes)
-}
-
-function getTimelineSegmentStartTime({
-  media,
-  segment,
-}: {
-  media: StudioProjectMediaItem | null
-  segment: StudioTimelineSegment
-}) {
-  return Math.max(0, segment.startTime ?? media?.startTime ?? 0)
-}
-
-function getTimelineSegmentEndTime({
-  media,
-  projectDurationSeconds,
-  segment,
-}: {
-  media: StudioProjectMediaItem | null
-  projectDurationSeconds: number
-  segment: StudioTimelineSegment
-}) {
-  return (
-    getTimelineSegmentStartTime({ media, segment }) +
-    getTimelineSegmentDuration({
-      media,
-      projectDurationSeconds,
-      segment,
-    })
-  )
 }
 
 type StudioEditorContextValue = {
@@ -482,27 +390,13 @@ export function StudioEditorProvider({
         startTime: number
       }
     ) => {
-      const durationSeconds = Math.max(0.25, timing.durationSeconds)
-
-      setProject((currentProject) => ({
-        ...currentProject,
-        timelineTracks: currentProject.timelineTracks.map((track) => ({
-          ...track,
-          segments: track.segments.map((segment) =>
-            segment.id === segmentId
-              ? {
-                  ...segment,
-                  durationSeconds,
-                  startTime: Math.max(0, timing.startTime),
-                  widthClassName: getTimelineWidthClassName(
-                    durationSeconds,
-                    currentProject.media.durationSeconds
-                  ),
-                }
-              : segment
-          ),
-        })),
-      }))
+      setProject((currentProject) =>
+        updateTimelineSegmentTimingInProject({
+          project: currentProject,
+          segmentId,
+          timing,
+        })
+      )
     },
     []
   )
@@ -543,90 +437,14 @@ export function StudioEditorProvider({
 
     recordEditorHistory()
 
-    const nextSegmentId = `${sourceSegment.id}-copy-${Date.now()}`
-    const sourceMedia =
-      sourceSegment.selectionId === project.sourceMedia.id
-        ? project.projectMedia.find(
-            (item) =>
-              item.linkedSelectionId === project.sourceMedia.id ||
-              item.origin === "SOURCE"
-          ) ?? null
-        : project.projectMedia.find(
-            (item) => item.linkedSelectionId === sourceSegment.selectionId
-          ) ?? null
-    const estimatedSegmentDuration = Math.max(
-      0.25,
-      getTimelineSegmentDuration({
-        media: sourceMedia,
-        projectDurationSeconds: project.media.durationSeconds,
-        segment: sourceSegment,
-      })
-    )
-    const sourceEndTime = getTimelineSegmentEndTime({
-      media: sourceMedia,
-      projectDurationSeconds: project.media.durationSeconds,
-      segment: sourceSegment,
+    const duplicatedSegment = getDuplicatedTimelineSegment({
+      project,
+      sourceSegment,
+      sourceTrack,
     })
-    const occupiedSegments = sourceTrack.segments
-      .filter((segment) => segment.id !== sourceSegment.id)
-      .map((segment) => {
-        const segmentMedia =
-          segment.selectionId === project.sourceMedia.id
-            ? project.projectMedia.find(
-                (item) =>
-                  item.linkedSelectionId === project.sourceMedia.id ||
-                  item.origin === "SOURCE"
-              ) ?? null
-            : project.projectMedia.find(
-                (item) => item.linkedSelectionId === segment.selectionId
-              ) ?? null
-        const startTime = getTimelineSegmentStartTime({
-          media: segmentMedia,
-          segment,
-        })
-
-        return {
-          endTime: getTimelineSegmentEndTime({
-            media: segmentMedia,
-            projectDurationSeconds: project.media.durationSeconds,
-            segment,
-          }),
-          laneIndex: segment.laneIndex ?? 0,
-          startTime,
-        }
-      })
-      .sort((left, right) => left.startTime - right.startTime)
-    const nextStartTime = Math.max(0, sourceEndTime)
-    const nextEndTime = nextStartTime + estimatedSegmentDuration
-    let nextLaneIndex = sourceSegment.laneIndex ?? 0
-
-    while (
-      occupiedSegments.some(
-        (occupiedSegment) =>
-          occupiedSegment.laneIndex === nextLaneIndex &&
-          nextStartTime < occupiedSegment.endTime &&
-          nextEndTime > occupiedSegment.startTime
-      )
-    ) {
-      nextLaneIndex += 1
-    }
-
     const sourceSegmentIndex = sourceTrack.segments.findIndex(
       (segment) => segment.id === segmentId
     )
-    const sourceLabel = sourceSegment.label.replace(/(?: copy)+$/i, "")
-    const nextSegment = {
-      ...sourceSegment,
-      id: nextSegmentId,
-      durationSeconds: estimatedSegmentDuration,
-      laneIndex: nextLaneIndex,
-      label: `${sourceLabel} copy`,
-      offsetClassName:
-        sourceTrack.id === "video" || sourceTrack.id === "audio"
-          ? sourceSegment.offsetClassName
-          : undefined,
-      startTime: nextStartTime,
-    }
 
     setProject((currentProject) => ({
       ...currentProject,
@@ -636,7 +454,7 @@ export function StudioEditorProvider({
               ...track,
               segments: [
                 ...track.segments.slice(0, sourceSegmentIndex + 1),
-                nextSegment,
+                duplicatedSegment.segment,
                 ...track.segments.slice(sourceSegmentIndex + 1),
               ],
             }
@@ -644,7 +462,7 @@ export function StudioEditorProvider({
       ),
     }))
 
-    setSelectedItemId(nextSegmentId)
+    setSelectedItemId(duplicatedSegment.id)
   }
 
   const addChapterToEnd = () => {
