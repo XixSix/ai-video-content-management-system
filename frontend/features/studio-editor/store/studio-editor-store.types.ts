@@ -3,9 +3,11 @@
 import type { StoreApi } from "zustand/vanilla"
 
 import type {
+  StudioAspectRatio,
   StudioCanvasLayer,
   StudioClipCandidate,
   StudioClipCandidateStatus,
+  StudioProjectMediaItem,
   StudioShortClip,
   StudioToolId,
 } from "../studio.types"
@@ -75,6 +77,7 @@ export type ShortClipDetailsUpdate = Partial<
 
 export type StudioEditorActions = {
   addChapterToEnd: () => void
+  addProjectMediaToTimeline: (mediaId: string) => void
   addTextLayerFromPreset: (presetId: string) => void
   applyCaptionPreset: (presetId: string) => void
   commitTranscriptWordText: (wordId: string, text: string) => void
@@ -101,6 +104,8 @@ export type StudioEditorActions = {
   togglePlayback: () => void
   toggleTrackMute: (trackId: string) => void
   undoEditorChange: () => void
+  removeProjectMedia: (mediaId: string) => void
+  upsertProjectMedia: (media: StudioProjectMediaItem) => void
   updateCaptionLayerStyle: (style: CaptionLayerStyleUpdate) => void
   updateChapterTiming: (
     chapterId: string,
@@ -132,6 +137,7 @@ export type StudioEditorActions = {
       startTime?: number
     }
   ) => void
+  updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => void
   updateTextLayerContent: (layerId: string, content: string) => void
   updateTextLayerStyle: (layerId: string, style: TextLayerStyleUpdate) => void
   updateTimelineSegmentTiming: (

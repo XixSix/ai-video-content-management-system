@@ -5,10 +5,9 @@ import { useEffect, useRef, useState } from "react"
 import {
   CANVAS_HORIZONTAL_PADDING,
   CANVAS_VERTICAL_PADDING,
-  VIDEO_ASPECT_RATIO,
 } from "../constants"
 
-export function usePreviewSize() {
+export function usePreviewSize(aspectRatio: number) {
   const canvasAreaRef = useRef<HTMLDivElement>(null)
   const [previewSize, setPreviewSize] = useState<{
     height: number
@@ -28,9 +27,9 @@ export function usePreviewSize() {
       const availableWidth = Math.max(0, width - CANVAS_HORIZONTAL_PADDING)
       const nextWidth = Math.max(
         0,
-        Math.min(availableWidth, availableHeight * VIDEO_ASPECT_RATIO)
+        Math.min(availableWidth, availableHeight * aspectRatio)
       )
-      const nextHeight = nextWidth / VIDEO_ASPECT_RATIO
+      const nextHeight = nextWidth / aspectRatio
 
       setPreviewSize((currentSize) => {
         const roundedWidth = Math.round(nextWidth)
@@ -58,7 +57,7 @@ export function usePreviewSize() {
     return () => {
       resizeObserver.disconnect()
     }
-  }, [])
+  }, [aspectRatio])
 
   return {
     canvasAreaRef,

@@ -95,6 +95,7 @@ export function createStudioMediaItem(
     resolutionLabel,
     dimensionsLabel: studioType === "IMAGE" ? resolutionLabel : undefined,
     sizeLabel: formatFileSize(item.fileSizeBytes),
+    sourceLibraryItemId: item.id,
     ...overrides,
   }
 }

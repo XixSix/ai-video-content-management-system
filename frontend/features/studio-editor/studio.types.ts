@@ -160,6 +160,7 @@ export type StudioSourceMedia = {
 export type StudioMediaDetail = {
   id: string
   title: string
+  aspectRatio: StudioAspectRatio
   thumbnailUrl: string
   durationSeconds: number
   durationLabel: string
@@ -200,6 +201,7 @@ export type StudioProjectMediaItem = {
   language?: string
   linkedMediaName?: string
   linkedSelectionId?: string
+  sourceLibraryItemId?: string
   startTime?: number
 }
 
@@ -300,7 +302,7 @@ export type StudioChapter = {
 }
 
 export type StudioClipCandidateStatus = "CANDIDATE" | "SELECTED" | "REJECTED"
-export type StudioAspectRatio = "9:16" | "1:1" | "16:9"
+export type StudioAspectRatio = "9:16" | "1:1" | "4:5" | "16:9"
 export type StudioClipPlatform =
   | "TIKTOK"
   | "YOUTUBE_SHORTS"

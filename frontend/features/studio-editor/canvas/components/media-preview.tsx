@@ -50,7 +50,7 @@ export function MediaPreview({
               seekToTime(event.currentTarget.currentTime)
             }
           }}
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full object-contain"
         />
       ) : media.type === "AUDIO" && media.streamUrl ? (
         <>
@@ -60,7 +60,7 @@ export function MediaPreview({
               alt=""
               fill
               sizes="70vw"
-              className="absolute inset-0 object-cover"
+              className="absolute inset-0 object-contain"
               priority
             />
           ) : null}
@@ -88,7 +88,7 @@ export function MediaPreview({
           alt=""
           fill
           sizes="70vw"
-          className="absolute inset-0 object-cover"
+          className="absolute inset-0 object-contain"
           priority
         />
       ) : (
@@ -107,7 +107,6 @@ export function MediaPreview({
           }}
         />
       ) : null}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.18))]" />
     </>
   )
 }

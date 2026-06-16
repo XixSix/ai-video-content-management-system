@@ -15,6 +15,7 @@ import { createClipActions } from "./actions/clip-actions"
 import { createHistoryActions } from "./actions/history-actions"
 import { createLayerActions } from "./actions/layer-actions"
 import { createPlaybackActions } from "./actions/playback-actions"
+import { createProjectActions } from "./actions/project-actions"
 import { createSelectionActions } from "./actions/selection-actions"
 import { createTimelineActions } from "./actions/timeline-actions"
 import { createToolActions } from "./actions/tool-actions"
@@ -39,6 +40,7 @@ function createStudioEditorStore() {
     ...createToolActions(set),
     ...createHistoryActions(set, get),
     ...createPlaybackActions(set, get),
+    ...createProjectActions(set, get),
     ...createSelectionActions(set, get),
     ...createTimelineActions(set, get),
     ...createLayerActions(set, get),
@@ -81,6 +83,17 @@ export function useStudioProjectState() {
     project,
     ...getStaleOutputState(project),
   }
+}
+
+export function useStudioProjectActions() {
+  return useStudioEditorStore(
+    useShallow((state) => ({
+      addProjectMediaToTimeline: state.addProjectMediaToTimeline,
+      removeProjectMedia: state.removeProjectMedia,
+      updateProjectAspectRatio: state.updateProjectAspectRatio,
+      upsertProjectMedia: state.upsertProjectMedia,
+    }))
+  )
 }
 
 export function useStudioToolState() {

@@ -2,14 +2,10 @@ import { formatDuration } from "@/features/media-library/media-library.utils"
 
 import type { StudioEditorProject } from "../studio.types"
 import {
-  bRollMediaItem,
-  brandMarkItem,
-  captionedMasterItem,
   createStudioMediaItem,
   getResolutionLabel,
   guideAudioItem,
   sourceMediaItem,
-  stillFrameItem,
 } from "./media.mock"
 import {
   transcriptFullText,
@@ -21,6 +17,7 @@ export const studioEditorProject: StudioEditorProject = {
   media: {
     id: sourceMediaItem.id,
     title: sourceMediaItem.title,
+    aspectRatio: "9:16",
     thumbnailUrl: sourceMediaItem.thumbnailUrl ?? "/window.svg",
     durationSeconds: sourceMediaItem.duration ?? 0,
     durationLabel: formatDuration(sourceMediaItem.duration),
@@ -39,33 +36,12 @@ export const studioEditorProject: StudioEditorProject = {
       linkedSelectionId: "source-media",
       startTime: 0,
     }),
-    createStudioMediaItem(bRollMediaItem, {
-      id: "media-b-roll",
-      summary: "Secondary video from Media Library available for inserts.",
-      usageLabel: "Project media",
-    }),
     createStudioMediaItem(guideAudioItem, {
       id: "media-guide-audio",
       summary: "Audio source linked to the timeline audio bed.",
       usageLabel: "Audio bed",
       linkedSelectionId: "audio-bed",
       startTime: 0,
-    }),
-    createStudioMediaItem(captionedMasterItem, {
-      id: "media-captioned-master",
-      summary: "Generated captioned master available as an editor output.",
-      usageLabel: "Rendered output",
-    }),
-    createStudioMediaItem(brandMarkItem, {
-      id: "media-brand-mark",
-      summary: "Thumbnail image already placed on the canvas.",
-      usageLabel: "Canvas layer",
-      linkedSelectionId: "brand-mark",
-    }),
-    createStudioMediaItem(stillFrameItem, {
-      id: "media-still-desk",
-      summary: "Still image from Media Library available for thumbnail work.",
-      usageLabel: "Still frame",
     }),
   ],
   transcript: {
@@ -312,37 +288,6 @@ export const studioEditorProject: StudioEditorProject = {
           selectionId: "source-media",
           summary: "Main interview clip on the primary video track",
           startTime: 0,
-        },
-      ],
-    },
-    {
-      id: "captions",
-      label: "Captions",
-      selectionId: "captions",
-      segments: [
-        {
-          id: "caption-a",
-          label: "Intro lines",
-          content:
-            "The workflow starts with a clean transcript before anything downstream becomes useful.",
-          widthClassName: "w-[24%]",
-          offsetClassName: "ml-[10%]",
-          tone: "accent",
-          selectionId: "captions",
-          summary: "Caption block for the opening hook",
-          startTime: 8.2,
-        },
-        {
-          id: "caption-b",
-          label: "Main phrase",
-          content:
-            "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
-          widthClassName: "w-[18%]",
-          offsetClassName: "ml-[7%]",
-          tone: "accent",
-          selectionId: "captions",
-          summary: "Caption block covering the first talking point",
-          startTime: 15.6,
         },
       ],
     },

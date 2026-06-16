@@ -20,6 +20,17 @@ function MediaFileIcon({ type }: { type: StudioProjectMediaType }) {
 
 export function MediaThumbnail({ item }: { item: StudioProjectMediaItem }) {
   if (item.thumbnailUrl) {
+    if (item.thumbnailUrl.startsWith("blob:")) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.thumbnailUrl}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+      )
+    }
+
     return (
       <Image
         src={item.thumbnailUrl}
