@@ -17,6 +17,15 @@ export function StudioInspector() {
   const { activeTool } = useStudioToolState()
   const selectedChapter =
     project.chapters.find((chapter) => chapter.id === selectedChapterId) ?? null
+  const selectedTextLayer =
+    selectedItem.kind === "layer" && selectedItem.layer.kind === "text"
+      ? selectedItem.layer
+      : selectedItem.kind === "segment" && activeTool === "text"
+        ? project.layers.find(
+            (layer) =>
+              layer.id === selectedItem.linkedSelectionId && layer.kind === "text"
+          )
+        : null
 
   return (
     <aside className="flex h-full min-h-0 w-full flex-col overflow-hidden border-l border-border bg-background">
@@ -27,8 +36,8 @@ export function StudioInspector() {
       <div className="flex flex-1 flex-col gap-4 overflow-auto p-4">
         {activeTool === "chapters" && selectedChapter ? (
           <ChapterInspector key={selectedChapter.id} chapter={selectedChapter} />
-        ) : selectedItem.kind === "layer" && selectedItem.layer.kind === "text" ? (
-          <TextInspector layer={selectedItem.layer} />
+        ) : selectedTextLayer ? (
+          <TextInspector layer={selectedTextLayer} />
         ) : selectedItem.kind === "layer" && selectedItem.layer.kind === "captions" ? (
           <CaptionInspector layer={selectedItem.layer} />
         ) : selectedItem.kind === "media" ? (

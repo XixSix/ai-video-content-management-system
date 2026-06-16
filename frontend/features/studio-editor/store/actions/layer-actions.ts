@@ -161,6 +161,12 @@ export function createLayerActions(
           layers: state.project.layers.map((layer) =>
             layer.id === layerId && layer.kind === "text" ? { ...layer, content } : layer
           ),
+          timelineTracks: state.project.timelineTracks.map((track) => ({
+            ...track,
+            segments: track.segments.map((segment) =>
+              segment.selectionId === layerId ? { ...segment, content } : segment
+            ),
+          })),
         },
       }))
     },
