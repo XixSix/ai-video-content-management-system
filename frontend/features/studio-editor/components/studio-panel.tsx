@@ -1,7 +1,7 @@
 "use client"
 
 import { ChaptersPanel } from "@/features/studio-editor/components/chapters-panel"
-import { CaptionsPanel } from "@/features/studio-editor/components/captions-panel"
+import { StudioCaptionsPanel } from "@/features/studio-editor/captions/studio-captions-panel"
 import { GenericToolPanel } from "@/features/studio-editor/components/generic-tool-panel"
 import { MediaPanel } from "@/features/studio-editor/components/media-panel"
 import { TextPanel } from "@/features/studio-editor/components/text-panel"
@@ -19,7 +19,7 @@ export function StudioPanel() {
   }
 
   if (activeTool === "captions") {
-    return <CaptionsPanel />
+    return <StudioCaptionsPanel />
   }
 
   if (activeTool === "chapters") {

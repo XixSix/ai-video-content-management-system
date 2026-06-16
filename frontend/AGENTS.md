@@ -170,7 +170,8 @@ Responsibilities:
 - `components/studio-*.tsx`: editor shell pieces such as rail, topbar, sidebar,
   and panel router.
 - Tool-specific panels should be separate files, for example
-  `captions-panel.tsx`, `chapters-panel.tsx`, and `clips-panel.tsx`.
+  `chapters-panel.tsx`, `clips-panel.tsx`, or a full subfeature when the
+  workflow owns components, hooks, and helpers.
 - Canvas is a full Studio Editor subfeature. Keep preview sizing, media sync,
   layer rendering, caption overlay rendering, and selection frame code under
   `features/studio-editor/canvas/`.
@@ -185,6 +186,19 @@ features/studio-editor/canvas/
 └── lib/                pure style, caption activity, and media sync helpers
 ```
 
+- Captions is a full Studio Editor subfeature. Keep captions panel composition,
+  toolbar/search, cue list, word editing hooks, and caption filtering/activity
+  helpers under `features/studio-editor/captions/`.
+- Captions structure:
+
+```text
+features/studio-editor/captions/
+├── studio-captions-panel.tsx  captions panel entry component
+├── components/                toolbar, cue list, cue rows, word editor, empty state
+├── hooks/                     search debounce, active cue scroll, word edit drafts
+└── lib/                       caption activity and filtering helpers
+```
+
 - Timeline is a full Studio Editor subfeature, not a top-level
   `features/studio-timeline` feature while it depends on `StudioEditorProject`,
   editor store state, and editor selection state. Keep all timeline code under
@@ -196,13 +210,17 @@ features/studio-editor/timeline/
 ├── studio-timeline.tsx  timeline entry component used by editor layout
 ├── constants.ts         timeline sizing, zoom, and ruler constants
 ├── components/          toolbar, ruler, tracks, segments, waveform UI
-├── hooks/               timeline interaction and waveform hooks
-└── lib/                 pure time, layout, display, and operation helpers
+├── hooks/               focused timeline interaction and waveform hooks
+└── lib/                 pure time, layout, display, resize, and operation helpers
 ```
 
 - Do not split one timeline behavior across both `components/timeline` and
   `timeline`. If code belongs to the timeline feature, keep it inside
   `features/studio-editor/timeline/`.
+- Inspector field primitives live under
+  `features/studio-editor/inspector/components/fields/`. Keep
+  text/caption/chapter/media inspectors importing the focused field component
+  they use instead of recreating a large combined fields file.
 
 Do not keep adding special cases to one giant panel file. If a tool needs its own
 workflow, give it a dedicated component and keep shared shell/panel primitives

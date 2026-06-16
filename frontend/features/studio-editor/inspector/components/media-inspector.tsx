@@ -1,7 +1,8 @@
 import { FileText, Film, ImageIcon, MoreHorizontal, Music2, Volume2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { ControlRow, SelectRow } from "@/features/studio-editor/inspector/components/inspector-fields"
+import { ControlRow } from "@/features/studio-editor/inspector/components/fields/control-row"
+import { SelectRow } from "@/features/studio-editor/inspector/components/fields/select-row"
 import { getMediaActions } from "@/features/studio-editor/inspector/lib/media-actions"
 import type {
   StudioProjectMediaItem,

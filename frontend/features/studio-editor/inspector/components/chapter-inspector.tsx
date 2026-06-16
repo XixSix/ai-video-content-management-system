@@ -5,7 +5,7 @@ import { Clapperboard } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store"
-import { SegmentedTimeInput } from "@/features/studio-editor/inspector/components/inspector-fields"
+import { SegmentedTimeInput } from "@/features/studio-editor/inspector/components/fields/segmented-time-input"
 import {
   formatChapterRange,
   getChapterDuration,
