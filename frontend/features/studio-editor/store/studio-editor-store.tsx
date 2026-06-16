@@ -87,13 +87,14 @@ export function useStudioToolState() {
   const toolState = useStudioEditorStore(
     useShallow((state) => ({
       activeTool: state.activeTool,
+      project: state.project,
       setActiveTool: state.setActiveTool,
     }))
   )
 
   return {
     ...toolState,
-    toolPanel: getToolPanel(toolState.activeTool),
+    toolPanel: getToolPanel(toolState.activeTool, toolState.project),
   }
 }
 

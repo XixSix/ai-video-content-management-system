@@ -8,7 +8,7 @@ import type { CaptionLayerStyleUpdate } from "@/features/studio-editor/inspector
 import {
   studioTextAnimationByOptions,
   studioTextAnimationOptions,
-} from "@/features/studio-editor/studio.data"
+} from "@/features/studio-editor/data/text-style.data"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 
 export function CaptionEffectsTab({

@@ -9,7 +9,7 @@ import {
 } from "@/features/studio-editor/inspector/components/inspector-fields"
 import type { CaptionLayerStyleUpdate } from "@/features/studio-editor/inspector/lib/style-types"
 import { DEFAULT_CAPTION_STROKE_WIDTH } from "@/features/studio-editor/studio-caption-presets"
-import { studioTextFontOptions } from "@/features/studio-editor/studio.data"
+import { studioTextFontOptions } from "@/features/studio-editor/data/text-style.data"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 
 export function CaptionFontTab({

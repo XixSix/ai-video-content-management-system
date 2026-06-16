@@ -17,7 +17,7 @@ import {
   studioTextAnimationByOptions,
   studioTextAnimationOptions,
   studioTextFontOptions,
-} from "@/features/studio-editor/studio.data"
+} from "@/features/studio-editor/data/text-style.data"
 import { useStudioLayerActions } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 

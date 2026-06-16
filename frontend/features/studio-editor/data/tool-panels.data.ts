@@ -1,0 +1,184 @@
+import type {
+  StudioEditorProject,
+  StudioToolId,
+  StudioToolPanelContent,
+} from "../studio.types"
+
+export function getStudioToolPanels(
+  project: StudioEditorProject
+): Record<StudioToolId, StudioToolPanelContent> {
+  return {
+    media: {
+      title: "Media",
+      sections: [
+        {
+          id: "source",
+          title: "Source",
+          items: [
+            {
+              id: "source-main",
+              label: project.sourceMedia.name,
+              meta: `${project.sourceMedia.durationLabel} · ${project.sourceMedia.resolutionLabel}`,
+              selectionId: project.sourceMedia.id,
+            },
+          ],
+        },
+        {
+          id: "imports",
+          title: "Imported",
+          items: [
+            { id: "images", label: "Images", meta: "12 files", selectionId: "brand-mark" },
+            { id: "captions", label: "Captions", meta: "2 styles", selectionId: "captions" },
+          ],
+        },
+      ],
+    },
+    assets: {
+      title: "Assets",
+      sections: [
+        {
+          id: "logos",
+          title: "Brand",
+          items: [
+            { id: "logo-1", label: "Primary logo", meta: "PNG", selectionId: "brand-mark" },
+            { id: "lower-third", label: "Lower third", meta: "Template" },
+          ],
+        },
+        {
+          id: "stills",
+          title: "Still frames",
+          items: [
+            { id: "still-1", label: "Desk close-up", meta: "Marked" },
+            { id: "still-2", label: "Wide room", meta: "Draft" },
+          ],
+        },
+      ],
+    },
+    text: {
+      title: "Text",
+      sections: [
+        {
+          id: "headline",
+          title: "Headline",
+          items: [
+            { id: "hook-copy", label: "Hook text", meta: "Selected", selectionId: "hook-copy" },
+            { id: "cta-copy", label: "CTA line", meta: "Draft" },
+          ],
+        },
+        {
+          id: "styles",
+          title: "Styles",
+          items: [
+            { id: "style-bold", label: "Bold opener", meta: "Preset" },
+            { id: "style-clean", label: "Clean quote", meta: "Preset" },
+          ],
+        },
+      ],
+    },
+    captions: {
+      title: "Captions",
+      sections: [
+        {
+          id: "tracks",
+          title: "Tracks",
+          items: [
+            { id: "caption-en", label: "English main", meta: "Active", selectionId: "captions" },
+            { id: "caption-burned", label: "Burn-in alt", meta: "Draft" },
+          ],
+        },
+        {
+          id: "styles",
+          title: "Styles",
+          items: [
+            { id: "caption-style-1", label: "Bold white", meta: "Applied" },
+            { id: "caption-style-2", label: "Minimal dark", meta: "Saved" },
+          ],
+        },
+      ],
+    },
+    chapters: {
+      title: "Chapters",
+      sections: [
+        {
+          id: "outline",
+          title: "Outline",
+          items: [
+            { id: "chapter-item-1", label: "Why transcript quality matters", meta: "0:00-1:32" },
+            { id: "chapter-item-2", label: "Reusable content pipeline", meta: "1:32-3:44" },
+          ],
+        },
+        {
+          id: "status",
+          title: "Status",
+          items: [
+            { id: "chapter-status", label: "Transcript version", meta: "v4" },
+            { id: "chapter-stale", label: "Needs regenerate", meta: "Generated from v3" },
+          ],
+        },
+      ],
+    },
+    audio: {
+      title: "Audio",
+      sections: [
+        {
+          id: "tracks",
+          title: "Tracks",
+          items: [
+            { id: "guide", label: "English guide", meta: "-3 dB", selectionId: "audio-bed" },
+            { id: "music", label: "Music bed", meta: "-18 dB" },
+          ],
+        },
+        {
+          id: "tools",
+          title: "Tools",
+          items: [
+            { id: "ducking", label: "Ducking", meta: "On" },
+            { id: "cleanup", label: "Cleanup", meta: "Ready" },
+          ],
+        },
+      ],
+    },
+    clips: {
+      title: "Clips",
+      sections: [
+        {
+          id: "candidates",
+          title: "Candidates",
+          items: [
+            { id: "clip-1", label: "Hook opener", meta: "0:12-0:42" },
+            { id: "clip-2", label: "Objection answer", meta: "1:44-2:18" },
+          ],
+        },
+        {
+          id: "exports",
+          title: "Exports",
+          items: [
+            { id: "clip-export-1", label: "9:16 social", meta: "Draft" },
+            { id: "clip-export-2", label: "1:1 feed", meta: "Draft" },
+          ],
+        },
+      ],
+    },
+    ai: {
+      title: "AI",
+      sections: [
+        {
+          id: "ideas",
+          title: "Ideas",
+          items: [
+            { id: "ai-1", label: "Hook rewrite", meta: "2 options" },
+            { id: "ai-2", label: "Caption polish", meta: "Ready" },
+          ],
+        },
+        {
+          id: "automation",
+          title: "Automation",
+          items: [
+            { id: "auto-1", label: "Clip finder", meta: "Queued" },
+            { id: "auto-2", label: "Silence trim", meta: "Idle" },
+          ],
+        },
+      ],
+    },
+  }
+}

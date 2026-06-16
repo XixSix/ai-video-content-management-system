@@ -158,10 +158,12 @@ Studio editor code lives under `features/studio-editor/`.
 Responsibilities:
 
 - `studio.types.ts`: editor domain types and UI state types.
-- `studio.data.ts`: small typed mock editor project data and static panel config.
-  Split large fixtures into `data/` as the editor grows, for example
-  `data/project.mock.ts`, `data/transcript.mock.ts`, `data/timeline.mock.ts`,
-  and `data/assets.mock.ts`.
+- `studio.data.ts`: legacy barrel only. Do not add new mock fixtures or config
+  here.
+- `data/`: typed editor mock fixtures and static config, such as
+  `project.mock.ts`, `transcript.mock.ts`, `media.mock.ts`,
+  `navigation.data.ts`, `text-style.data.ts`, and `tool-panels.data.ts`.
+- `lib/selection.ts`: pure project selection lookup helpers.
 - `store/`: scoped Zustand editor state, domain action groups, selectors, and
   public hooks such as `useStudioProjectState`, `useStudioPlaybackState`, and
   `useStudioSelectionState`.

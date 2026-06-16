@@ -1,6 +1,6 @@
 "use client"
 
-import { studioEditorProject } from "../studio.data"
+import { studioEditorProject } from "../data/project.mock"
 import type {
   StudioEditorProject,
   StudioTranscript,

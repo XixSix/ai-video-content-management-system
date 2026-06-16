@@ -1,9 +1,5 @@
-"use client"
-
-import {
-  getStudioSelectionById,
-  studioToolPanels,
-} from "../studio.data"
+import { getStudioToolPanels } from "../data/tool-panels.data"
+import { getStudioSelectionById } from "../lib/selection"
 import type {
   StudioEditorProject,
   StudioSelection,
@@ -28,8 +24,8 @@ export function getSelectedTargetId(selectedItem: StudioSelection) {
   return selectedItem.id
 }
 
-export function getToolPanel(activeTool: StudioToolId) {
-  return studioToolPanels[activeTool]
+export function getToolPanel(activeTool: StudioToolId, project: StudioEditorProject) {
+  return getStudioToolPanels(project)[activeTool]
 }
 
 export function getStaleOutputState(project: StudioEditorProject) {
