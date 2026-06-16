@@ -3,8 +3,10 @@
 import {
   getDuplicatedTimelineSegment,
   insertSegmentWithPush,
+  moveSegmentWithinTrackWithPush,
   updateTimelineSegmentTimingInProject,
 } from "../../timeline/lib/operations"
+import type { StudioEditorProject } from "../../studio.types"
 import { recordEditorHistory } from "./history-actions"
 import type {
   StudioEditorGet,
@@ -81,6 +83,36 @@ export function createTimelineActions(
           segmentId,
           timing,
         }),
+      }))
+    },
+    moveTimelineSegmentWithPush: (
+      segmentId: string,
+      startTime: number,
+      options?: {
+        baseProject?: StudioEditorProject
+        recordHistory?: boolean
+      }
+    ) => {
+      const project = options?.baseProject ?? get().project
+      const sourceTrack = project.timelineTracks.find((track) =>
+        track.segments.some((segment) => segment.id === segmentId)
+      )
+
+      if (!sourceTrack || sourceTrack.id === "SOURCE") {
+        return
+      }
+
+      if (options?.recordHistory) {
+        recordEditorHistory(set, get)
+      }
+
+      set((state) => ({
+        project: moveSegmentWithinTrackWithPush({
+          project: options?.baseProject ?? state.project,
+          segmentId,
+          startTime,
+        }),
+        selectedItemId: segmentId,
       }))
     },
   }

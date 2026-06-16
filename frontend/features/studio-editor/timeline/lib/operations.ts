@@ -185,6 +185,56 @@ export function insertSegmentWithPush({
   }
 }
 
+export function moveSegmentWithinTrackWithPush({
+  project,
+  segmentId,
+  startTime,
+}: {
+  project: StudioEditorProject
+  segmentId: string
+  startTime: number
+}) {
+  const sourceTrack = project.timelineTracks.find((track) =>
+    track.segments.some((segment) => segment.id === segmentId)
+  )
+  const sourceSegment = sourceTrack?.segments.find(
+    (segment) => segment.id === segmentId
+  )
+
+  if (!sourceTrack || !sourceSegment || sourceTrack.id === "SOURCE") {
+    return project
+  }
+
+  const sourceRange = getSegmentRange({ project, segment: sourceSegment })
+  const movedSegment = withTimelineSegmentTiming({
+    durationSeconds: sourceRange.durationSeconds,
+    projectDurationSeconds: project.media.durationSeconds,
+    segment: sourceSegment,
+    startTime,
+  })
+  const trackWithoutMovedSegment = {
+    ...sourceTrack,
+    segments: sourceTrack.segments.filter((segment) => segment.id !== segmentId),
+  }
+  const movedTrackSegments = pushTrackSegmentsForInsert({
+    insertedSegment: movedSegment,
+    project,
+    track: trackWithoutMovedSegment,
+  })
+
+  return {
+    ...project,
+    timelineTracks: project.timelineTracks.map((track) =>
+      track.id === sourceTrack.id
+        ? {
+            ...track,
+            segments: movedTrackSegments,
+          }
+        : track
+    ),
+  }
+}
+
 export function getSmartTimelineInsertStartTime({
   durationSeconds,
   preferredStartTime,

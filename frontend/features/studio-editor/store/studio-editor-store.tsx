@@ -167,6 +167,7 @@ export function useStudioTimelineActions() {
     useShallow((state) => ({
       deleteTimelineSegment: state.deleteTimelineSegment,
       duplicateTimelineSegment: state.duplicateTimelineSegment,
+      moveTimelineSegmentWithPush: state.moveTimelineSegmentWithPush,
       updateTimelineSegmentTiming: state.updateTimelineSegmentTiming,
     }))
   )

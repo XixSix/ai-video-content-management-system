@@ -8,6 +8,7 @@ import type {
 } from "../../studio.types"
 import { getTimelineTimeFromClientX } from "../lib/time"
 import { useSegmentActions } from "./use-segment-actions"
+import { useSegmentDrag } from "./use-segment-drag"
 import { useSegmentResize } from "./use-segment-resize"
 import { useTimelinePan } from "./use-timeline-pan"
 import { useTimelineZoom } from "./use-timeline-zoom"
@@ -18,6 +19,7 @@ export function useTimelineInteractions({
   setActiveTool,
   setSelectedItemId,
   timelineDurationSeconds,
+  moveTimelineSegmentWithPush,
   updateTimelineSegmentTiming,
 }: {
   project: StudioEditorProject
@@ -25,6 +27,14 @@ export function useTimelineInteractions({
   setActiveTool: (toolId: StudioToolId) => void
   setSelectedItemId: (selectionId: string) => void
   timelineDurationSeconds: number
+  moveTimelineSegmentWithPush: (
+    segmentId: string,
+    startTime: number,
+    options?: {
+      baseProject?: StudioEditorProject
+      recordHistory?: boolean
+    }
+  ) => void
   updateTimelineSegmentTiming: (
     segmentId: string,
     timing: {
@@ -79,6 +89,19 @@ export function useTimelineInteractions({
     updateTimelineSegmentTiming,
   })
 
+  const {
+    draggingSegmentId,
+    handleSegmentDragPointerDown,
+    segmentDragPreview,
+  } = useSegmentDrag({
+    didResizeSegmentRef,
+    getTimelineTime,
+    moveTimelineSegmentWithPush,
+    project,
+    setActiveTool,
+    setSelectedItemId,
+  })
+
   const { downloadTimelineSegment, selectTimelineSegment } = useSegmentActions({
     project,
     seekToTimelineClientX,
@@ -90,10 +113,13 @@ export function useTimelineInteractions({
     applyZoomLevel,
     didResizeSegmentRef,
     downloadTimelineSegment,
+    draggingSegmentId,
+    handleSegmentDragPointerDown,
     handleSegmentResizePointerDown,
     handleTimelinePointerDown,
     isPanningTimeline,
     selectTimelineSegment,
+    segmentDragPreview,
     timelineSurfaceRef,
     timelineViewportRef,
     updateZoom,

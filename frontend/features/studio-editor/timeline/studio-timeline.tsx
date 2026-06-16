@@ -59,6 +59,7 @@ export function StudioTimeline({
   const {
     deleteTimelineSegment,
     duplicateTimelineSegment,
+    moveTimelineSegmentWithPush,
     updateTimelineSegmentTiming,
   } = useStudioTimelineActions()
   const sourceMediaItem = useMemo(
@@ -82,10 +83,13 @@ export function StudioTimeline({
     applyZoomLevel,
     didResizeSegmentRef,
     downloadTimelineSegment,
+    draggingSegmentId,
+    handleSegmentDragPointerDown,
     handleSegmentResizePointerDown,
     handleTimelinePointerDown,
     isPanningTimeline,
     selectTimelineSegment,
+    segmentDragPreview,
     timelineSurfaceRef,
     timelineViewportRef,
     updateZoom,
@@ -96,6 +100,7 @@ export function StudioTimeline({
     setActiveTool,
     setSelectedItemId,
     timelineDurationSeconds,
+    moveTimelineSegmentWithPush,
     updateTimelineSegmentTiming,
   })
   const sourceAudioPeaks = useAudioPeaks(
@@ -186,11 +191,14 @@ export function StudioTimeline({
                   onDeleteSegment={deleteTimelineSegment}
                   onDownloadSegment={downloadTimelineSegment}
                   onDuplicateSegment={duplicateTimelineSegment}
+                  onSegmentDragStart={handleSegmentDragPointerDown}
                   onSegmentClick={selectTimelineSegment}
                   onSegmentContextMenu={selectTimelineSegment}
                   onSegmentResizeStart={handleSegmentResizePointerDown}
                   project={project}
                   selectedItem={selectedItem}
+                  draggingSegmentId={draggingSegmentId}
+                  segmentDragPreview={segmentDragPreview}
                   sourceAudioPeaks={sourceAudioPeaks}
                   sourceMediaItem={sourceMediaItem}
                   timelineDurationSeconds={timelineDurationSeconds}

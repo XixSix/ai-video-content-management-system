@@ -61,10 +61,12 @@ export function TimelineSegment({
   guideAudioItem,
   guideAudioPeaks,
   hasTimedSegmentLayout,
+  isDragging,
   isSelected,
   isTextSegment,
   onContextMenu,
   onDelete,
+  onDragStart,
   onDownload,
   onDuplicate,
   onResizeStart,
@@ -81,6 +83,7 @@ export function TimelineSegment({
   guideAudioItem: StudioProjectMediaItem | null
   guideAudioPeaks: number[] | null
   hasTimedSegmentLayout: boolean
+  isDragging: boolean
   isSelected: boolean
   isTextSegment: boolean
   onContextMenu: (
@@ -89,6 +92,12 @@ export function TimelineSegment({
     segment: StudioTimelineSegmentType
   ) => void
   onDelete: (segmentId: string) => void
+  onDragStart: (args: {
+    event: ReactPointerEvent<HTMLElement>
+    media: StudioProjectMediaItem | null
+    segment: StudioTimelineSegmentType
+    track: StudioTimelineTrack
+  }) => void
   onDownload: (args: {
     media: StudioProjectMediaItem | null
     segment: StudioTimelineSegmentType
@@ -115,6 +124,7 @@ export function TimelineSegment({
   track: StudioTimelineTrack
 }) {
   const canResizeSegment = hasTimedSegmentLayout && track.id !== "SOURCE"
+  const canDragSegment = hasTimedSegmentLayout && track.id !== "SOURCE"
   const isOverlayMedia =
     track.id === "OVERLAY_MEDIA" &&
     (segmentMedia?.type === "IMAGE" || segmentMedia?.type === "VIDEO")
@@ -126,7 +136,18 @@ export function TimelineSegment({
         <button
           data-timeline-segment="true"
           type="button"
-          onPointerDown={(event) => event.stopPropagation()}
+          onPointerDown={(event) => {
+            event.stopPropagation()
+
+            if (canDragSegment) {
+              onDragStart({
+                event,
+                media: segmentMedia,
+                segment,
+                track,
+              })
+            }
+          }}
           onClick={(event) => {
             event.stopPropagation()
 
@@ -143,8 +164,13 @@ export function TimelineSegment({
           }}
           style={segmentStyle}
           className={cn(
-            "group relative cursor-pointer overflow-hidden rounded-lg border px-3 text-left text-xs font-medium transition",
+            "group relative overflow-hidden rounded-lg border px-3 text-left text-xs font-medium transition",
             track.id === "SOURCE" ? "h-16 leading-8" : "h-8 leading-8",
+            canDragSegment
+              ? isDragging
+                ? "cursor-grabbing"
+                : "cursor-grab"
+              : "cursor-pointer",
             hasTimedSegmentLayout ? "absolute top-0 min-w-10" : null,
             hasTimedSegmentLayout ? null : segment.widthClassName,
             hasTimedSegmentLayout ? null : segment.offsetClassName,
@@ -155,7 +181,10 @@ export function TimelineSegment({
               ? isTextSegment
                 ? "z-10 border-blue-600 shadow-[0_0_0_2px_rgba(37,99,235,0.45)] ring-0 dark:border-blue-300"
                 : "z-10 border-yellow-400 text-foreground shadow-[0_0_0_2px_rgba(250,204,21,0.95)] ring-0"
-              : "hover:ring-1 hover:ring-foreground/20"
+              : "hover:ring-1 hover:ring-foreground/20",
+            isDragging
+              ? "z-20 scale-[1.01] shadow-[0_16px_40px_-26px_rgba(0,0,0,0.75)] ring-2 ring-foreground/30"
+              : null
           )}
         >
           {track.id === "SOURCE" ? (

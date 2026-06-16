@@ -7,6 +7,7 @@ import type {
   StudioCanvasLayer,
   StudioClipCandidate,
   StudioClipCandidateStatus,
+  StudioEditorProject,
   StudioProjectMediaItem,
   StudioShortClip,
   StudioToolId,
@@ -86,6 +87,14 @@ export type StudioEditorActions = {
   discardTranscriptChanges: () => void
   duplicateTimelineSegment: (segmentId: string) => void
   markTranscriptDirty: () => void
+  moveTimelineSegmentWithPush: (
+    segmentId: string,
+    startTime: number,
+    options?: {
+      baseProject?: StudioEditorProject
+      recordHistory?: boolean
+    }
+  ) => void
   pausePlayback: () => void
   playPlayback: () => void
   redoEditorChange: () => void
