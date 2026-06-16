@@ -167,10 +167,24 @@ Responsibilities:
 - `store/`: scoped Zustand editor state, domain action groups, selectors, and
   public hooks such as `useStudioProjectState`, `useStudioPlaybackState`, and
   `useStudioSelectionState`.
-- `components/studio-*.tsx`: editor shell pieces such as rail, topbar, canvas,
-  inspector, sidebar, and panel router.
+- `components/studio-*.tsx`: editor shell pieces such as rail, topbar, sidebar,
+  and panel router.
 - Tool-specific panels should be separate files, for example
   `captions-panel.tsx`, `chapters-panel.tsx`, and `clips-panel.tsx`.
+- Canvas is a full Studio Editor subfeature. Keep preview sizing, media sync,
+  layer rendering, caption overlay rendering, and selection frame code under
+  `features/studio-editor/canvas/`.
+- Canvas structure:
+
+```text
+features/studio-editor/canvas/
+├── studio-canvas.tsx   canvas entry component used by the editor route
+├── constants.ts        sizing and media sync constants
+├── components/         media preview, layer renderers, captions, selection frame
+├── hooks/              preview sizing and media sync hooks
+└── lib/                pure style, caption activity, and media sync helpers
+```
+
 - Timeline is a full Studio Editor subfeature, not a top-level
   `features/studio-timeline` feature while it depends on `StudioEditorProject`,
   editor store state, and editor selection state. Keep all timeline code under
