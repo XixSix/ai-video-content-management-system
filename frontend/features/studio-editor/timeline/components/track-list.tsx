@@ -13,9 +13,7 @@ import type {
 } from "@/features/studio-editor/studio.types"
 import {
   getTimedSegmentStyle,
-  getTimelineSegmentEndTime,
   getTimelineSegmentMedia,
-  getTimelineSegmentStartTime,
   getTrackContentHeight,
 } from "@/features/studio-editor/timeline/lib/layout"
 import {
@@ -79,10 +77,10 @@ export function TimelineTrackList({
 }) {
   return (
     <div className="pb-1">
-      {project.timelineTracks.map((track, trackIndex) => {
+      {project.timelineTracks.map((track) => {
         const trackUsesTimedLayout =
-          track.id === "video" ||
-          track.id === "audio" ||
+          track.id === "SOURCE" ||
+          track.id === "AUDIO" ||
           track.segments.some((segment) => typeof segment.startTime === "number")
         const trackContentHeight = getTrackContentHeight(track)
 
@@ -91,10 +89,10 @@ export function TimelineTrackList({
             key={track.id}
             className={cn(
               timelineLaneClassName,
-              track.id === "video" ? "min-h-[88px]" : null
+              track.id === "SOURCE" ? "min-h-[88px]" : null
             )}
           >
-            {trackIndex === 0 ? (
+            {track.id === "SOURCE" ? (
               <div className="mb-1 ml-3 flex h-4 items-center justify-between">
                 <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground-subtle">
                   Fit
@@ -109,7 +107,7 @@ export function TimelineTrackList({
               )}
               style={trackUsesTimedLayout ? { height: trackContentHeight } : undefined}
             >
-              {track.segments.map((segment, segmentIndex) => {
+              {track.segments.map((segment) => {
                 const isSelected =
                   selectedItem.id === segment.id ||
                   selectedItem.id === segment.selectionId
@@ -119,21 +117,10 @@ export function TimelineTrackList({
                     : getTimelineSegmentMedia({ project, segment })
                 const hasTimedSegmentLayout =
                   trackUsesTimedLayout || typeof segment.startTime === "number"
-                const segmentStartTime = getTimelineSegmentStartTime({
-                  media: segmentMedia,
-                  segment,
-                })
-                const segmentEndTime = getTimelineSegmentEndTime({
-                  media: segmentMedia,
-                  projectDurationSeconds: project.media.durationSeconds,
-                  segment,
-                })
                 const segmentIsText = isTextTimelineSegment(project, segment)
                 const segmentDisplayText = getTimelineSegmentDisplayText({
                   project,
                   segment,
-                  segmentEndTime,
-                  segmentStartTime,
                 })
                 const baseSegmentStyle = hasTimedSegmentLayout
                   ? getTimedSegmentStyle({
@@ -145,11 +132,7 @@ export function TimelineTrackList({
                   : undefined
                 const segmentStyle =
                   baseSegmentStyle && hasTimedSegmentLayout
-                    ? getSegmentTopStyle({
-                        segment,
-                        segmentStyle: baseSegmentStyle,
-                        track,
-                      })
+                    ? getSegmentTopStyle({ segmentStyle: baseSegmentStyle })
                     : undefined
 
                 return (
@@ -170,12 +153,10 @@ export function TimelineTrackList({
                     onSegmentClick={onSegmentClick}
                     projectMediaThumbnailUrl={project.media.thumbnailUrl}
                     segment={segment}
-                    segmentIndex={segmentIndex}
                     segmentMedia={segmentMedia}
                     segmentStyle={segmentStyle}
                     sourceAudioPeaks={sourceAudioPeaks}
                     track={track}
-                    trackIndex={trackIndex}
                   />
                 )
               })}

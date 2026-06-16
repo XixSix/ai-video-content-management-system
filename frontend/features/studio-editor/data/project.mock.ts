@@ -2,14 +2,10 @@ import { formatDuration } from "@/features/media-library/media-library.utils"
 
 import type { StudioEditorProject } from "../studio.types"
 import {
-  bRollMediaItem,
-  brandMarkItem,
-  captionedMasterItem,
   createStudioMediaItem,
   getResolutionLabel,
   guideAudioItem,
   sourceMediaItem,
-  stillFrameItem,
 } from "./media.mock"
 import {
   transcriptFullText,
@@ -21,6 +17,7 @@ export const studioEditorProject: StudioEditorProject = {
   media: {
     id: sourceMediaItem.id,
     title: sourceMediaItem.title,
+    aspectRatio: "9:16",
     thumbnailUrl: sourceMediaItem.thumbnailUrl ?? "/window.svg",
     durationSeconds: sourceMediaItem.duration ?? 0,
     durationLabel: formatDuration(sourceMediaItem.duration),
@@ -39,33 +36,12 @@ export const studioEditorProject: StudioEditorProject = {
       linkedSelectionId: "source-media",
       startTime: 0,
     }),
-    createStudioMediaItem(bRollMediaItem, {
-      id: "media-b-roll",
-      summary: "Secondary video from Media Library available for inserts.",
-      usageLabel: "Project media",
-    }),
     createStudioMediaItem(guideAudioItem, {
       id: "media-guide-audio",
       summary: "Audio source linked to the timeline audio bed.",
       usageLabel: "Audio bed",
       linkedSelectionId: "audio-bed",
       startTime: 0,
-    }),
-    createStudioMediaItem(captionedMasterItem, {
-      id: "media-captioned-master",
-      summary: "Generated captioned master available as an editor output.",
-      usageLabel: "Rendered output",
-    }),
-    createStudioMediaItem(brandMarkItem, {
-      id: "media-brand-mark",
-      summary: "Thumbnail image already placed on the canvas.",
-      usageLabel: "Canvas layer",
-      linkedSelectionId: "brand-mark",
-    }),
-    createStudioMediaItem(stillFrameItem, {
-      id: "media-still-desk",
-      summary: "Still image from Media Library available for thumbnail work.",
-      usageLabel: "Still frame",
     }),
   ],
   transcript: {
@@ -300,73 +276,16 @@ export const studioEditorProject: StudioEditorProject = {
   ],
   timelineTracks: [
     {
-      id: "video",
-      label: "Video",
-      selectionId: "source-media",
-      segments: [
-        {
-          id: "video-main",
-          label: "Source cut",
-          widthClassName: "w-[56%]",
-          tone: "base",
-          selectionId: "source-media",
-          summary: "Main interview clip on the primary video track",
-          startTime: 0,
-        },
-      ],
-    },
-    {
-      id: "captions",
-      label: "Captions",
-      selectionId: "captions",
-      segments: [
-        {
-          id: "caption-a",
-          label: "Intro lines",
-          content:
-            "The workflow starts with a clean transcript before anything downstream becomes useful.",
-          widthClassName: "w-[24%]",
-          offsetClassName: "ml-[10%]",
-          tone: "accent",
-          selectionId: "captions",
-          summary: "Caption block for the opening hook",
-          startTime: 8.2,
-        },
-        {
-          id: "caption-b",
-          label: "Main phrase",
-          content:
-            "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
-          widthClassName: "w-[18%]",
-          offsetClassName: "ml-[7%]",
-          tone: "accent",
-          selectionId: "captions",
-          summary: "Caption block covering the first talking point",
-          startTime: 15.6,
-        },
-      ],
-    },
-    {
-      id: "overlays",
-      label: "Overlays",
+      id: "TEXT",
+      label: "Text",
       selectionId: "hook-copy",
       segments: [
         {
-          id: "overlay-logo",
-          label: "Logo",
-          widthClassName: "w-[14%]",
-          offsetClassName: "ml-[8%]",
-          tone: "muted",
-          selectionId: "brand-mark",
-          summary: "Brand mark entrance layer",
-          startTime: 0,
-        },
-        {
-          id: "overlay-title",
+          id: "text-hook-title",
           label: "Hook title",
           content: "The fastest way to repurpose a keynote",
-          widthClassName: "w-[20%]",
-          offsetClassName: "ml-[12%]",
+          durationSeconds: 5,
+          widthClassName: "w-[17.86%]",
           tone: "muted",
           selectionId: "hook-copy",
           summary: "Headline text layer timing",
@@ -375,15 +294,49 @@ export const studioEditorProject: StudioEditorProject = {
       ],
     },
     {
-      id: "audio",
+      id: "OVERLAY_MEDIA",
+      label: "Overlay media",
+      selectionId: "brand-mark",
+      segments: [
+        {
+          id: "overlay-logo",
+          label: "Logo",
+          durationSeconds: 4,
+          widthClassName: "w-[14.29%]",
+          tone: "muted",
+          selectionId: "brand-mark",
+          summary: "Brand mark entrance layer",
+          startTime: 0,
+        },
+      ],
+    },
+    {
+      id: "SOURCE",
+      label: "Source",
+      selectionId: "source-media",
+      segments: [
+        {
+          id: "video-main",
+          label: "Source cut",
+          durationSeconds: 28,
+          widthClassName: "w-[100%]",
+          tone: "base",
+          selectionId: "source-media",
+          summary: "Main interview clip on the source track",
+          startTime: 0,
+        },
+      ],
+    },
+    {
+      id: "AUDIO",
       label: "Audio",
       selectionId: "audio-bed",
       segments: [
         {
           id: "audio-bed",
           label: "Bed track",
-          widthClassName: "w-[44%]",
-          offsetClassName: "ml-[18%]",
+          durationSeconds: 8,
+          widthClassName: "w-[28.57%]",
           tone: "base",
           selectionId: "audio-bed",
           summary: "English guide track",

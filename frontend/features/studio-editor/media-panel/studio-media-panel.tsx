@@ -2,18 +2,32 @@
 
 import { useMemo, useState } from "react"
 
-import { useStudioProjectState } from "@/features/studio-editor/store/studio-editor-store"
+import {
+  useStudioProjectActions,
+  useStudioProjectState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import { StudioPanelShell } from "@/features/studio-editor/tool-panel/components/studio-panel-shell"
 
 import { MediaCard } from "./components/media-card"
 import { MediaFilterTabs } from "./components/media-filter-tabs"
 import { MediaUploadActions } from "./components/media-upload-actions"
 import type { MediaFilter } from "./lib/media-display"
+import {
+  createProjectMediaFromLibraryItem,
+  createProjectMediaFromUploadFile,
+  getImportableMediaLibraryItems,
+  isSupportedProjectMediaUpload,
+} from "./services/project-media-adapter"
 
 export function StudioMediaPanel() {
   const { project } = useStudioProjectState()
+  const { upsertProjectMedia } = useStudioProjectActions()
   const [activeFilter, setActiveFilter] = useState<MediaFilter>("ALL")
   const mediaItems = project.projectMedia.filter((item) => item.type !== "SUBTITLE")
+  const importableItems = useMemo(
+    () => getImportableMediaLibraryItems(project.projectMedia),
+    [project.projectMedia]
+  )
   const filteredItems = useMemo(() => {
     if (activeFilter === "ALL") {
       return mediaItems
@@ -25,7 +39,17 @@ export function StudioMediaPanel() {
   return (
     <StudioPanelShell title="Media">
       <div className="flex flex-1 flex-col overflow-auto p-4">
-        <MediaUploadActions />
+        <MediaUploadActions
+          importableItems={importableItems}
+          onImportMedia={(item) =>
+            upsertProjectMedia(createProjectMediaFromLibraryItem(item))
+          }
+          onUploadFiles={(files) => {
+            files.filter(isSupportedProjectMediaUpload).forEach((file) => {
+              upsertProjectMedia(createProjectMediaFromUploadFile(file))
+            })
+          }}
+        />
         <MediaFilterTabs
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}

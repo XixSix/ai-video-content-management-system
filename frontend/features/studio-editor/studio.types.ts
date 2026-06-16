@@ -126,6 +126,7 @@ export type StudioTextPreset = {
 }
 
 export type StudioTimelineTone = "base" | "accent" | "muted"
+export type StudioTimelineTrackId = "TEXT" | "OVERLAY_MEDIA" | "SOURCE" | "AUDIO"
 
 export type StudioTimelineSegment = {
   id: string
@@ -142,7 +143,7 @@ export type StudioTimelineSegment = {
 }
 
 export type StudioTimelineTrack = {
-  id: string
+  id: StudioTimelineTrackId
   label: string
   selectionId: string
   segments: StudioTimelineSegment[]
@@ -160,6 +161,7 @@ export type StudioSourceMedia = {
 export type StudioMediaDetail = {
   id: string
   title: string
+  aspectRatio: StudioAspectRatio
   thumbnailUrl: string
   durationSeconds: number
   durationLabel: string
@@ -200,6 +202,7 @@ export type StudioProjectMediaItem = {
   language?: string
   linkedMediaName?: string
   linkedSelectionId?: string
+  sourceLibraryItemId?: string
   startTime?: number
 }
 
@@ -300,7 +303,7 @@ export type StudioChapter = {
 }
 
 export type StudioClipCandidateStatus = "CANDIDATE" | "SELECTED" | "REJECTED"
-export type StudioAspectRatio = "9:16" | "1:1" | "16:9"
+export type StudioAspectRatio = "9:16" | "1:1" | "4:5" | "16:9"
 export type StudioClipPlatform =
   | "TIKTOK"
   | "YOUTUBE_SHORTS"

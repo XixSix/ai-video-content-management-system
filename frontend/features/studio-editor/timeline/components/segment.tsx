@@ -19,7 +19,6 @@ import type {
   StudioTimelineTone,
   StudioTimelineTrack,
 } from "@/features/studio-editor/studio.types"
-import { getTrackLaneHeight } from "@/features/studio-editor/timeline/lib/layout"
 import { cn } from "@/lib/utils"
 import { TimelineThumbnailStrip } from "./thumbnail-strip"
 import { TimelineWaveform } from "./waveform"
@@ -46,12 +45,10 @@ export function TimelineSegment({
   onSegmentClick,
   projectMediaThumbnailUrl,
   segment,
-  segmentIndex,
   segmentMedia,
   segmentStyle,
   sourceAudioPeaks,
   track,
-  trackIndex,
 }: {
   didResizeSegmentRef: MutableRefObject<boolean>
   displayText: string
@@ -86,12 +83,10 @@ export function TimelineSegment({
   ) => void
   projectMediaThumbnailUrl: string | null
   segment: StudioTimelineSegmentType
-  segmentIndex: number
   segmentMedia: StudioProjectMediaItem | null
   segmentStyle: CSSProperties | undefined
   sourceAudioPeaks: number[] | null
   track: StudioTimelineTrack
-  trackIndex: number
 }) {
   return (
     <ContextMenu>
@@ -117,7 +112,7 @@ export function TimelineSegment({
           style={segmentStyle}
           className={cn(
             "relative cursor-pointer overflow-hidden rounded-lg border px-3 text-left text-xs font-medium transition",
-            track.id === "video" ? "h-16 leading-8" : "h-8 leading-8",
+            track.id === "SOURCE" ? "h-16 leading-8" : "h-8 leading-8",
             hasTimedSegmentLayout ? "absolute top-0 min-w-10" : null,
             hasTimedSegmentLayout ? null : segment.widthClassName,
             hasTimedSegmentLayout ? null : segment.offsetClassName,
@@ -131,7 +126,7 @@ export function TimelineSegment({
               : "hover:ring-1 hover:ring-foreground/20"
           )}
         >
-          {trackIndex === 0 && segmentIndex === 0 ? (
+          {track.id === "SOURCE" ? (
             <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
               <TimelineThumbnailStrip
                 thumbnailUrl={segmentMedia?.thumbnailUrl ?? projectMediaThumbnailUrl}
@@ -147,8 +142,8 @@ export function TimelineSegment({
             </div>
           ) : null}
 
-          {trackIndex !== 0 && !isTextSegment ? (
-            track.id === "audio" ? (
+          {track.id !== "SOURCE" && !isTextSegment ? (
+            track.id === "AUDIO" ? (
               <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-blue-500/12">
                 <TimelineWaveform
                   barCount={140}
@@ -200,7 +195,7 @@ export function TimelineSegment({
           ) : null}
 
           <span className="relative z-10 flex min-w-0 items-center gap-1.5 truncate">
-            {track.id === "audio" ? (
+            {track.id === "AUDIO" ? (
               <span className="inline-flex items-center gap-1.5 rounded bg-background/70 px-1.5 py-0.5 leading-none text-[11px] text-foreground-subtle shadow-sm dark:bg-black/28 dark:text-white/85">
                 <AudioLines className="size-3" />
                 Audio: {guideAudioItem?.name ?? segment.label}
@@ -247,16 +242,12 @@ export function TimelineSegment({
 }
 
 export function getSegmentTopStyle({
-  segment,
   segmentStyle,
-  track,
 }: {
-  segment: StudioTimelineSegmentType
   segmentStyle: CSSProperties
-  track: StudioTimelineTrack
 }) {
   return {
     ...segmentStyle,
-    top: (segment.laneIndex ?? 0) * getTrackLaneHeight(track.id),
+    top: 0,
   }
 }

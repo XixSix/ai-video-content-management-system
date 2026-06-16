@@ -1,13 +1,16 @@
-import { FileText, Film, ImageIcon, MoreHorizontal, Music2, Volume2 } from "lucide-react"
+import { FileText, Film, ImageIcon, Music2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { ControlRow } from "@/features/studio-editor/inspector/components/fields/control-row"
-import { SelectRow } from "@/features/studio-editor/inspector/components/fields/select-row"
-import { getMediaActions } from "@/features/studio-editor/inspector/lib/media-actions"
+import { studioAspectRatioOptions } from "@/features/studio-editor/lib/aspect-ratio"
 import type {
   StudioProjectMediaItem,
   StudioProjectMediaType,
 } from "@/features/studio-editor/studio.types"
+import {
+  useStudioProjectActions,
+  useStudioProjectState,
+} from "@/features/studio-editor/store/studio-editor-store"
+import { cn } from "@/lib/utils"
 
 function MediaTypeIcon({ type }: { type: StudioProjectMediaType }) {
   if (type === "AUDIO") {
@@ -25,62 +28,10 @@ function MediaTypeIcon({ type }: { type: StudioProjectMediaType }) {
   return <Film className="size-4" />
 }
 
-function MediaEditPanel({ media }: { media: StudioProjectMediaItem }) {
-  const title =
-    media.type === "AUDIO" ? "Edit Audio" : media.type === "IMAGE" ? "Edit Image" : "Edit Video"
-
-  return (
-    <section className="rounded-xl border border-border bg-surface-muted">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <p className="text-sm font-semibold text-foreground">{title}</p>
-        <Button type="button" variant="ghost" size="icon-sm" aria-label="More media settings">
-          <MoreHorizontal className="size-4" />
-        </Button>
-      </div>
-
-      <div className="space-y-5 p-4">
-        {media.type === "VIDEO" || media.type === "IMAGE" ? (
-          <div className="grid grid-cols-3 gap-2">
-            {["Fit", "Fill", "Crop"].map((mode) => (
-              <Button
-                key={mode}
-                type="button"
-                variant={mode === "Fit" ? "default" : "outline"}
-                size="sm"
-              >
-                {mode}
-              </Button>
-            ))}
-          </div>
-        ) : null}
-
-        <div className="space-y-3">
-          <p className="text-xs font-semibold text-foreground">Playback</p>
-          <ControlRow
-            label="Volume"
-            value={media.type === "AUDIO" && media.usageLabel === "Music" ? "-18 dB" : "100 %"}
-            control={
-              <span className="flex size-8 items-center justify-center rounded-lg border border-border bg-background">
-                <Volume2 className="size-4 text-foreground" />
-              </span>
-            }
-          />
-          <ControlRow label="Fade In" value="0 s" />
-          <ControlRow label="Fade Out" value="0 s" />
-          <ControlRow label="Speed" value="1.0 x" />
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-xs font-semibold text-foreground">Animation</p>
-          <SelectRow label="In" value="0.0 s" />
-          <SelectRow label="Out" value="0.0 s" />
-        </div>
-      </div>
-    </section>
-  )
-}
-
 export function MediaInspector({ media }: { media: StudioProjectMediaItem }) {
+  const { project } = useStudioProjectState()
+  const { updateProjectAspectRatio } = useStudioProjectActions()
+
   return (
     <>
       <section className="rounded-xl border border-border bg-surface-muted px-4 py-3">
@@ -98,25 +49,65 @@ export function MediaInspector({ media }: { media: StudioProjectMediaItem }) {
         </div>
       </section>
 
-      <MediaEditPanel media={media} />
-
       <section className="rounded-xl border border-border bg-surface-muted p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          Actions
+          Canvas ratio
         </p>
-        <div className="mt-3 grid gap-2">
-          {getMediaActions(media).map((action, actionIndex) => (
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {studioAspectRatioOptions.map((option) => (
             <Button
-              key={action}
+              key={option.value}
               type="button"
-              variant={actionIndex === 0 ? "default" : "outline"}
+              variant={
+                project.media.aspectRatio === option.value ? "default" : "outline"
+              }
               size="sm"
-              className="justify-start"
+              onClick={() => updateProjectAspectRatio(option.value)}
             >
-              {action}
+              {option.label}
             </Button>
           ))}
         </div>
+        <div className="mt-3 rounded-lg border border-border bg-background p-3">
+          <div
+            className={cn(
+              "mx-auto rounded-md border border-dashed border-foreground/35 bg-muted",
+              project.media.aspectRatio === "16:9"
+                ? "aspect-video w-full"
+                : project.media.aspectRatio === "1:1"
+                  ? "aspect-square w-20"
+                  : project.media.aspectRatio === "4:5"
+                    ? "aspect-[4/5] h-24"
+                    : "aspect-[9/16] h-24"
+            )}
+          />
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-surface-muted p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          Media details
+        </p>
+        <dl className="mt-3 grid gap-2 text-xs">
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-muted-foreground">Status</dt>
+            <dd className="font-medium text-foreground">{media.status}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-muted-foreground">Origin</dt>
+            <dd className="font-medium text-foreground">{media.origin}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-muted-foreground">Format</dt>
+            <dd className="font-medium text-foreground">{media.format}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-muted-foreground">Size</dt>
+            <dd className="font-medium text-foreground">
+              {media.sizeLabel ?? media.metadata}
+            </dd>
+          </div>
+        </dl>
       </section>
     </>
   )

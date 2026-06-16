@@ -5,15 +5,11 @@ import type {
 } from "../../studio.types"
 
 export function getTrackToolId(trackId: StudioTimelineTrack["id"]) {
-  if (trackId === "captions") {
-    return "captions"
-  }
-
-  if (trackId === "audio") {
+  if (trackId === "AUDIO") {
     return "audio"
   }
 
-  if (trackId === "overlays") {
+  if (trackId === "TEXT") {
     return "text"
   }
 
@@ -32,10 +28,6 @@ export function getSelectionToolId(
     return "text"
   }
 
-  if (selectionId === "captions") {
-    return "captions"
-  }
-
   if (selectionId === "audio-bed") {
     return "audio"
   }
@@ -43,39 +35,12 @@ export function getSelectionToolId(
   return getTrackToolId(trackId)
 }
 
-export function getCaptionSegmentText({
-  project,
-  segment,
-  segmentEndTime,
-  segmentStartTime,
-}: {
-  project: StudioEditorProject
-  segment: StudioTimelineSegment
-  segmentEndTime: number
-  segmentStartTime: number
-}) {
-  const overlappingSegments = project.transcriptSegments.filter(
-    (transcriptSegment) =>
-      transcriptSegment.startTime < segmentEndTime &&
-      transcriptSegment.endTime > segmentStartTime
-  )
-
-  return (
-    overlappingSegments.map((transcriptSegment) => transcriptSegment.text).join(" ") ||
-    segment.label
-  )
-}
-
 export function getTimelineSegmentDisplayText({
-  project,
   segment,
-  segmentEndTime,
-  segmentStartTime,
+  project,
 }: {
   project: StudioEditorProject
   segment: StudioTimelineSegment
-  segmentEndTime: number
-  segmentStartTime: number
 }) {
   if (segment.content) {
     return segment.content
@@ -87,15 +52,6 @@ export function getTimelineSegmentDisplayText({
     return linkedLayer.content ?? linkedLayer.label
   }
 
-  if (linkedLayer?.kind === "captions") {
-    return getCaptionSegmentText({
-      project,
-      segment,
-      segmentEndTime,
-      segmentStartTime,
-    })
-  }
-
   return segment.label
 }
 
@@ -105,5 +61,5 @@ export function isTextTimelineSegment(
 ) {
   const linkedLayer = project.layers.find((layer) => layer.id === segment.selectionId)
 
-  return linkedLayer?.kind === "text" || linkedLayer?.kind === "captions"
+  return linkedLayer?.kind === "text"
 }

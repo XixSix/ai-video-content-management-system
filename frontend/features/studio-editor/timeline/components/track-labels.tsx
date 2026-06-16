@@ -30,7 +30,7 @@ export function TimelineTrackLabels({
               key={track.id}
               className={cn(
                 timelineLaneClassName,
-                track.id === "video" ? "min-h-[88px]" : null
+                track.id === "SOURCE" ? "min-h-[88px]" : null
               )}
             >
               {trackIndex === 0 ? <div className="mb-1 h-4" /> : null}
