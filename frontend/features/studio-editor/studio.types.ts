@@ -130,8 +130,11 @@ export type StudioTimelineTone = "base" | "accent" | "muted"
 export type StudioTimelineSegment = {
   id: string
   label: string
+  content?: string
   widthClassName: string
   offsetClassName?: string
+  durationSeconds?: number
+  laneIndex?: number
   tone: StudioTimelineTone
   selectionId: string
   summary: string

@@ -46,6 +46,13 @@ function getWidthPercentFromClassName(widthClassName: string) {
   return Number(arbitraryWidthMatch[1])
 }
 
+function getTimelineWidthClassName(durationSeconds: number, projectDurationSeconds: number) {
+  const widthPercent =
+    projectDurationSeconds > 0 ? (durationSeconds / projectDurationSeconds) * 100 : 0
+
+  return `w-[${Number(widthPercent.toFixed(2))}%]`
+}
+
 function getTimelineSegmentDuration({
   media,
   projectDurationSeconds,
@@ -59,7 +66,13 @@ function getTimelineSegmentDuration({
   const widthDuration =
     widthPercent !== null ? (widthPercent / 100) * projectDurationSeconds : null
 
-  return Math.max(0, media?.durationSeconds ?? widthDuration ?? projectDurationSeconds)
+  return Math.max(
+    0,
+    segment.durationSeconds ??
+      media?.durationSeconds ??
+      widthDuration ??
+      projectDurationSeconds
+  )
 }
 
 function getProjectTimelineDuration(project: StudioEditorProject) {
@@ -87,6 +100,35 @@ function getProjectTimelineDuration(project: StudioEditorProject) {
   )
 
   return Math.max(project.media.durationSeconds, ...segmentEndTimes)
+}
+
+function getTimelineSegmentStartTime({
+  media,
+  segment,
+}: {
+  media: StudioProjectMediaItem | null
+  segment: StudioTimelineSegment
+}) {
+  return Math.max(0, segment.startTime ?? media?.startTime ?? 0)
+}
+
+function getTimelineSegmentEndTime({
+  media,
+  projectDurationSeconds,
+  segment,
+}: {
+  media: StudioProjectMediaItem | null
+  projectDurationSeconds: number
+  segment: StudioTimelineSegment
+}) {
+  return (
+    getTimelineSegmentStartTime({ media, segment }) +
+    getTimelineSegmentDuration({
+      media,
+      projectDurationSeconds,
+      segment,
+    })
+  )
 }
 
 type StudioEditorContextValue = {
@@ -144,6 +186,13 @@ type StudioEditorContextValue = {
     }
   ) => void
   updateChapterTitle: (chapterId: string, title: string) => void
+  updateTimelineSegmentTiming: (
+    segmentId: string,
+    timing: {
+      durationSeconds: number
+      startTime: number
+    }
+  ) => void
   updateClipCandidateDetails: (
     clipCandidateId: string,
     details: Partial<
@@ -425,6 +474,39 @@ export function StudioEditorProvider({
     )
   }, [])
 
+  const updateTimelineSegmentTiming = useCallback(
+    (
+      segmentId: string,
+      timing: {
+        durationSeconds: number
+        startTime: number
+      }
+    ) => {
+      const durationSeconds = Math.max(0.25, timing.durationSeconds)
+
+      setProject((currentProject) => ({
+        ...currentProject,
+        timelineTracks: currentProject.timelineTracks.map((track) => ({
+          ...track,
+          segments: track.segments.map((segment) =>
+            segment.id === segmentId
+              ? {
+                  ...segment,
+                  durationSeconds,
+                  startTime: Math.max(0, timing.startTime),
+                  widthClassName: getTimelineWidthClassName(
+                    durationSeconds,
+                    currentProject.media.durationSeconds
+                  ),
+                }
+              : segment
+          ),
+        })),
+      }))
+    },
+    []
+  )
+
   const deleteTimelineSegment = (segmentId: string) => {
     const track = project.timelineTracks.find((track) =>
       track.segments.some((segment) => segment.id === segmentId)
@@ -472,21 +554,73 @@ export function StudioEditorProvider({
         : project.projectMedia.find(
             (item) => item.linkedSelectionId === sourceSegment.selectionId
           ) ?? null
-    const widthPercent = getWidthPercentFromClassName(sourceSegment.widthClassName)
-    const estimatedSegmentDuration =
-      sourceMedia?.durationSeconds ??
-      (widthPercent !== null
-        ? (widthPercent / 100) * project.media.durationSeconds
-        : 1)
-    const sourceStartTime = sourceSegment.startTime ?? sourceMedia?.startTime ?? 0
-    const nextStartTime = Math.max(0, sourceStartTime + estimatedSegmentDuration)
+    const estimatedSegmentDuration = Math.max(
+      0.25,
+      getTimelineSegmentDuration({
+        media: sourceMedia,
+        projectDurationSeconds: project.media.durationSeconds,
+        segment: sourceSegment,
+      })
+    )
+    const sourceEndTime = getTimelineSegmentEndTime({
+      media: sourceMedia,
+      projectDurationSeconds: project.media.durationSeconds,
+      segment: sourceSegment,
+    })
+    const occupiedSegments = sourceTrack.segments
+      .filter((segment) => segment.id !== sourceSegment.id)
+      .map((segment) => {
+        const segmentMedia =
+          segment.selectionId === project.sourceMedia.id
+            ? project.projectMedia.find(
+                (item) =>
+                  item.linkedSelectionId === project.sourceMedia.id ||
+                  item.origin === "SOURCE"
+              ) ?? null
+            : project.projectMedia.find(
+                (item) => item.linkedSelectionId === segment.selectionId
+              ) ?? null
+        const startTime = getTimelineSegmentStartTime({
+          media: segmentMedia,
+          segment,
+        })
+
+        return {
+          endTime: getTimelineSegmentEndTime({
+            media: segmentMedia,
+            projectDurationSeconds: project.media.durationSeconds,
+            segment,
+          }),
+          laneIndex: segment.laneIndex ?? 0,
+          startTime,
+        }
+      })
+      .sort((left, right) => left.startTime - right.startTime)
+    const nextStartTime = Math.max(0, sourceEndTime)
+    const nextEndTime = nextStartTime + estimatedSegmentDuration
+    let nextLaneIndex = sourceSegment.laneIndex ?? 0
+
+    while (
+      occupiedSegments.some(
+        (occupiedSegment) =>
+          occupiedSegment.laneIndex === nextLaneIndex &&
+          nextStartTime < occupiedSegment.endTime &&
+          nextEndTime > occupiedSegment.startTime
+      )
+    ) {
+      nextLaneIndex += 1
+    }
+
     const sourceSegmentIndex = sourceTrack.segments.findIndex(
       (segment) => segment.id === segmentId
     )
+    const sourceLabel = sourceSegment.label.replace(/(?: copy)+$/i, "")
     const nextSegment = {
       ...sourceSegment,
       id: nextSegmentId,
-      label: `${sourceSegment.label} copy`,
+      durationSeconds: estimatedSegmentDuration,
+      laneIndex: nextLaneIndex,
+      label: `${sourceLabel} copy`,
       offsetClassName:
         sourceTrack.id === "video" || sourceTrack.id === "audio"
           ? sourceSegment.offsetClassName
@@ -1276,6 +1410,7 @@ export function StudioEditorProvider({
     updateTranscriptWordText,
     updateShortClipDetails,
     updateShortClipTiming,
+    updateTimelineSegmentTiming,
     updateTextLayerContent,
     updateTextLayerStyle,
   }

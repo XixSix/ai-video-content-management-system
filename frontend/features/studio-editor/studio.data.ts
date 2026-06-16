@@ -719,6 +719,8 @@ export const studioEditorProject: StudioEditorProject = {
         {
           id: "caption-a",
           label: "Intro lines",
+          content:
+            "The workflow starts with a clean transcript before anything downstream becomes useful.",
           widthClassName: "w-[24%]",
           offsetClassName: "ml-[10%]",
           tone: "accent",
@@ -729,6 +731,8 @@ export const studioEditorProject: StudioEditorProject = {
         {
           id: "caption-b",
           label: "Main phrase",
+          content:
+            "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
           widthClassName: "w-[18%]",
           offsetClassName: "ml-[7%]",
           tone: "accent",
@@ -756,6 +760,7 @@ export const studioEditorProject: StudioEditorProject = {
         {
           id: "overlay-title",
           label: "Hook title",
+          content: "The fastest way to repurpose a keynote",
           widthClassName: "w-[20%]",
           offsetClassName: "ml-[12%]",
           tone: "muted",

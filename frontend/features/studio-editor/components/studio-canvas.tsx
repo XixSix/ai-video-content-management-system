@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 const VIDEO_ASPECT_RATIO = 16 / 9
 const CANVAS_HORIZONTAL_PADDING = 56
 const CANVAS_VERTICAL_PADDING = 48
+const MEDIA_SYNC_THRESHOLD_SECONDS = 0.35
 
 function getFontFamilyValue(fontFamily?: string) {
   const fontFamilyMap: Record<string, string> = {
@@ -112,6 +113,25 @@ function isCueActive(
 
 function isWordGroupActive(wordGroup: StudioCaptionWordGroup, currentTime: number) {
   return currentTime >= wordGroup.startTime && currentTime <= wordGroup.endTime
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError"
+}
+
+function syncMediaElementTime(
+  mediaElement: HTMLMediaElement,
+  timeSeconds: number,
+  maxTimeSeconds?: number
+) {
+  const nextTime =
+    typeof maxTimeSeconds === "number"
+      ? Math.min(timeSeconds, maxTimeSeconds)
+      : timeSeconds
+
+  if (Math.abs(mediaElement.currentTime - nextTime) > MEDIA_SYNC_THRESHOLD_SECONDS) {
+    mediaElement.currentTime = nextTime
+  }
 }
 
 function CaptionWord({
@@ -250,16 +270,12 @@ export function StudioCanvas() {
     const previewMedia = previewMediaRef.current
     const guideAudio = guideAudioRef.current
 
-    if (
-      previewMedia &&
-      currentTime <= project.media.durationSeconds &&
-      Math.abs(previewMedia.currentTime - currentTime) > 0.35
-    ) {
-      previewMedia.currentTime = currentTime
+    if (previewMedia && currentTime <= project.media.durationSeconds) {
+      syncMediaElementTime(previewMedia, currentTime, project.media.durationSeconds)
     }
 
-    if (guideAudio && Math.abs(guideAudio.currentTime - currentTime) > 0.35) {
-      guideAudio.currentTime = currentTime
+    if (guideAudio) {
+      syncMediaElementTime(guideAudio, currentTime)
     }
   }, [currentTime, project.media.durationSeconds])
 
@@ -273,25 +289,53 @@ export function StudioCanvas() {
 
     if (isPlaying) {
       const playbackTime = currentTimeRef.current
-      const playPromise =
-        previewMedia && playbackTime < project.media.durationSeconds
-          ? previewMedia.play()
-          : null
-      const guideAudioPlayPromise = guideAudio?.play()
+      let didCancelPlaybackStart = false
 
-      if (playPromise) {
-        playPromise.catch(() => {
-          pausePlayback()
+      if (previewMedia && playbackTime < project.media.durationSeconds) {
+        syncMediaElementTime(previewMedia, playbackTime, project.media.durationSeconds)
+        const playPromise = previewMedia.play()
+
+        playPromise.catch((error) => {
+          if (!isAbortError(error)) {
+            if (guideAudio) {
+              previewMedia.pause()
+              return
+            }
+
+            pausePlayback()
+            return
+          }
+
+          window.requestAnimationFrame(() => {
+            if (
+              didCancelPlaybackStart ||
+              currentTimeRef.current >= project.media.durationSeconds
+            ) {
+              return
+            }
+
+            previewMedia.play().catch(() => {
+              pausePlayback()
+            })
+          })
         })
       }
 
-      if (guideAudioPlayPromise) {
-        guideAudioPlayPromise.catch(() => {
+      if (guideAudio) {
+        syncMediaElementTime(guideAudio, playbackTime)
+        const guideAudioPlayPromise = guideAudio.play()
+
+        guideAudioPlayPromise.catch((error) => {
           // Audio-bed playback is optional in mock mode; source playback still drives time.
+          if (!isAbortError(error)) {
+            guideAudio.pause()
+          }
         })
       }
 
-      return
+      return () => {
+        didCancelPlaybackStart = true
+      }
     }
 
     previewMedia?.pause()
@@ -340,8 +384,14 @@ export function StudioCanvas() {
     const syncPlaybackFrame = () => {
       const shouldUsePreviewClock =
         previewMedia &&
+        !previewMedia.paused &&
         (!guideAudio || currentTimeRef.current < project.media.durationSeconds - 0.05)
-      const playbackClock = shouldUsePreviewClock ? previewMedia : guideAudio ?? previewMedia
+      const shouldUseGuideAudioClock = guideAudio && !guideAudio.paused
+      const playbackClock = shouldUsePreviewClock
+        ? previewMedia
+        : shouldUseGuideAudioClock
+          ? guideAudio
+          : previewMedia ?? guideAudio
 
       if (playbackClock) {
         seekToTime(playbackClock.currentTime)
