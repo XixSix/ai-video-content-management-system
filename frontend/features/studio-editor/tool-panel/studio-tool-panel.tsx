@@ -1,21 +1,21 @@
 "use client"
 
-import { ChaptersPanel } from "@/features/studio-editor/components/chapters-panel"
 import { StudioCaptionsPanel } from "@/features/studio-editor/captions/studio-captions-panel"
-import { MediaPanel } from "@/features/studio-editor/components/media-panel"
-import { TextPanel } from "@/features/studio-editor/components/text-panel"
+import { StudioChaptersPanel } from "@/features/studio-editor/chapters/studio-chapters-panel"
+import { StudioMediaPanel } from "@/features/studio-editor/media-panel/studio-media-panel"
 import { useStudioToolState } from "@/features/studio-editor/store/studio-editor-store"
+import { StudioTextPanel } from "@/features/studio-editor/text-panel/studio-text-panel"
 import { GenericToolPanel } from "@/features/studio-editor/tool-panel/components/generic-tool-panel"
 
 export function StudioToolPanel() {
   const { activeTool } = useStudioToolState()
 
   if (activeTool === "media") {
-    return <MediaPanel />
+    return <StudioMediaPanel />
   }
 
   if (activeTool === "text") {
-    return <TextPanel />
+    return <StudioTextPanel />
   }
 
   if (activeTool === "captions") {
@@ -23,7 +23,7 @@ export function StudioToolPanel() {
   }
 
   if (activeTool === "chapters") {
-    return <ChaptersPanel />
+    return <StudioChaptersPanel />
   }
 
   return <GenericToolPanel />
