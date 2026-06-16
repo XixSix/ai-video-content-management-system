@@ -7,8 +7,13 @@ import {
   buildCaptionCues,
   formatCaptionTimestamp,
 } from "@/features/studio-editor/studio-captions"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
 import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
+import {
+  useStudioPlaybackState,
+  useStudioProjectState,
+  useStudioSelectionState,
+  useStudioTranscriptActions,
+} from "@/features/studio-editor/store/studio-editor-store"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -40,12 +45,11 @@ function isWordGroupActive(
 export function CaptionsPanel() {
   const {
     commitTranscriptWordText,
-    currentTime,
     discardTranscriptChanges,
-    project,
-    seekToTime,
-    selectTranscriptSegment,
-  } = useStudioEditor()
+  } = useStudioTranscriptActions()
+  const { currentTime, seekToTime } = useStudioPlaybackState()
+  const { project } = useStudioProjectState()
+  const { selectTranscriptSegment } = useStudioSelectionState()
   const [editingWordId, setEditingWordId] = useState<string | null>(null)
   const [editingText, setEditingText] = useState("")
   const [isSearchOpen, setIsSearchOpen] = useState(false)

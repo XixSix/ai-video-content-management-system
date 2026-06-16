@@ -162,14 +162,16 @@ Responsibilities:
   Split large fixtures into `data/` as the editor grows, for example
   `data/project.mock.ts`, `data/transcript.mock.ts`, `data/timeline.mock.ts`,
   and `data/assets.mock.ts`.
-- `studio-editor-context.tsx`: editor-wide client state and actions.
+- `store/`: scoped Zustand editor state, domain action groups, selectors, and
+  public hooks such as `useStudioProjectState`, `useStudioPlaybackState`, and
+  `useStudioSelectionState`.
 - `components/studio-*.tsx`: editor shell pieces such as rail, topbar, canvas,
   inspector, sidebar, and panel router.
 - Tool-specific panels should be separate files, for example
   `captions-panel.tsx`, `chapters-panel.tsx`, and `clips-panel.tsx`.
 - Timeline is a full Studio Editor subfeature, not a top-level
   `features/studio-timeline` feature while it depends on `StudioEditorProject`,
-  editor context, and editor selection state. Keep all timeline code under
+  editor store state, and editor selection state. Keep all timeline code under
   `features/studio-editor/timeline/`.
 - Timeline structure:
 

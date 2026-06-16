@@ -11,13 +11,18 @@ import {
   getChapterDuration,
   getChapterTranscriptPreview,
 } from "@/features/studio-editor/inspector/lib/chapter-time"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioChapterActions,
+  useStudioPlaybackState,
+  useStudioProjectState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioChapter } from "@/features/studio-editor/studio.types"
 
 export function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
   const openLongToShort = useLongToShortStore((state) => state.openManager)
-  const { project, seekToTime, updateChapterTiming, updateChapterTitle } =
-    useStudioEditor()
+  const { updateChapterTiming, updateChapterTitle } = useStudioChapterActions()
+  const { seekToTime } = useStudioPlaybackState()
+  const { project } = useStudioProjectState()
   const [titleDraft, setTitleDraft] = useState(chapter.title)
   const transcriptPreview = getChapterTranscriptPreview(
     chapter,

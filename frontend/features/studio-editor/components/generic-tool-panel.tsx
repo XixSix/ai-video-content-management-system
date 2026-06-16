@@ -1,10 +1,14 @@
 "use client"
 
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
 import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
+import {
+  useStudioSelectionState,
+  useStudioToolState,
+} from "@/features/studio-editor/store/studio-editor-store"
 
 export function GenericToolPanel() {
-  const { selectedTargetId, setSelectedItemId, toolPanel } = useStudioEditor()
+  const { selectedTargetId, setSelectedItemId } = useStudioSelectionState()
+  const { toolPanel } = useStudioToolState()
 
   return (
     <StudioPanelShell title={toolPanel.title}>

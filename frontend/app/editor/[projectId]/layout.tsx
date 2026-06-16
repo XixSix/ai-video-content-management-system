@@ -14,7 +14,7 @@ import type { PanelSize } from "react-resizable-panels"
 import { StudioInspector } from "@/features/studio-editor/inspector/studio-inspector"
 import { StudioPanel } from "@/features/studio-editor/components/studio-panel"
 import { StudioSidebar } from "@/features/studio-editor/components/studio-sidebar"
-import { StudioEditorProvider } from "@/features/studio-editor/studio-editor-context"
+import { StudioEditorStoreProvider } from "@/features/studio-editor/store/studio-editor-store"
 import {
   TIMELINE_COLLAPSED_HEIGHT,
   StudioTimeline,
@@ -106,11 +106,12 @@ export default function StudioLayout({
   children: ReactNode
 }) {
   const params = useParams<{ projectId: string }>()
+  const projectId = params.projectId ?? "untitled-project"
   const timelinePanelRef = usePanelRef()
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false)
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false)
-  const projectName = getStudioProjectDisplayName(params.projectId ?? "untitled-project")
+  const projectName = getStudioProjectDisplayName(projectId)
 
   const syncLeftPanelCollapsed = (panelSize: PanelSize) => {
     setIsLeftPanelCollapsed(panelSize.inPixels <= SIDE_PANEL_COLLAPSED_HANDLE_WIDTH)
@@ -136,7 +137,7 @@ export default function StudioLayout({
   }
 
   return (
-    <StudioEditorProvider>
+    <StudioEditorStoreProvider key={projectId}>
       <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
         <StudioTopbar projectName={projectName} />
 
@@ -249,6 +250,6 @@ export default function StudioLayout({
           </Panel>
         </PanelGroup>
       </div>
-    </StudioEditorProvider>
+    </StudioEditorStoreProvider>
   )
 }

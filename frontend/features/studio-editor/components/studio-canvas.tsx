@@ -6,7 +6,12 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { TextAnimate } from "@/components/ui/text-animate"
 import { buildCaptionCues } from "@/features/studio-editor/studio-captions"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioPlaybackState,
+  useStudioProjectState,
+  useStudioSelectionState,
+  useStudioToolState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer, StudioCaptionWordGroup } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
@@ -188,13 +193,12 @@ export function StudioCanvas() {
     isPlaying,
     mutedTrackIds,
     pausePlayback,
-    project,
     seekToTime,
-    selectedItem,
-    selectedTargetId,
-    setActiveTool,
-    setSelectedItemId,
-  } = useStudioEditor()
+  } = useStudioPlaybackState()
+  const { project } = useStudioProjectState()
+  const { selectedItem, selectedTargetId, setSelectedItemId } =
+    useStudioSelectionState()
+  const { setActiveTool } = useStudioToolState()
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
   const canvasAreaRef = useRef<HTMLDivElement>(null)
   const previewMediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null)

@@ -18,7 +18,7 @@ import {
   studioTextAnimationOptions,
   studioTextFontOptions,
 } from "@/features/studio-editor/studio.data"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import { useStudioLayerActions } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 
 function TypeIcon() {
@@ -30,7 +30,7 @@ export function TextInspector({
 }: {
   layer: Extract<StudioSelection, { kind: "layer" }>["layer"]
 }) {
-  const { updateTextLayerContent, updateTextLayerStyle } = useStudioEditor()
+  const { updateTextLayerContent, updateTextLayerStyle } = useStudioLayerActions()
   const content = layer.content ?? ""
   const fontSize = layer.fontSize ?? 16
   const backgroundColor = layer.backgroundColor ?? "#101010"

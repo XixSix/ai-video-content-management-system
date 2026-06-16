@@ -1,12 +1,12 @@
 "use client"
 
 import { studioRailItems } from "@/features/studio-editor/studio.data"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import { useStudioToolState } from "@/features/studio-editor/store/studio-editor-store"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function StudioRail() {
-  const { activeTool, setActiveTool } = useStudioEditor()
+  const { activeTool, setActiveTool } = useStudioToolState()
 
   return (
     <aside className="flex h-full w-[78px] shrink-0 flex-col items-center gap-1 border-r border-border bg-surface-raised px-2 py-4">

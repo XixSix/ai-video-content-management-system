@@ -1,14 +1,14 @@
 "use client"
 
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
 import { ChaptersPanel } from "@/features/studio-editor/components/chapters-panel"
 import { CaptionsPanel } from "@/features/studio-editor/components/captions-panel"
 import { GenericToolPanel } from "@/features/studio-editor/components/generic-tool-panel"
 import { MediaPanel } from "@/features/studio-editor/components/media-panel"
 import { TextPanel } from "@/features/studio-editor/components/text-panel"
+import { useStudioToolState } from "@/features/studio-editor/store/studio-editor-store"
 
 export function StudioPanel() {
-  const { activeTool } = useStudioEditor()
+  const { activeTool } = useStudioToolState()
 
   if (activeTool === "media") {
     return <MediaPanel />

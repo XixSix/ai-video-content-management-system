@@ -5,10 +5,16 @@ import { ChapterInspector } from "@/features/studio-editor/inspector/components/
 import { DefaultInspector } from "@/features/studio-editor/inspector/components/default-inspector"
 import { MediaInspector } from "@/features/studio-editor/inspector/components/media-inspector"
 import { TextInspector } from "@/features/studio-editor/inspector/components/text-inspector"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioProjectState,
+  useStudioSelectionState,
+  useStudioToolState,
+} from "@/features/studio-editor/store/studio-editor-store"
 
 export function StudioInspector() {
-  const { activeTool, project, selectedChapterId, selectedItem } = useStudioEditor()
+  const { project } = useStudioProjectState()
+  const { selectedChapterId, selectedItem } = useStudioSelectionState()
+  const { activeTool } = useStudioToolState()
   const selectedChapter =
     project.chapters.find((chapter) => chapter.id === selectedChapterId) ?? null
 

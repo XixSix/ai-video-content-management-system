@@ -4,7 +4,12 @@ import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioChapterActions,
+  useStudioPlaybackState,
+  useStudioProjectState,
+  useStudioSelectionState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioChapter } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
@@ -39,13 +44,10 @@ function getCurrentChapterId(
 }
 
 export function ChaptersPanel() {
-  const {
-    addChapterToEnd,
-    currentTime,
-    project,
-    selectChapter,
-    selectedChapterId,
-  } = useStudioEditor()
+  const { addChapterToEnd } = useStudioChapterActions()
+  const { currentTime } = useStudioPlaybackState()
+  const { project } = useStudioProjectState()
+  const { selectChapter, selectedChapterId } = useStudioSelectionState()
   const chapters = [...project.chapters].sort(
     (left, right) => left.chapterIndex - right.chapterIndex
   )

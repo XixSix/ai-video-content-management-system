@@ -6,7 +6,13 @@ import { TimelineRuler } from "@/features/studio-editor/timeline/components/rule
 import { TimelineToolbar } from "@/features/studio-editor/timeline/components/toolbar"
 import { TimelineTrackLabels } from "@/features/studio-editor/timeline/components/track-labels"
 import { TimelineTrackList } from "@/features/studio-editor/timeline/components/track-list"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioPlaybackState,
+  useStudioProjectState,
+  useStudioSelectionState,
+  useStudioTimelineActions,
+  useStudioToolState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import {
   TIMELINE_BASE_WIDTH,
   TIMELINE_GRID_LABEL_WIDTH,
@@ -41,19 +47,20 @@ export function StudioTimeline({
 }) {
   const {
     currentTime,
-    deleteTimelineSegment,
-    duplicateTimelineSegment,
     isPlaying,
     mutedTrackIds,
-    project,
     seekToTime,
-    selectedItem,
-    setActiveTool,
-    setSelectedItemId,
     togglePlayback,
     toggleTrackMute,
+  } = useStudioPlaybackState()
+  const { project } = useStudioProjectState()
+  const { selectedItem, setSelectedItemId } = useStudioSelectionState()
+  const { setActiveTool } = useStudioToolState()
+  const {
+    deleteTimelineSegment,
+    duplicateTimelineSegment,
     updateTimelineSegmentTiming,
-  } = useStudioEditor()
+  } = useStudioTimelineActions()
   const sourceMediaItem = useMemo(
     () =>
       project.projectMedia.find(

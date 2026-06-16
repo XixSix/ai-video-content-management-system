@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import { useStudioHistoryState } from "@/features/studio-editor/store/studio-editor-store"
 
 type StudioTopbarProps = {
   projectName: string
@@ -69,7 +69,8 @@ function StudioMenu() {
 }
 
 export function StudioTopbar({ projectName }: StudioTopbarProps) {
-  const { canRedo, canUndo, redoEditorChange, undoEditorChange } = useStudioEditor()
+  const { canRedo, canUndo, redoEditorChange, undoEditorChange } =
+    useStudioHistoryState()
 
   return (
     <header className="relative flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/88">

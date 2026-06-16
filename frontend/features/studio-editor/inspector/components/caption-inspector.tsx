@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { CaptionEffectsTab } from "@/features/studio-editor/inspector/components/caption-effects-tab"
 import { CaptionFontTab } from "@/features/studio-editor/inspector/components/caption-font-tab"
 import { CaptionPresetsTab } from "@/features/studio-editor/inspector/components/caption-presets-tab"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import { useStudioLayerActions } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioSelection } from "@/features/studio-editor/studio.types"
 
 type CaptionInspectorTab = "presets" | "font" | "effects"
@@ -23,7 +23,7 @@ export function CaptionInspector({
 }: {
   layer: Extract<StudioSelection, { kind: "layer" }>["layer"]
 }) {
-  const { applyCaptionPreset, updateCaptionLayerStyle } = useStudioEditor()
+  const { applyCaptionPreset, updateCaptionLayerStyle } = useStudioLayerActions()
   const [activeTab, setActiveTab] = useState<CaptionInspectorTab>("presets")
 
   return (

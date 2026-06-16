@@ -6,7 +6,11 @@ import { CloudUpload, FileMusic, ImageIcon, Library, Video } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioPlaybackState,
+  useStudioProjectState,
+  useStudioSelectionState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import type {
   StudioProjectMediaItem,
   StudioProjectMediaType,
@@ -80,8 +84,9 @@ function MediaThumbnail({ item }: { item: StudioProjectMediaItem }) {
 }
 
 function MediaCard({ item }: { item: StudioProjectMediaItem }) {
-  const { seekToTime, selectedItem, selectedTargetId, setSelectedItemId } =
-    useStudioEditor()
+  const { seekToTime } = useStudioPlaybackState()
+  const { selectedItem, selectedTargetId, setSelectedItemId } =
+    useStudioSelectionState()
   const isSelected =
     selectedItem.id === item.id ||
     (item.linkedSelectionId ? selectedTargetId === item.linkedSelectionId : false)
@@ -119,7 +124,7 @@ function MediaCard({ item }: { item: StudioProjectMediaItem }) {
 }
 
 export function MediaPanel() {
-  const { project } = useStudioEditor()
+  const { project } = useStudioProjectState()
   const [activeFilter, setActiveFilter] = useState<MediaFilter>("ALL")
   const mediaItems = project.projectMedia.filter((item) => item.type !== "SUBTITLE")
   const filteredItems = useMemo(() => {

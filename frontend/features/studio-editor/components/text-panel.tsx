@@ -4,12 +4,16 @@ import { Plus, Type } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
-import { useStudioEditor } from "@/features/studio-editor/studio-editor-context"
+import {
+  useStudioLayerActions,
+  useStudioProjectState,
+  useStudioSelectionState,
+} from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
 function TextLayerButton({ layer }: { layer: StudioCanvasLayer }) {
-  const { selectedTargetId, setSelectedItemId } = useStudioEditor()
+  const { selectedTargetId, setSelectedItemId } = useStudioSelectionState()
   const isSelected = selectedTargetId === layer.id
 
   return (
@@ -46,7 +50,8 @@ function TextLayerButton({ layer }: { layer: StudioCanvasLayer }) {
 }
 
 export function TextPanel() {
-  const { addTextLayerFromPreset, project } = useStudioEditor()
+  const { project } = useStudioProjectState()
+  const { addTextLayerFromPreset } = useStudioLayerActions()
   const textLayers = project.layers.filter((layer) => layer.kind === "text")
 
   return (
