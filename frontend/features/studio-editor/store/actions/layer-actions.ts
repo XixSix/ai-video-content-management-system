@@ -7,6 +7,7 @@ import {
 import { studioTextPresets } from "../../data/text-style.data"
 import type { StudioCanvasLayer } from "../../studio.types"
 import {
+  getSmartTimelineInsertStartTime,
   getTimelineWidthClassName,
   insertSegmentWithPush,
 } from "../../timeline/lib/operations"
@@ -33,45 +34,54 @@ export function createLayerActions(
       recordEditorHistory(set, get)
 
       const layerId = `text-${Date.now()}`
+      const defaultTextContent = "Text"
       const segmentDurationSeconds = 5
       const nextLayer: StudioCanvasLayer = {
         id: layerId,
         kind: "text",
-        label: preset.label,
+        label: defaultTextContent,
         summary: preset.styleSummary,
-        animationBy: preset.defaultStyle.animationBy,
+        animationBy: "text",
         animationDuration: preset.defaultStyle.animationDuration,
-        animationName: preset.defaultStyle.animationName,
+        animationName: "none",
         backgroundColor: preset.defaultStyle.backgroundColor,
-        backgroundRadius: preset.defaultStyle.backgroundRadius,
+        backgroundEnabled: false,
+        backgroundRadius: 0,
         backgroundStyle: preset.defaultStyle.backgroundStyle,
         boxWidth: preset.defaultStyle.boxWidth,
         className: preset.className,
-        content: preset.previewText,
+        content: defaultTextContent,
         fontFamily: preset.defaultStyle.fontFamily,
         fontSize: preset.defaultStyle.fontSize,
         fontStyle: preset.defaultStyle.fontStyle,
         fontWeight: preset.defaultStyle.fontWeight,
         frameClassName: preset.frameClassName,
         presetId: preset.id,
-        textAlign: preset.defaultStyle.textAlign,
+        textAlign: "center",
         textColor: preset.defaultStyle.textColor,
+        xPercent: 50,
+        yPercent: 50,
       }
 
       set((state) => ({
         activeTool: "text",
         project: insertSegmentWithPush({
           project: {
-          ...state.project,
-          layers: [...state.project.layers, nextLayer],
+            ...state.project,
+            layers: [...state.project.layers, nextLayer],
           },
           segment: {
             id: `segment-${layerId}`,
-            content: preset.previewText,
+            content: defaultTextContent,
             durationSeconds: segmentDurationSeconds,
-            label: preset.label,
+            label: defaultTextContent,
             selectionId: layerId,
-            startTime: state.currentTime,
+            startTime: getSmartTimelineInsertStartTime({
+              durationSeconds: segmentDurationSeconds,
+              preferredStartTime: state.currentTime,
+              project: state.project,
+              trackId: "TEXT",
+            }),
             summary: preset.styleSummary,
             tone: "muted",
             widthClassName: getTimelineWidthClassName(
@@ -154,6 +164,43 @@ export function createLayerActions(
           ...state.project,
           layers: state.project.layers.map((layer) =>
             layer.id === layerId && layer.kind === "text" ? { ...layer, content } : layer
+          ),
+          timelineTracks: state.project.timelineTracks.map((track) => ({
+            ...track,
+            segments: track.segments.map((segment) =>
+              segment.selectionId === layerId ? { ...segment, content } : segment
+            ),
+          })),
+        },
+      }))
+    },
+    updateTextLayerPosition: (
+      layerId: string,
+      position: {
+        xPercent: number
+        yPercent: number
+      },
+      options?: {
+        recordHistory?: boolean
+      }
+    ) => {
+      const layer = get().project.layers.find((item) => item.id === layerId)
+
+      if (!layer || layer.kind !== "text") {
+        return
+      }
+
+      if (options?.recordHistory) {
+        recordEditorHistory(set, get)
+      }
+
+      set((state) => ({
+        project: {
+          ...state.project,
+          layers: state.project.layers.map((layer) =>
+            layer.id === layerId && layer.kind === "text"
+              ? { ...layer, ...position }
+              : layer
           ),
         },
       }))

@@ -33,18 +33,31 @@ export function getTextLayerClassName(backgroundStyle?: string) {
 
 export function getTextLayerStyle(layer: StudioCanvasLayer): CSSProperties {
   const backgroundColor =
-    layer.backgroundStyle === "none" ? "transparent" : layer.backgroundColor
+    layer.backgroundStyle === "none" || layer.backgroundEnabled === false
+      ? "transparent"
+      : layer.backgroundColor
+  const hasPosition =
+    typeof layer.xPercent === "number" && typeof layer.yPercent === "number"
 
   return {
     backgroundColor,
     borderRadius: layer.backgroundRadius,
+    boxSizing: "border-box",
     color: layer.textColor,
     fontFamily: getFontFamilyValue(layer.fontFamily),
     fontSize: layer.fontSize,
     fontStyle: layer.fontStyle,
     fontWeight: layer.fontWeight === "bold" ? 700 : 500,
+    maxWidth: "none",
+    minWidth: layer.boxWidth ? `${Math.min(layer.boxWidth, 92)}%` : undefined,
+    overflowWrap: "normal",
     textAlign: layer.textAlign,
-    width: layer.boxWidth ? `${layer.boxWidth}%` : undefined,
+    left: hasPosition ? `${layer.xPercent}%` : undefined,
+    right: hasPosition ? "auto" : undefined,
+    top: hasPosition ? `${layer.yPercent}%` : undefined,
+    bottom: hasPosition ? "auto" : undefined,
+    transform: hasPosition ? "translate(-50%, -50%)" : undefined,
+    width: "max-content",
   }
 }
 

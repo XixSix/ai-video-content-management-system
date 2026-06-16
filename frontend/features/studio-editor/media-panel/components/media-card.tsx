@@ -1,6 +1,7 @@
 "use client"
 
-import { ListPlus, Trash2 } from "lucide-react"
+import { useState } from "react"
+import { Check, ListPlus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import type { StudioProjectMediaItem } from "@/features/studio-editor/studio.types"
@@ -15,6 +16,7 @@ import { getMediaLabel } from "../lib/media-display"
 import { MediaThumbnail } from "./media-thumbnail"
 
 export function MediaCard({ item }: { item: StudioProjectMediaItem }) {
+  const [recentlyAdded, setRecentlyAdded] = useState(false)
   const { seekToTime } = useStudioPlaybackState()
   const { addProjectMediaToTimeline, removeProjectMedia } =
     useStudioProjectActions()
@@ -67,9 +69,15 @@ export function MediaCard({ item }: { item: StudioProjectMediaItem }) {
               onClick={(event) => {
                 event.stopPropagation()
                 addProjectMediaToTimeline(item.id)
+                setRecentlyAdded(true)
+                window.setTimeout(() => setRecentlyAdded(false), 900)
               }}
             >
-              <ListPlus className="size-3.5" />
+              {recentlyAdded ? (
+                <Check className="size-3.5 text-emerald-600 dark:text-emerald-300" />
+              ) : (
+                <ListPlus className="size-3.5" />
+              )}
             </Button>
           ) : null}
 

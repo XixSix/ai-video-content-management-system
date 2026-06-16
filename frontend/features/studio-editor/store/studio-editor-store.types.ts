@@ -7,6 +7,7 @@ import type {
   StudioCanvasLayer,
   StudioClipCandidate,
   StudioClipCandidateStatus,
+  StudioEditorProject,
   StudioProjectMediaItem,
   StudioShortClip,
   StudioToolId,
@@ -58,6 +59,8 @@ export type TextLayerStyleUpdate = Partial<
     | "fontWeight"
     | "textAlign"
     | "textColor"
+    | "xPercent"
+    | "yPercent"
   >
 >
 
@@ -86,6 +89,14 @@ export type StudioEditorActions = {
   discardTranscriptChanges: () => void
   duplicateTimelineSegment: (segmentId: string) => void
   markTranscriptDirty: () => void
+  moveTimelineSegmentWithPush: (
+    segmentId: string,
+    startTime: number,
+    options?: {
+      baseProject?: StudioEditorProject
+      recordHistory?: boolean
+    }
+  ) => void
   pausePlayback: () => void
   playPlayback: () => void
   redoEditorChange: () => void
@@ -139,6 +150,16 @@ export type StudioEditorActions = {
   ) => void
   updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => void
   updateTextLayerContent: (layerId: string, content: string) => void
+  updateTextLayerPosition: (
+    layerId: string,
+    position: {
+      xPercent: number
+      yPercent: number
+    },
+    options?: {
+      recordHistory?: boolean
+    }
+  ) => void
   updateTextLayerStyle: (layerId: string, style: TextLayerStyleUpdate) => void
   updateTimelineSegmentTiming: (
     segmentId: string,

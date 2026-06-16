@@ -240,6 +240,8 @@ export const studioEditorProject: StudioEditorProject = {
       presetId: "hook-title",
       textAlign: "left",
       textColor: "#ffffff",
+      xPercent: 31,
+      yPercent: 26.5,
     },
     {
       id: "captions",

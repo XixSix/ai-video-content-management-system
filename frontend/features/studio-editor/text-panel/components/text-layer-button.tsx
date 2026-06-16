@@ -32,11 +32,10 @@ export function TextLayerButton({ layer }: { layer: StudioCanvasLayer }) {
         >
           <Type className="size-4" />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-foreground">
             {layer.content ?? layer.label}
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{layer.label}</p>
         </div>
       </div>
     </button>

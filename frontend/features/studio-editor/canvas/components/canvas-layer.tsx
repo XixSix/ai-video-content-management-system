@@ -1,3 +1,6 @@
+import { useRef } from "react"
+import type { PointerEvent as ReactPointerEvent } from "react"
+
 import { TextAnimate } from "@/components/ui/text-animate"
 import { cn } from "@/lib/utils"
 
@@ -13,29 +16,183 @@ import {
 } from "../lib/layer-style"
 import { CaptionWord } from "./caption-word"
 
+const CANVAS_CENTER_SNAP_THRESHOLD_PX = 6
+
 export function CanvasLayer({
   activeCue,
   currentTime,
   isSelected,
   layer,
+  onMoveTextLayer,
   onSelect,
+  onTextDragGuideChange,
 }: {
   activeCue: StudioCaptionCue | null
   currentTime: number
   isSelected: boolean
   layer: StudioCanvasLayer
+  onMoveTextLayer: (
+    layerId: string,
+    position: {
+      xPercent: number
+      yPercent: number
+    },
+    options?: {
+      recordHistory?: boolean
+    }
+  ) => void
   onSelect: (layer: StudioCanvasLayer) => void
+  onTextDragGuideChange: (guide: {
+    horizontal: boolean
+    vertical: boolean
+  } | null) => void
 }) {
+  const didDragRef = useRef(false)
+
   if (layer.kind === "captions" && !layer.enabled) {
     return null
+  }
+
+  const handleTextPointerDown = (
+    event: ReactPointerEvent<HTMLButtonElement>
+  ) => {
+    if (event.button !== 0 || layer.kind !== "text") {
+      return
+    }
+
+    event.stopPropagation()
+    onSelect(layer)
+
+    const layerElement = event.currentTarget
+    const previewElement = layerElement.parentElement
+
+    if (!previewElement) {
+      return
+    }
+
+    const previewRect = previewElement.getBoundingClientRect()
+    const layerRect = layerElement.getBoundingClientRect()
+    const initialXPercent =
+      typeof layer.xPercent === "number"
+        ? layer.xPercent
+        : ((layerRect.left + layerRect.width / 2 - previewRect.left) /
+            previewRect.width) *
+          100
+    const initialYPercent =
+      typeof layer.yPercent === "number"
+        ? layer.yPercent
+        : ((layerRect.top + layerRect.height / 2 - previewRect.top) /
+            previewRect.height) *
+          100
+    const layerWidthPercent = (layerRect.width / previewRect.width) * 100
+    const layerHeightPercent = (layerRect.height / previewRect.height) * 100
+    const startClientX = event.clientX
+    const startClientY = event.clientY
+    let hasDragged = false
+    let hasRecordedHistory = false
+
+    const clampAxis = (value: number, sizePercent: number) => {
+      const halfSizePercent = sizePercent / 2
+      const startBound = halfSizePercent
+      const endBound = 100 - halfSizePercent
+      const minBound = Math.min(startBound, endBound)
+      const maxBound = Math.max(startBound, endBound)
+
+      return Math.min(maxBound, Math.max(minBound, value))
+    }
+
+    const clampPosition = ({
+      xPercent,
+      yPercent,
+    }: {
+      xPercent: number
+      yPercent: number
+    }) => ({
+      xPercent: clampAxis(xPercent, layerWidthPercent),
+      yPercent: clampAxis(yPercent, layerHeightPercent),
+    })
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startClientX
+      const deltaY = moveEvent.clientY - startClientY
+
+      if (!hasDragged && Math.hypot(deltaX, deltaY) < 4) {
+        return
+      }
+
+      moveEvent.preventDefault()
+      hasDragged = true
+      didDragRef.current = true
+
+      const unsnappedPosition = clampPosition({
+        xPercent: initialXPercent + (deltaX / previewRect.width) * 100,
+        yPercent: initialYPercent + (deltaY / previewRect.height) * 100,
+      })
+      const layerCenterX = (unsnappedPosition.xPercent / 100) * previewRect.width
+      const layerCenterY = (unsnappedPosition.yPercent / 100) * previewRect.height
+      const shouldSnapVertical =
+        Math.abs(layerCenterX - previewRect.width / 2) <=
+        CANVAS_CENTER_SNAP_THRESHOLD_PX
+      const shouldSnapHorizontal =
+        Math.abs(layerCenterY - previewRect.height / 2) <=
+        CANVAS_CENTER_SNAP_THRESHOLD_PX
+      const nextPosition = clampPosition({
+        xPercent: shouldSnapVertical ? 50 : unsnappedPosition.xPercent,
+        yPercent: shouldSnapHorizontal ? 50 : unsnappedPosition.yPercent,
+      })
+
+      onTextDragGuideChange(
+        shouldSnapHorizontal || shouldSnapVertical
+          ? {
+              horizontal: shouldSnapHorizontal,
+              vertical: shouldSnapVertical,
+            }
+          : null
+      )
+
+      onMoveTextLayer(layer.id, nextPosition, {
+        recordHistory: !hasRecordedHistory,
+      })
+      hasRecordedHistory = true
+    }
+
+    const cleanup = () => {
+      onTextDragGuideChange(null)
+      window.removeEventListener("pointermove", handlePointerMove)
+      window.removeEventListener("pointerup", handlePointerUp)
+      window.removeEventListener("pointercancel", handlePointerCancel)
+    }
+
+    const handlePointerUp = (upEvent: PointerEvent) => {
+      if (hasDragged) {
+        upEvent.preventDefault()
+      }
+
+      cleanup()
+    }
+
+    const handlePointerCancel = () => {
+      cleanup()
+    }
+
+    window.addEventListener("pointermove", handlePointerMove)
+    window.addEventListener("pointerup", handlePointerUp)
+    window.addEventListener("pointercancel", handlePointerCancel)
   }
 
   return (
     <button
       type="button"
       aria-label={layer.label}
+      onPointerDown={handleTextPointerDown}
       onClick={(event) => {
         event.stopPropagation()
+
+        if (didDragRef.current) {
+          didDragRef.current = false
+          return
+        }
+
         onSelect(layer)
       }}
       className={cn(
@@ -48,7 +205,8 @@ export function CanvasLayer({
             : null,
         isSelected
           ? "ring-2 ring-sky-300/75 ring-offset-0"
-          : "hover:ring-2 hover:ring-white/20"
+          : "hover:ring-2 hover:ring-white/20",
+        layer.kind === "text" ? "cursor-move" : null
       )}
       style={
         layer.kind === "text"

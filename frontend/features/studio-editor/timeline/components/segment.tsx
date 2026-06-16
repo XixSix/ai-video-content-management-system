@@ -4,7 +4,15 @@ import type {
   MutableRefObject,
   PointerEvent as ReactPointerEvent,
 } from "react"
-import { AudioLines, Copy, Download, Trash2, Type } from "lucide-react"
+import {
+  AudioLines,
+  Copy,
+  Download,
+  ImageIcon,
+  Trash2,
+  Type,
+  Video,
+} from "lucide-react"
 
 import {
   ContextMenu,
@@ -29,16 +37,36 @@ const timelineToneClassName: Record<StudioTimelineTone, string> = {
   muted: "border-amber-500/25 bg-amber-500/12 text-amber-700 dark:text-amber-300",
 }
 
+const resizeHandleClassName =
+  "absolute inset-y-1 z-20 w-2 cursor-ew-resize rounded-full opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100"
+
+const resizeHandleMarkerClassName =
+  "before:absolute before:top-1/2 before:h-4 before:w-1 before:-translate-y-1/2 before:rounded-full"
+
+function getResizeHandleToneClassName(trackId: StudioTimelineTrack["id"]) {
+  if (trackId === "AUDIO") {
+    return "before:bg-cyan-600 dark:before:bg-cyan-300"
+  }
+
+  if (trackId === "OVERLAY_MEDIA") {
+    return "before:bg-amber-600 dark:before:bg-amber-300"
+  }
+
+  return "before:bg-blue-600 dark:before:bg-blue-300"
+}
+
 export function TimelineSegment({
   didResizeSegmentRef,
   displayText,
   guideAudioItem,
   guideAudioPeaks,
   hasTimedSegmentLayout,
+  isDragging,
   isSelected,
   isTextSegment,
   onContextMenu,
   onDelete,
+  onDragStart,
   onDownload,
   onDuplicate,
   onResizeStart,
@@ -55,6 +83,7 @@ export function TimelineSegment({
   guideAudioItem: StudioProjectMediaItem | null
   guideAudioPeaks: number[] | null
   hasTimedSegmentLayout: boolean
+  isDragging: boolean
   isSelected: boolean
   isTextSegment: boolean
   onContextMenu: (
@@ -63,6 +92,12 @@ export function TimelineSegment({
     segment: StudioTimelineSegmentType
   ) => void
   onDelete: (segmentId: string) => void
+  onDragStart: (args: {
+    event: ReactPointerEvent<HTMLElement>
+    media: StudioProjectMediaItem | null
+    segment: StudioTimelineSegmentType
+    track: StudioTimelineTrack
+  }) => void
   onDownload: (args: {
     media: StudioProjectMediaItem | null
     segment: StudioTimelineSegmentType
@@ -88,13 +123,31 @@ export function TimelineSegment({
   sourceAudioPeaks: number[] | null
   track: StudioTimelineTrack
 }) {
+  const canResizeSegment = hasTimedSegmentLayout && track.id !== "SOURCE"
+  const canDragSegment = hasTimedSegmentLayout && track.id !== "SOURCE"
+  const isOverlayMedia =
+    track.id === "OVERLAY_MEDIA" &&
+    (segmentMedia?.type === "IMAGE" || segmentMedia?.type === "VIDEO")
+  const overlayThumbnailUrl = segmentMedia?.thumbnailUrl ?? segmentMedia?.assetUrl
+
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <button
           data-timeline-segment="true"
           type="button"
-          onPointerDown={(event) => event.stopPropagation()}
+          onPointerDown={(event) => {
+            event.stopPropagation()
+
+            if (canDragSegment) {
+              onDragStart({
+                event,
+                media: segmentMedia,
+                segment,
+                track,
+              })
+            }
+          }}
           onClick={(event) => {
             event.stopPropagation()
 
@@ -111,8 +164,13 @@ export function TimelineSegment({
           }}
           style={segmentStyle}
           className={cn(
-            "relative cursor-pointer overflow-hidden rounded-lg border px-3 text-left text-xs font-medium transition",
+            "group relative overflow-hidden rounded-lg border px-3 text-left text-xs font-medium transition",
             track.id === "SOURCE" ? "h-16 leading-8" : "h-8 leading-8",
+            canDragSegment
+              ? isDragging
+                ? "cursor-grabbing"
+                : "cursor-grab"
+              : "cursor-pointer",
             hasTimedSegmentLayout ? "absolute top-0 min-w-10" : null,
             hasTimedSegmentLayout ? null : segment.widthClassName,
             hasTimedSegmentLayout ? null : segment.offsetClassName,
@@ -123,7 +181,10 @@ export function TimelineSegment({
               ? isTextSegment
                 ? "z-10 border-blue-600 shadow-[0_0_0_2px_rgba(37,99,235,0.45)] ring-0 dark:border-blue-300"
                 : "z-10 border-yellow-400 text-foreground shadow-[0_0_0_2px_rgba(250,204,21,0.95)] ring-0"
-              : "hover:ring-1 hover:ring-foreground/20"
+              : "hover:ring-1 hover:ring-foreground/20",
+            isDragging
+              ? "z-20 scale-[1.01] shadow-[0_16px_40px_-26px_rgba(0,0,0,0.75)] ring-2 ring-foreground/30"
+              : null
           )}
         >
           {track.id === "SOURCE" ? (
@@ -144,26 +205,34 @@ export function TimelineSegment({
 
           {track.id !== "SOURCE" && !isTextSegment ? (
             track.id === "AUDIO" ? (
-              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-blue-500/12">
+              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-cyan-500/12">
                 <TimelineWaveform
                   barCount={140}
-                  className="bg-blue-600/45 dark:bg-blue-100/40"
+                  className="bg-cyan-600/45 dark:bg-cyan-100/40"
                   peaks={guideAudioPeaks}
                   seed={23}
                 />
               </div>
+            ) : isOverlayMedia ? (
+              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-amber-500/10">
+                {segmentMedia.type === "VIDEO" ? (
+                  <TimelineThumbnailStrip thumbnailUrl={overlayThumbnailUrl} />
+                ) : overlayThumbnailUrl ? (
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${overlayThumbnailUrl})` }}
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/24 via-black/4 to-black/20" />
+              </div>
             ) : (
-              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-foreground/[0.05]">
-                <TimelineWaveform
-                  barCount={110}
-                  className="bg-foreground/25"
-                  seed={13}
-                />
+              <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-amber-500/10">
+                <div className="absolute inset-0 bg-[repeating-linear-gradient(135deg,rgba(245,158,11,0.24)_0,rgba(245,158,11,0.24)_1px,transparent_1px,transparent_7px)]" />
               </div>
             )
           ) : null}
 
-          {isTextSegment && hasTimedSegmentLayout ? (
+          {canResizeSegment ? (
             <>
               <span
                 aria-hidden="true"
@@ -176,7 +245,12 @@ export function TimelineSegment({
                     trackId: track.id,
                   })
                 }
-                className="absolute inset-y-1 left-1 z-20 w-2 cursor-ew-resize rounded-full before:absolute before:left-1 before:top-1/2 before:h-4 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-blue-600 dark:before:bg-blue-300"
+                className={cn(
+                  resizeHandleClassName,
+                  resizeHandleMarkerClassName,
+                  getResizeHandleToneClassName(track.id),
+                  "left-1 before:left-1"
+                )}
               />
               <span
                 aria-hidden="true"
@@ -189,14 +263,19 @@ export function TimelineSegment({
                     trackId: track.id,
                   })
                 }
-                className="absolute inset-y-1 right-1 z-20 w-2 cursor-ew-resize rounded-full before:absolute before:right-1 before:top-1/2 before:h-4 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-blue-600 dark:before:bg-blue-300"
+                className={cn(
+                  resizeHandleClassName,
+                  resizeHandleMarkerClassName,
+                  getResizeHandleToneClassName(track.id),
+                  "right-1 before:right-1"
+                )}
               />
             </>
           ) : null}
 
           <span className="relative z-10 flex min-w-0 items-center gap-1.5 truncate">
             {track.id === "AUDIO" ? (
-              <span className="inline-flex items-center gap-1.5 rounded bg-background/70 px-1.5 py-0.5 leading-none text-[11px] text-foreground-subtle shadow-sm dark:bg-black/28 dark:text-white/85">
+              <span className="inline-flex items-center gap-1.5 rounded bg-background/75 px-1.5 py-0.5 leading-none text-[11px] text-foreground-subtle shadow-sm dark:bg-black/35 dark:text-white/85">
                 <AudioLines className="size-3" />
                 Audio: {guideAudioItem?.name ?? segment.label}
               </span>
@@ -205,6 +284,15 @@ export function TimelineSegment({
                 <Type className="size-3 shrink-0 text-blue-700 dark:text-blue-200" />
                 <span className="min-w-0 truncate leading-none">{displayText}</span>
               </>
+            ) : isOverlayMedia ? (
+              <span className="inline-flex min-w-0 items-center gap-1.5 rounded bg-black/48 px-1.5 py-0.5 leading-none text-[11px] text-white shadow-sm">
+                {segmentMedia?.type === "VIDEO" ? (
+                  <Video className="size-3 shrink-0" />
+                ) : (
+                  <ImageIcon className="size-3 shrink-0" />
+                )}
+                <span className="min-w-0 truncate">{segment.label}</span>
+              </span>
             ) : (
               segment.label
             )}

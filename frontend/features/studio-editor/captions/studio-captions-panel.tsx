@@ -4,6 +4,7 @@ import { buildCaptionCues } from "@/features/studio-editor/lib/caption-cues"
 import { StudioPanelShell } from "@/features/studio-editor/tool-panel/components/studio-panel-shell"
 import {
   useStudioPlaybackState,
+  useStudioLayerActions,
   useStudioProjectState,
   useStudioSelectionState,
   useStudioTranscriptActions,
@@ -19,9 +20,12 @@ import { useCaptionWordEdit } from "./hooks/use-caption-word-edit"
 export function StudioCaptionsPanel() {
   const { commitTranscriptWordText, discardTranscriptChanges } =
     useStudioTranscriptActions()
+  const { updateCaptionLayerStyle } = useStudioLayerActions()
   const { currentTime, seekToTime } = useStudioPlaybackState()
   const { project } = useStudioProjectState()
   const { selectTranscriptSegment } = useStudioSelectionState()
+  const captionLayer = project.layers.find((layer) => layer.kind === "captions")
+  const captionLayerEnabled = captionLayer?.enabled ?? true
   const cues = buildCaptionCues(project.transcriptSegments, project.transcriptWords)
   const {
     activeCueId,
@@ -56,6 +60,7 @@ export function StudioCaptionsPanel() {
     <StudioPanelShell title="Captions">
       <div className="flex min-h-0 flex-1 flex-col bg-background">
         <CaptionsToolbar
+          captionLayerEnabled={captionLayerEnabled}
           cueCount={cues.length}
           filteredCueCount={filteredCues.length}
           isSearchOpen={isSearchOpen}
@@ -67,6 +72,9 @@ export function StudioCaptionsPanel() {
           }}
           onOpenSearch={() => setIsSearchOpen(true)}
           onSearchInputChange={setSearchInput}
+          onToggleCaptionLayer={() =>
+            updateCaptionLayerStyle({ enabled: !captionLayerEnabled })
+          }
           searchInput={searchInput}
         />
 

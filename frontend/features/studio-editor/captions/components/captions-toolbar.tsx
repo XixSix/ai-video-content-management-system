@@ -1,4 +1,4 @@
-import { Download, RotateCcw, Search, X } from "lucide-react"
+import { Download, Eye, EyeOff, RotateCcw, Search, X } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 export function CaptionsToolbar({
+  captionLayerEnabled,
   cueCount,
   filteredCueCount,
   isSearchOpen,
@@ -20,8 +21,10 @@ export function CaptionsToolbar({
   onDiscardChanges,
   onOpenSearch,
   onSearchInputChange,
+  onToggleCaptionLayer,
   searchInput,
 }: {
+  captionLayerEnabled: boolean
   cueCount: number
   filteredCueCount: number
   isSearchOpen: boolean
@@ -30,6 +33,7 @@ export function CaptionsToolbar({
   onDiscardChanges: () => void
   onOpenSearch: () => void
   onSearchInputChange: (value: string) => void
+  onToggleCaptionLayer: () => void
   searchInput: string
 }) {
   return (
@@ -76,6 +80,19 @@ export function CaptionsToolbar({
           onClick={onDiscardChanges}
         >
           <RotateCcw />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label={
+            captionLayerEnabled ? "Hide caption layer" : "Show caption layer"
+          }
+          aria-pressed={captionLayerEnabled}
+          onClick={onToggleCaptionLayer}
+        >
+          {captionLayerEnabled ? <Eye /> : <EyeOff />}
         </Button>
 
         {!isSearchOpen ? (

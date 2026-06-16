@@ -167,6 +167,7 @@ export function useStudioTimelineActions() {
     useShallow((state) => ({
       deleteTimelineSegment: state.deleteTimelineSegment,
       duplicateTimelineSegment: state.duplicateTimelineSegment,
+      moveTimelineSegmentWithPush: state.moveTimelineSegmentWithPush,
       updateTimelineSegmentTiming: state.updateTimelineSegmentTiming,
     }))
   )
@@ -179,6 +180,7 @@ export function useStudioLayerActions() {
       applyCaptionPreset: state.applyCaptionPreset,
       updateCaptionLayerStyle: state.updateCaptionLayerStyle,
       updateTextLayerContent: state.updateTextLayerContent,
+      updateTextLayerPosition: state.updateTextLayerPosition,
       updateTextLayerStyle: state.updateTextLayerStyle,
     }))
   )

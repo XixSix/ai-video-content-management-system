@@ -42,14 +42,14 @@ export function getTimelineSegmentDisplayText({
   project: StudioEditorProject
   segment: StudioTimelineSegment
 }) {
-  if (segment.content) {
-    return segment.content
-  }
-
   const linkedLayer = project.layers.find((layer) => layer.id === segment.selectionId)
 
   if (linkedLayer?.kind === "text") {
     return linkedLayer.content ?? linkedLayer.label
+  }
+
+  if (segment.content) {
+    return segment.content
   }
 
   return segment.label

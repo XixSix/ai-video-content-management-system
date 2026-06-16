@@ -8,6 +8,7 @@ import type {
   StudioTimelineTrackId,
 } from "../../studio.types"
 import {
+  getSmartTimelineInsertStartTime,
   getTimelineWidthClassName,
   insertSegmentWithPush,
 } from "../../timeline/lib/operations"
@@ -38,6 +39,10 @@ function getMediaTimelineSelectionId(media: StudioProjectMediaItem) {
   return media.linkedSelectionId ?? media.id
 }
 
+function getMediaTimelineSegmentDuration(media: StudioProjectMediaItem) {
+  return Math.max(0.25, media.durationSeconds ?? 8)
+}
+
 function createMediaTimelineSegment({
   durationSeconds,
   media,
@@ -47,7 +52,7 @@ function createMediaTimelineSegment({
   media: StudioProjectMediaItem
   startTime: number
 }): StudioTimelineSegment {
-  const segmentDurationSeconds = Math.max(0.25, media.durationSeconds ?? 8)
+  const segmentDurationSeconds = getMediaTimelineSegmentDuration(media)
 
   return {
     id: `segment-${media.id}-${Date.now()}`,
@@ -80,10 +85,16 @@ export function createProjectActions(
 
       recordEditorHistory(set, get)
 
+      const segmentDurationSeconds = getMediaTimelineSegmentDuration(media)
       const nextSegment = createMediaTimelineSegment({
         durationSeconds: project.media.durationSeconds,
         media,
-        startTime: currentTime,
+        startTime: getSmartTimelineInsertStartTime({
+          durationSeconds: segmentDurationSeconds,
+          preferredStartTime: currentTime,
+          project,
+          trackId,
+        }),
       })
 
       set((state) => ({
