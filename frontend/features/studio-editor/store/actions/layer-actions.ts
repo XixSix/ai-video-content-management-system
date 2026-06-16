@@ -6,6 +6,10 @@ import {
 } from "../../data/caption-presets.data"
 import { studioTextPresets } from "../../data/text-style.data"
 import type { StudioCanvasLayer } from "../../studio.types"
+import {
+  getTimelineWidthClassName,
+  insertSegmentWithPush,
+} from "../../timeline/lib/operations"
 import { recordEditorHistory } from "./history-actions"
 import type {
   CaptionLayerStyleUpdate,
@@ -29,6 +33,7 @@ export function createLayerActions(
       recordEditorHistory(set, get)
 
       const layerId = `text-${Date.now()}`
+      const segmentDurationSeconds = 5
       const nextLayer: StudioCanvasLayer = {
         id: layerId,
         kind: "text",
@@ -55,10 +60,27 @@ export function createLayerActions(
 
       set((state) => ({
         activeTool: "text",
-        project: {
+        project: insertSegmentWithPush({
+          project: {
           ...state.project,
           layers: [...state.project.layers, nextLayer],
-        },
+          },
+          segment: {
+            id: `segment-${layerId}`,
+            content: preset.previewText,
+            durationSeconds: segmentDurationSeconds,
+            label: preset.label,
+            selectionId: layerId,
+            startTime: state.currentTime,
+            summary: preset.styleSummary,
+            tone: "muted",
+            widthClassName: getTimelineWidthClassName(
+              segmentDurationSeconds,
+              state.project.media.durationSeconds
+            ),
+          },
+          trackId: "TEXT",
+        }),
         selectedItemId: layerId,
       }))
     },

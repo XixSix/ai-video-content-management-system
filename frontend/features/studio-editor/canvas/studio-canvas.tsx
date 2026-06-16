@@ -41,8 +41,8 @@ export function StudioCanvas() {
       null,
     [project.projectMedia]
   )
-  const sourceTrackMuted = mutedTrackIds.includes("video")
-  const audioTrackMuted = mutedTrackIds.includes("audio")
+  const sourceTrackMuted = mutedTrackIds.includes("SOURCE")
+  const audioTrackMuted = mutedTrackIds.includes("AUDIO")
   const { setGuideAudioElement, setPreviewMediaElement } = useCanvasMediaSync({
     audioTrackMuted,
     currentTime,

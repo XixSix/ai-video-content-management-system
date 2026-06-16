@@ -2,6 +2,7 @@
 
 import {
   getDuplicatedTimelineSegment,
+  insertSegmentWithPush,
   updateTimelineSegmentTimingInProject,
 } from "../../timeline/lib/operations"
 import { recordEditorHistory } from "./history-actions"
@@ -57,28 +58,13 @@ export function createTimelineActions(
       const duplicatedSegment = getDuplicatedTimelineSegment({
         project,
         sourceSegment,
-        sourceTrack,
       })
-      const sourceSegmentIndex = sourceTrack.segments.findIndex(
-        (segment) => segment.id === segmentId
-      )
-
       set((state) => ({
-        project: {
-          ...state.project,
-          timelineTracks: state.project.timelineTracks.map((track) =>
-            track.id === sourceTrack.id
-              ? {
-                  ...track,
-                  segments: [
-                    ...track.segments.slice(0, sourceSegmentIndex + 1),
-                    duplicatedSegment.segment,
-                    ...track.segments.slice(sourceSegmentIndex + 1),
-                  ],
-                }
-              : track
-          ),
-        },
+        project: insertSegmentWithPush({
+          project: state.project,
+          segment: duplicatedSegment.segment,
+          trackId: sourceTrack.id,
+        }),
         selectedItemId: duplicatedSegment.id,
       }))
     },

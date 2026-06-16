@@ -38,7 +38,9 @@ export function getTimelineSegmentMedia({
 
   return (
     project.projectMedia.find(
-      (item) => item.linkedSelectionId === segment.selectionId
+      (item) =>
+        item.id === segment.selectionId ||
+        item.linkedSelectionId === segment.selectionId
     ) ?? null
   )
 }
@@ -110,21 +112,18 @@ export function getProjectTimelineDuration(project: StudioEditorProject) {
   return Math.max(project.media.durationSeconds, ...segmentEndTimes)
 }
 
-export function getTrackLaneCount(track: StudioTimelineTrack) {
-  return Math.max(
-    1,
-    ...track.segments.map((segment) => (segment.laneIndex ?? 0) + 1)
-  )
+export function getTrackLaneCount() {
+  return 1
 }
 
 export function getTrackLaneHeight(trackId: StudioTimelineTrack["id"]) {
-  return trackId === "video"
+  return trackId === "SOURCE"
     ? TIMELINE_VIDEO_LANE_HEIGHT
     : TIMELINE_DEFAULT_LANE_HEIGHT
 }
 
 export function getTrackContentHeight(track: StudioTimelineTrack) {
-  return getTrackLaneCount(track) * getTrackLaneHeight(track.id)
+  return getTrackLaneCount() * getTrackLaneHeight(track.id)
 }
 
 export function getTimedSegmentStyle({

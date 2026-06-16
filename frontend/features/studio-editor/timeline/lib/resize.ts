@@ -30,13 +30,11 @@ export function getTimelineSegmentResizeBounds({
     projectDurationSeconds: project.media.durationSeconds,
     segment,
   })
-  const activeLaneIndex = segment.laneIndex ?? 0
   const track = project.timelineTracks.find(
     (timelineTrack) => timelineTrack.id === trackId
   )
   const trackSegments =
     track?.segments
-      .filter((trackSegment) => (trackSegment.laneIndex ?? 0) === activeLaneIndex)
       .map((trackSegment) => {
         const trackSegmentMedia = getTimelineSegmentMedia({
           project,

@@ -126,6 +126,7 @@ export type StudioTextPreset = {
 }
 
 export type StudioTimelineTone = "base" | "accent" | "muted"
+export type StudioTimelineTrackId = "TEXT" | "OVERLAY_MEDIA" | "SOURCE" | "AUDIO"
 
 export type StudioTimelineSegment = {
   id: string
@@ -142,7 +143,7 @@ export type StudioTimelineSegment = {
 }
 
 export type StudioTimelineTrack = {
-  id: string
+  id: StudioTimelineTrackId
   label: string
   selectionId: string
   segments: StudioTimelineSegment[]

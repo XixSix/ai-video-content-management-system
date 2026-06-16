@@ -2,6 +2,7 @@ import type {
   StudioEditorProject,
   StudioTimelineSegment,
   StudioTimelineTrack,
+  StudioTimelineTrackId,
 } from "../../studio.types"
 import {
   getTimelineSegmentDuration,
@@ -9,6 +10,13 @@ import {
   getTimelineSegmentMedia,
   getTimelineSegmentStartTime,
 } from "./layout"
+
+export const STRICT_TIMELINE_TRACK_ORDER: StudioTimelineTrackId[] = [
+  "TEXT",
+  "OVERLAY_MEDIA",
+  "SOURCE",
+  "AUDIO",
+]
 
 export function getTimelineWidthClassName(
   durationSeconds: number,
@@ -55,14 +63,134 @@ export function updateTimelineSegmentTimingInProject({
   }
 }
 
+export function getSegmentRange({
+  project,
+  segment,
+}: {
+  project: StudioEditorProject
+  segment: StudioTimelineSegment
+}) {
+  const media = getTimelineSegmentMedia({ project, segment })
+  const startTime = getTimelineSegmentStartTime({ media, segment })
+  const durationSeconds = getTimelineSegmentDuration({
+    media,
+    projectDurationSeconds: project.media.durationSeconds,
+    segment,
+  })
+
+  return {
+    durationSeconds,
+    endTime: startTime + durationSeconds,
+    startTime,
+  }
+}
+
+function withTimelineSegmentTiming({
+  durationSeconds,
+  projectDurationSeconds,
+  segment,
+  startTime,
+}: {
+  durationSeconds: number
+  projectDurationSeconds: number
+  segment: StudioTimelineSegment
+  startTime: number
+}): StudioTimelineSegment {
+  return {
+    ...segment,
+    durationSeconds,
+    laneIndex: undefined,
+    offsetClassName: undefined,
+    startTime: Math.max(0, startTime),
+    widthClassName: getTimelineWidthClassName(
+      durationSeconds,
+      projectDurationSeconds
+    ),
+  }
+}
+
+function pushTrackSegmentsForInsert({
+  insertedSegment,
+  project,
+  track,
+}: {
+  insertedSegment: StudioTimelineSegment
+  project: StudioEditorProject
+  track: StudioTimelineTrack
+}) {
+  const insertedRange = getSegmentRange({ project, segment: insertedSegment })
+  let cursorEndTime = insertedRange.endTime
+  const shiftedSegments = track.segments
+    .map((segment) => {
+      const range = getSegmentRange({ project, segment })
+
+      return {
+        range,
+        segment,
+      }
+    })
+    .sort((left, right) => left.range.startTime - right.range.startTime)
+    .map(({ range, segment }) => {
+      if (range.endTime <= insertedRange.startTime) {
+        return segment
+      }
+
+      if (range.startTime >= cursorEndTime) {
+        return segment
+      }
+
+      const shiftedSegment = withTimelineSegmentTiming({
+        durationSeconds: range.durationSeconds,
+        projectDurationSeconds: project.media.durationSeconds,
+        segment,
+        startTime: cursorEndTime,
+      })
+
+      cursorEndTime += range.durationSeconds
+
+      return shiftedSegment
+    })
+
+  return [...shiftedSegments, insertedSegment].sort((left, right) => {
+    const leftRange = getSegmentRange({ project, segment: left })
+    const rightRange = getSegmentRange({ project, segment: right })
+
+    return leftRange.startTime - rightRange.startTime
+  })
+}
+
+export function insertSegmentWithPush({
+  project,
+  segment,
+  trackId,
+}: {
+  project: StudioEditorProject
+  segment: StudioTimelineSegment
+  trackId: StudioTimelineTrackId
+}) {
+  return {
+    ...project,
+    timelineTracks: project.timelineTracks.map((track) =>
+      track.id === trackId
+        ? {
+            ...track,
+            segments: pushTrackSegmentsForInsert({
+              insertedSegment: segment,
+              project,
+              track,
+            }),
+          }
+        : track
+    ),
+  }
+}
+
 export function getDuplicatedTimelineSegment({
   project,
   sourceSegment,
-  sourceTrack,
 }: {
   project: StudioEditorProject
   sourceSegment: StudioTimelineSegment
-  sourceTrack: StudioTimelineTrack
 }) {
   const sourceMedia = getTimelineSegmentMedia({
     project,
@@ -81,57 +209,20 @@ export function getDuplicatedTimelineSegment({
     projectDurationSeconds: project.media.durationSeconds,
     segment: sourceSegment,
   })
-  const occupiedSegments = sourceTrack.segments
-    .filter((segment) => segment.id !== sourceSegment.id)
-    .map((segment) => {
-      const segmentMedia = getTimelineSegmentMedia({ project, segment })
-      const startTime = getTimelineSegmentStartTime({
-        media: segmentMedia,
-        segment,
-      })
-
-      return {
-        endTime: getTimelineSegmentEndTime({
-          media: segmentMedia,
-          projectDurationSeconds: project.media.durationSeconds,
-          segment,
-        }),
-        laneIndex: segment.laneIndex ?? 0,
-        startTime,
-      }
-    })
-    .sort((left, right) => left.startTime - right.startTime)
-  const nextStartTime = Math.max(0, sourceEndTime)
-  const nextEndTime = nextStartTime + estimatedSegmentDuration
-  let nextLaneIndex = sourceSegment.laneIndex ?? 0
-
-  while (
-    occupiedSegments.some(
-      (occupiedSegment) =>
-        occupiedSegment.laneIndex === nextLaneIndex &&
-        nextStartTime < occupiedSegment.endTime &&
-        nextEndTime > occupiedSegment.startTime
-    )
-  ) {
-    nextLaneIndex += 1
-  }
-
   const nextSegmentId = `${sourceSegment.id}-copy-${Date.now()}`
   const sourceLabel = sourceSegment.label.replace(/(?: copy)+$/i, "")
 
   return {
     id: nextSegmentId,
-    segment: {
-      ...sourceSegment,
-      id: nextSegmentId,
+    segment: withTimelineSegmentTiming({
       durationSeconds: estimatedSegmentDuration,
-      laneIndex: nextLaneIndex,
-      label: `${sourceLabel} copy`,
-      offsetClassName:
-        sourceTrack.id === "video" || sourceTrack.id === "audio"
-          ? sourceSegment.offsetClassName
-          : undefined,
-      startTime: nextStartTime,
-    },
+      projectDurationSeconds: project.media.durationSeconds,
+      segment: {
+        ...sourceSegment,
+        id: nextSegmentId,
+        label: `${sourceLabel} copy`,
+      },
+      startTime: Math.max(0, sourceEndTime),
+    }),
   }
 }

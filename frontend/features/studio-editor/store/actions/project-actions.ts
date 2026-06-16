@@ -3,33 +3,32 @@
 import { recordEditorHistory } from "./history-actions"
 import type {
   StudioAspectRatio,
-  StudioEditorProject,
   StudioProjectMediaItem,
   StudioTimelineSegment,
-  StudioTimelineTrack,
+  StudioTimelineTrackId,
 } from "../../studio.types"
 import {
-  getTimelineSegmentEndTime,
-  getTimelineSegmentMedia,
-  getTimelineSegmentStartTime,
-} from "../../timeline/lib/layout"
-import { getTimelineWidthClassName } from "../../timeline/lib/operations"
+  getTimelineWidthClassName,
+  insertSegmentWithPush,
+} from "../../timeline/lib/operations"
 import type {
   StudioEditorGet,
   StudioEditorSet,
 } from "../studio-editor-store.types"
 
-function getTimelineTrackIdForMedia(media: StudioProjectMediaItem) {
-  if (media.type === "VIDEO") {
-    return "video"
+function getTimelineTrackIdForMedia(
+  media: StudioProjectMediaItem
+): StudioTimelineTrackId | null {
+  if (media.origin === "SOURCE" || media.linkedSelectionId === "source-media") {
+    return "SOURCE"
   }
 
   if (media.type === "AUDIO") {
-    return "audio"
+    return "AUDIO"
   }
 
-  if (media.type === "IMAGE") {
-    return "overlays"
+  if (media.type === "IMAGE" || media.type === "VIDEO") {
+    return "OVERLAY_MEDIA"
   }
 
   return null
@@ -37,54 +36,6 @@ function getTimelineTrackIdForMedia(media: StudioProjectMediaItem) {
 
 function getMediaTimelineSelectionId(media: StudioProjectMediaItem) {
   return media.linkedSelectionId ?? media.id
-}
-
-function getNextAvailableTimelineStart({
-  durationSeconds,
-  project,
-  startTime,
-  track,
-}: {
-  durationSeconds: number
-  project: StudioEditorProject
-  startTime: number
-  track: StudioTimelineTrack
-}) {
-  let nextStartTime = Math.max(0, startTime)
-  const occupiedRanges = track.segments
-    .map((segment) => {
-      const segmentMedia = getTimelineSegmentMedia({ project, segment })
-
-      return {
-        endTime: getTimelineSegmentEndTime({
-          media: segmentMedia,
-          projectDurationSeconds: project.media.durationSeconds,
-          segment,
-        }),
-        startTime: getTimelineSegmentStartTime({
-          media: segmentMedia,
-          segment,
-        }),
-      }
-    })
-    .sort((left, right) => left.startTime - right.startTime)
-
-  for (const range of occupiedRanges) {
-    const nextEndTime = nextStartTime + durationSeconds
-    const fitsBeforeRange = nextEndTime <= range.startTime
-    const overlapsRange =
-      nextStartTime < range.endTime && nextEndTime > range.startTime
-
-    if (fitsBeforeRange) {
-      return nextStartTime
-    }
-
-    if (overlapsRange) {
-      nextStartTime = range.endTime
-    }
-  }
-
-  return nextStartTime
 }
 
 function createMediaTimelineSegment({
@@ -122,38 +73,25 @@ export function createProjectActions(
       const { currentTime, project } = get()
       const media = project.projectMedia.find((item) => item.id === mediaId)
       const trackId = media ? getTimelineTrackIdForMedia(media) : null
-      const targetTrack = project.timelineTracks.find((track) => track.id === trackId)
 
-      if (!media || !trackId || !targetTrack) {
+      if (!media || !trackId) {
         return
       }
 
       recordEditorHistory(set, get)
 
-      const segmentDurationSeconds = Math.max(0.25, media.durationSeconds ?? 8)
       const nextSegment = createMediaTimelineSegment({
         durationSeconds: project.media.durationSeconds,
         media,
-        startTime: getNextAvailableTimelineStart({
-          durationSeconds: segmentDurationSeconds,
-          project,
-          startTime: currentTime,
-          track: targetTrack,
-        }),
+        startTime: currentTime,
       })
 
       set((state) => ({
-        project: {
-          ...state.project,
-          timelineTracks: state.project.timelineTracks.map((track) =>
-            track.id === trackId
-              ? {
-                  ...track,
-                  segments: [...track.segments, nextSegment],
-                }
-              : track
-          ),
-        },
+        project: insertSegmentWithPush({
+          project: state.project,
+          segment: nextSegment,
+          trackId,
+        }),
         selectedItemId: nextSegment.id,
       }))
     },
