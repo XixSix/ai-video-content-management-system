@@ -1,7 +1,7 @@
 "use client"
 
 import { buildCaptionCues } from "@/features/studio-editor/studio-captions"
-import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
+import { StudioPanelShell } from "@/features/studio-editor/tool-panel/components/studio-panel-shell"
 import {
   useStudioPlaybackState,
   useStudioProjectState,

@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
+import { StudioPanelShell } from "@/features/studio-editor/tool-panel/components/studio-panel-shell"
 import {
   useStudioChapterActions,
   useStudioPlaybackState,

@@ -1,6 +1,6 @@
 "use client"
 
-import { StudioRail } from "@/features/studio-editor/components/studio-rail"
+import { StudioRail } from "@/features/studio-editor/shell/studio-rail"
 
 export function StudioSidebar() {
   return (

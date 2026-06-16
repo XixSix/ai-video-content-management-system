@@ -2,12 +2,12 @@
 
 import { ChaptersPanel } from "@/features/studio-editor/components/chapters-panel"
 import { StudioCaptionsPanel } from "@/features/studio-editor/captions/studio-captions-panel"
-import { GenericToolPanel } from "@/features/studio-editor/components/generic-tool-panel"
 import { MediaPanel } from "@/features/studio-editor/components/media-panel"
 import { TextPanel } from "@/features/studio-editor/components/text-panel"
 import { useStudioToolState } from "@/features/studio-editor/store/studio-editor-store"
+import { GenericToolPanel } from "@/features/studio-editor/tool-panel/components/generic-tool-panel"
 
-export function StudioPanel() {
+export function StudioToolPanel() {
   const { activeTool } = useStudioToolState()
 
   if (activeTool === "media") {

@@ -1,6 +1,6 @@
 "use client"
 
-import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
+import { StudioPanelShell } from "@/features/studio-editor/tool-panel/components/studio-panel-shell"
 import {
   useStudioSelectionState,
   useStudioToolState,

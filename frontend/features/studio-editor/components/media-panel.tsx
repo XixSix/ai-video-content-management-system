@@ -5,7 +5,7 @@ import { useMemo, useState } from "react"
 import { CloudUpload, FileMusic, ImageIcon, Library, Video } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { StudioPanelShell } from "@/features/studio-editor/components/studio-panel-shell"
+import { StudioPanelShell } from "@/features/studio-editor/tool-panel/components/studio-panel-shell"
 import {
   useStudioPlaybackState,
   useStudioProjectState,
