@@ -66,6 +66,7 @@ export type ClipCandidateMinAggregateOutputType = {
   transcriptId: string | null
   chapterId: string | null
   jobId: string | null
+  projectId: string | null
   startTime: number | null
   endTime: number | null
   duration: number | null
@@ -94,6 +95,7 @@ export type ClipCandidateMaxAggregateOutputType = {
   transcriptId: string | null
   chapterId: string | null
   jobId: string | null
+  projectId: string | null
   startTime: number | null
   endTime: number | null
   duration: number | null
@@ -122,6 +124,7 @@ export type ClipCandidateCountAggregateOutputType = {
   transcriptId: number
   chapterId: number
   jobId: number
+  projectId: number
   startTime: number
   endTime: number
   duration: number
@@ -187,6 +190,7 @@ export type ClipCandidateMinAggregateInputType = {
   transcriptId?: true
   chapterId?: true
   jobId?: true
+  projectId?: true
   startTime?: true
   endTime?: true
   duration?: true
@@ -215,6 +219,7 @@ export type ClipCandidateMaxAggregateInputType = {
   transcriptId?: true
   chapterId?: true
   jobId?: true
+  projectId?: true
   startTime?: true
   endTime?: true
   duration?: true
@@ -243,6 +248,7 @@ export type ClipCandidateCountAggregateInputType = {
   transcriptId?: true
   chapterId?: true
   jobId?: true
+  projectId?: true
   startTime?: true
   endTime?: true
   duration?: true
@@ -359,6 +365,7 @@ export type ClipCandidateGroupByOutputType = {
   transcriptId: string
   chapterId: string | null
   jobId: string | null
+  projectId: string | null
   startTime: number
   endTime: number
   duration: number
@@ -411,6 +418,7 @@ export type ClipCandidateWhereInput = {
   transcriptId?: Prisma.UuidFilter<"ClipCandidate"> | string
   chapterId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
   jobId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
   startTime?: Prisma.FloatFilter<"ClipCandidate"> | number
   endTime?: Prisma.FloatFilter<"ClipCandidate"> | number
   duration?: Prisma.FloatFilter<"ClipCandidate"> | number
@@ -436,6 +444,7 @@ export type ClipCandidateWhereInput = {
   transcript?: Prisma.XOR<Prisma.TranscriptScalarRelationFilter, Prisma.TranscriptWhereInput>
   chapter?: Prisma.XOR<Prisma.VideoChapterNullableScalarRelationFilter, Prisma.VideoChapterWhereInput> | null
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   shortClips?: Prisma.ShortClipListRelationFilter
 }
 
@@ -445,6 +454,7 @@ export type ClipCandidateOrderByWithRelationInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   duration?: Prisma.SortOrder
@@ -470,6 +480,7 @@ export type ClipCandidateOrderByWithRelationInput = {
   transcript?: Prisma.TranscriptOrderByWithRelationInput
   chapter?: Prisma.VideoChapterOrderByWithRelationInput
   job?: Prisma.ProcessingJobOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
   shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
 }
 
@@ -482,6 +493,7 @@ export type ClipCandidateWhereUniqueInput = Prisma.AtLeast<{
   transcriptId?: Prisma.UuidFilter<"ClipCandidate"> | string
   chapterId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
   jobId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
   startTime?: Prisma.FloatFilter<"ClipCandidate"> | number
   endTime?: Prisma.FloatFilter<"ClipCandidate"> | number
   duration?: Prisma.FloatFilter<"ClipCandidate"> | number
@@ -507,6 +519,7 @@ export type ClipCandidateWhereUniqueInput = Prisma.AtLeast<{
   transcript?: Prisma.XOR<Prisma.TranscriptScalarRelationFilter, Prisma.TranscriptWhereInput>
   chapter?: Prisma.XOR<Prisma.VideoChapterNullableScalarRelationFilter, Prisma.VideoChapterWhereInput> | null
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   shortClips?: Prisma.ShortClipListRelationFilter
 }, "id">
 
@@ -516,6 +529,7 @@ export type ClipCandidateOrderByWithAggregationInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   duration?: Prisma.SortOrder
@@ -553,6 +567,7 @@ export type ClipCandidateScalarWhereWithAggregatesInput = {
   transcriptId?: Prisma.UuidWithAggregatesFilter<"ClipCandidate"> | string
   chapterId?: Prisma.UuidNullableWithAggregatesFilter<"ClipCandidate"> | string | null
   jobId?: Prisma.UuidNullableWithAggregatesFilter<"ClipCandidate"> | string | null
+  projectId?: Prisma.UuidNullableWithAggregatesFilter<"ClipCandidate"> | string | null
   startTime?: Prisma.FloatWithAggregatesFilter<"ClipCandidate"> | number
   endTime?: Prisma.FloatWithAggregatesFilter<"ClipCandidate"> | number
   duration?: Prisma.FloatWithAggregatesFilter<"ClipCandidate"> | number
@@ -603,6 +618,7 @@ export type ClipCandidateCreateInput = {
   transcript: Prisma.TranscriptCreateNestedOneWithoutClipCandidatesInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutClipCandidatesInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutClipCandidatesInput
+  project?: Prisma.ProjectCreateNestedOneWithoutClipCandidatesInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutCandidateInput
 }
 
@@ -612,6 +628,7 @@ export type ClipCandidateUncheckedCreateInput = {
   transcriptId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -663,6 +680,7 @@ export type ClipCandidateUpdateInput = {
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutClipCandidatesNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutClipCandidatesNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutClipCandidatesNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutClipCandidatesNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutCandidateNestedInput
 }
 
@@ -672,6 +690,7 @@ export type ClipCandidateUncheckedUpdateInput = {
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -702,6 +721,7 @@ export type ClipCandidateCreateManyInput = {
   transcriptId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -756,6 +776,7 @@ export type ClipCandidateUncheckedUpdateManyInput = {
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -795,6 +816,7 @@ export type ClipCandidateCountOrderByAggregateInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   duration?: Prisma.SortOrder
@@ -841,6 +863,7 @@ export type ClipCandidateMaxOrderByAggregateInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   duration?: Prisma.SortOrder
@@ -869,6 +892,7 @@ export type ClipCandidateMinOrderByAggregateInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   duration?: Prisma.SortOrder
@@ -952,6 +976,48 @@ export type ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput = {
   connect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
   update?: Prisma.ClipCandidateUpdateWithWhereUniqueWithoutMediaInput | Prisma.ClipCandidateUpdateWithWhereUniqueWithoutMediaInput[]
   updateMany?: Prisma.ClipCandidateUpdateManyWithWhereWithoutMediaInput | Prisma.ClipCandidateUpdateManyWithWhereWithoutMediaInput[]
+  deleteMany?: Prisma.ClipCandidateScalarWhereInput | Prisma.ClipCandidateScalarWhereInput[]
+}
+
+export type ClipCandidateCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.ClipCandidateCreateWithoutProjectInput, Prisma.ClipCandidateUncheckedCreateWithoutProjectInput> | Prisma.ClipCandidateCreateWithoutProjectInput[] | Prisma.ClipCandidateUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ClipCandidateCreateOrConnectWithoutProjectInput | Prisma.ClipCandidateCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.ClipCandidateCreateManyProjectInputEnvelope
+  connect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+}
+
+export type ClipCandidateUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.ClipCandidateCreateWithoutProjectInput, Prisma.ClipCandidateUncheckedCreateWithoutProjectInput> | Prisma.ClipCandidateCreateWithoutProjectInput[] | Prisma.ClipCandidateUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ClipCandidateCreateOrConnectWithoutProjectInput | Prisma.ClipCandidateCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.ClipCandidateCreateManyProjectInputEnvelope
+  connect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+}
+
+export type ClipCandidateUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.ClipCandidateCreateWithoutProjectInput, Prisma.ClipCandidateUncheckedCreateWithoutProjectInput> | Prisma.ClipCandidateCreateWithoutProjectInput[] | Prisma.ClipCandidateUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ClipCandidateCreateOrConnectWithoutProjectInput | Prisma.ClipCandidateCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.ClipCandidateUpsertWithWhereUniqueWithoutProjectInput | Prisma.ClipCandidateUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.ClipCandidateCreateManyProjectInputEnvelope
+  set?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  disconnect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  delete?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  connect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  update?: Prisma.ClipCandidateUpdateWithWhereUniqueWithoutProjectInput | Prisma.ClipCandidateUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.ClipCandidateUpdateManyWithWhereWithoutProjectInput | Prisma.ClipCandidateUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.ClipCandidateScalarWhereInput | Prisma.ClipCandidateScalarWhereInput[]
+}
+
+export type ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.ClipCandidateCreateWithoutProjectInput, Prisma.ClipCandidateUncheckedCreateWithoutProjectInput> | Prisma.ClipCandidateCreateWithoutProjectInput[] | Prisma.ClipCandidateUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ClipCandidateCreateOrConnectWithoutProjectInput | Prisma.ClipCandidateCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.ClipCandidateUpsertWithWhereUniqueWithoutProjectInput | Prisma.ClipCandidateUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.ClipCandidateCreateManyProjectInputEnvelope
+  set?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  disconnect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  delete?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  connect?: Prisma.ClipCandidateWhereUniqueInput | Prisma.ClipCandidateWhereUniqueInput[]
+  update?: Prisma.ClipCandidateUpdateWithWhereUniqueWithoutProjectInput | Prisma.ClipCandidateUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.ClipCandidateUpdateManyWithWhereWithoutProjectInput | Prisma.ClipCandidateUpdateManyWithWhereWithoutProjectInput[]
   deleteMany?: Prisma.ClipCandidateScalarWhereInput | Prisma.ClipCandidateScalarWhereInput[]
 }
 
@@ -1127,6 +1193,7 @@ export type ClipCandidateCreateWithoutMediaInput = {
   transcript: Prisma.TranscriptCreateNestedOneWithoutClipCandidatesInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutClipCandidatesInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutClipCandidatesInput
+  project?: Prisma.ProjectCreateNestedOneWithoutClipCandidatesInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutCandidateInput
 }
 
@@ -1135,6 +1202,7 @@ export type ClipCandidateUncheckedCreateWithoutMediaInput = {
   transcriptId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1194,6 +1262,7 @@ export type ClipCandidateScalarWhereInput = {
   transcriptId?: Prisma.UuidFilter<"ClipCandidate"> | string
   chapterId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
   jobId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"ClipCandidate"> | string | null
   startTime?: Prisma.FloatFilter<"ClipCandidate"> | number
   endTime?: Prisma.FloatFilter<"ClipCandidate"> | number
   duration?: Prisma.FloatFilter<"ClipCandidate"> | number
@@ -1215,6 +1284,92 @@ export type ClipCandidateScalarWhereInput = {
   metadata?: Prisma.JsonNullableFilter<"ClipCandidate">
   status?: Prisma.EnumClipCandidateStatusFilter<"ClipCandidate"> | $Enums.ClipCandidateStatus
   createdAt?: Prisma.DateTimeFilter<"ClipCandidate"> | Date | string
+}
+
+export type ClipCandidateCreateWithoutProjectInput = {
+  id?: string
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion: number
+  text?: string | null
+  cleanText?: string | null
+  hookScore?: number | null
+  questionScore?: number | null
+  keywordScore?: number | null
+  durationScore?: number | null
+  speechDensityScore?: number | null
+  saliencyScore?: number | null
+  completenessScore?: number | null
+  emotionScore?: number | null
+  finalScore?: number | null
+  llmScore?: number | null
+  llmReason?: string | null
+  dedupGroupId?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.ClipCandidateStatus
+  createdAt?: Date | string
+  media: Prisma.MediaCreateNestedOneWithoutClipCandidatesInput
+  transcript: Prisma.TranscriptCreateNestedOneWithoutClipCandidatesInput
+  chapter?: Prisma.VideoChapterCreateNestedOneWithoutClipCandidatesInput
+  job?: Prisma.ProcessingJobCreateNestedOneWithoutClipCandidatesInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutCandidateInput
+}
+
+export type ClipCandidateUncheckedCreateWithoutProjectInput = {
+  id?: string
+  mediaId: string
+  transcriptId: string
+  chapterId?: string | null
+  jobId?: string | null
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion: number
+  text?: string | null
+  cleanText?: string | null
+  hookScore?: number | null
+  questionScore?: number | null
+  keywordScore?: number | null
+  durationScore?: number | null
+  speechDensityScore?: number | null
+  saliencyScore?: number | null
+  completenessScore?: number | null
+  emotionScore?: number | null
+  finalScore?: number | null
+  llmScore?: number | null
+  llmReason?: string | null
+  dedupGroupId?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.ClipCandidateStatus
+  createdAt?: Date | string
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutCandidateInput
+}
+
+export type ClipCandidateCreateOrConnectWithoutProjectInput = {
+  where: Prisma.ClipCandidateWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClipCandidateCreateWithoutProjectInput, Prisma.ClipCandidateUncheckedCreateWithoutProjectInput>
+}
+
+export type ClipCandidateCreateManyProjectInputEnvelope = {
+  data: Prisma.ClipCandidateCreateManyProjectInput | Prisma.ClipCandidateCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type ClipCandidateUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.ClipCandidateWhereUniqueInput
+  update: Prisma.XOR<Prisma.ClipCandidateUpdateWithoutProjectInput, Prisma.ClipCandidateUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.ClipCandidateCreateWithoutProjectInput, Prisma.ClipCandidateUncheckedCreateWithoutProjectInput>
+}
+
+export type ClipCandidateUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.ClipCandidateWhereUniqueInput
+  data: Prisma.XOR<Prisma.ClipCandidateUpdateWithoutProjectInput, Prisma.ClipCandidateUncheckedUpdateWithoutProjectInput>
+}
+
+export type ClipCandidateUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.ClipCandidateScalarWhereInput
+  data: Prisma.XOR<Prisma.ClipCandidateUpdateManyMutationInput, Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectInput>
 }
 
 export type ClipCandidateCreateWithoutJobInput = {
@@ -1243,6 +1398,7 @@ export type ClipCandidateCreateWithoutJobInput = {
   media: Prisma.MediaCreateNestedOneWithoutClipCandidatesInput
   transcript: Prisma.TranscriptCreateNestedOneWithoutClipCandidatesInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutClipCandidatesInput
+  project?: Prisma.ProjectCreateNestedOneWithoutClipCandidatesInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutCandidateInput
 }
 
@@ -1251,6 +1407,7 @@ export type ClipCandidateUncheckedCreateWithoutJobInput = {
   mediaId: string
   transcriptId: string
   chapterId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1327,6 +1484,7 @@ export type ClipCandidateCreateWithoutTranscriptInput = {
   media: Prisma.MediaCreateNestedOneWithoutClipCandidatesInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutClipCandidatesInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutClipCandidatesInput
+  project?: Prisma.ProjectCreateNestedOneWithoutClipCandidatesInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutCandidateInput
 }
 
@@ -1335,6 +1493,7 @@ export type ClipCandidateUncheckedCreateWithoutTranscriptInput = {
   mediaId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1411,6 +1570,7 @@ export type ClipCandidateCreateWithoutChapterInput = {
   media: Prisma.MediaCreateNestedOneWithoutClipCandidatesInput
   transcript: Prisma.TranscriptCreateNestedOneWithoutClipCandidatesInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutClipCandidatesInput
+  project?: Prisma.ProjectCreateNestedOneWithoutClipCandidatesInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutCandidateInput
 }
 
@@ -1419,6 +1579,7 @@ export type ClipCandidateUncheckedCreateWithoutChapterInput = {
   mediaId: string
   transcriptId: string
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1496,6 +1657,7 @@ export type ClipCandidateCreateWithoutShortClipsInput = {
   transcript: Prisma.TranscriptCreateNestedOneWithoutClipCandidatesInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutClipCandidatesInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutClipCandidatesInput
+  project?: Prisma.ProjectCreateNestedOneWithoutClipCandidatesInput
 }
 
 export type ClipCandidateUncheckedCreateWithoutShortClipsInput = {
@@ -1504,6 +1666,7 @@ export type ClipCandidateUncheckedCreateWithoutShortClipsInput = {
   transcriptId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1570,6 +1733,7 @@ export type ClipCandidateUpdateWithoutShortClipsInput = {
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutClipCandidatesNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutClipCandidatesNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutClipCandidatesNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutClipCandidatesNestedInput
 }
 
 export type ClipCandidateUncheckedUpdateWithoutShortClipsInput = {
@@ -1578,6 +1742,7 @@ export type ClipCandidateUncheckedUpdateWithoutShortClipsInput = {
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1606,6 +1771,7 @@ export type ClipCandidateCreateManyMediaInput = {
   transcriptId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1655,11 +1821,131 @@ export type ClipCandidateUpdateWithoutMediaInput = {
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutClipCandidatesNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutClipCandidatesNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutClipCandidatesNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutClipCandidatesNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutCandidateNestedInput
 }
 
 export type ClipCandidateUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
+  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cleanText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hookScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  questionScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  keywordScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  speechDensityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  saliencyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  completenessScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  emotionScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  finalScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dedupGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumClipCandidateStatusFieldUpdateOperationsInput | $Enums.ClipCandidateStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutCandidateNestedInput
+}
+
+export type ClipCandidateUncheckedUpdateManyWithoutMediaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
+  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cleanText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hookScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  questionScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  keywordScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  speechDensityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  saliencyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  completenessScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  emotionScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  finalScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dedupGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumClipCandidateStatusFieldUpdateOperationsInput | $Enums.ClipCandidateStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ClipCandidateCreateManyProjectInput = {
+  id?: string
+  mediaId: string
+  transcriptId: string
+  chapterId?: string | null
+  jobId?: string | null
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion: number
+  text?: string | null
+  cleanText?: string | null
+  hookScore?: number | null
+  questionScore?: number | null
+  keywordScore?: number | null
+  durationScore?: number | null
+  speechDensityScore?: number | null
+  saliencyScore?: number | null
+  completenessScore?: number | null
+  emotionScore?: number | null
+  finalScore?: number | null
+  llmScore?: number | null
+  llmReason?: string | null
+  dedupGroupId?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.ClipCandidateStatus
+  createdAt?: Date | string
+}
+
+export type ClipCandidateUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cleanText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hookScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  questionScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  keywordScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  speechDensityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  saliencyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  completenessScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  emotionScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  finalScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dedupGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumClipCandidateStatusFieldUpdateOperationsInput | $Enums.ClipCandidateStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateOneRequiredWithoutClipCandidatesNestedInput
+  transcript?: Prisma.TranscriptUpdateOneRequiredWithoutClipCandidatesNestedInput
+  chapter?: Prisma.VideoChapterUpdateOneWithoutClipCandidatesNestedInput
+  job?: Prisma.ProcessingJobUpdateOneWithoutClipCandidatesNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutCandidateNestedInput
+}
+
+export type ClipCandidateUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1687,8 +1973,9 @@ export type ClipCandidateUncheckedUpdateWithoutMediaInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
-export type ClipCandidateUncheckedUpdateManyWithoutMediaInput = {
+export type ClipCandidateUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1720,6 +2007,7 @@ export type ClipCandidateCreateManyJobInput = {
   mediaId: string
   transcriptId: string
   chapterId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1769,6 +2057,7 @@ export type ClipCandidateUpdateWithoutJobInput = {
   media?: Prisma.MediaUpdateOneRequiredWithoutClipCandidatesNestedInput
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutClipCandidatesNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutClipCandidatesNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutClipCandidatesNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutCandidateNestedInput
 }
 
@@ -1777,6 +2066,7 @@ export type ClipCandidateUncheckedUpdateWithoutJobInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1806,6 +2096,7 @@ export type ClipCandidateUncheckedUpdateManyWithoutJobInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1834,6 +2125,7 @@ export type ClipCandidateCreateManyTranscriptInput = {
   mediaId: string
   chapterId?: string | null
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1883,6 +2175,7 @@ export type ClipCandidateUpdateWithoutTranscriptInput = {
   media?: Prisma.MediaUpdateOneRequiredWithoutClipCandidatesNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutClipCandidatesNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutClipCandidatesNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutClipCandidatesNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutCandidateNestedInput
 }
 
@@ -1891,6 +2184,7 @@ export type ClipCandidateUncheckedUpdateWithoutTranscriptInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1920,6 +2214,7 @@ export type ClipCandidateUncheckedUpdateManyWithoutTranscriptInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1948,6 +2243,7 @@ export type ClipCandidateCreateManyChapterInput = {
   mediaId: string
   transcriptId: string
   jobId?: string | null
+  projectId?: string | null
   startTime: number
   endTime: number
   duration: number
@@ -1997,6 +2293,7 @@ export type ClipCandidateUpdateWithoutChapterInput = {
   media?: Prisma.MediaUpdateOneRequiredWithoutClipCandidatesNestedInput
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutClipCandidatesNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutClipCandidatesNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutClipCandidatesNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutCandidateNestedInput
 }
 
@@ -2005,6 +2302,7 @@ export type ClipCandidateUncheckedUpdateWithoutChapterInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2034,6 +2332,7 @@ export type ClipCandidateUncheckedUpdateManyWithoutChapterInput = {
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startTime?: Prisma.FloatFieldUpdateOperationsInput | number
   endTime?: Prisma.FloatFieldUpdateOperationsInput | number
   duration?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2094,6 +2393,7 @@ export type ClipCandidateSelect<ExtArgs extends runtime.Types.Extensions.Interna
   transcriptId?: boolean
   chapterId?: boolean
   jobId?: boolean
+  projectId?: boolean
   startTime?: boolean
   endTime?: boolean
   duration?: boolean
@@ -2119,6 +2419,7 @@ export type ClipCandidateSelect<ExtArgs extends runtime.Types.Extensions.Interna
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   chapter?: boolean | Prisma.ClipCandidate$chapterArgs<ExtArgs>
   job?: boolean | Prisma.ClipCandidate$jobArgs<ExtArgs>
+  project?: boolean | Prisma.ClipCandidate$projectArgs<ExtArgs>
   shortClips?: boolean | Prisma.ClipCandidate$shortClipsArgs<ExtArgs>
   _count?: boolean | Prisma.ClipCandidateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clipCandidate"]>
@@ -2129,6 +2430,7 @@ export type ClipCandidateSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   transcriptId?: boolean
   chapterId?: boolean
   jobId?: boolean
+  projectId?: boolean
   startTime?: boolean
   endTime?: boolean
   duration?: boolean
@@ -2154,6 +2456,7 @@ export type ClipCandidateSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   chapter?: boolean | Prisma.ClipCandidate$chapterArgs<ExtArgs>
   job?: boolean | Prisma.ClipCandidate$jobArgs<ExtArgs>
+  project?: boolean | Prisma.ClipCandidate$projectArgs<ExtArgs>
 }, ExtArgs["result"]["clipCandidate"]>
 
 export type ClipCandidateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2162,6 +2465,7 @@ export type ClipCandidateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   transcriptId?: boolean
   chapterId?: boolean
   jobId?: boolean
+  projectId?: boolean
   startTime?: boolean
   endTime?: boolean
   duration?: boolean
@@ -2187,6 +2491,7 @@ export type ClipCandidateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   chapter?: boolean | Prisma.ClipCandidate$chapterArgs<ExtArgs>
   job?: boolean | Prisma.ClipCandidate$jobArgs<ExtArgs>
+  project?: boolean | Prisma.ClipCandidate$projectArgs<ExtArgs>
 }, ExtArgs["result"]["clipCandidate"]>
 
 export type ClipCandidateSelectScalar = {
@@ -2195,6 +2500,7 @@ export type ClipCandidateSelectScalar = {
   transcriptId?: boolean
   chapterId?: boolean
   jobId?: boolean
+  projectId?: boolean
   startTime?: boolean
   endTime?: boolean
   duration?: boolean
@@ -2218,12 +2524,13 @@ export type ClipCandidateSelectScalar = {
   createdAt?: boolean
 }
 
-export type ClipCandidateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "transcriptId" | "chapterId" | "jobId" | "startTime" | "endTime" | "duration" | "transcriptVersion" | "text" | "cleanText" | "hookScore" | "questionScore" | "keywordScore" | "durationScore" | "speechDensityScore" | "saliencyScore" | "completenessScore" | "emotionScore" | "finalScore" | "llmScore" | "llmReason" | "dedupGroupId" | "metadata" | "status" | "createdAt", ExtArgs["result"]["clipCandidate"]>
+export type ClipCandidateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "transcriptId" | "chapterId" | "jobId" | "projectId" | "startTime" | "endTime" | "duration" | "transcriptVersion" | "text" | "cleanText" | "hookScore" | "questionScore" | "keywordScore" | "durationScore" | "speechDensityScore" | "saliencyScore" | "completenessScore" | "emotionScore" | "finalScore" | "llmScore" | "llmReason" | "dedupGroupId" | "metadata" | "status" | "createdAt", ExtArgs["result"]["clipCandidate"]>
 export type ClipCandidateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   chapter?: boolean | Prisma.ClipCandidate$chapterArgs<ExtArgs>
   job?: boolean | Prisma.ClipCandidate$jobArgs<ExtArgs>
+  project?: boolean | Prisma.ClipCandidate$projectArgs<ExtArgs>
   shortClips?: boolean | Prisma.ClipCandidate$shortClipsArgs<ExtArgs>
   _count?: boolean | Prisma.ClipCandidateCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2232,12 +2539,14 @@ export type ClipCandidateIncludeCreateManyAndReturn<ExtArgs extends runtime.Type
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   chapter?: boolean | Prisma.ClipCandidate$chapterArgs<ExtArgs>
   job?: boolean | Prisma.ClipCandidate$jobArgs<ExtArgs>
+  project?: boolean | Prisma.ClipCandidate$projectArgs<ExtArgs>
 }
 export type ClipCandidateIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.TranscriptDefaultArgs<ExtArgs>
   chapter?: boolean | Prisma.ClipCandidate$chapterArgs<ExtArgs>
   job?: boolean | Prisma.ClipCandidate$jobArgs<ExtArgs>
+  project?: boolean | Prisma.ClipCandidate$projectArgs<ExtArgs>
 }
 
 export type $ClipCandidatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2247,6 +2556,7 @@ export type $ClipCandidatePayload<ExtArgs extends runtime.Types.Extensions.Inter
     transcript: Prisma.$TranscriptPayload<ExtArgs>
     chapter: Prisma.$VideoChapterPayload<ExtArgs> | null
     job: Prisma.$ProcessingJobPayload<ExtArgs> | null
+    project: Prisma.$ProjectPayload<ExtArgs> | null
     shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2255,6 +2565,7 @@ export type $ClipCandidatePayload<ExtArgs extends runtime.Types.Extensions.Inter
     transcriptId: string
     chapterId: string | null
     jobId: string | null
+    projectId: string | null
     startTime: number
     endTime: number
     duration: number
@@ -2674,6 +2985,7 @@ export interface Prisma__ClipCandidateClient<T, Null = never, ExtArgs extends ru
   transcript<T extends Prisma.TranscriptDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TranscriptDefaultArgs<ExtArgs>>): Prisma.Prisma__TranscriptClient<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   chapter<T extends Prisma.ClipCandidate$chapterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClipCandidate$chapterArgs<ExtArgs>>): Prisma.Prisma__VideoChapterClient<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   job<T extends Prisma.ClipCandidate$jobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClipCandidate$jobArgs<ExtArgs>>): Prisma.Prisma__ProcessingJobClient<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.ClipCandidate$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClipCandidate$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   shortClips<T extends Prisma.ClipCandidate$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClipCandidate$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2709,6 +3021,7 @@ export interface ClipCandidateFieldRefs {
   readonly transcriptId: Prisma.FieldRef<"ClipCandidate", 'String'>
   readonly chapterId: Prisma.FieldRef<"ClipCandidate", 'String'>
   readonly jobId: Prisma.FieldRef<"ClipCandidate", 'String'>
+  readonly projectId: Prisma.FieldRef<"ClipCandidate", 'String'>
   readonly startTime: Prisma.FieldRef<"ClipCandidate", 'Float'>
   readonly endTime: Prisma.FieldRef<"ClipCandidate", 'Float'>
   readonly duration: Prisma.FieldRef<"ClipCandidate", 'Float'>
@@ -3166,6 +3479,25 @@ export type ClipCandidate$jobArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.ProcessingJobInclude<ExtArgs> | null
   where?: Prisma.ProcessingJobWhereInput
+}
+
+/**
+ * ClipCandidate.project
+ */
+export type ClipCandidate$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
 }
 
 /**

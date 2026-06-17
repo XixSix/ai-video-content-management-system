@@ -24,7 +24,10 @@ enum UserStatus {
 
 enum MediaType {
   VIDEO
+  AUDIO
   IMAGE
+  SUBTITLE
+  DOCUMENT
 }
 
 enum MediaStatus {
@@ -34,19 +37,53 @@ enum MediaStatus {
   DELETED
 }
 
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum ProjectMediaRole {
+  SOURCE
+  OVERLAY
+  AUDIO_BED
+  GENERATED
+  REFERENCE
+}
+
+enum EditorLayerKind {
+  TEXT
+  CAPTIONS
+  IMAGE
+}
+
+enum TimelineTrackType {
+  TEXT
+  IMAGES
+  SOURCE
+  AUDIO
+}
+
 enum JobType {
   TRANSCRIBE
   GENERATE_SUBTITLE
   GENERATE_CHAPTERS
   GENERATE_SHORT_CLIPS
+  GENERATE_AI_SUGGESTIONS
   GENERATE_SUGGESTIONS
+  RENDER_EXPORT
   BURN_SUBTITLE
   PUBLISH
+  MEDIA_TRANSCODE
+  THUMBNAIL_GENERATION
+  WAVEFORM_PEAK_GENERATION
 }
 
 enum JobStatus {
   PENDING
   QUEUED
+  RUNNING
   TRANSCRIBING
   GENERATING_SUBTITLE
   BURNING_SUBTITLE
@@ -56,6 +93,7 @@ enum JobStatus {
   PUBLISHING
   COMPLETED
   FAILED
+  CANCELED
 }
 
 enum TranscriptSource {
@@ -102,13 +140,19 @@ enum ShortClipStatus {
 }
 
 enum AssetType {
+  THUMBNAIL
   SUBTITLE_SRT
   SUBTITLE_VTT
   BURNED_SUBTITLE_VIDEO
+  EXPORT_VIDEO
+  EXPORT_AUDIO
+  WAVEFORM_PEAKS
 }
 
 enum TargetType {
   MEDIA
+  PROJECT
+  TRANSCRIPT
   VIDEO_CHAPTER
   SHORT_CLIP
   PUBLISH_TASK
@@ -127,6 +171,8 @@ enum Platform {
   TIKTOK
   FACEBOOK
   INSTAGRAM
+  LINKEDIN
+  X
 }
 
 enum PlatformAccountStatus {
@@ -156,17 +202,22 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  media                Media[]
-  processingJobs       ProcessingJob[]
-  shortClips           ShortClip[]
-  generatedAssets      GeneratedAsset[]
-  aiSuggestions        AiSuggestion[]
-  platformAccounts     PlatformAccount[]
-  platformOAuthStates  PlatformOAuthState[]
-  publishTasks         PublishTask[]
-  authSessions         AuthSession[]
-  auditLogs            AuditLog[]
-  transcriptEditDrafts TranscriptEditDraft[]
+  media                  Media[]
+  ownedWorkspaces        Workspace[]             @relation("WorkspaceOwner")
+  workspaceMemberships   WorkspaceMember[]
+  projects               Project[]
+  processingJobs         ProcessingJob[]
+  shortClips             ShortClip[]
+  generatedAssets        GeneratedAsset[]
+  aiSuggestions          AiSuggestion[]
+  platformAccounts       PlatformAccount[]
+  platformOAuthStates    PlatformOAuthState[]
+  publishTasks           PublishTask[]
+  authSessions           AuthSession[]
+  auditLogs              AuditLog[]
+  transcriptEditDrafts   TranscriptEditDraft[]
+  savedEditorDocuments   EditorDocument[]        @relation("EditorDocumentSavedBy")
+  editorDocumentVersions EditorDocumentVersion[] @relation("EditorDocumentVersionSavedBy")
 
   @@map("users")
 }
@@ -194,10 +245,48 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
+model Workspace {
+  id      String @id @default(uuid()) @db.Uuid
+  ownerId String @map("owner_id") @db.Uuid
+
+  name String @db.VarChar(255)
+  slug String @unique @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner User @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  members  WorkspaceMember[]
+  media    Media[]
+  projects Project[]
+
+  @@index([ownerId])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  userId      String @map("user_id") @db.Uuid
+
+  role String @default("OWNER") @db.VarChar(50)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
 model Media {
-  id     String    @id @default(uuid()) @db.Uuid
-  userId String    @map("user_id") @db.Uuid
-  type   MediaType
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  workspaceId String?   @map("workspace_id") @db.Uuid
+  type        MediaType
 
   title            String? @db.VarChar(255)
   description      String? @db.Text
@@ -214,13 +303,15 @@ model Media {
   mimeType      String? @map("mime_type") @db.VarChar(100)
   width         Int?
   height        Int?
+  metadata      Json?
 
   status MediaStatus @default(UPLOADED)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
 
   processingJobs     ProcessingJob[]
   transcripts        Transcript[]
@@ -229,24 +320,223 @@ model Media {
   videoChapters      VideoChapter[]
   clipCandidates     ClipCandidate[]
   shortClips         ShortClip[]
+  sourceProjects     Project[]           @relation("ProjectSourceMedia")
+  thumbnailProjects  Project[]           @relation("ProjectThumbnailMedia")
+  projectMedia       ProjectMedia[]
+  canvasLayers       CanvasLayer[]
+  timelineSegments   TimelineSegment[]
+  generatedAssets    GeneratedAsset[]
   publishTasks       PublishTask[]
 
   @@unique([s3Bucket, s3Key])
   @@index([userId])
+  @@index([workspaceId])
   @@index([status])
   @@index([type])
   @@map("media")
 }
 
+model Project {
+  id          String  @id @default(uuid()) @db.Uuid
+  userId      String  @map("user_id") @db.Uuid
+  workspaceId String? @map("workspace_id") @db.Uuid
+
+  sourceMediaId    String? @map("source_media_id") @db.Uuid
+  thumbnailMediaId String? @map("thumbnail_media_id") @db.Uuid
+
+  title       String        @db.VarChar(255)
+  slug        String        @db.VarChar(255)
+  status      ProjectStatus @default(DRAFT)
+  aspectRatio String        @default("9:16") @map("aspect_ratio") @db.VarChar(20)
+  duration    Float?
+
+  currentDocumentVersion Int @default(1) @map("current_document_version")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  sourceMedia    Media?     @relation("ProjectSourceMedia", fields: [sourceMediaId], references: [id], onDelete: SetNull)
+  thumbnailMedia Media?     @relation("ProjectThumbnailMedia", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+
+  projectMedia     ProjectMedia[]
+  editorDocument   EditorDocument?
+  documentVersions EditorDocumentVersion[]
+  canvasLayers     CanvasLayer[]
+  timelineTracks   TimelineTrack[]
+  timelineSegments TimelineSegment[]
+  processingJobs   ProcessingJob[]
+  transcripts      Transcript[]
+  videoChapters    VideoChapter[]
+  clipCandidates   ClipCandidate[]
+  shortClips       ShortClip[]
+  generatedAssets  GeneratedAsset[]
+  aiSuggestions    AiSuggestion[]
+  publishTasks     PublishTask[]
+
+  @@unique([userId, slug])
+  @@index([workspaceId])
+  @@index([sourceMediaId])
+  @@index([thumbnailMediaId])
+  @@index([status])
+  @@map("projects")
+}
+
+model ProjectMedia {
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @map("project_id") @db.Uuid
+  mediaId   String @map("media_id") @db.Uuid
+
+  role        ProjectMediaRole @default(REFERENCE)
+  displayName String?          @map("display_name") @db.VarChar(255)
+  startTime   Float?           @map("start_time")
+  duration    Float?
+  metadata    Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  media   Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([mediaId])
+  @@index([role])
+  @@index([projectId, mediaId, role])
+  @@map("project_media")
+}
+
+model EditorDocument {
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @unique @map("project_id") @db.Uuid
+
+  version  Int  @default(1)
+  document Json @map("document_json")
+
+  savedByUserId String?  @map("saved_by_user_id") @db.Uuid
+  savedAt       DateTime @default(now()) @map("saved_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  savedBy User?   @relation("EditorDocumentSavedBy", fields: [savedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([savedByUserId])
+  @@map("editor_documents")
+}
+
+model EditorDocumentVersion {
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @map("project_id") @db.Uuid
+
+  version  Int
+  document Json @map("document_json")
+
+  savedByUserId String? @map("saved_by_user_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  savedBy User?   @relation("EditorDocumentVersionSavedBy", fields: [savedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([projectId, version])
+  @@index([savedByUserId])
+  @@map("editor_document_versions")
+}
+
+model CanvasLayer {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  mediaId   String? @map("linked_media_id") @db.Uuid
+
+  kind    EditorLayerKind
+  label   String          @db.VarChar(255)
+  content String?         @db.Text
+  enabled Boolean         @default(true)
+
+  xPercent        Float? @map("x_percent")
+  yPercent        Float? @map("y_percent")
+  boxWidthPercent Float? @map("box_width_percent")
+  rotation        Float  @default(0) @map("rotation_degrees")
+  scale           Float  @default(1)
+  zIndex          Int    @default(0) @map("z_index")
+  style           Json   @default("{}") @map("style_json")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  media   Media?  @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  timelineSegments TimelineSegment[]
+
+  @@index([projectId])
+  @@index([mediaId])
+  @@index([kind])
+  @@map("canvas_layers")
+}
+
+model TimelineTrack {
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @map("project_id") @db.Uuid
+
+  type      TimelineTrackType
+  label     String            @db.VarChar(100)
+  sortOrder Int               @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  segments TimelineSegment[]
+
+  @@unique([projectId, type])
+  @@index([projectId, sortOrder])
+  @@map("timeline_tracks")
+}
+
+model TimelineSegment {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  trackId   String  @map("track_id") @db.Uuid
+  layerId   String? @map("layer_id") @db.Uuid
+  mediaId   String? @map("media_id") @db.Uuid
+
+  label     String  @db.VarChar(255)
+  content   String? @db.Text
+  startTime Float   @map("start_time")
+  duration  Float
+  laneIndex Int     @default(0) @map("lane_index")
+  metadata  Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  track   TimelineTrack @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  layer   CanvasLayer?  @relation(fields: [layerId], references: [id], onDelete: SetNull)
+  media   Media?        @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([trackId])
+  @@index([layerId])
+  @@index([mediaId])
+  @@index([projectId, startTime])
+  @@map("timeline_segments")
+}
+
 model ProcessingJob {
-  id      String @id @default(uuid()) @db.Uuid
-  mediaId String @map("media_id") @db.Uuid
-  userId  String @map("user_id") @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
+  mediaId   String  @map("media_id") @db.Uuid
+  userId    String  @map("user_id") @db.Uuid
+  projectId String? @map("project_id") @db.Uuid
 
   jobType JobType   @map("job_type")
   status  JobStatus @default(PENDING)
 
   progress     Int?    @default(0)
+  currentStep  String? @map("current_step") @db.VarChar(255)
   errorMessage String? @map("error_message") @db.Text
 
   queueName      String? @map("queue_name") @db.VarChar(100)
@@ -262,25 +552,48 @@ model ProcessingJob {
   startedAt   DateTime? @map("started_at")
   completedAt DateTime? @map("completed_at")
 
-  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media   Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
-  transcripts    Transcript[]
-  videoChapters  VideoChapter[]
-  clipCandidates ClipCandidate[]
-  publishTasks   PublishTask[]
+  transcripts     Transcript[]
+  videoChapters   VideoChapter[]
+  clipCandidates  ClipCandidate[]
+  generatedAssets GeneratedAsset[]
+  publishTasks    PublishTask[]
+  events          JobEvent[]
 
   @@index([userId])
   @@index([mediaId])
+  @@index([projectId])
   @@index([jobType])
   @@index([status])
   @@map("processing_jobs")
 }
 
+model JobEvent {
+  id    String @id @default(uuid()) @db.Uuid
+  jobId String @map("job_id") @db.Uuid
+
+  eventType String  @map("event_type") @db.VarChar(100)
+  message   String? @db.Text
+  progress  Int?
+  payload   Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  job ProcessingJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([createdAt])
+  @@map("job_events")
+}
+
 model Transcript {
-  id      String  @id @default(uuid()) @db.Uuid
-  mediaId String  @map("media_id") @db.Uuid
-  jobId   String? @map("job_id") @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
+  mediaId   String  @map("media_id") @db.Uuid
+  jobId     String? @map("job_id") @db.Uuid
+  projectId String? @map("project_id") @db.Uuid
 
   language  String?          @db.VarChar(20)
   source    TranscriptSource @default(LOCAL)
@@ -297,8 +610,9 @@ model Transcript {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  media Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  job   ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  media   Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  job     ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  project Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   segments        TranscriptSegment[]
   words           TranscriptWord[]
@@ -310,6 +624,7 @@ model Transcript {
 
   @@index([mediaId])
   @@index([jobId])
+  @@index([projectId])
   @@index([source])
   @@map("transcripts")
 }
@@ -405,6 +720,7 @@ model VideoChapter {
   mediaId      String  @map("media_id") @db.Uuid
   transcriptId String  @map("transcript_id") @db.Uuid
   jobId        String? @map("job_id") @db.Uuid
+  projectId    String? @map("project_id") @db.Uuid
 
   chapterIndex Int   @map("chapter_index")
   startTime    Float @map("start_time")
@@ -435,6 +751,7 @@ model VideoChapter {
   media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   transcript Transcript     @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
   job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   clipCandidates  ClipCandidate[]
   shortClips      ShortClip[]
@@ -444,6 +761,7 @@ model VideoChapter {
   @@index([mediaId])
   @@index([transcriptId])
   @@index([jobId])
+  @@index([projectId])
   @@index([startTime, endTime])
   @@map("video_chapters")
 }
@@ -454,6 +772,7 @@ model ClipCandidate {
   transcriptId String  @map("transcript_id") @db.Uuid
   chapterId    String? @map("chapter_id") @db.Uuid
   jobId        String? @map("job_id") @db.Uuid
+  projectId    String? @map("project_id") @db.Uuid
 
   startTime Float @map("start_time")
   endTime   Float @map("end_time")
@@ -488,6 +807,7 @@ model ClipCandidate {
   transcript Transcript     @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
   chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
   job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   shortClips ShortClip[]
 
@@ -495,6 +815,7 @@ model ClipCandidate {
   @@index([transcriptId])
   @@index([chapterId])
   @@index([jobId])
+  @@index([projectId])
   @@index([status])
   @@index([finalScore])
   @@index([startTime, endTime])
@@ -508,6 +829,7 @@ model ShortClip {
   transcriptId String? @map("transcript_id") @db.Uuid
   chapterId    String? @map("chapter_id") @db.Uuid
   candidateId  String? @map("candidate_id") @db.Uuid
+  projectId    String? @map("project_id") @db.Uuid
 
   title       String? @db.VarChar(255)
   caption     String? @db.Text
@@ -538,14 +860,17 @@ model ShortClip {
   transcript Transcript?    @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
   chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
   candidate  ClipCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
-  publishTasks PublishTask[]
+  publishTasks    PublishTask[]
+  generatedAssets GeneratedAsset[]
 
   @@index([mediaId])
   @@index([userId])
   @@index([transcriptId])
   @@index([chapterId])
   @@index([candidateId])
+  @@index([projectId])
   @@index([status])
   @@map("short_clips")
 }
@@ -554,8 +879,12 @@ model GeneratedAsset {
   id     String @id @default(uuid()) @db.Uuid
   userId String @map("user_id") @db.Uuid
 
+  mediaId      String? @map("media_id") @db.Uuid
+  projectId    String? @map("project_id") @db.Uuid
   transcriptId String? @map("transcript_id") @db.Uuid
   chapterId    String? @map("chapter_id") @db.Uuid
+  shortClipId  String? @map("short_clip_id") @db.Uuid
+  jobId        String? @map("job_id") @db.Uuid
 
   assetType         AssetType @map("asset_type")
   transcriptVersion Int?      @map("transcript_version")
@@ -572,21 +901,30 @@ model GeneratedAsset {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transcript Transcript?   @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
-  chapter    VideoChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media      Media?         @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  transcript Transcript?    @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
+  chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  shortClip  ShortClip?     @relation(fields: [shortClipId], references: [id], onDelete: SetNull)
+  job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
 
   @@unique([s3Bucket, s3Key])
   @@index([userId])
+  @@index([mediaId])
+  @@index([projectId])
   @@index([transcriptId])
   @@index([chapterId])
+  @@index([shortClipId])
+  @@index([jobId])
   @@index([assetType])
   @@map("generated_assets")
 }
 
 model AiSuggestion {
-  id     String @id @default(uuid()) @db.Uuid
-  userId String @map("user_id") @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
+  userId    String  @map("user_id") @db.Uuid
+  projectId String? @map("project_id") @db.Uuid
 
   targetType TargetType @map("target_type")
   targetId   String     @map("target_id") @db.Uuid
@@ -599,9 +937,11 @@ model AiSuggestion {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([projectId])
   @@index([targetType, targetId])
   @@index([suggestionType])
   @@index([platform])
@@ -661,6 +1001,7 @@ model PublishTask {
   userId String @map("user_id") @db.Uuid
 
   mediaId           String? @map("media_id") @db.Uuid
+  projectId         String? @map("project_id") @db.Uuid
   shortClipId       String? @map("short_clip_id") @db.Uuid
   platformAccountId String? @map("platform_account_id") @db.Uuid
   jobId             String? @map("job_id") @db.Uuid
@@ -686,12 +1027,14 @@ model PublishTask {
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   media           Media?           @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  project         Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
   shortClip       ShortClip?       @relation(fields: [shortClipId], references: [id], onDelete: SetNull)
   platformAccount PlatformAccount? @relation(fields: [platformAccountId], references: [id], onDelete: SetNull)
   job             ProcessingJob?   @relation(fields: [jobId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([mediaId])
+  @@index([projectId])
   @@index([shortClipId])
   @@index([platformAccountId])
   @@index([jobId])

@@ -53,8 +53,18 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   AuthSession: 'AuthSession',
+  Workspace: 'Workspace',
+  WorkspaceMember: 'WorkspaceMember',
   Media: 'Media',
+  Project: 'Project',
+  ProjectMedia: 'ProjectMedia',
+  EditorDocument: 'EditorDocument',
+  EditorDocumentVersion: 'EditorDocumentVersion',
+  CanvasLayer: 'CanvasLayer',
+  TimelineTrack: 'TimelineTrack',
+  TimelineSegment: 'TimelineSegment',
   ProcessingJob: 'ProcessingJob',
+  JobEvent: 'JobEvent',
   Transcript: 'Transcript',
   TranscriptSegment: 'TranscriptSegment',
   TranscriptWord: 'TranscriptWord',
@@ -117,9 +127,33 @@ export const AuthSessionScalarFieldEnum = {
 export type AuthSessionScalarFieldEnum = (typeof AuthSessionScalarFieldEnum)[keyof typeof AuthSessionScalarFieldEnum]
 
 
+export const WorkspaceScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  name: 'name',
+  slug: 'slug',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
+
+
+export const WorkspaceMemberScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  userId: 'userId',
+  role: 'role',
+  createdAt: 'createdAt'
+} as const
+
+export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
+
+
 export const MediaScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  workspaceId: 'workspaceId',
   type: 'type',
   title: 'title',
   description: 'description',
@@ -134,6 +168,7 @@ export const MediaScalarFieldEnum = {
   mimeType: 'mimeType',
   width: 'width',
   height: 'height',
+  metadata: 'metadata',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -142,13 +177,128 @@ export const MediaScalarFieldEnum = {
 export type MediaScalarFieldEnum = (typeof MediaScalarFieldEnum)[keyof typeof MediaScalarFieldEnum]
 
 
+export const ProjectScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  sourceMediaId: 'sourceMediaId',
+  thumbnailMediaId: 'thumbnailMediaId',
+  title: 'title',
+  slug: 'slug',
+  status: 'status',
+  aspectRatio: 'aspectRatio',
+  duration: 'duration',
+  currentDocumentVersion: 'currentDocumentVersion',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
+
+
+export const ProjectMediaScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  mediaId: 'mediaId',
+  role: 'role',
+  displayName: 'displayName',
+  startTime: 'startTime',
+  duration: 'duration',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectMediaScalarFieldEnum = (typeof ProjectMediaScalarFieldEnum)[keyof typeof ProjectMediaScalarFieldEnum]
+
+
+export const EditorDocumentScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  version: 'version',
+  document: 'document',
+  savedByUserId: 'savedByUserId',
+  savedAt: 'savedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EditorDocumentScalarFieldEnum = (typeof EditorDocumentScalarFieldEnum)[keyof typeof EditorDocumentScalarFieldEnum]
+
+
+export const EditorDocumentVersionScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  version: 'version',
+  document: 'document',
+  savedByUserId: 'savedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type EditorDocumentVersionScalarFieldEnum = (typeof EditorDocumentVersionScalarFieldEnum)[keyof typeof EditorDocumentVersionScalarFieldEnum]
+
+
+export const CanvasLayerScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  mediaId: 'mediaId',
+  kind: 'kind',
+  label: 'label',
+  content: 'content',
+  enabled: 'enabled',
+  xPercent: 'xPercent',
+  yPercent: 'yPercent',
+  boxWidthPercent: 'boxWidthPercent',
+  rotation: 'rotation',
+  scale: 'scale',
+  zIndex: 'zIndex',
+  style: 'style',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CanvasLayerScalarFieldEnum = (typeof CanvasLayerScalarFieldEnum)[keyof typeof CanvasLayerScalarFieldEnum]
+
+
+export const TimelineTrackScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  type: 'type',
+  label: 'label',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type TimelineTrackScalarFieldEnum = (typeof TimelineTrackScalarFieldEnum)[keyof typeof TimelineTrackScalarFieldEnum]
+
+
+export const TimelineSegmentScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  trackId: 'trackId',
+  layerId: 'layerId',
+  mediaId: 'mediaId',
+  label: 'label',
+  content: 'content',
+  startTime: 'startTime',
+  duration: 'duration',
+  laneIndex: 'laneIndex',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TimelineSegmentScalarFieldEnum = (typeof TimelineSegmentScalarFieldEnum)[keyof typeof TimelineSegmentScalarFieldEnum]
+
+
 export const ProcessingJobScalarFieldEnum = {
   id: 'id',
   mediaId: 'mediaId',
   userId: 'userId',
+  projectId: 'projectId',
   jobType: 'jobType',
   status: 'status',
   progress: 'progress',
+  currentStep: 'currentStep',
   errorMessage: 'errorMessage',
   queueName: 'queueName',
   taskName: 'taskName',
@@ -165,10 +315,24 @@ export const ProcessingJobScalarFieldEnum = {
 export type ProcessingJobScalarFieldEnum = (typeof ProcessingJobScalarFieldEnum)[keyof typeof ProcessingJobScalarFieldEnum]
 
 
+export const JobEventScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  eventType: 'eventType',
+  message: 'message',
+  progress: 'progress',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type JobEventScalarFieldEnum = (typeof JobEventScalarFieldEnum)[keyof typeof JobEventScalarFieldEnum]
+
+
 export const TranscriptScalarFieldEnum = {
   id: 'id',
   mediaId: 'mediaId',
   jobId: 'jobId',
+  projectId: 'projectId',
   language: 'language',
   source: 'source',
   asrModel: 'asrModel',
@@ -243,6 +407,7 @@ export const VideoChapterScalarFieldEnum = {
   mediaId: 'mediaId',
   transcriptId: 'transcriptId',
   jobId: 'jobId',
+  projectId: 'projectId',
   chapterIndex: 'chapterIndex',
   startTime: 'startTime',
   endTime: 'endTime',
@@ -274,6 +439,7 @@ export const ClipCandidateScalarFieldEnum = {
   transcriptId: 'transcriptId',
   chapterId: 'chapterId',
   jobId: 'jobId',
+  projectId: 'projectId',
   startTime: 'startTime',
   endTime: 'endTime',
   duration: 'duration',
@@ -307,6 +473,7 @@ export const ShortClipScalarFieldEnum = {
   transcriptId: 'transcriptId',
   chapterId: 'chapterId',
   candidateId: 'candidateId',
+  projectId: 'projectId',
   title: 'title',
   caption: 'caption',
   description: 'description',
@@ -332,8 +499,12 @@ export type ShortClipScalarFieldEnum = (typeof ShortClipScalarFieldEnum)[keyof t
 export const GeneratedAssetScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  mediaId: 'mediaId',
+  projectId: 'projectId',
   transcriptId: 'transcriptId',
   chapterId: 'chapterId',
+  shortClipId: 'shortClipId',
+  jobId: 'jobId',
   assetType: 'assetType',
   transcriptVersion: 'transcriptVersion',
   s3Bucket: 's3Bucket',
@@ -352,6 +523,7 @@ export type GeneratedAssetScalarFieldEnum = (typeof GeneratedAssetScalarFieldEnu
 export const AiSuggestionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  projectId: 'projectId',
   targetType: 'targetType',
   targetId: 'targetId',
   suggestionType: 'suggestionType',
@@ -399,6 +571,7 @@ export const PublishTaskScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   mediaId: 'mediaId',
+  projectId: 'projectId',
   shortClipId: 'shortClipId',
   platformAccountId: 'platformAccountId',
   jobId: 'jobId',

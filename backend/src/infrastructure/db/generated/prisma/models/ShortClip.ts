@@ -49,6 +49,7 @@ export type ShortClipMinAggregateOutputType = {
   transcriptId: string | null
   chapterId: string | null
   candidateId: string | null
+  projectId: string | null
   title: string | null
   caption: string | null
   description: string | null
@@ -74,6 +75,7 @@ export type ShortClipMaxAggregateOutputType = {
   transcriptId: string | null
   chapterId: string | null
   candidateId: string | null
+  projectId: string | null
   title: string | null
   caption: string | null
   description: string | null
@@ -99,6 +101,7 @@ export type ShortClipCountAggregateOutputType = {
   transcriptId: number
   chapterId: number
   candidateId: number
+  projectId: number
   title: number
   caption: number
   description: number
@@ -143,6 +146,7 @@ export type ShortClipMinAggregateInputType = {
   transcriptId?: true
   chapterId?: true
   candidateId?: true
+  projectId?: true
   title?: true
   caption?: true
   description?: true
@@ -168,6 +172,7 @@ export type ShortClipMaxAggregateInputType = {
   transcriptId?: true
   chapterId?: true
   candidateId?: true
+  projectId?: true
   title?: true
   caption?: true
   description?: true
@@ -193,6 +198,7 @@ export type ShortClipCountAggregateInputType = {
   transcriptId?: true
   chapterId?: true
   candidateId?: true
+  projectId?: true
   title?: true
   caption?: true
   description?: true
@@ -306,6 +312,7 @@ export type ShortClipGroupByOutputType = {
   transcriptId: string | null
   chapterId: string | null
   candidateId: string | null
+  projectId: string | null
   title: string | null
   caption: string | null
   description: string | null
@@ -355,6 +362,7 @@ export type ShortClipWhereInput = {
   transcriptId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   chapterId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   candidateId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   title?: Prisma.StringNullableFilter<"ShortClip"> | string | null
   caption?: Prisma.StringNullableFilter<"ShortClip"> | string | null
   description?: Prisma.StringNullableFilter<"ShortClip"> | string | null
@@ -377,7 +385,9 @@ export type ShortClipWhereInput = {
   transcript?: Prisma.XOR<Prisma.TranscriptNullableScalarRelationFilter, Prisma.TranscriptWhereInput> | null
   chapter?: Prisma.XOR<Prisma.VideoChapterNullableScalarRelationFilter, Prisma.VideoChapterWhereInput> | null
   candidate?: Prisma.XOR<Prisma.ClipCandidateNullableScalarRelationFilter, Prisma.ClipCandidateWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   publishTasks?: Prisma.PublishTaskListRelationFilter
+  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
 }
 
 export type ShortClipOrderByWithRelationInput = {
@@ -387,6 +397,7 @@ export type ShortClipOrderByWithRelationInput = {
   transcriptId?: Prisma.SortOrderInput | Prisma.SortOrder
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder
   candidateId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -409,7 +420,9 @@ export type ShortClipOrderByWithRelationInput = {
   transcript?: Prisma.TranscriptOrderByWithRelationInput
   chapter?: Prisma.VideoChapterOrderByWithRelationInput
   candidate?: Prisma.ClipCandidateOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
+  generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
 }
 
 export type ShortClipWhereUniqueInput = Prisma.AtLeast<{
@@ -422,6 +435,7 @@ export type ShortClipWhereUniqueInput = Prisma.AtLeast<{
   transcriptId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   chapterId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   candidateId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   title?: Prisma.StringNullableFilter<"ShortClip"> | string | null
   caption?: Prisma.StringNullableFilter<"ShortClip"> | string | null
   description?: Prisma.StringNullableFilter<"ShortClip"> | string | null
@@ -444,7 +458,9 @@ export type ShortClipWhereUniqueInput = Prisma.AtLeast<{
   transcript?: Prisma.XOR<Prisma.TranscriptNullableScalarRelationFilter, Prisma.TranscriptWhereInput> | null
   chapter?: Prisma.XOR<Prisma.VideoChapterNullableScalarRelationFilter, Prisma.VideoChapterWhereInput> | null
   candidate?: Prisma.XOR<Prisma.ClipCandidateNullableScalarRelationFilter, Prisma.ClipCandidateWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   publishTasks?: Prisma.PublishTaskListRelationFilter
+  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
 }, "id">
 
 export type ShortClipOrderByWithAggregationInput = {
@@ -454,6 +470,7 @@ export type ShortClipOrderByWithAggregationInput = {
   transcriptId?: Prisma.SortOrderInput | Prisma.SortOrder
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder
   candidateId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -488,6 +505,7 @@ export type ShortClipScalarWhereWithAggregatesInput = {
   transcriptId?: Prisma.UuidNullableWithAggregatesFilter<"ShortClip"> | string | null
   chapterId?: Prisma.UuidNullableWithAggregatesFilter<"ShortClip"> | string | null
   candidateId?: Prisma.UuidNullableWithAggregatesFilter<"ShortClip"> | string | null
+  projectId?: Prisma.UuidNullableWithAggregatesFilter<"ShortClip"> | string | null
   title?: Prisma.StringNullableWithAggregatesFilter<"ShortClip"> | string | null
   caption?: Prisma.StringNullableWithAggregatesFilter<"ShortClip"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"ShortClip"> | string | null
@@ -531,7 +549,9 @@ export type ShortClipCreateInput = {
   transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
   candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateInput = {
@@ -541,6 +561,7 @@ export type ShortClipUncheckedCreateInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -559,6 +580,7 @@ export type ShortClipUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUpdateInput = {
@@ -585,7 +607,9 @@ export type ShortClipUpdateInput = {
   transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
   candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateInput = {
@@ -595,6 +619,7 @@ export type ShortClipUncheckedUpdateInput = {
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -613,6 +638,7 @@ export type ShortClipUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipCreateManyInput = {
@@ -622,6 +648,7 @@ export type ShortClipCreateManyInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -669,6 +696,7 @@ export type ShortClipUncheckedUpdateManyInput = {
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -705,6 +733,7 @@ export type ShortClipCountOrderByAggregateInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   candidateId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -739,6 +768,7 @@ export type ShortClipMaxOrderByAggregateInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   candidateId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -764,6 +794,7 @@ export type ShortClipMinOrderByAggregateInput = {
   transcriptId?: Prisma.SortOrder
   chapterId?: Prisma.SortOrder
   candidateId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -876,6 +907,48 @@ export type ShortClipUncheckedUpdateManyWithoutMediaNestedInput = {
   connect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
   update?: Prisma.ShortClipUpdateWithWhereUniqueWithoutMediaInput | Prisma.ShortClipUpdateWithWhereUniqueWithoutMediaInput[]
   updateMany?: Prisma.ShortClipUpdateManyWithWhereWithoutMediaInput | Prisma.ShortClipUpdateManyWithWhereWithoutMediaInput[]
+  deleteMany?: Prisma.ShortClipScalarWhereInput | Prisma.ShortClipScalarWhereInput[]
+}
+
+export type ShortClipCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.ShortClipCreateWithoutProjectInput, Prisma.ShortClipUncheckedCreateWithoutProjectInput> | Prisma.ShortClipCreateWithoutProjectInput[] | Prisma.ShortClipUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutProjectInput | Prisma.ShortClipCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.ShortClipCreateManyProjectInputEnvelope
+  connect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+}
+
+export type ShortClipUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.ShortClipCreateWithoutProjectInput, Prisma.ShortClipUncheckedCreateWithoutProjectInput> | Prisma.ShortClipCreateWithoutProjectInput[] | Prisma.ShortClipUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutProjectInput | Prisma.ShortClipCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.ShortClipCreateManyProjectInputEnvelope
+  connect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+}
+
+export type ShortClipUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.ShortClipCreateWithoutProjectInput, Prisma.ShortClipUncheckedCreateWithoutProjectInput> | Prisma.ShortClipCreateWithoutProjectInput[] | Prisma.ShortClipUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutProjectInput | Prisma.ShortClipCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.ShortClipUpsertWithWhereUniqueWithoutProjectInput | Prisma.ShortClipUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.ShortClipCreateManyProjectInputEnvelope
+  set?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  disconnect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  delete?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  connect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  update?: Prisma.ShortClipUpdateWithWhereUniqueWithoutProjectInput | Prisma.ShortClipUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.ShortClipUpdateManyWithWhereWithoutProjectInput | Prisma.ShortClipUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.ShortClipScalarWhereInput | Prisma.ShortClipScalarWhereInput[]
+}
+
+export type ShortClipUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.ShortClipCreateWithoutProjectInput, Prisma.ShortClipUncheckedCreateWithoutProjectInput> | Prisma.ShortClipCreateWithoutProjectInput[] | Prisma.ShortClipUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutProjectInput | Prisma.ShortClipCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.ShortClipUpsertWithWhereUniqueWithoutProjectInput | Prisma.ShortClipUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.ShortClipCreateManyProjectInputEnvelope
+  set?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  disconnect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  delete?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  connect?: Prisma.ShortClipWhereUniqueInput | Prisma.ShortClipWhereUniqueInput[]
+  update?: Prisma.ShortClipUpdateWithWhereUniqueWithoutProjectInput | Prisma.ShortClipUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.ShortClipUpdateManyWithWhereWithoutProjectInput | Prisma.ShortClipUpdateManyWithWhereWithoutProjectInput[]
   deleteMany?: Prisma.ShortClipScalarWhereInput | Prisma.ShortClipScalarWhereInput[]
 }
 
@@ -1009,6 +1082,22 @@ export type EnumShortClipStatusFieldUpdateOperationsInput = {
   set?: $Enums.ShortClipStatus
 }
 
+export type ShortClipCreateNestedOneWithoutGeneratedAssetsInput = {
+  create?: Prisma.XOR<Prisma.ShortClipCreateWithoutGeneratedAssetsInput, Prisma.ShortClipUncheckedCreateWithoutGeneratedAssetsInput>
+  connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutGeneratedAssetsInput
+  connect?: Prisma.ShortClipWhereUniqueInput
+}
+
+export type ShortClipUpdateOneWithoutGeneratedAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.ShortClipCreateWithoutGeneratedAssetsInput, Prisma.ShortClipUncheckedCreateWithoutGeneratedAssetsInput>
+  connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutGeneratedAssetsInput
+  upsert?: Prisma.ShortClipUpsertWithoutGeneratedAssetsInput
+  disconnect?: Prisma.ShortClipWhereInput | boolean
+  delete?: Prisma.ShortClipWhereInput | boolean
+  connect?: Prisma.ShortClipWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ShortClipUpdateToOneWithWhereWithoutGeneratedAssetsInput, Prisma.ShortClipUpdateWithoutGeneratedAssetsInput>, Prisma.ShortClipUncheckedUpdateWithoutGeneratedAssetsInput>
+}
+
 export type ShortClipCreateNestedOneWithoutPublishTasksInput = {
   create?: Prisma.XOR<Prisma.ShortClipCreateWithoutPublishTasksInput, Prisma.ShortClipUncheckedCreateWithoutPublishTasksInput>
   connectOrCreate?: Prisma.ShortClipCreateOrConnectWithoutPublishTasksInput
@@ -1048,7 +1137,9 @@ export type ShortClipCreateWithoutUserInput = {
   transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
   candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateWithoutUserInput = {
@@ -1057,6 +1148,7 @@ export type ShortClipUncheckedCreateWithoutUserInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1075,6 +1167,7 @@ export type ShortClipUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipCreateOrConnectWithoutUserInput = {
@@ -1113,6 +1206,7 @@ export type ShortClipScalarWhereInput = {
   transcriptId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   chapterId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   candidateId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"ShortClip"> | string | null
   title?: Prisma.StringNullableFilter<"ShortClip"> | string | null
   caption?: Prisma.StringNullableFilter<"ShortClip"> | string | null
   description?: Prisma.StringNullableFilter<"ShortClip"> | string | null
@@ -1155,7 +1249,9 @@ export type ShortClipCreateWithoutMediaInput = {
   transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
   candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateWithoutMediaInput = {
@@ -1164,6 +1260,7 @@ export type ShortClipUncheckedCreateWithoutMediaInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1182,6 +1279,7 @@ export type ShortClipUncheckedCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipCreateOrConnectWithoutMediaInput = {
@@ -1210,6 +1308,88 @@ export type ShortClipUpdateManyWithWhereWithoutMediaInput = {
   data: Prisma.XOR<Prisma.ShortClipUpdateManyMutationInput, Prisma.ShortClipUncheckedUpdateManyWithoutMediaInput>
 }
 
+export type ShortClipCreateWithoutProjectInput = {
+  id?: string
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion?: number | null
+  score?: number | null
+  reason?: string | null
+  videoPath?: string | null
+  thumbnailPath?: string | null
+  subtitlePath?: string | null
+  aspectRatio?: string | null
+  status?: $Enums.ShortClipStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media: Prisma.MediaCreateNestedOneWithoutShortClipsInput
+  user: Prisma.UserCreateNestedOneWithoutShortClipsInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
+  chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
+  candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
+}
+
+export type ShortClipUncheckedCreateWithoutProjectInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  transcriptId?: string | null
+  chapterId?: string | null
+  candidateId?: string | null
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion?: number | null
+  score?: number | null
+  reason?: string | null
+  videoPath?: string | null
+  thumbnailPath?: string | null
+  subtitlePath?: string | null
+  aspectRatio?: string | null
+  status?: $Enums.ShortClipStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
+}
+
+export type ShortClipCreateOrConnectWithoutProjectInput = {
+  where: Prisma.ShortClipWhereUniqueInput
+  create: Prisma.XOR<Prisma.ShortClipCreateWithoutProjectInput, Prisma.ShortClipUncheckedCreateWithoutProjectInput>
+}
+
+export type ShortClipCreateManyProjectInputEnvelope = {
+  data: Prisma.ShortClipCreateManyProjectInput | Prisma.ShortClipCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type ShortClipUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.ShortClipWhereUniqueInput
+  update: Prisma.XOR<Prisma.ShortClipUpdateWithoutProjectInput, Prisma.ShortClipUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.ShortClipCreateWithoutProjectInput, Prisma.ShortClipUncheckedCreateWithoutProjectInput>
+}
+
+export type ShortClipUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.ShortClipWhereUniqueInput
+  data: Prisma.XOR<Prisma.ShortClipUpdateWithoutProjectInput, Prisma.ShortClipUncheckedUpdateWithoutProjectInput>
+}
+
+export type ShortClipUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.ShortClipScalarWhereInput
+  data: Prisma.XOR<Prisma.ShortClipUpdateManyMutationInput, Prisma.ShortClipUncheckedUpdateManyWithoutProjectInput>
+}
+
 export type ShortClipCreateWithoutTranscriptInput = {
   id?: string
   title?: string | null
@@ -1233,7 +1413,9 @@ export type ShortClipCreateWithoutTranscriptInput = {
   user: Prisma.UserCreateNestedOneWithoutShortClipsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
   candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateWithoutTranscriptInput = {
@@ -1242,6 +1424,7 @@ export type ShortClipUncheckedCreateWithoutTranscriptInput = {
   userId: string
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1260,6 +1443,7 @@ export type ShortClipUncheckedCreateWithoutTranscriptInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipCreateOrConnectWithoutTranscriptInput = {
@@ -1311,7 +1495,9 @@ export type ShortClipCreateWithoutChapterInput = {
   user: Prisma.UserCreateNestedOneWithoutShortClipsInput
   transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
   candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateWithoutChapterInput = {
@@ -1320,6 +1506,7 @@ export type ShortClipUncheckedCreateWithoutChapterInput = {
   userId: string
   transcriptId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1338,6 +1525,7 @@ export type ShortClipUncheckedCreateWithoutChapterInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipCreateOrConnectWithoutChapterInput = {
@@ -1389,7 +1577,9 @@ export type ShortClipCreateWithoutCandidateInput = {
   user: Prisma.UserCreateNestedOneWithoutShortClipsInput
   transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateWithoutCandidateInput = {
@@ -1398,6 +1588,7 @@ export type ShortClipUncheckedCreateWithoutCandidateInput = {
   userId: string
   transcriptId?: string | null
   chapterId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1416,6 +1607,7 @@ export type ShortClipUncheckedCreateWithoutCandidateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipCreateOrConnectWithoutCandidateInput = {
@@ -1444,6 +1636,134 @@ export type ShortClipUpdateManyWithWhereWithoutCandidateInput = {
   data: Prisma.XOR<Prisma.ShortClipUpdateManyMutationInput, Prisma.ShortClipUncheckedUpdateManyWithoutCandidateInput>
 }
 
+export type ShortClipCreateWithoutGeneratedAssetsInput = {
+  id?: string
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion?: number | null
+  score?: number | null
+  reason?: string | null
+  videoPath?: string | null
+  thumbnailPath?: string | null
+  subtitlePath?: string | null
+  aspectRatio?: string | null
+  status?: $Enums.ShortClipStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media: Prisma.MediaCreateNestedOneWithoutShortClipsInput
+  user: Prisma.UserCreateNestedOneWithoutShortClipsInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
+  chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
+  candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutShortClipInput
+}
+
+export type ShortClipUncheckedCreateWithoutGeneratedAssetsInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  transcriptId?: string | null
+  chapterId?: string | null
+  candidateId?: string | null
+  projectId?: string | null
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion?: number | null
+  score?: number | null
+  reason?: string | null
+  videoPath?: string | null
+  thumbnailPath?: string | null
+  subtitlePath?: string | null
+  aspectRatio?: string | null
+  status?: $Enums.ShortClipStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutShortClipInput
+}
+
+export type ShortClipCreateOrConnectWithoutGeneratedAssetsInput = {
+  where: Prisma.ShortClipWhereUniqueInput
+  create: Prisma.XOR<Prisma.ShortClipCreateWithoutGeneratedAssetsInput, Prisma.ShortClipUncheckedCreateWithoutGeneratedAssetsInput>
+}
+
+export type ShortClipUpsertWithoutGeneratedAssetsInput = {
+  update: Prisma.XOR<Prisma.ShortClipUpdateWithoutGeneratedAssetsInput, Prisma.ShortClipUncheckedUpdateWithoutGeneratedAssetsInput>
+  create: Prisma.XOR<Prisma.ShortClipCreateWithoutGeneratedAssetsInput, Prisma.ShortClipUncheckedCreateWithoutGeneratedAssetsInput>
+  where?: Prisma.ShortClipWhereInput
+}
+
+export type ShortClipUpdateToOneWithWhereWithoutGeneratedAssetsInput = {
+  where?: Prisma.ShortClipWhereInput
+  data: Prisma.XOR<Prisma.ShortClipUpdateWithoutGeneratedAssetsInput, Prisma.ShortClipUncheckedUpdateWithoutGeneratedAssetsInput>
+}
+
+export type ShortClipUpdateWithoutGeneratedAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtitlePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aspectRatio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumShortClipStatusFieldUpdateOperationsInput | $Enums.ShortClipStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateOneRequiredWithoutShortClipsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutShortClipsNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
+  chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
+  candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+}
+
+export type ShortClipUncheckedUpdateWithoutGeneratedAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtitlePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aspectRatio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumShortClipStatusFieldUpdateOperationsInput | $Enums.ShortClipStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+}
+
 export type ShortClipCreateWithoutPublishTasksInput = {
   id?: string
   title?: string | null
@@ -1468,6 +1788,8 @@ export type ShortClipCreateWithoutPublishTasksInput = {
   transcript?: Prisma.TranscriptCreateNestedOneWithoutShortClipsInput
   chapter?: Prisma.VideoChapterCreateNestedOneWithoutShortClipsInput
   candidate?: Prisma.ClipCandidateCreateNestedOneWithoutShortClipsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutShortClipsInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipUncheckedCreateWithoutPublishTasksInput = {
@@ -1477,6 +1799,7 @@ export type ShortClipUncheckedCreateWithoutPublishTasksInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1494,6 +1817,7 @@ export type ShortClipUncheckedCreateWithoutPublishTasksInput = {
   status?: $Enums.ShortClipStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutShortClipInput
 }
 
 export type ShortClipCreateOrConnectWithoutPublishTasksInput = {
@@ -1536,6 +1860,8 @@ export type ShortClipUpdateWithoutPublishTasksInput = {
   transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
   candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateWithoutPublishTasksInput = {
@@ -1545,6 +1871,7 @@ export type ShortClipUncheckedUpdateWithoutPublishTasksInput = {
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1562,6 +1889,7 @@ export type ShortClipUncheckedUpdateWithoutPublishTasksInput = {
   status?: Prisma.EnumShortClipStatusFieldUpdateOperationsInput | $Enums.ShortClipStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipCreateManyUserInput = {
@@ -1570,6 +1898,7 @@ export type ShortClipCreateManyUserInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1612,7 +1941,9 @@ export type ShortClipUpdateWithoutUserInput = {
   transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
   candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateWithoutUserInput = {
@@ -1621,6 +1952,7 @@ export type ShortClipUncheckedUpdateWithoutUserInput = {
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1639,6 +1971,7 @@ export type ShortClipUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateManyWithoutUserInput = {
@@ -1647,6 +1980,7 @@ export type ShortClipUncheckedUpdateManyWithoutUserInput = {
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1672,6 +2006,7 @@ export type ShortClipCreateManyMediaInput = {
   transcriptId?: string | null
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1714,11 +2049,122 @@ export type ShortClipUpdateWithoutMediaInput = {
   transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
   candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtitlePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aspectRatio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumShortClipStatusFieldUpdateOperationsInput | $Enums.ShortClipStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
+}
+
+export type ShortClipUncheckedUpdateManyWithoutMediaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtitlePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aspectRatio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumShortClipStatusFieldUpdateOperationsInput | $Enums.ShortClipStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ShortClipCreateManyProjectInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  transcriptId?: string | null
+  chapterId?: string | null
+  candidateId?: string | null
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime: number
+  endTime: number
+  duration: number
+  transcriptVersion?: number | null
+  score?: number | null
+  reason?: string | null
+  videoPath?: string | null
+  thumbnailPath?: string | null
+  subtitlePath?: string | null
+  aspectRatio?: string | null
+  status?: $Enums.ShortClipStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ShortClipUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
+  duration?: Prisma.FloatFieldUpdateOperationsInput | number
+  transcriptVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtitlePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aspectRatio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumShortClipStatusFieldUpdateOperationsInput | $Enums.ShortClipStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateOneRequiredWithoutShortClipsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutShortClipsNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
+  chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
+  candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
+}
+
+export type ShortClipUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1741,10 +2187,12 @@ export type ShortClipUncheckedUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
-export type ShortClipUncheckedUpdateManyWithoutMediaInput = {
+export type ShortClipUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1774,6 +2222,7 @@ export type ShortClipCreateManyTranscriptInput = {
   userId: string
   chapterId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1816,7 +2265,9 @@ export type ShortClipUpdateWithoutTranscriptInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutShortClipsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
   candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateWithoutTranscriptInput = {
@@ -1825,6 +2276,7 @@ export type ShortClipUncheckedUpdateWithoutTranscriptInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1843,6 +2295,7 @@ export type ShortClipUncheckedUpdateWithoutTranscriptInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateManyWithoutTranscriptInput = {
@@ -1851,6 +2304,7 @@ export type ShortClipUncheckedUpdateManyWithoutTranscriptInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1876,6 +2330,7 @@ export type ShortClipCreateManyChapterInput = {
   userId: string
   transcriptId?: string | null
   candidateId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -1918,7 +2373,9 @@ export type ShortClipUpdateWithoutChapterInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutShortClipsNestedInput
   transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
   candidate?: Prisma.ClipCandidateUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateWithoutChapterInput = {
@@ -1927,6 +2384,7 @@ export type ShortClipUncheckedUpdateWithoutChapterInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1945,6 +2403,7 @@ export type ShortClipUncheckedUpdateWithoutChapterInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateManyWithoutChapterInput = {
@@ -1953,6 +2412,7 @@ export type ShortClipUncheckedUpdateManyWithoutChapterInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1978,6 +2438,7 @@ export type ShortClipCreateManyCandidateInput = {
   userId: string
   transcriptId?: string | null
   chapterId?: string | null
+  projectId?: string | null
   title?: string | null
   caption?: string | null
   description?: string | null
@@ -2020,7 +2481,9 @@ export type ShortClipUpdateWithoutCandidateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutShortClipsNestedInput
   transcript?: Prisma.TranscriptUpdateOneWithoutShortClipsNestedInput
   chapter?: Prisma.VideoChapterUpdateOneWithoutShortClipsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutShortClipsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateWithoutCandidateInput = {
@@ -2029,6 +2492,7 @@ export type ShortClipUncheckedUpdateWithoutCandidateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2047,6 +2511,7 @@ export type ShortClipUncheckedUpdateWithoutCandidateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutShortClipNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutShortClipNestedInput
 }
 
 export type ShortClipUncheckedUpdateManyWithoutCandidateInput = {
@@ -2055,6 +2520,7 @@ export type ShortClipUncheckedUpdateManyWithoutCandidateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   transcriptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2081,10 +2547,12 @@ export type ShortClipUncheckedUpdateManyWithoutCandidateInput = {
 
 export type ShortClipCountOutputType = {
   publishTasks: number
+  generatedAssets: number
 }
 
 export type ShortClipCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   publishTasks?: boolean | ShortClipCountOutputTypeCountPublishTasksArgs
+  generatedAssets?: boolean | ShortClipCountOutputTypeCountGeneratedAssetsArgs
 }
 
 /**
@@ -2104,6 +2572,13 @@ export type ShortClipCountOutputTypeCountPublishTasksArgs<ExtArgs extends runtim
   where?: Prisma.PublishTaskWhereInput
 }
 
+/**
+ * ShortClipCountOutputType without action
+ */
+export type ShortClipCountOutputTypeCountGeneratedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GeneratedAssetWhereInput
+}
+
 
 export type ShortClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2112,6 +2587,7 @@ export type ShortClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   transcriptId?: boolean
   chapterId?: boolean
   candidateId?: boolean
+  projectId?: boolean
   title?: boolean
   caption?: boolean
   description?: boolean
@@ -2134,7 +2610,9 @@ export type ShortClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   transcript?: boolean | Prisma.ShortClip$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.ShortClip$chapterArgs<ExtArgs>
   candidate?: boolean | Prisma.ShortClip$candidateArgs<ExtArgs>
+  project?: boolean | Prisma.ShortClip$projectArgs<ExtArgs>
   publishTasks?: boolean | Prisma.ShortClip$publishTasksArgs<ExtArgs>
+  generatedAssets?: boolean | Prisma.ShortClip$generatedAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.ShortClipCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shortClip"]>
 
@@ -2145,6 +2623,7 @@ export type ShortClipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   transcriptId?: boolean
   chapterId?: boolean
   candidateId?: boolean
+  projectId?: boolean
   title?: boolean
   caption?: boolean
   description?: boolean
@@ -2167,6 +2646,7 @@ export type ShortClipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   transcript?: boolean | Prisma.ShortClip$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.ShortClip$chapterArgs<ExtArgs>
   candidate?: boolean | Prisma.ShortClip$candidateArgs<ExtArgs>
+  project?: boolean | Prisma.ShortClip$projectArgs<ExtArgs>
 }, ExtArgs["result"]["shortClip"]>
 
 export type ShortClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2176,6 +2656,7 @@ export type ShortClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   transcriptId?: boolean
   chapterId?: boolean
   candidateId?: boolean
+  projectId?: boolean
   title?: boolean
   caption?: boolean
   description?: boolean
@@ -2198,6 +2679,7 @@ export type ShortClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   transcript?: boolean | Prisma.ShortClip$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.ShortClip$chapterArgs<ExtArgs>
   candidate?: boolean | Prisma.ShortClip$candidateArgs<ExtArgs>
+  project?: boolean | Prisma.ShortClip$projectArgs<ExtArgs>
 }, ExtArgs["result"]["shortClip"]>
 
 export type ShortClipSelectScalar = {
@@ -2207,6 +2689,7 @@ export type ShortClipSelectScalar = {
   transcriptId?: boolean
   chapterId?: boolean
   candidateId?: boolean
+  projectId?: boolean
   title?: boolean
   caption?: boolean
   description?: boolean
@@ -2226,14 +2709,16 @@ export type ShortClipSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ShortClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "userId" | "transcriptId" | "chapterId" | "candidateId" | "title" | "caption" | "description" | "hashtags" | "startTime" | "endTime" | "duration" | "transcriptVersion" | "score" | "reason" | "videoPath" | "thumbnailPath" | "subtitlePath" | "aspectRatio" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["shortClip"]>
+export type ShortClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "userId" | "transcriptId" | "chapterId" | "candidateId" | "projectId" | "title" | "caption" | "description" | "hashtags" | "startTime" | "endTime" | "duration" | "transcriptVersion" | "score" | "reason" | "videoPath" | "thumbnailPath" | "subtitlePath" | "aspectRatio" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["shortClip"]>
 export type ShortClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   transcript?: boolean | Prisma.ShortClip$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.ShortClip$chapterArgs<ExtArgs>
   candidate?: boolean | Prisma.ShortClip$candidateArgs<ExtArgs>
+  project?: boolean | Prisma.ShortClip$projectArgs<ExtArgs>
   publishTasks?: boolean | Prisma.ShortClip$publishTasksArgs<ExtArgs>
+  generatedAssets?: boolean | Prisma.ShortClip$generatedAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.ShortClipCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ShortClipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2242,6 +2727,7 @@ export type ShortClipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   transcript?: boolean | Prisma.ShortClip$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.ShortClip$chapterArgs<ExtArgs>
   candidate?: boolean | Prisma.ShortClip$candidateArgs<ExtArgs>
+  project?: boolean | Prisma.ShortClip$projectArgs<ExtArgs>
 }
 export type ShortClipIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -2249,6 +2735,7 @@ export type ShortClipIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   transcript?: boolean | Prisma.ShortClip$transcriptArgs<ExtArgs>
   chapter?: boolean | Prisma.ShortClip$chapterArgs<ExtArgs>
   candidate?: boolean | Prisma.ShortClip$candidateArgs<ExtArgs>
+  project?: boolean | Prisma.ShortClip$projectArgs<ExtArgs>
 }
 
 export type $ShortClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2259,7 +2746,9 @@ export type $ShortClipPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     transcript: Prisma.$TranscriptPayload<ExtArgs> | null
     chapter: Prisma.$VideoChapterPayload<ExtArgs> | null
     candidate: Prisma.$ClipCandidatePayload<ExtArgs> | null
+    project: Prisma.$ProjectPayload<ExtArgs> | null
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
+    generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2268,6 +2757,7 @@ export type $ShortClipPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     transcriptId: string | null
     chapterId: string | null
     candidateId: string | null
+    projectId: string | null
     title: string | null
     caption: string | null
     description: string | null
@@ -2684,7 +3174,9 @@ export interface Prisma__ShortClipClient<T, Null = never, ExtArgs extends runtim
   transcript<T extends Prisma.ShortClip$transcriptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShortClip$transcriptArgs<ExtArgs>>): Prisma.Prisma__TranscriptClient<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   chapter<T extends Prisma.ShortClip$chapterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShortClip$chapterArgs<ExtArgs>>): Prisma.Prisma__VideoChapterClient<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   candidate<T extends Prisma.ShortClip$candidateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShortClip$candidateArgs<ExtArgs>>): Prisma.Prisma__ClipCandidateClient<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.ShortClip$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShortClip$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   publishTasks<T extends Prisma.ShortClip$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShortClip$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  generatedAssets<T extends Prisma.ShortClip$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShortClip$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2720,6 +3212,7 @@ export interface ShortClipFieldRefs {
   readonly transcriptId: Prisma.FieldRef<"ShortClip", 'String'>
   readonly chapterId: Prisma.FieldRef<"ShortClip", 'String'>
   readonly candidateId: Prisma.FieldRef<"ShortClip", 'String'>
+  readonly projectId: Prisma.FieldRef<"ShortClip", 'String'>
   readonly title: Prisma.FieldRef<"ShortClip", 'String'>
   readonly caption: Prisma.FieldRef<"ShortClip", 'String'>
   readonly description: Prisma.FieldRef<"ShortClip", 'String'>
@@ -3195,6 +3688,25 @@ export type ShortClip$candidateArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
+ * ShortClip.project
+ */
+export type ShortClip$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
+}
+
+/**
  * ShortClip.publishTasks
  */
 export type ShortClip$publishTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3216,6 +3728,30 @@ export type ShortClip$publishTasksArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PublishTaskScalarFieldEnum | Prisma.PublishTaskScalarFieldEnum[]
+}
+
+/**
+ * ShortClip.generatedAssets
+ */
+export type ShortClip$generatedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GeneratedAsset
+   */
+  select?: Prisma.GeneratedAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GeneratedAsset
+   */
+  omit?: Prisma.GeneratedAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GeneratedAssetInclude<ExtArgs> | null
+  where?: Prisma.GeneratedAssetWhereInput
+  orderBy?: Prisma.GeneratedAssetOrderByWithRelationInput | Prisma.GeneratedAssetOrderByWithRelationInput[]
+  cursor?: Prisma.GeneratedAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GeneratedAssetScalarFieldEnum | Prisma.GeneratedAssetScalarFieldEnum[]
 }
 
 /**

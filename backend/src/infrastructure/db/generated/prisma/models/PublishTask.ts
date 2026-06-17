@@ -28,6 +28,7 @@ export type PublishTaskMinAggregateOutputType = {
   id: string | null
   userId: string | null
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
   platformAccountId: string | null
   jobId: string | null
@@ -49,6 +50,7 @@ export type PublishTaskMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
   platformAccountId: string | null
   jobId: string | null
@@ -70,6 +72,7 @@ export type PublishTaskCountAggregateOutputType = {
   id: number
   userId: number
   mediaId: number
+  projectId: number
   shortClipId: number
   platformAccountId: number
   jobId: number
@@ -94,6 +97,7 @@ export type PublishTaskMinAggregateInputType = {
   id?: true
   userId?: true
   mediaId?: true
+  projectId?: true
   shortClipId?: true
   platformAccountId?: true
   jobId?: true
@@ -115,6 +119,7 @@ export type PublishTaskMaxAggregateInputType = {
   id?: true
   userId?: true
   mediaId?: true
+  projectId?: true
   shortClipId?: true
   platformAccountId?: true
   jobId?: true
@@ -136,6 +141,7 @@ export type PublishTaskCountAggregateInputType = {
   id?: true
   userId?: true
   mediaId?: true
+  projectId?: true
   shortClipId?: true
   platformAccountId?: true
   jobId?: true
@@ -231,6 +237,7 @@ export type PublishTaskGroupByOutputType = {
   id: string
   userId: string
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
   platformAccountId: string | null
   jobId: string | null
@@ -274,6 +281,7 @@ export type PublishTaskWhereInput = {
   id?: Prisma.UuidFilter<"PublishTask"> | string
   userId?: Prisma.UuidFilter<"PublishTask"> | string
   mediaId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   shortClipId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   platformAccountId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   jobId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
@@ -292,6 +300,7 @@ export type PublishTaskWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   media?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   shortClip?: Prisma.XOR<Prisma.ShortClipNullableScalarRelationFilter, Prisma.ShortClipWhereInput> | null
   platformAccount?: Prisma.XOR<Prisma.PlatformAccountNullableScalarRelationFilter, Prisma.PlatformAccountWhereInput> | null
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
@@ -301,6 +310,7 @@ export type PublishTaskOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   shortClipId?: Prisma.SortOrderInput | Prisma.SortOrder
   platformAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -319,6 +329,7 @@ export type PublishTaskOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   media?: Prisma.MediaOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
   shortClip?: Prisma.ShortClipOrderByWithRelationInput
   platformAccount?: Prisma.PlatformAccountOrderByWithRelationInput
   job?: Prisma.ProcessingJobOrderByWithRelationInput
@@ -331,6 +342,7 @@ export type PublishTaskWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PublishTaskWhereInput | Prisma.PublishTaskWhereInput[]
   userId?: Prisma.UuidFilter<"PublishTask"> | string
   mediaId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   shortClipId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   platformAccountId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   jobId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
@@ -349,6 +361,7 @@ export type PublishTaskWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   media?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   shortClip?: Prisma.XOR<Prisma.ShortClipNullableScalarRelationFilter, Prisma.ShortClipWhereInput> | null
   platformAccount?: Prisma.XOR<Prisma.PlatformAccountNullableScalarRelationFilter, Prisma.PlatformAccountWhereInput> | null
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
@@ -358,6 +371,7 @@ export type PublishTaskOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   shortClipId?: Prisma.SortOrderInput | Prisma.SortOrder
   platformAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -386,6 +400,7 @@ export type PublishTaskScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"PublishTask"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"PublishTask"> | string
   mediaId?: Prisma.UuidNullableWithAggregatesFilter<"PublishTask"> | string | null
+  projectId?: Prisma.UuidNullableWithAggregatesFilter<"PublishTask"> | string | null
   shortClipId?: Prisma.UuidNullableWithAggregatesFilter<"PublishTask"> | string | null
   platformAccountId?: Prisma.UuidNullableWithAggregatesFilter<"PublishTask"> | string | null
   jobId?: Prisma.UuidNullableWithAggregatesFilter<"PublishTask"> | string | null
@@ -421,6 +436,7 @@ export type PublishTaskCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
   media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
+  project?: Prisma.ProjectCreateNestedOneWithoutPublishTasksInput
   shortClip?: Prisma.ShortClipCreateNestedOneWithoutPublishTasksInput
   platformAccount?: Prisma.PlatformAccountCreateNestedOneWithoutPublishTasksInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutPublishTasksInput
@@ -430,6 +446,7 @@ export type PublishTaskUncheckedCreateInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
@@ -465,6 +482,7 @@ export type PublishTaskUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
   media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutPublishTasksNestedInput
   shortClip?: Prisma.ShortClipUpdateOneWithoutPublishTasksNestedInput
   platformAccount?: Prisma.PlatformAccountUpdateOneWithoutPublishTasksNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutPublishTasksNestedInput
@@ -474,6 +492,7 @@ export type PublishTaskUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -496,6 +515,7 @@ export type PublishTaskCreateManyInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
@@ -535,6 +555,7 @@ export type PublishTaskUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -567,6 +588,7 @@ export type PublishTaskCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   shortClipId?: Prisma.SortOrder
   platformAccountId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
@@ -589,6 +611,7 @@ export type PublishTaskMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   shortClipId?: Prisma.SortOrder
   platformAccountId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
@@ -610,6 +633,7 @@ export type PublishTaskMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   shortClipId?: Prisma.SortOrder
   platformAccountId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
@@ -708,6 +732,48 @@ export type PublishTaskUncheckedUpdateManyWithoutMediaNestedInput = {
   connect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
   update?: Prisma.PublishTaskUpdateWithWhereUniqueWithoutMediaInput | Prisma.PublishTaskUpdateWithWhereUniqueWithoutMediaInput[]
   updateMany?: Prisma.PublishTaskUpdateManyWithWhereWithoutMediaInput | Prisma.PublishTaskUpdateManyWithWhereWithoutMediaInput[]
+  deleteMany?: Prisma.PublishTaskScalarWhereInput | Prisma.PublishTaskScalarWhereInput[]
+}
+
+export type PublishTaskCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.PublishTaskCreateWithoutProjectInput, Prisma.PublishTaskUncheckedCreateWithoutProjectInput> | Prisma.PublishTaskCreateWithoutProjectInput[] | Prisma.PublishTaskUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.PublishTaskCreateOrConnectWithoutProjectInput | Prisma.PublishTaskCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.PublishTaskCreateManyProjectInputEnvelope
+  connect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+}
+
+export type PublishTaskUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.PublishTaskCreateWithoutProjectInput, Prisma.PublishTaskUncheckedCreateWithoutProjectInput> | Prisma.PublishTaskCreateWithoutProjectInput[] | Prisma.PublishTaskUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.PublishTaskCreateOrConnectWithoutProjectInput | Prisma.PublishTaskCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.PublishTaskCreateManyProjectInputEnvelope
+  connect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+}
+
+export type PublishTaskUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.PublishTaskCreateWithoutProjectInput, Prisma.PublishTaskUncheckedCreateWithoutProjectInput> | Prisma.PublishTaskCreateWithoutProjectInput[] | Prisma.PublishTaskUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.PublishTaskCreateOrConnectWithoutProjectInput | Prisma.PublishTaskCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.PublishTaskUpsertWithWhereUniqueWithoutProjectInput | Prisma.PublishTaskUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.PublishTaskCreateManyProjectInputEnvelope
+  set?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  disconnect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  delete?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  connect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  update?: Prisma.PublishTaskUpdateWithWhereUniqueWithoutProjectInput | Prisma.PublishTaskUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.PublishTaskUpdateManyWithWhereWithoutProjectInput | Prisma.PublishTaskUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.PublishTaskScalarWhereInput | Prisma.PublishTaskScalarWhereInput[]
+}
+
+export type PublishTaskUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.PublishTaskCreateWithoutProjectInput, Prisma.PublishTaskUncheckedCreateWithoutProjectInput> | Prisma.PublishTaskCreateWithoutProjectInput[] | Prisma.PublishTaskUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.PublishTaskCreateOrConnectWithoutProjectInput | Prisma.PublishTaskCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.PublishTaskUpsertWithWhereUniqueWithoutProjectInput | Prisma.PublishTaskUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.PublishTaskCreateManyProjectInputEnvelope
+  set?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  disconnect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  delete?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  connect?: Prisma.PublishTaskWhereUniqueInput | Prisma.PublishTaskWhereUniqueInput[]
+  update?: Prisma.PublishTaskUpdateWithWhereUniqueWithoutProjectInput | Prisma.PublishTaskUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.PublishTaskUpdateManyWithWhereWithoutProjectInput | Prisma.PublishTaskUpdateManyWithWhereWithoutProjectInput[]
   deleteMany?: Prisma.PublishTaskScalarWhereInput | Prisma.PublishTaskScalarWhereInput[]
 }
 
@@ -857,6 +923,7 @@ export type PublishTaskCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
+  project?: Prisma.ProjectCreateNestedOneWithoutPublishTasksInput
   shortClip?: Prisma.ShortClipCreateNestedOneWithoutPublishTasksInput
   platformAccount?: Prisma.PlatformAccountCreateNestedOneWithoutPublishTasksInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutPublishTasksInput
@@ -865,6 +932,7 @@ export type PublishTaskCreateWithoutUserInput = {
 export type PublishTaskUncheckedCreateWithoutUserInput = {
   id?: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
@@ -916,6 +984,7 @@ export type PublishTaskScalarWhereInput = {
   id?: Prisma.UuidFilter<"PublishTask"> | string
   userId?: Prisma.UuidFilter<"PublishTask"> | string
   mediaId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   shortClipId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   platformAccountId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
   jobId?: Prisma.UuidNullableFilter<"PublishTask"> | string | null
@@ -950,6 +1019,7 @@ export type PublishTaskCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
+  project?: Prisma.ProjectCreateNestedOneWithoutPublishTasksInput
   shortClip?: Prisma.ShortClipCreateNestedOneWithoutPublishTasksInput
   platformAccount?: Prisma.PlatformAccountCreateNestedOneWithoutPublishTasksInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutPublishTasksInput
@@ -958,6 +1028,7 @@ export type PublishTaskCreateWithoutMediaInput = {
 export type PublishTaskUncheckedCreateWithoutMediaInput = {
   id?: string
   userId: string
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
@@ -1002,7 +1073,7 @@ export type PublishTaskUpdateManyWithWhereWithoutMediaInput = {
   data: Prisma.XOR<Prisma.PublishTaskUpdateManyMutationInput, Prisma.PublishTaskUncheckedUpdateManyWithoutMediaInput>
 }
 
-export type PublishTaskCreateWithoutJobInput = {
+export type PublishTaskCreateWithoutProjectInput = {
   id?: string
   platform: $Enums.Platform
   title?: string | null
@@ -1021,12 +1092,84 @@ export type PublishTaskCreateWithoutJobInput = {
   media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
   shortClip?: Prisma.ShortClipCreateNestedOneWithoutPublishTasksInput
   platformAccount?: Prisma.PlatformAccountCreateNestedOneWithoutPublishTasksInput
+  job?: Prisma.ProcessingJobCreateNestedOneWithoutPublishTasksInput
+}
+
+export type PublishTaskUncheckedCreateWithoutProjectInput = {
+  id?: string
+  userId: string
+  mediaId?: string | null
+  shortClipId?: string | null
+  platformAccountId?: string | null
+  jobId?: string | null
+  platform: $Enums.Platform
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.PublishStatus
+  scheduledAt?: Date | string | null
+  publishedAt?: Date | string | null
+  platformPostId?: string | null
+  platformPostUrl?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PublishTaskCreateOrConnectWithoutProjectInput = {
+  where: Prisma.PublishTaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.PublishTaskCreateWithoutProjectInput, Prisma.PublishTaskUncheckedCreateWithoutProjectInput>
+}
+
+export type PublishTaskCreateManyProjectInputEnvelope = {
+  data: Prisma.PublishTaskCreateManyProjectInput | Prisma.PublishTaskCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type PublishTaskUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.PublishTaskWhereUniqueInput
+  update: Prisma.XOR<Prisma.PublishTaskUpdateWithoutProjectInput, Prisma.PublishTaskUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.PublishTaskCreateWithoutProjectInput, Prisma.PublishTaskUncheckedCreateWithoutProjectInput>
+}
+
+export type PublishTaskUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.PublishTaskWhereUniqueInput
+  data: Prisma.XOR<Prisma.PublishTaskUpdateWithoutProjectInput, Prisma.PublishTaskUncheckedUpdateWithoutProjectInput>
+}
+
+export type PublishTaskUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.PublishTaskScalarWhereInput
+  data: Prisma.XOR<Prisma.PublishTaskUpdateManyMutationInput, Prisma.PublishTaskUncheckedUpdateManyWithoutProjectInput>
+}
+
+export type PublishTaskCreateWithoutJobInput = {
+  id?: string
+  platform: $Enums.Platform
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.PublishStatus
+  scheduledAt?: Date | string | null
+  publishedAt?: Date | string | null
+  platformPostId?: string | null
+  platformPostUrl?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
+  media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
+  project?: Prisma.ProjectCreateNestedOneWithoutPublishTasksInput
+  shortClip?: Prisma.ShortClipCreateNestedOneWithoutPublishTasksInput
+  platformAccount?: Prisma.PlatformAccountCreateNestedOneWithoutPublishTasksInput
 }
 
 export type PublishTaskUncheckedCreateWithoutJobInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   platform: $Enums.Platform
@@ -1087,6 +1230,7 @@ export type PublishTaskCreateWithoutShortClipInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
   media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
+  project?: Prisma.ProjectCreateNestedOneWithoutPublishTasksInput
   platformAccount?: Prisma.PlatformAccountCreateNestedOneWithoutPublishTasksInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutPublishTasksInput
 }
@@ -1095,6 +1239,7 @@ export type PublishTaskUncheckedCreateWithoutShortClipInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
   platform: $Enums.Platform
@@ -1155,6 +1300,7 @@ export type PublishTaskCreateWithoutPlatformAccountInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
   media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
+  project?: Prisma.ProjectCreateNestedOneWithoutPublishTasksInput
   shortClip?: Prisma.ShortClipCreateNestedOneWithoutPublishTasksInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutPublishTasksInput
 }
@@ -1163,6 +1309,7 @@ export type PublishTaskUncheckedCreateWithoutPlatformAccountInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   jobId?: string | null
   platform: $Enums.Platform
@@ -1209,6 +1356,7 @@ export type PublishTaskUpdateManyWithWhereWithoutPlatformAccountInput = {
 export type PublishTaskCreateManyUserInput = {
   id?: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
@@ -1243,6 +1391,7 @@ export type PublishTaskUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutPublishTasksNestedInput
   shortClip?: Prisma.ShortClipUpdateOneWithoutPublishTasksNestedInput
   platformAccount?: Prisma.PlatformAccountUpdateOneWithoutPublishTasksNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutPublishTasksNestedInput
@@ -1251,6 +1400,7 @@ export type PublishTaskUpdateWithoutUserInput = {
 export type PublishTaskUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1272,6 +1422,7 @@ export type PublishTaskUncheckedUpdateWithoutUserInput = {
 export type PublishTaskUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1293,6 +1444,7 @@ export type PublishTaskUncheckedUpdateManyWithoutUserInput = {
 export type PublishTaskCreateManyMediaInput = {
   id?: string
   userId: string
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
@@ -1327,6 +1479,7 @@ export type PublishTaskUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutPublishTasksNestedInput
   shortClip?: Prisma.ShortClipUpdateOneWithoutPublishTasksNestedInput
   platformAccount?: Prisma.PlatformAccountUpdateOneWithoutPublishTasksNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutPublishTasksNestedInput
@@ -1335,6 +1488,7 @@ export type PublishTaskUpdateWithoutMediaInput = {
 export type PublishTaskUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1356,6 +1510,95 @@ export type PublishTaskUncheckedUpdateWithoutMediaInput = {
 export type PublishTaskUncheckedUpdateManyWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumPublishStatusFieldUpdateOperationsInput | $Enums.PublishStatus
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PublishTaskCreateManyProjectInput = {
+  id?: string
+  userId: string
+  mediaId?: string | null
+  shortClipId?: string | null
+  platformAccountId?: string | null
+  jobId?: string | null
+  platform: $Enums.Platform
+  title?: string | null
+  caption?: string | null
+  description?: string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.PublishStatus
+  scheduledAt?: Date | string | null
+  publishedAt?: Date | string | null
+  platformPostId?: string | null
+  platformPostUrl?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PublishTaskUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumPublishStatusFieldUpdateOperationsInput | $Enums.PublishStatus
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
+  media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
+  shortClip?: Prisma.ShortClipUpdateOneWithoutPublishTasksNestedInput
+  platformAccount?: Prisma.PlatformAccountUpdateOneWithoutPublishTasksNestedInput
+  job?: Prisma.ProcessingJobUpdateOneWithoutPublishTasksNestedInput
+}
+
+export type PublishTaskUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hashtags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumPublishStatusFieldUpdateOperationsInput | $Enums.PublishStatus
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PublishTaskUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1378,6 +1621,7 @@ export type PublishTaskCreateManyJobInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   platformAccountId?: string | null
   platform: $Enums.Platform
@@ -1412,6 +1656,7 @@ export type PublishTaskUpdateWithoutJobInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
   media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutPublishTasksNestedInput
   shortClip?: Prisma.ShortClipUpdateOneWithoutPublishTasksNestedInput
   platformAccount?: Prisma.PlatformAccountUpdateOneWithoutPublishTasksNestedInput
 }
@@ -1420,6 +1665,7 @@ export type PublishTaskUncheckedUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
@@ -1441,6 +1687,7 @@ export type PublishTaskUncheckedUpdateManyWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
@@ -1462,6 +1709,7 @@ export type PublishTaskCreateManyShortClipInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   platformAccountId?: string | null
   jobId?: string | null
   platform: $Enums.Platform
@@ -1496,6 +1744,7 @@ export type PublishTaskUpdateWithoutShortClipInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
   media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutPublishTasksNestedInput
   platformAccount?: Prisma.PlatformAccountUpdateOneWithoutPublishTasksNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutPublishTasksNestedInput
 }
@@ -1504,6 +1753,7 @@ export type PublishTaskUncheckedUpdateWithoutShortClipInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
@@ -1525,6 +1775,7 @@ export type PublishTaskUncheckedUpdateManyWithoutShortClipInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
@@ -1546,6 +1797,7 @@ export type PublishTaskCreateManyPlatformAccountInput = {
   id?: string
   userId: string
   mediaId?: string | null
+  projectId?: string | null
   shortClipId?: string | null
   jobId?: string | null
   platform: $Enums.Platform
@@ -1580,6 +1832,7 @@ export type PublishTaskUpdateWithoutPlatformAccountInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
   media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutPublishTasksNestedInput
   shortClip?: Prisma.ShortClipUpdateOneWithoutPublishTasksNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutPublishTasksNestedInput
 }
@@ -1588,6 +1841,7 @@ export type PublishTaskUncheckedUpdateWithoutPlatformAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
@@ -1609,6 +1863,7 @@ export type PublishTaskUncheckedUpdateManyWithoutPlatformAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortClipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
@@ -1632,6 +1887,7 @@ export type PublishTaskSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   id?: boolean
   userId?: boolean
   mediaId?: boolean
+  projectId?: boolean
   shortClipId?: boolean
   platformAccountId?: boolean
   jobId?: boolean
@@ -1650,6 +1906,7 @@ export type PublishTaskSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
+  project?: boolean | Prisma.PublishTask$projectArgs<ExtArgs>
   shortClip?: boolean | Prisma.PublishTask$shortClipArgs<ExtArgs>
   platformAccount?: boolean | Prisma.PublishTask$platformAccountArgs<ExtArgs>
   job?: boolean | Prisma.PublishTask$jobArgs<ExtArgs>
@@ -1659,6 +1916,7 @@ export type PublishTaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   id?: boolean
   userId?: boolean
   mediaId?: boolean
+  projectId?: boolean
   shortClipId?: boolean
   platformAccountId?: boolean
   jobId?: boolean
@@ -1677,6 +1935,7 @@ export type PublishTaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
+  project?: boolean | Prisma.PublishTask$projectArgs<ExtArgs>
   shortClip?: boolean | Prisma.PublishTask$shortClipArgs<ExtArgs>
   platformAccount?: boolean | Prisma.PublishTask$platformAccountArgs<ExtArgs>
   job?: boolean | Prisma.PublishTask$jobArgs<ExtArgs>
@@ -1686,6 +1945,7 @@ export type PublishTaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   id?: boolean
   userId?: boolean
   mediaId?: boolean
+  projectId?: boolean
   shortClipId?: boolean
   platformAccountId?: boolean
   jobId?: boolean
@@ -1704,6 +1964,7 @@ export type PublishTaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
+  project?: boolean | Prisma.PublishTask$projectArgs<ExtArgs>
   shortClip?: boolean | Prisma.PublishTask$shortClipArgs<ExtArgs>
   platformAccount?: boolean | Prisma.PublishTask$platformAccountArgs<ExtArgs>
   job?: boolean | Prisma.PublishTask$jobArgs<ExtArgs>
@@ -1713,6 +1974,7 @@ export type PublishTaskSelectScalar = {
   id?: boolean
   userId?: boolean
   mediaId?: boolean
+  projectId?: boolean
   shortClipId?: boolean
   platformAccountId?: boolean
   jobId?: boolean
@@ -1731,10 +1993,11 @@ export type PublishTaskSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PublishTaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "mediaId" | "shortClipId" | "platformAccountId" | "jobId" | "platform" | "title" | "caption" | "description" | "hashtags" | "status" | "scheduledAt" | "publishedAt" | "platformPostId" | "platformPostUrl" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["publishTask"]>
+export type PublishTaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "mediaId" | "projectId" | "shortClipId" | "platformAccountId" | "jobId" | "platform" | "title" | "caption" | "description" | "hashtags" | "status" | "scheduledAt" | "publishedAt" | "platformPostId" | "platformPostUrl" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["publishTask"]>
 export type PublishTaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
+  project?: boolean | Prisma.PublishTask$projectArgs<ExtArgs>
   shortClip?: boolean | Prisma.PublishTask$shortClipArgs<ExtArgs>
   platformAccount?: boolean | Prisma.PublishTask$platformAccountArgs<ExtArgs>
   job?: boolean | Prisma.PublishTask$jobArgs<ExtArgs>
@@ -1742,6 +2005,7 @@ export type PublishTaskInclude<ExtArgs extends runtime.Types.Extensions.Internal
 export type PublishTaskIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
+  project?: boolean | Prisma.PublishTask$projectArgs<ExtArgs>
   shortClip?: boolean | Prisma.PublishTask$shortClipArgs<ExtArgs>
   platformAccount?: boolean | Prisma.PublishTask$platformAccountArgs<ExtArgs>
   job?: boolean | Prisma.PublishTask$jobArgs<ExtArgs>
@@ -1749,6 +2013,7 @@ export type PublishTaskIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type PublishTaskIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
+  project?: boolean | Prisma.PublishTask$projectArgs<ExtArgs>
   shortClip?: boolean | Prisma.PublishTask$shortClipArgs<ExtArgs>
   platformAccount?: boolean | Prisma.PublishTask$platformAccountArgs<ExtArgs>
   job?: boolean | Prisma.PublishTask$jobArgs<ExtArgs>
@@ -1759,6 +2024,7 @@ export type $PublishTaskPayload<ExtArgs extends runtime.Types.Extensions.Interna
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     media: Prisma.$MediaPayload<ExtArgs> | null
+    project: Prisma.$ProjectPayload<ExtArgs> | null
     shortClip: Prisma.$ShortClipPayload<ExtArgs> | null
     platformAccount: Prisma.$PlatformAccountPayload<ExtArgs> | null
     job: Prisma.$ProcessingJobPayload<ExtArgs> | null
@@ -1767,6 +2033,7 @@ export type $PublishTaskPayload<ExtArgs extends runtime.Types.Extensions.Interna
     id: string
     userId: string
     mediaId: string | null
+    projectId: string | null
     shortClipId: string | null
     platformAccountId: string | null
     jobId: string | null
@@ -2179,6 +2446,7 @@ export interface Prisma__PublishTaskClient<T, Null = never, ExtArgs extends runt
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   media<T extends Prisma.PublishTask$mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PublishTask$mediaArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.PublishTask$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PublishTask$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   shortClip<T extends Prisma.PublishTask$shortClipArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PublishTask$shortClipArgs<ExtArgs>>): Prisma.Prisma__ShortClipClient<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   platformAccount<T extends Prisma.PublishTask$platformAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PublishTask$platformAccountArgs<ExtArgs>>): Prisma.Prisma__PlatformAccountClient<runtime.Types.Result.GetResult<Prisma.$PlatformAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   job<T extends Prisma.PublishTask$jobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PublishTask$jobArgs<ExtArgs>>): Prisma.Prisma__ProcessingJobClient<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2214,6 +2482,7 @@ export interface PublishTaskFieldRefs {
   readonly id: Prisma.FieldRef<"PublishTask", 'String'>
   readonly userId: Prisma.FieldRef<"PublishTask", 'String'>
   readonly mediaId: Prisma.FieldRef<"PublishTask", 'String'>
+  readonly projectId: Prisma.FieldRef<"PublishTask", 'String'>
   readonly shortClipId: Prisma.FieldRef<"PublishTask", 'String'>
   readonly platformAccountId: Prisma.FieldRef<"PublishTask", 'String'>
   readonly jobId: Prisma.FieldRef<"PublishTask", 'String'>
@@ -2647,6 +2916,25 @@ export type PublishTask$mediaArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.MediaInclude<ExtArgs> | null
   where?: Prisma.MediaWhereInput
+}
+
+/**
+ * PublishTask.project
+ */
+export type PublishTask$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
 }
 
 /**

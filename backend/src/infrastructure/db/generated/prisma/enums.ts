@@ -27,7 +27,10 @@ export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
 
 export const MediaType = {
   VIDEO: 'VIDEO',
-  IMAGE: 'IMAGE'
+  AUDIO: 'AUDIO',
+  IMAGE: 'IMAGE',
+  SUBTITLE: 'SUBTITLE',
+  DOCUMENT: 'DOCUMENT'
 } as const
 
 export type MediaType = (typeof MediaType)[keyof typeof MediaType]
@@ -43,14 +46,59 @@ export const MediaStatus = {
 export type MediaStatus = (typeof MediaStatus)[keyof typeof MediaStatus]
 
 
+export const ProjectStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED',
+  DELETED: 'DELETED'
+} as const
+
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
+
+
+export const ProjectMediaRole = {
+  SOURCE: 'SOURCE',
+  OVERLAY: 'OVERLAY',
+  AUDIO_BED: 'AUDIO_BED',
+  GENERATED: 'GENERATED',
+  REFERENCE: 'REFERENCE'
+} as const
+
+export type ProjectMediaRole = (typeof ProjectMediaRole)[keyof typeof ProjectMediaRole]
+
+
+export const EditorLayerKind = {
+  TEXT: 'TEXT',
+  CAPTIONS: 'CAPTIONS',
+  IMAGE: 'IMAGE'
+} as const
+
+export type EditorLayerKind = (typeof EditorLayerKind)[keyof typeof EditorLayerKind]
+
+
+export const TimelineTrackType = {
+  TEXT: 'TEXT',
+  IMAGES: 'IMAGES',
+  SOURCE: 'SOURCE',
+  AUDIO: 'AUDIO'
+} as const
+
+export type TimelineTrackType = (typeof TimelineTrackType)[keyof typeof TimelineTrackType]
+
+
 export const JobType = {
   TRANSCRIBE: 'TRANSCRIBE',
   GENERATE_SUBTITLE: 'GENERATE_SUBTITLE',
   GENERATE_CHAPTERS: 'GENERATE_CHAPTERS',
   GENERATE_SHORT_CLIPS: 'GENERATE_SHORT_CLIPS',
+  GENERATE_AI_SUGGESTIONS: 'GENERATE_AI_SUGGESTIONS',
   GENERATE_SUGGESTIONS: 'GENERATE_SUGGESTIONS',
+  RENDER_EXPORT: 'RENDER_EXPORT',
   BURN_SUBTITLE: 'BURN_SUBTITLE',
-  PUBLISH: 'PUBLISH'
+  PUBLISH: 'PUBLISH',
+  MEDIA_TRANSCODE: 'MEDIA_TRANSCODE',
+  THUMBNAIL_GENERATION: 'THUMBNAIL_GENERATION',
+  WAVEFORM_PEAK_GENERATION: 'WAVEFORM_PEAK_GENERATION'
 } as const
 
 export type JobType = (typeof JobType)[keyof typeof JobType]
@@ -59,6 +107,7 @@ export type JobType = (typeof JobType)[keyof typeof JobType]
 export const JobStatus = {
   PENDING: 'PENDING',
   QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
   TRANSCRIBING: 'TRANSCRIBING',
   GENERATING_SUBTITLE: 'GENERATING_SUBTITLE',
   BURNING_SUBTITLE: 'BURNING_SUBTITLE',
@@ -67,7 +116,8 @@ export const JobStatus = {
   GENERATING_SUGGESTIONS: 'GENERATING_SUGGESTIONS',
   PUBLISHING: 'PUBLISHING',
   COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  CANCELED: 'CANCELED'
 } as const
 
 export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]
@@ -135,9 +185,13 @@ export type ShortClipStatus = (typeof ShortClipStatus)[keyof typeof ShortClipSta
 
 
 export const AssetType = {
+  THUMBNAIL: 'THUMBNAIL',
   SUBTITLE_SRT: 'SUBTITLE_SRT',
   SUBTITLE_VTT: 'SUBTITLE_VTT',
-  BURNED_SUBTITLE_VIDEO: 'BURNED_SUBTITLE_VIDEO'
+  BURNED_SUBTITLE_VIDEO: 'BURNED_SUBTITLE_VIDEO',
+  EXPORT_VIDEO: 'EXPORT_VIDEO',
+  EXPORT_AUDIO: 'EXPORT_AUDIO',
+  WAVEFORM_PEAKS: 'WAVEFORM_PEAKS'
 } as const
 
 export type AssetType = (typeof AssetType)[keyof typeof AssetType]
@@ -145,6 +199,8 @@ export type AssetType = (typeof AssetType)[keyof typeof AssetType]
 
 export const TargetType = {
   MEDIA: 'MEDIA',
+  PROJECT: 'PROJECT',
+  TRANSCRIPT: 'TRANSCRIPT',
   VIDEO_CHAPTER: 'VIDEO_CHAPTER',
   SHORT_CLIP: 'SHORT_CLIP',
   PUBLISH_TASK: 'PUBLISH_TASK'
@@ -168,7 +224,9 @@ export const Platform = {
   YOUTUBE: 'YOUTUBE',
   TIKTOK: 'TIKTOK',
   FACEBOOK: 'FACEBOOK',
-  INSTAGRAM: 'INSTAGRAM'
+  INSTAGRAM: 'INSTAGRAM',
+  LINKEDIN: 'LINKEDIN',
+  X: 'X'
 } as const
 
 export type Platform = (typeof Platform)[keyof typeof Platform]

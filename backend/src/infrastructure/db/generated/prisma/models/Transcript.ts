@@ -40,6 +40,7 @@ export type TranscriptMinAggregateOutputType = {
   id: string | null
   mediaId: string | null
   jobId: string | null
+  projectId: string | null
   language: string | null
   source: $Enums.TranscriptSource | null
   asrModel: $Enums.AsrModel | null
@@ -57,6 +58,7 @@ export type TranscriptMaxAggregateOutputType = {
   id: string | null
   mediaId: string | null
   jobId: string | null
+  projectId: string | null
   language: string | null
   source: $Enums.TranscriptSource | null
   asrModel: $Enums.AsrModel | null
@@ -74,6 +76,7 @@ export type TranscriptCountAggregateOutputType = {
   id: number
   mediaId: number
   jobId: number
+  projectId: number
   language: number
   source: number
   asrModel: number
@@ -103,6 +106,7 @@ export type TranscriptMinAggregateInputType = {
   id?: true
   mediaId?: true
   jobId?: true
+  projectId?: true
   language?: true
   source?: true
   asrModel?: true
@@ -120,6 +124,7 @@ export type TranscriptMaxAggregateInputType = {
   id?: true
   mediaId?: true
   jobId?: true
+  projectId?: true
   language?: true
   source?: true
   asrModel?: true
@@ -137,6 +142,7 @@ export type TranscriptCountAggregateInputType = {
   id?: true
   mediaId?: true
   jobId?: true
+  projectId?: true
   language?: true
   source?: true
   asrModel?: true
@@ -241,6 +247,7 @@ export type TranscriptGroupByOutputType = {
   id: string
   mediaId: string
   jobId: string | null
+  projectId: string | null
   language: string | null
   source: $Enums.TranscriptSource
   asrModel: $Enums.AsrModel | null
@@ -281,6 +288,7 @@ export type TranscriptWhereInput = {
   id?: Prisma.UuidFilter<"Transcript"> | string
   mediaId?: Prisma.UuidFilter<"Transcript"> | string
   jobId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceFilter<"Transcript"> | $Enums.TranscriptSource
   asrModel?: Prisma.EnumAsrModelNullableFilter<"Transcript"> | $Enums.AsrModel | null
@@ -294,6 +302,7 @@ export type TranscriptWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   segments?: Prisma.TranscriptSegmentListRelationFilter
   words?: Prisma.TranscriptWordListRelationFilter
   videoChapters?: Prisma.VideoChapterListRelationFilter
@@ -307,6 +316,7 @@ export type TranscriptOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrderInput | Prisma.SortOrder
   source?: Prisma.SortOrder
   asrModel?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -320,6 +330,7 @@ export type TranscriptOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   media?: Prisma.MediaOrderByWithRelationInput
   job?: Prisma.ProcessingJobOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
   segments?: Prisma.TranscriptSegmentOrderByRelationAggregateInput
   words?: Prisma.TranscriptWordOrderByRelationAggregateInput
   videoChapters?: Prisma.VideoChapterOrderByRelationAggregateInput
@@ -336,6 +347,7 @@ export type TranscriptWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TranscriptWhereInput | Prisma.TranscriptWhereInput[]
   mediaId?: Prisma.UuidFilter<"Transcript"> | string
   jobId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceFilter<"Transcript"> | $Enums.TranscriptSource
   asrModel?: Prisma.EnumAsrModelNullableFilter<"Transcript"> | $Enums.AsrModel | null
@@ -349,6 +361,7 @@ export type TranscriptWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   segments?: Prisma.TranscriptSegmentListRelationFilter
   words?: Prisma.TranscriptWordListRelationFilter
   videoChapters?: Prisma.VideoChapterListRelationFilter
@@ -362,6 +375,7 @@ export type TranscriptOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrderInput | Prisma.SortOrder
   source?: Prisma.SortOrder
   asrModel?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -387,6 +401,7 @@ export type TranscriptScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"Transcript"> | string
   mediaId?: Prisma.UuidWithAggregatesFilter<"Transcript"> | string
   jobId?: Prisma.UuidNullableWithAggregatesFilter<"Transcript"> | string | null
+  projectId?: Prisma.UuidNullableWithAggregatesFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableWithAggregatesFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceWithAggregatesFilter<"Transcript"> | $Enums.TranscriptSource
   asrModel?: Prisma.EnumAsrModelNullableWithAggregatesFilter<"Transcript"> | $Enums.AsrModel | null
@@ -415,6 +430,7 @@ export type TranscriptCreateInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -428,6 +444,7 @@ export type TranscriptUncheckedCreateInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -463,6 +480,7 @@ export type TranscriptUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -476,6 +494,7 @@ export type TranscriptUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -500,6 +519,7 @@ export type TranscriptCreateManyInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -532,6 +552,7 @@ export type TranscriptUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -559,6 +580,7 @@ export type TranscriptCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   language?: Prisma.SortOrder
   source?: Prisma.SortOrder
   asrModel?: Prisma.SortOrder
@@ -581,6 +603,7 @@ export type TranscriptMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   language?: Prisma.SortOrder
   source?: Prisma.SortOrder
   asrModel?: Prisma.SortOrder
@@ -598,6 +621,7 @@ export type TranscriptMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   language?: Prisma.SortOrder
   source?: Prisma.SortOrder
   asrModel?: Prisma.SortOrder
@@ -668,6 +692,48 @@ export type TranscriptUncheckedUpdateManyWithoutMediaNestedInput = {
   deleteMany?: Prisma.TranscriptScalarWhereInput | Prisma.TranscriptScalarWhereInput[]
 }
 
+export type TranscriptCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.TranscriptCreateWithoutProjectInput, Prisma.TranscriptUncheckedCreateWithoutProjectInput> | Prisma.TranscriptCreateWithoutProjectInput[] | Prisma.TranscriptUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutProjectInput | Prisma.TranscriptCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.TranscriptCreateManyProjectInputEnvelope
+  connect?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+}
+
+export type TranscriptUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.TranscriptCreateWithoutProjectInput, Prisma.TranscriptUncheckedCreateWithoutProjectInput> | Prisma.TranscriptCreateWithoutProjectInput[] | Prisma.TranscriptUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutProjectInput | Prisma.TranscriptCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.TranscriptCreateManyProjectInputEnvelope
+  connect?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+}
+
+export type TranscriptUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.TranscriptCreateWithoutProjectInput, Prisma.TranscriptUncheckedCreateWithoutProjectInput> | Prisma.TranscriptCreateWithoutProjectInput[] | Prisma.TranscriptUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutProjectInput | Prisma.TranscriptCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.TranscriptUpsertWithWhereUniqueWithoutProjectInput | Prisma.TranscriptUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.TranscriptCreateManyProjectInputEnvelope
+  set?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  disconnect?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  delete?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  connect?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  update?: Prisma.TranscriptUpdateWithWhereUniqueWithoutProjectInput | Prisma.TranscriptUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.TranscriptUpdateManyWithWhereWithoutProjectInput | Prisma.TranscriptUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.TranscriptScalarWhereInput | Prisma.TranscriptScalarWhereInput[]
+}
+
+export type TranscriptUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.TranscriptCreateWithoutProjectInput, Prisma.TranscriptUncheckedCreateWithoutProjectInput> | Prisma.TranscriptCreateWithoutProjectInput[] | Prisma.TranscriptUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutProjectInput | Prisma.TranscriptCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.TranscriptUpsertWithWhereUniqueWithoutProjectInput | Prisma.TranscriptUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.TranscriptCreateManyProjectInputEnvelope
+  set?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  disconnect?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  delete?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  connect?: Prisma.TranscriptWhereUniqueInput | Prisma.TranscriptWhereUniqueInput[]
+  update?: Prisma.TranscriptUpdateWithWhereUniqueWithoutProjectInput | Prisma.TranscriptUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.TranscriptUpdateManyWithWhereWithoutProjectInput | Prisma.TranscriptUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.TranscriptScalarWhereInput | Prisma.TranscriptScalarWhereInput[]
+}
+
 export type TranscriptCreateNestedManyWithoutJobInput = {
   create?: Prisma.XOR<Prisma.TranscriptCreateWithoutJobInput, Prisma.TranscriptUncheckedCreateWithoutJobInput> | Prisma.TranscriptCreateWithoutJobInput[] | Prisma.TranscriptUncheckedCreateWithoutJobInput[]
   connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutJobInput | Prisma.TranscriptCreateOrConnectWithoutJobInput[]
@@ -720,10 +786,6 @@ export type NullableEnumAsrModelFieldUpdateOperationsInput = {
 
 export type NullableEnumModelSizeFieldUpdateOperationsInput = {
   set?: $Enums.ModelSize | null
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
 }
 
 export type TranscriptCreateNestedOneWithoutSegmentsInput = {
@@ -842,6 +904,7 @@ export type TranscriptCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -854,6 +917,7 @@ export type TranscriptCreateWithoutMediaInput = {
 export type TranscriptUncheckedCreateWithoutMediaInput = {
   id?: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -907,6 +971,7 @@ export type TranscriptScalarWhereInput = {
   id?: Prisma.UuidFilter<"Transcript"> | string
   mediaId?: Prisma.UuidFilter<"Transcript"> | string
   jobId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
+  projectId?: Prisma.UuidNullableFilter<"Transcript"> | string | null
   language?: Prisma.StringNullableFilter<"Transcript"> | string | null
   source?: Prisma.EnumTranscriptSourceFilter<"Transcript"> | $Enums.TranscriptSource
   asrModel?: Prisma.EnumAsrModelNullableFilter<"Transcript"> | $Enums.AsrModel | null
@@ -918,6 +983,80 @@ export type TranscriptScalarWhereInput = {
   fullTextUpdatedAt?: Prisma.DateTimeNullableFilter<"Transcript"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Transcript"> | Date | string
+}
+
+export type TranscriptCreateWithoutProjectInput = {
+  id?: string
+  language?: string | null
+  source?: $Enums.TranscriptSource
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
+  fullText?: string | null
+  wordCount?: number | null
+  isEdited?: boolean
+  version?: number
+  fullTextUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
+  job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
+  words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutTranscriptInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftCreateNestedOneWithoutTranscriptInput
+}
+
+export type TranscriptUncheckedCreateWithoutProjectInput = {
+  id?: string
+  mediaId: string
+  jobId?: string | null
+  language?: string | null
+  source?: $Enums.TranscriptSource
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
+  fullText?: string | null
+  wordCount?: number | null
+  isEdited?: boolean
+  version?: number
+  fullTextUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  segments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutTranscriptInput
+  words?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutTranscriptInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutTranscriptInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutTranscriptInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutTranscriptInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutTranscriptInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedCreateNestedOneWithoutTranscriptInput
+}
+
+export type TranscriptCreateOrConnectWithoutProjectInput = {
+  where: Prisma.TranscriptWhereUniqueInput
+  create: Prisma.XOR<Prisma.TranscriptCreateWithoutProjectInput, Prisma.TranscriptUncheckedCreateWithoutProjectInput>
+}
+
+export type TranscriptCreateManyProjectInputEnvelope = {
+  data: Prisma.TranscriptCreateManyProjectInput | Prisma.TranscriptCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type TranscriptUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.TranscriptWhereUniqueInput
+  update: Prisma.XOR<Prisma.TranscriptUpdateWithoutProjectInput, Prisma.TranscriptUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.TranscriptCreateWithoutProjectInput, Prisma.TranscriptUncheckedCreateWithoutProjectInput>
+}
+
+export type TranscriptUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.TranscriptWhereUniqueInput
+  data: Prisma.XOR<Prisma.TranscriptUpdateWithoutProjectInput, Prisma.TranscriptUncheckedUpdateWithoutProjectInput>
+}
+
+export type TranscriptUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.TranscriptScalarWhereInput
+  data: Prisma.XOR<Prisma.TranscriptUpdateManyMutationInput, Prisma.TranscriptUncheckedUpdateManyWithoutProjectInput>
 }
 
 export type TranscriptCreateWithoutJobInput = {
@@ -934,6 +1073,7 @@ export type TranscriptCreateWithoutJobInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -946,6 +1086,7 @@ export type TranscriptCreateWithoutJobInput = {
 export type TranscriptUncheckedCreateWithoutJobInput = {
   id?: string
   mediaId: string
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1007,6 +1148,7 @@ export type TranscriptCreateWithoutSegmentsInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
@@ -1019,6 +1161,7 @@ export type TranscriptUncheckedCreateWithoutSegmentsInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1069,6 +1212,7 @@ export type TranscriptUpdateWithoutSegmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
@@ -1081,6 +1225,7 @@ export type TranscriptUncheckedUpdateWithoutSegmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1115,6 +1260,7 @@ export type TranscriptCreateWithoutWordsInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
@@ -1127,6 +1273,7 @@ export type TranscriptUncheckedCreateWithoutWordsInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1177,6 +1324,7 @@ export type TranscriptUpdateWithoutWordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
@@ -1189,6 +1337,7 @@ export type TranscriptUncheckedUpdateWithoutWordsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1223,6 +1372,7 @@ export type TranscriptCreateWithoutEditDraftInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -1235,6 +1385,7 @@ export type TranscriptUncheckedCreateWithoutEditDraftInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1285,6 +1436,7 @@ export type TranscriptUpdateWithoutEditDraftInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -1297,6 +1449,7 @@ export type TranscriptUncheckedUpdateWithoutEditDraftInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1331,6 +1484,7 @@ export type TranscriptCreateWithoutVideoChaptersInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutTranscriptInput
@@ -1343,6 +1497,7 @@ export type TranscriptUncheckedCreateWithoutVideoChaptersInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1393,6 +1548,7 @@ export type TranscriptUpdateWithoutVideoChaptersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
@@ -1405,6 +1561,7 @@ export type TranscriptUncheckedUpdateWithoutVideoChaptersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1439,6 +1596,7 @@ export type TranscriptCreateWithoutClipCandidatesInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -1451,6 +1609,7 @@ export type TranscriptUncheckedCreateWithoutClipCandidatesInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1501,6 +1660,7 @@ export type TranscriptUpdateWithoutClipCandidatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -1513,6 +1673,7 @@ export type TranscriptUncheckedUpdateWithoutClipCandidatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1547,6 +1708,7 @@ export type TranscriptCreateWithoutShortClipsInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -1559,6 +1721,7 @@ export type TranscriptUncheckedCreateWithoutShortClipsInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1609,6 +1772,7 @@ export type TranscriptUpdateWithoutShortClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -1621,6 +1785,7 @@ export type TranscriptUncheckedUpdateWithoutShortClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1655,6 +1820,7 @@ export type TranscriptCreateWithoutGeneratedAssetsInput = {
   updatedAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutTranscriptsInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutTranscriptsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutTranscriptsInput
   segments?: Prisma.TranscriptSegmentCreateNestedManyWithoutTranscriptInput
   words?: Prisma.TranscriptWordCreateNestedManyWithoutTranscriptInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutTranscriptInput
@@ -1667,6 +1833,7 @@ export type TranscriptUncheckedCreateWithoutGeneratedAssetsInput = {
   id?: string
   mediaId: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1717,6 +1884,7 @@ export type TranscriptUpdateWithoutGeneratedAssetsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -1729,6 +1897,7 @@ export type TranscriptUncheckedUpdateWithoutGeneratedAssetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1751,6 +1920,7 @@ export type TranscriptUncheckedUpdateWithoutGeneratedAssetsInput = {
 export type TranscriptCreateManyMediaInput = {
   id?: string
   jobId?: string | null
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1778,6 +1948,7 @@ export type TranscriptUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -1790,6 +1961,7 @@ export type TranscriptUpdateWithoutMediaInput = {
 export type TranscriptUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1813,6 +1985,89 @@ export type TranscriptUncheckedUpdateWithoutMediaInput = {
 export type TranscriptUncheckedUpdateManyWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
+  fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type TranscriptCreateManyProjectInput = {
+  id?: string
+  mediaId: string
+  jobId?: string | null
+  language?: string | null
+  source?: $Enums.TranscriptSource
+  asrModel?: $Enums.AsrModel | null
+  modelSize?: $Enums.ModelSize | null
+  fullText?: string | null
+  wordCount?: number | null
+  isEdited?: boolean
+  version?: number
+  fullTextUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type TranscriptUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
+  fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
+  job?: Prisma.ProcessingJobUpdateOneWithoutTranscriptsNestedInput
+  segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
+  words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutTranscriptNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutTranscriptNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUpdateOneWithoutTranscriptNestedInput
+}
+
+export type TranscriptUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
+  asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
+  modelSize?: Prisma.NullableEnumModelSizeFieldUpdateOperationsInput | $Enums.ModelSize | null
+  fullText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  fullTextUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  segments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutTranscriptNestedInput
+  words?: Prisma.TranscriptWordUncheckedUpdateManyWithoutTranscriptNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutTranscriptNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutTranscriptNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutTranscriptNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutTranscriptNestedInput
+  editDraft?: Prisma.TranscriptEditDraftUncheckedUpdateOneWithoutTranscriptNestedInput
+}
+
+export type TranscriptUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1829,6 +2084,7 @@ export type TranscriptUncheckedUpdateManyWithoutMediaInput = {
 export type TranscriptCreateManyJobInput = {
   id?: string
   mediaId: string
+  projectId?: string | null
   language?: string | null
   source?: $Enums.TranscriptSource
   asrModel?: $Enums.AsrModel | null
@@ -1856,6 +2112,7 @@ export type TranscriptUpdateWithoutJobInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutTranscriptsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutTranscriptsNestedInput
   segments?: Prisma.TranscriptSegmentUpdateManyWithoutTranscriptNestedInput
   words?: Prisma.TranscriptWordUpdateManyWithoutTranscriptNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutTranscriptNestedInput
@@ -1868,6 +2125,7 @@ export type TranscriptUpdateWithoutJobInput = {
 export type TranscriptUncheckedUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1891,6 +2149,7 @@ export type TranscriptUncheckedUpdateWithoutJobInput = {
 export type TranscriptUncheckedUpdateManyWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumTranscriptSourceFieldUpdateOperationsInput | $Enums.TranscriptSource
   asrModel?: Prisma.NullableEnumAsrModelFieldUpdateOperationsInput | $Enums.AsrModel | null
@@ -1984,6 +2243,7 @@ export type TranscriptSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   id?: boolean
   mediaId?: boolean
   jobId?: boolean
+  projectId?: boolean
   language?: boolean
   source?: boolean
   asrModel?: boolean
@@ -1997,6 +2257,7 @@ export type TranscriptSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
+  project?: boolean | Prisma.Transcript$projectArgs<ExtArgs>
   segments?: boolean | Prisma.Transcript$segmentsArgs<ExtArgs>
   words?: boolean | Prisma.Transcript$wordsArgs<ExtArgs>
   videoChapters?: boolean | Prisma.Transcript$videoChaptersArgs<ExtArgs>
@@ -2011,6 +2272,7 @@ export type TranscriptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   id?: boolean
   mediaId?: boolean
   jobId?: boolean
+  projectId?: boolean
   language?: boolean
   source?: boolean
   asrModel?: boolean
@@ -2024,12 +2286,14 @@ export type TranscriptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   updatedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
+  project?: boolean | Prisma.Transcript$projectArgs<ExtArgs>
 }, ExtArgs["result"]["transcript"]>
 
 export type TranscriptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   mediaId?: boolean
   jobId?: boolean
+  projectId?: boolean
   language?: boolean
   source?: boolean
   asrModel?: boolean
@@ -2043,12 +2307,14 @@ export type TranscriptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   updatedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
+  project?: boolean | Prisma.Transcript$projectArgs<ExtArgs>
 }, ExtArgs["result"]["transcript"]>
 
 export type TranscriptSelectScalar = {
   id?: boolean
   mediaId?: boolean
   jobId?: boolean
+  projectId?: boolean
   language?: boolean
   source?: boolean
   asrModel?: boolean
@@ -2062,10 +2328,11 @@ export type TranscriptSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TranscriptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "jobId" | "language" | "source" | "asrModel" | "modelSize" | "fullText" | "wordCount" | "isEdited" | "version" | "fullTextUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transcript"]>
+export type TranscriptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "jobId" | "projectId" | "language" | "source" | "asrModel" | "modelSize" | "fullText" | "wordCount" | "isEdited" | "version" | "fullTextUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transcript"]>
 export type TranscriptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
+  project?: boolean | Prisma.Transcript$projectArgs<ExtArgs>
   segments?: boolean | Prisma.Transcript$segmentsArgs<ExtArgs>
   words?: boolean | Prisma.Transcript$wordsArgs<ExtArgs>
   videoChapters?: boolean | Prisma.Transcript$videoChaptersArgs<ExtArgs>
@@ -2078,10 +2345,12 @@ export type TranscriptInclude<ExtArgs extends runtime.Types.Extensions.InternalA
 export type TranscriptIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
+  project?: boolean | Prisma.Transcript$projectArgs<ExtArgs>
 }
 export type TranscriptIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   job?: boolean | Prisma.Transcript$jobArgs<ExtArgs>
+  project?: boolean | Prisma.Transcript$projectArgs<ExtArgs>
 }
 
 export type $TranscriptPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2089,6 +2358,7 @@ export type $TranscriptPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     media: Prisma.$MediaPayload<ExtArgs>
     job: Prisma.$ProcessingJobPayload<ExtArgs> | null
+    project: Prisma.$ProjectPayload<ExtArgs> | null
     segments: Prisma.$TranscriptSegmentPayload<ExtArgs>[]
     words: Prisma.$TranscriptWordPayload<ExtArgs>[]
     videoChapters: Prisma.$VideoChapterPayload<ExtArgs>[]
@@ -2101,6 +2371,7 @@ export type $TranscriptPayload<ExtArgs extends runtime.Types.Extensions.Internal
     id: string
     mediaId: string
     jobId: string | null
+    projectId: string | null
     language: string | null
     source: $Enums.TranscriptSource
     asrModel: $Enums.AsrModel | null
@@ -2508,6 +2779,7 @@ export interface Prisma__TranscriptClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   media<T extends Prisma.MediaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaDefaultArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   job<T extends Prisma.Transcript$jobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$jobArgs<ExtArgs>>): Prisma.Prisma__ProcessingJobClient<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.Transcript$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   segments<T extends Prisma.Transcript$segmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$segmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   words<T extends Prisma.Transcript$wordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$wordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptWordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   videoChapters<T extends Prisma.Transcript$videoChaptersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transcript$videoChaptersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2547,6 +2819,7 @@ export interface TranscriptFieldRefs {
   readonly id: Prisma.FieldRef<"Transcript", 'String'>
   readonly mediaId: Prisma.FieldRef<"Transcript", 'String'>
   readonly jobId: Prisma.FieldRef<"Transcript", 'String'>
+  readonly projectId: Prisma.FieldRef<"Transcript", 'String'>
   readonly language: Prisma.FieldRef<"Transcript", 'String'>
   readonly source: Prisma.FieldRef<"Transcript", 'TranscriptSource'>
   readonly asrModel: Prisma.FieldRef<"Transcript", 'AsrModel'>
@@ -2975,6 +3248,25 @@ export type Transcript$jobArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   include?: Prisma.ProcessingJobInclude<ExtArgs> | null
   where?: Prisma.ProcessingJobWhereInput
+}
+
+/**
+ * Transcript.project
+ */
+export type Transcript$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
 }
 
 /**

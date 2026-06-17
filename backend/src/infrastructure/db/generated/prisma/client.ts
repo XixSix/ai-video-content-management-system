@@ -52,15 +52,65 @@ export type User = Prisma.UserModel
  */
 export type AuthSession = Prisma.AuthSessionModel
 /**
+ * Model Workspace
+ * 
+ */
+export type Workspace = Prisma.WorkspaceModel
+/**
+ * Model WorkspaceMember
+ * 
+ */
+export type WorkspaceMember = Prisma.WorkspaceMemberModel
+/**
  * Model Media
  * 
  */
 export type Media = Prisma.MediaModel
 /**
+ * Model Project
+ * 
+ */
+export type Project = Prisma.ProjectModel
+/**
+ * Model ProjectMedia
+ * 
+ */
+export type ProjectMedia = Prisma.ProjectMediaModel
+/**
+ * Model EditorDocument
+ * 
+ */
+export type EditorDocument = Prisma.EditorDocumentModel
+/**
+ * Model EditorDocumentVersion
+ * 
+ */
+export type EditorDocumentVersion = Prisma.EditorDocumentVersionModel
+/**
+ * Model CanvasLayer
+ * 
+ */
+export type CanvasLayer = Prisma.CanvasLayerModel
+/**
+ * Model TimelineTrack
+ * 
+ */
+export type TimelineTrack = Prisma.TimelineTrackModel
+/**
+ * Model TimelineSegment
+ * 
+ */
+export type TimelineSegment = Prisma.TimelineSegmentModel
+/**
  * Model ProcessingJob
  * 
  */
 export type ProcessingJob = Prisma.ProcessingJobModel
+/**
+ * Model JobEvent
+ * 
+ */
+export type JobEvent = Prisma.JobEventModel
 /**
  * Model Transcript
  * 
