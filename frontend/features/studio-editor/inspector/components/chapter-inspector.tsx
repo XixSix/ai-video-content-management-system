@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { Clapperboard } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store"
 import { SegmentedTimeInput } from "@/features/studio-editor/inspector/components/fields/segmented-time-input"
 import {
   formatChapterRange,
@@ -13,15 +11,12 @@ import {
 } from "@/features/studio-editor/inspector/lib/chapter-time"
 import {
   useStudioChapterActions,
-  useStudioPlaybackState,
   useStudioProjectState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioChapter } from "@/features/studio-editor/studio.types"
 
 export function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
-  const openLongToShort = useLongToShortStore((state) => state.openManager)
   const { updateChapterTiming, updateChapterTitle } = useStudioChapterActions()
-  const { seekToTime } = useStudioPlaybackState()
   const { project } = useStudioProjectState()
   const [titleDraft, setTitleDraft] = useState(chapter.title)
   const transcriptPreview = getChapterTranscriptPreview(
@@ -126,30 +121,6 @@ export function ChapterInspector({ chapter }: { chapter: StudioChapter }) {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="rounded-xl border border-border bg-surface-muted p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          Actions
-        </p>
-        <div className="mt-3 grid gap-2">
-          <Button
-            type="button"
-            size="sm"
-            className="justify-start"
-            onClick={() => seekToTime(chapter.startTime)}
-          >
-            Seek to chapter
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="justify-start"
-            onClick={openLongToShort}
-          >
-            Open in Long to Short
-          </Button>
         </div>
       </section>
     </>

@@ -1,6 +1,8 @@
 "use client"
 
+import { StudioAiPanel } from "@/features/studio-editor/ai/studio-ai-panel"
 import { StudioAssetsPanel } from "@/features/studio-editor/assets/studio-assets-panel"
+import { StudioAudioPanel } from "@/features/studio-editor/audio/studio-audio-panel"
 import { StudioCaptionsPanel } from "@/features/studio-editor/captions/studio-captions-panel"
 import { StudioChaptersPanel } from "@/features/studio-editor/chapters/studio-chapters-panel"
 import { StudioMediaPanel } from "@/features/studio-editor/media-panel/studio-media-panel"
@@ -17,6 +19,14 @@ export function StudioToolPanel() {
 
   if (activeTool === "assets") {
     return <StudioAssetsPanel />
+  }
+
+  if (activeTool === "audio") {
+    return <StudioAudioPanel />
+  }
+
+  if (activeTool === "ai") {
+    return <StudioAiPanel />
   }
 
   if (activeTool === "text") {
