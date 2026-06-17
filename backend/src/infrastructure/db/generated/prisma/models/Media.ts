@@ -43,6 +43,7 @@ export type MediaSumAggregateOutputType = {
 export type MediaMinAggregateOutputType = {
   id: string | null
   userId: string | null
+  workspaceId: string | null
   type: $Enums.MediaType | null
   title: string | null
   description: string | null
@@ -65,6 +66,7 @@ export type MediaMinAggregateOutputType = {
 export type MediaMaxAggregateOutputType = {
   id: string | null
   userId: string | null
+  workspaceId: string | null
   type: $Enums.MediaType | null
   title: string | null
   description: string | null
@@ -87,6 +89,7 @@ export type MediaMaxAggregateOutputType = {
 export type MediaCountAggregateOutputType = {
   id: number
   userId: number
+  workspaceId: number
   type: number
   title: number
   description: number
@@ -101,6 +104,7 @@ export type MediaCountAggregateOutputType = {
   mimeType: number
   width: number
   height: number
+  metadata: number
   status: number
   createdAt: number
   updatedAt: number
@@ -125,6 +129,7 @@ export type MediaSumAggregateInputType = {
 export type MediaMinAggregateInputType = {
   id?: true
   userId?: true
+  workspaceId?: true
   type?: true
   title?: true
   description?: true
@@ -147,6 +152,7 @@ export type MediaMinAggregateInputType = {
 export type MediaMaxAggregateInputType = {
   id?: true
   userId?: true
+  workspaceId?: true
   type?: true
   title?: true
   description?: true
@@ -169,6 +175,7 @@ export type MediaMaxAggregateInputType = {
 export type MediaCountAggregateInputType = {
   id?: true
   userId?: true
+  workspaceId?: true
   type?: true
   title?: true
   description?: true
@@ -183,6 +190,7 @@ export type MediaCountAggregateInputType = {
   mimeType?: true
   width?: true
   height?: true
+  metadata?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -278,6 +286,7 @@ export type MediaGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type MediaGroupByOutputType = {
   id: string
   userId: string
+  workspaceId: string | null
   type: $Enums.MediaType
   title: string | null
   description: string | null
@@ -292,6 +301,7 @@ export type MediaGroupByOutputType = {
   mimeType: string | null
   width: number | null
   height: number | null
+  metadata: runtime.JsonValue | null
   status: $Enums.MediaStatus
   createdAt: Date
   updatedAt: Date
@@ -323,6 +333,7 @@ export type MediaWhereInput = {
   NOT?: Prisma.MediaWhereInput | Prisma.MediaWhereInput[]
   id?: Prisma.UuidFilter<"Media"> | string
   userId?: Prisma.UuidFilter<"Media"> | string
+  workspaceId?: Prisma.UuidNullableFilter<"Media"> | string | null
   type?: Prisma.EnumMediaTypeFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableFilter<"Media"> | string | null
   description?: Prisma.StringNullableFilter<"Media"> | string | null
@@ -337,10 +348,12 @@ export type MediaWhereInput = {
   mimeType?: Prisma.StringNullableFilter<"Media"> | string | null
   width?: Prisma.IntNullableFilter<"Media"> | number | null
   height?: Prisma.IntNullableFilter<"Media"> | number | null
+  metadata?: Prisma.JsonNullableFilter<"Media">
   status?: Prisma.EnumMediaStatusFilter<"Media"> | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   processingJobs?: Prisma.ProcessingJobListRelationFilter
   transcripts?: Prisma.TranscriptListRelationFilter
   transcriptSegments?: Prisma.TranscriptSegmentListRelationFilter
@@ -348,12 +361,19 @@ export type MediaWhereInput = {
   videoChapters?: Prisma.VideoChapterListRelationFilter
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
+  sourceProjects?: Prisma.ProjectListRelationFilter
+  thumbnailProjects?: Prisma.ProjectListRelationFilter
+  projectMedia?: Prisma.ProjectMediaListRelationFilter
+  canvasLayers?: Prisma.CanvasLayerListRelationFilter
+  timelineSegments?: Prisma.TimelineSegmentListRelationFilter
+  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }
 
 export type MediaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -368,10 +388,12 @@ export type MediaOrderByWithRelationInput = {
   mimeType?: Prisma.SortOrderInput | Prisma.SortOrder
   width?: Prisma.SortOrderInput | Prisma.SortOrder
   height?: Prisma.SortOrderInput | Prisma.SortOrder
+  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  workspace?: Prisma.WorkspaceOrderByWithRelationInput
   processingJobs?: Prisma.ProcessingJobOrderByRelationAggregateInput
   transcripts?: Prisma.TranscriptOrderByRelationAggregateInput
   transcriptSegments?: Prisma.TranscriptSegmentOrderByRelationAggregateInput
@@ -379,6 +401,12 @@ export type MediaOrderByWithRelationInput = {
   videoChapters?: Prisma.VideoChapterOrderByRelationAggregateInput
   clipCandidates?: Prisma.ClipCandidateOrderByRelationAggregateInput
   shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
+  sourceProjects?: Prisma.ProjectOrderByRelationAggregateInput
+  thumbnailProjects?: Prisma.ProjectOrderByRelationAggregateInput
+  projectMedia?: Prisma.ProjectMediaOrderByRelationAggregateInput
+  canvasLayers?: Prisma.CanvasLayerOrderByRelationAggregateInput
+  timelineSegments?: Prisma.TimelineSegmentOrderByRelationAggregateInput
+  generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
 }
 
@@ -389,6 +417,7 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MediaWhereInput[]
   NOT?: Prisma.MediaWhereInput | Prisma.MediaWhereInput[]
   userId?: Prisma.UuidFilter<"Media"> | string
+  workspaceId?: Prisma.UuidNullableFilter<"Media"> | string | null
   type?: Prisma.EnumMediaTypeFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableFilter<"Media"> | string | null
   description?: Prisma.StringNullableFilter<"Media"> | string | null
@@ -403,10 +432,12 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
   mimeType?: Prisma.StringNullableFilter<"Media"> | string | null
   width?: Prisma.IntNullableFilter<"Media"> | number | null
   height?: Prisma.IntNullableFilter<"Media"> | number | null
+  metadata?: Prisma.JsonNullableFilter<"Media">
   status?: Prisma.EnumMediaStatusFilter<"Media"> | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   processingJobs?: Prisma.ProcessingJobListRelationFilter
   transcripts?: Prisma.TranscriptListRelationFilter
   transcriptSegments?: Prisma.TranscriptSegmentListRelationFilter
@@ -414,12 +445,19 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
   videoChapters?: Prisma.VideoChapterListRelationFilter
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
+  sourceProjects?: Prisma.ProjectListRelationFilter
+  thumbnailProjects?: Prisma.ProjectListRelationFilter
+  projectMedia?: Prisma.ProjectMediaListRelationFilter
+  canvasLayers?: Prisma.CanvasLayerListRelationFilter
+  timelineSegments?: Prisma.TimelineSegmentListRelationFilter
+  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }, "id" | "s3Bucket_s3Key">
 
 export type MediaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -434,6 +472,7 @@ export type MediaOrderByWithAggregationInput = {
   mimeType?: Prisma.SortOrderInput | Prisma.SortOrder
   width?: Prisma.SortOrderInput | Prisma.SortOrder
   height?: Prisma.SortOrderInput | Prisma.SortOrder
+  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -450,6 +489,7 @@ export type MediaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MediaScalarWhereWithAggregatesInput | Prisma.MediaScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"Media"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"Media"> | string
+  workspaceId?: Prisma.UuidNullableWithAggregatesFilter<"Media"> | string | null
   type?: Prisma.EnumMediaTypeWithAggregatesFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableWithAggregatesFilter<"Media"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Media"> | string | null
@@ -464,6 +504,7 @@ export type MediaScalarWhereWithAggregatesInput = {
   mimeType?: Prisma.StringNullableWithAggregatesFilter<"Media"> | string | null
   width?: Prisma.IntNullableWithAggregatesFilter<"Media"> | number | null
   height?: Prisma.IntNullableWithAggregatesFilter<"Media"> | number | null
+  metadata?: Prisma.JsonNullableWithAggregatesFilter<"Media">
   status?: Prisma.EnumMediaStatusWithAggregatesFilter<"Media"> | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Media"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Media"> | Date | string
@@ -485,10 +526,12 @@ export type MediaCreateInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -496,12 +539,19 @@ export type MediaCreateInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -516,6 +566,7 @@ export type MediaUncheckedCreateInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -526,6 +577,12 @@ export type MediaUncheckedCreateInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -545,10 +602,12 @@ export type MediaUpdateInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -556,12 +615,19 @@ export type MediaUpdateInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -576,6 +642,7 @@ export type MediaUncheckedUpdateInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -586,12 +653,19 @@ export type MediaUncheckedUpdateInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaCreateManyInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -606,6 +680,7 @@ export type MediaCreateManyInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -627,6 +702,7 @@ export type MediaUpdateManyMutationInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -635,6 +711,7 @@ export type MediaUpdateManyMutationInput = {
 export type MediaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -649,6 +726,7 @@ export type MediaUncheckedUpdateManyInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -672,6 +750,7 @@ export type MediaS3BucketS3KeyCompoundUniqueInput = {
 export type MediaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -686,6 +765,7 @@ export type MediaCountOrderByAggregateInput = {
   mimeType?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -701,6 +781,7 @@ export type MediaAvgOrderByAggregateInput = {
 export type MediaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -723,6 +804,7 @@ export type MediaMaxOrderByAggregateInput = {
 export type MediaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -749,14 +831,14 @@ export type MediaSumOrderByAggregateInput = {
   height?: Prisma.SortOrder
 }
 
-export type MediaScalarRelationFilter = {
-  is?: Prisma.MediaWhereInput
-  isNot?: Prisma.MediaWhereInput
-}
-
 export type MediaNullableScalarRelationFilter = {
   is?: Prisma.MediaWhereInput | null
   isNot?: Prisma.MediaWhereInput | null
+}
+
+export type MediaScalarRelationFilter = {
+  is?: Prisma.MediaWhereInput
+  isNot?: Prisma.MediaWhereInput
 }
 
 export type MediaCreateNestedManyWithoutUserInput = {
@@ -801,6 +883,48 @@ export type MediaUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.MediaScalarWhereInput | Prisma.MediaScalarWhereInput[]
 }
 
+export type MediaCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutWorkspaceInput, Prisma.MediaUncheckedCreateWithoutWorkspaceInput> | Prisma.MediaCreateWithoutWorkspaceInput[] | Prisma.MediaUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutWorkspaceInput | Prisma.MediaCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.MediaCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+}
+
+export type MediaUncheckedCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutWorkspaceInput, Prisma.MediaUncheckedCreateWithoutWorkspaceInput> | Prisma.MediaCreateWithoutWorkspaceInput[] | Prisma.MediaUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutWorkspaceInput | Prisma.MediaCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.MediaCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+}
+
+export type MediaUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutWorkspaceInput, Prisma.MediaUncheckedCreateWithoutWorkspaceInput> | Prisma.MediaCreateWithoutWorkspaceInput[] | Prisma.MediaUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutWorkspaceInput | Prisma.MediaCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.MediaUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.MediaUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.MediaCreateManyWorkspaceInputEnvelope
+  set?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  disconnect?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  delete?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  connect?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  update?: Prisma.MediaUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.MediaUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.MediaUpdateManyWithWhereWithoutWorkspaceInput | Prisma.MediaUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.MediaScalarWhereInput | Prisma.MediaScalarWhereInput[]
+}
+
+export type MediaUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutWorkspaceInput, Prisma.MediaUncheckedCreateWithoutWorkspaceInput> | Prisma.MediaCreateWithoutWorkspaceInput[] | Prisma.MediaUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutWorkspaceInput | Prisma.MediaCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.MediaUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.MediaUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.MediaCreateManyWorkspaceInputEnvelope
+  set?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  disconnect?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  delete?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  connect?: Prisma.MediaWhereUniqueInput | Prisma.MediaWhereUniqueInput[]
+  update?: Prisma.MediaUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.MediaUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.MediaUpdateManyWithWhereWithoutWorkspaceInput | Prisma.MediaUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.MediaScalarWhereInput | Prisma.MediaScalarWhereInput[]
+}
+
 export type EnumMediaTypeFieldUpdateOperationsInput = {
   set?: $Enums.MediaType
 }
@@ -831,6 +955,84 @@ export type NullableIntFieldUpdateOperationsInput = {
 
 export type EnumMediaStatusFieldUpdateOperationsInput = {
   set?: $Enums.MediaStatus
+}
+
+export type MediaCreateNestedOneWithoutSourceProjectsInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutSourceProjectsInput, Prisma.MediaUncheckedCreateWithoutSourceProjectsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutSourceProjectsInput
+  connect?: Prisma.MediaWhereUniqueInput
+}
+
+export type MediaCreateNestedOneWithoutThumbnailProjectsInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutThumbnailProjectsInput, Prisma.MediaUncheckedCreateWithoutThumbnailProjectsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutThumbnailProjectsInput
+  connect?: Prisma.MediaWhereUniqueInput
+}
+
+export type MediaUpdateOneWithoutSourceProjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutSourceProjectsInput, Prisma.MediaUncheckedCreateWithoutSourceProjectsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutSourceProjectsInput
+  upsert?: Prisma.MediaUpsertWithoutSourceProjectsInput
+  disconnect?: Prisma.MediaWhereInput | boolean
+  delete?: Prisma.MediaWhereInput | boolean
+  connect?: Prisma.MediaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutSourceProjectsInput, Prisma.MediaUpdateWithoutSourceProjectsInput>, Prisma.MediaUncheckedUpdateWithoutSourceProjectsInput>
+}
+
+export type MediaUpdateOneWithoutThumbnailProjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutThumbnailProjectsInput, Prisma.MediaUncheckedCreateWithoutThumbnailProjectsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutThumbnailProjectsInput
+  upsert?: Prisma.MediaUpsertWithoutThumbnailProjectsInput
+  disconnect?: Prisma.MediaWhereInput | boolean
+  delete?: Prisma.MediaWhereInput | boolean
+  connect?: Prisma.MediaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutThumbnailProjectsInput, Prisma.MediaUpdateWithoutThumbnailProjectsInput>, Prisma.MediaUncheckedUpdateWithoutThumbnailProjectsInput>
+}
+
+export type MediaCreateNestedOneWithoutProjectMediaInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutProjectMediaInput, Prisma.MediaUncheckedCreateWithoutProjectMediaInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutProjectMediaInput
+  connect?: Prisma.MediaWhereUniqueInput
+}
+
+export type MediaUpdateOneRequiredWithoutProjectMediaNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutProjectMediaInput, Prisma.MediaUncheckedCreateWithoutProjectMediaInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutProjectMediaInput
+  upsert?: Prisma.MediaUpsertWithoutProjectMediaInput
+  connect?: Prisma.MediaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutProjectMediaInput, Prisma.MediaUpdateWithoutProjectMediaInput>, Prisma.MediaUncheckedUpdateWithoutProjectMediaInput>
+}
+
+export type MediaCreateNestedOneWithoutCanvasLayersInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutCanvasLayersInput, Prisma.MediaUncheckedCreateWithoutCanvasLayersInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutCanvasLayersInput
+  connect?: Prisma.MediaWhereUniqueInput
+}
+
+export type MediaUpdateOneWithoutCanvasLayersNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutCanvasLayersInput, Prisma.MediaUncheckedCreateWithoutCanvasLayersInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutCanvasLayersInput
+  upsert?: Prisma.MediaUpsertWithoutCanvasLayersInput
+  disconnect?: Prisma.MediaWhereInput | boolean
+  delete?: Prisma.MediaWhereInput | boolean
+  connect?: Prisma.MediaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutCanvasLayersInput, Prisma.MediaUpdateWithoutCanvasLayersInput>, Prisma.MediaUncheckedUpdateWithoutCanvasLayersInput>
+}
+
+export type MediaCreateNestedOneWithoutTimelineSegmentsInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutTimelineSegmentsInput, Prisma.MediaUncheckedCreateWithoutTimelineSegmentsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutTimelineSegmentsInput
+  connect?: Prisma.MediaWhereUniqueInput
+}
+
+export type MediaUpdateOneWithoutTimelineSegmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutTimelineSegmentsInput, Prisma.MediaUncheckedCreateWithoutTimelineSegmentsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutTimelineSegmentsInput
+  upsert?: Prisma.MediaUpsertWithoutTimelineSegmentsInput
+  disconnect?: Prisma.MediaWhereInput | boolean
+  delete?: Prisma.MediaWhereInput | boolean
+  connect?: Prisma.MediaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutTimelineSegmentsInput, Prisma.MediaUpdateWithoutTimelineSegmentsInput>, Prisma.MediaUncheckedUpdateWithoutTimelineSegmentsInput>
 }
 
 export type MediaCreateNestedOneWithoutProcessingJobsInput = {
@@ -931,6 +1133,22 @@ export type MediaUpdateOneRequiredWithoutShortClipsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutShortClipsInput, Prisma.MediaUpdateWithoutShortClipsInput>, Prisma.MediaUncheckedUpdateWithoutShortClipsInput>
 }
 
+export type MediaCreateNestedOneWithoutGeneratedAssetsInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutGeneratedAssetsInput
+  connect?: Prisma.MediaWhereUniqueInput
+}
+
+export type MediaUpdateOneWithoutGeneratedAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
+  connectOrCreate?: Prisma.MediaCreateOrConnectWithoutGeneratedAssetsInput
+  upsert?: Prisma.MediaUpsertWithoutGeneratedAssetsInput
+  disconnect?: Prisma.MediaWhereInput | boolean
+  delete?: Prisma.MediaWhereInput | boolean
+  connect?: Prisma.MediaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaUpdateToOneWithWhereWithoutGeneratedAssetsInput, Prisma.MediaUpdateWithoutGeneratedAssetsInput>, Prisma.MediaUncheckedUpdateWithoutGeneratedAssetsInput>
+}
+
 export type MediaCreateNestedOneWithoutPublishTasksInput = {
   create?: Prisma.XOR<Prisma.MediaCreateWithoutPublishTasksInput, Prisma.MediaUncheckedCreateWithoutPublishTasksInput>
   connectOrCreate?: Prisma.MediaCreateOrConnectWithoutPublishTasksInput
@@ -963,9 +1181,11 @@ export type MediaCreateWithoutUserInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -973,11 +1193,18 @@ export type MediaCreateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutUserInput = {
   id?: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -992,6 +1219,7 @@ export type MediaUncheckedCreateWithoutUserInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1002,6 +1230,12 @@ export type MediaUncheckedCreateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1037,6 +1271,7 @@ export type MediaScalarWhereInput = {
   NOT?: Prisma.MediaScalarWhereInput | Prisma.MediaScalarWhereInput[]
   id?: Prisma.UuidFilter<"Media"> | string
   userId?: Prisma.UuidFilter<"Media"> | string
+  workspaceId?: Prisma.UuidNullableFilter<"Media"> | string | null
   type?: Prisma.EnumMediaTypeFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableFilter<"Media"> | string | null
   description?: Prisma.StringNullableFilter<"Media"> | string | null
@@ -1051,9 +1286,930 @@ export type MediaScalarWhereInput = {
   mimeType?: Prisma.StringNullableFilter<"Media"> | string | null
   width?: Prisma.IntNullableFilter<"Media"> | number | null
   height?: Prisma.IntNullableFilter<"Media"> | number | null
+  metadata?: Prisma.JsonNullableFilter<"Media">
   status?: Prisma.EnumMediaStatusFilter<"Media"> | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Media"> | Date | string
+}
+
+export type MediaCreateWithoutWorkspaceInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutWorkspaceInput = {
+  id?: string
+  userId: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutWorkspaceInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutWorkspaceInput, Prisma.MediaUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type MediaCreateManyWorkspaceInputEnvelope = {
+  data: Prisma.MediaCreateManyWorkspaceInput | Prisma.MediaCreateManyWorkspaceInput[]
+  skipDuplicates?: boolean
+}
+
+export type MediaUpsertWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.MediaWhereUniqueInput
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutWorkspaceInput, Prisma.MediaUncheckedUpdateWithoutWorkspaceInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutWorkspaceInput, Prisma.MediaUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type MediaUpdateWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.MediaWhereUniqueInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutWorkspaceInput, Prisma.MediaUncheckedUpdateWithoutWorkspaceInput>
+}
+
+export type MediaUpdateManyWithWhereWithoutWorkspaceInput = {
+  where: Prisma.MediaScalarWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateManyMutationInput, Prisma.MediaUncheckedUpdateManyWithoutWorkspaceInput>
+}
+
+export type MediaCreateWithoutSourceProjectsInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutSourceProjectsInput = {
+  id?: string
+  userId: string
+  workspaceId?: string | null
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutSourceProjectsInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutSourceProjectsInput, Prisma.MediaUncheckedCreateWithoutSourceProjectsInput>
+}
+
+export type MediaCreateWithoutThumbnailProjectsInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutThumbnailProjectsInput = {
+  id?: string
+  userId: string
+  workspaceId?: string | null
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutThumbnailProjectsInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutThumbnailProjectsInput, Prisma.MediaUncheckedCreateWithoutThumbnailProjectsInput>
+}
+
+export type MediaUpsertWithoutSourceProjectsInput = {
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutSourceProjectsInput, Prisma.MediaUncheckedUpdateWithoutSourceProjectsInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutSourceProjectsInput, Prisma.MediaUncheckedCreateWithoutSourceProjectsInput>
+  where?: Prisma.MediaWhereInput
+}
+
+export type MediaUpdateToOneWithWhereWithoutSourceProjectsInput = {
+  where?: Prisma.MediaWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutSourceProjectsInput, Prisma.MediaUncheckedUpdateWithoutSourceProjectsInput>
+}
+
+export type MediaUpdateWithoutSourceProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutSourceProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUpsertWithoutThumbnailProjectsInput = {
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutThumbnailProjectsInput, Prisma.MediaUncheckedUpdateWithoutThumbnailProjectsInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutThumbnailProjectsInput, Prisma.MediaUncheckedCreateWithoutThumbnailProjectsInput>
+  where?: Prisma.MediaWhereInput
+}
+
+export type MediaUpdateToOneWithWhereWithoutThumbnailProjectsInput = {
+  where?: Prisma.MediaWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutThumbnailProjectsInput, Prisma.MediaUncheckedUpdateWithoutThumbnailProjectsInput>
+}
+
+export type MediaUpdateWithoutThumbnailProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutThumbnailProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaCreateWithoutProjectMediaInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutProjectMediaInput = {
+  id?: string
+  userId: string
+  workspaceId?: string | null
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutProjectMediaInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutProjectMediaInput, Prisma.MediaUncheckedCreateWithoutProjectMediaInput>
+}
+
+export type MediaUpsertWithoutProjectMediaInput = {
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutProjectMediaInput, Prisma.MediaUncheckedUpdateWithoutProjectMediaInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutProjectMediaInput, Prisma.MediaUncheckedCreateWithoutProjectMediaInput>
+  where?: Prisma.MediaWhereInput
+}
+
+export type MediaUpdateToOneWithWhereWithoutProjectMediaInput = {
+  where?: Prisma.MediaWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutProjectMediaInput, Prisma.MediaUncheckedUpdateWithoutProjectMediaInput>
+}
+
+export type MediaUpdateWithoutProjectMediaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutProjectMediaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaCreateWithoutCanvasLayersInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutCanvasLayersInput = {
+  id?: string
+  userId: string
+  workspaceId?: string | null
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutCanvasLayersInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutCanvasLayersInput, Prisma.MediaUncheckedCreateWithoutCanvasLayersInput>
+}
+
+export type MediaUpsertWithoutCanvasLayersInput = {
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutCanvasLayersInput, Prisma.MediaUncheckedUpdateWithoutCanvasLayersInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutCanvasLayersInput, Prisma.MediaUncheckedCreateWithoutCanvasLayersInput>
+  where?: Prisma.MediaWhereInput
+}
+
+export type MediaUpdateToOneWithWhereWithoutCanvasLayersInput = {
+  where?: Prisma.MediaWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutCanvasLayersInput, Prisma.MediaUncheckedUpdateWithoutCanvasLayersInput>
+}
+
+export type MediaUpdateWithoutCanvasLayersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutCanvasLayersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaCreateWithoutTimelineSegmentsInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutTimelineSegmentsInput = {
+  id?: string
+  userId: string
+  workspaceId?: string | null
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutTimelineSegmentsInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutTimelineSegmentsInput, Prisma.MediaUncheckedCreateWithoutTimelineSegmentsInput>
+}
+
+export type MediaUpsertWithoutTimelineSegmentsInput = {
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutTimelineSegmentsInput, Prisma.MediaUncheckedUpdateWithoutTimelineSegmentsInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutTimelineSegmentsInput, Prisma.MediaUncheckedCreateWithoutTimelineSegmentsInput>
+  where?: Prisma.MediaWhereInput
+}
+
+export type MediaUpdateToOneWithWhereWithoutTimelineSegmentsInput = {
+  where?: Prisma.MediaWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutTimelineSegmentsInput, Prisma.MediaUncheckedUpdateWithoutTimelineSegmentsInput>
+}
+
+export type MediaUpdateWithoutTimelineSegmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutTimelineSegmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaCreateWithoutProcessingJobsInput = {
@@ -1072,22 +2228,31 @@ export type MediaCreateWithoutProcessingJobsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutProcessingJobsInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1102,6 +2267,7 @@ export type MediaUncheckedCreateWithoutProcessingJobsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1111,6 +2277,12 @@ export type MediaUncheckedCreateWithoutProcessingJobsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1146,22 +2318,31 @@ export type MediaUpdateWithoutProcessingJobsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutProcessingJobsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1176,6 +2357,7 @@ export type MediaUncheckedUpdateWithoutProcessingJobsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1185,6 +2367,12 @@ export type MediaUncheckedUpdateWithoutProcessingJobsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1204,22 +2392,31 @@ export type MediaCreateWithoutTranscriptsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutTranscriptsInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1234,6 +2431,7 @@ export type MediaUncheckedCreateWithoutTranscriptsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1243,6 +2441,12 @@ export type MediaUncheckedCreateWithoutTranscriptsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1278,22 +2482,31 @@ export type MediaUpdateWithoutTranscriptsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutTranscriptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1308,6 +2521,7 @@ export type MediaUncheckedUpdateWithoutTranscriptsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1317,6 +2531,12 @@ export type MediaUncheckedUpdateWithoutTranscriptsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1336,22 +2556,31 @@ export type MediaCreateWithoutTranscriptSegmentsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutTranscriptSegmentsInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1366,6 +2595,7 @@ export type MediaUncheckedCreateWithoutTranscriptSegmentsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1375,6 +2605,12 @@ export type MediaUncheckedCreateWithoutTranscriptSegmentsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1410,22 +2646,31 @@ export type MediaUpdateWithoutTranscriptSegmentsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutTranscriptSegmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1440,6 +2685,7 @@ export type MediaUncheckedUpdateWithoutTranscriptSegmentsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1449,6 +2695,12 @@ export type MediaUncheckedUpdateWithoutTranscriptSegmentsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1468,22 +2720,31 @@ export type MediaCreateWithoutTranscriptWordsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutTranscriptWordsInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1498,6 +2759,7 @@ export type MediaUncheckedCreateWithoutTranscriptWordsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1507,6 +2769,12 @@ export type MediaUncheckedCreateWithoutTranscriptWordsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1542,22 +2810,31 @@ export type MediaUpdateWithoutTranscriptWordsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutTranscriptWordsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1572,6 +2849,7 @@ export type MediaUncheckedUpdateWithoutTranscriptWordsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1581,6 +2859,12 @@ export type MediaUncheckedUpdateWithoutTranscriptWordsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1600,22 +2884,31 @@ export type MediaCreateWithoutVideoChaptersInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutVideoChaptersInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1630,6 +2923,7 @@ export type MediaUncheckedCreateWithoutVideoChaptersInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1639,6 +2933,12 @@ export type MediaUncheckedCreateWithoutVideoChaptersInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1674,22 +2974,31 @@ export type MediaUpdateWithoutVideoChaptersInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutVideoChaptersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1704,6 +3013,7 @@ export type MediaUncheckedUpdateWithoutVideoChaptersInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1713,6 +3023,12 @@ export type MediaUncheckedUpdateWithoutVideoChaptersInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1732,22 +3048,31 @@ export type MediaCreateWithoutClipCandidatesInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutClipCandidatesInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1762,6 +3087,7 @@ export type MediaUncheckedCreateWithoutClipCandidatesInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1771,6 +3097,12 @@ export type MediaUncheckedCreateWithoutClipCandidatesInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1806,22 +3138,31 @@ export type MediaUpdateWithoutClipCandidatesInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutClipCandidatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1836,6 +3177,7 @@ export type MediaUncheckedUpdateWithoutClipCandidatesInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1845,6 +3187,12 @@ export type MediaUncheckedUpdateWithoutClipCandidatesInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1864,22 +3212,31 @@ export type MediaCreateWithoutShortClipsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutShortClipsInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1894,6 +3251,7 @@ export type MediaUncheckedCreateWithoutShortClipsInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1903,6 +3261,12 @@ export type MediaUncheckedCreateWithoutShortClipsInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
 }
 
@@ -1938,22 +3302,31 @@ export type MediaUpdateWithoutShortClipsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutShortClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1968,6 +3341,7 @@ export type MediaUncheckedUpdateWithoutShortClipsInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1977,6 +3351,176 @@ export type MediaUncheckedUpdateWithoutShortClipsInput = {
   transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaCreateWithoutGeneratedAssetsInput = {
+  id?: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutMediaInput
+}
+
+export type MediaUncheckedCreateWithoutGeneratedAssetsInput = {
+  id?: string
+  userId: string
+  workspaceId?: string | null
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutMediaInput
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutMediaInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedCreateNestedManyWithoutMediaInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedCreateNestedManyWithoutMediaInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutMediaInput
+}
+
+export type MediaCreateOrConnectWithoutGeneratedAssetsInput = {
+  where: Prisma.MediaWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
+}
+
+export type MediaUpsertWithoutGeneratedAssetsInput = {
+  update: Prisma.XOR<Prisma.MediaUpdateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedUpdateWithoutGeneratedAssetsInput>
+  create: Prisma.XOR<Prisma.MediaCreateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedCreateWithoutGeneratedAssetsInput>
+  where?: Prisma.MediaWhereInput
+}
+
+export type MediaUpdateToOneWithWhereWithoutGeneratedAssetsInput = {
+  where?: Prisma.MediaWhereInput
+  data: Prisma.XOR<Prisma.MediaUpdateWithoutGeneratedAssetsInput, Prisma.MediaUncheckedUpdateWithoutGeneratedAssetsInput>
+}
+
+export type MediaUpdateWithoutGeneratedAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutGeneratedAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
@@ -1996,10 +3540,12 @@ export type MediaCreateWithoutPublishTasksInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -2007,11 +3553,18 @@ export type MediaCreateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutMediaInput
 }
 
 export type MediaUncheckedCreateWithoutPublishTasksInput = {
   id?: string
   userId: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2026,6 +3579,7 @@ export type MediaUncheckedCreateWithoutPublishTasksInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2036,6 +3590,12 @@ export type MediaUncheckedCreateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutMediaInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutMediaInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutMediaInput
+  sourceProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutSourceMediaInput
+  thumbnailProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutThumbnailMediaInput
+  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutMediaInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutMediaInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutMediaInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutMediaInput
 }
 
 export type MediaCreateOrConnectWithoutPublishTasksInput = {
@@ -2070,10 +3630,12 @@ export type MediaUpdateWithoutPublishTasksInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -2081,11 +3643,18 @@ export type MediaUpdateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutPublishTasksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2100,6 +3669,7 @@ export type MediaUncheckedUpdateWithoutPublishTasksInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2110,10 +3680,17 @@ export type MediaUncheckedUpdateWithoutPublishTasksInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaCreateManyUserInput = {
   id?: string
+  workspaceId?: string | null
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2128,6 +3705,7 @@ export type MediaCreateManyUserInput = {
   mimeType?: string | null
   width?: number | null
   height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2149,9 +3727,11 @@ export type MediaUpdateWithoutUserInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -2159,11 +3739,18 @@ export type MediaUpdateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2178,6 +3765,7 @@ export type MediaUncheckedUpdateWithoutUserInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2188,10 +3776,62 @@ export type MediaUncheckedUpdateWithoutUserInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
 }
 
 export type MediaUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MediaCreateManyWorkspaceInput = {
+  id?: string
+  userId: string
+  type: $Enums.MediaType
+  title?: string | null
+  description?: string | null
+  originalFilename: string
+  s3Bucket: string
+  s3Key: string
+  s3Region?: string | null
+  s3Etag?: string | null
+  uploadId?: string | null
+  duration?: number | null
+  fileSizeBytes?: bigint | number | null
+  mimeType?: string | null
+  width?: number | null
+  height?: number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.MediaStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MediaUpdateWithoutWorkspaceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2207,6 +3847,82 @@ export type MediaUncheckedUpdateManyWithoutUserInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptSegments?: Prisma.TranscriptSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  transcriptWords?: Prisma.TranscriptWordUncheckedUpdateManyWithoutMediaNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutMediaNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutMediaNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutMediaNestedInput
+  sourceProjects?: Prisma.ProjectUncheckedUpdateManyWithoutSourceMediaNestedInput
+  thumbnailProjects?: Prisma.ProjectUncheckedUpdateManyWithoutThumbnailMediaNestedInput
+  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutMediaNestedInput
+  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutMediaNestedInput
+  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutMediaNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutMediaNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutMediaNestedInput
+}
+
+export type MediaUncheckedUpdateManyWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  s3Region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3Etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fileSizeBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2225,6 +3941,12 @@ export type MediaCountOutputType = {
   videoChapters: number
   clipCandidates: number
   shortClips: number
+  sourceProjects: number
+  thumbnailProjects: number
+  projectMedia: number
+  canvasLayers: number
+  timelineSegments: number
+  generatedAssets: number
   publishTasks: number
 }
 
@@ -2236,6 +3958,12 @@ export type MediaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   videoChapters?: boolean | MediaCountOutputTypeCountVideoChaptersArgs
   clipCandidates?: boolean | MediaCountOutputTypeCountClipCandidatesArgs
   shortClips?: boolean | MediaCountOutputTypeCountShortClipsArgs
+  sourceProjects?: boolean | MediaCountOutputTypeCountSourceProjectsArgs
+  thumbnailProjects?: boolean | MediaCountOutputTypeCountThumbnailProjectsArgs
+  projectMedia?: boolean | MediaCountOutputTypeCountProjectMediaArgs
+  canvasLayers?: boolean | MediaCountOutputTypeCountCanvasLayersArgs
+  timelineSegments?: boolean | MediaCountOutputTypeCountTimelineSegmentsArgs
+  generatedAssets?: boolean | MediaCountOutputTypeCountGeneratedAssetsArgs
   publishTasks?: boolean | MediaCountOutputTypeCountPublishTasksArgs
 }
 
@@ -2301,6 +4029,48 @@ export type MediaCountOutputTypeCountShortClipsArgs<ExtArgs extends runtime.Type
 /**
  * MediaCountOutputType without action
  */
+export type MediaCountOutputTypeCountSourceProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectWhereInput
+}
+
+/**
+ * MediaCountOutputType without action
+ */
+export type MediaCountOutputTypeCountThumbnailProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectWhereInput
+}
+
+/**
+ * MediaCountOutputType without action
+ */
+export type MediaCountOutputTypeCountProjectMediaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectMediaWhereInput
+}
+
+/**
+ * MediaCountOutputType without action
+ */
+export type MediaCountOutputTypeCountCanvasLayersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CanvasLayerWhereInput
+}
+
+/**
+ * MediaCountOutputType without action
+ */
+export type MediaCountOutputTypeCountTimelineSegmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TimelineSegmentWhereInput
+}
+
+/**
+ * MediaCountOutputType without action
+ */
+export type MediaCountOutputTypeCountGeneratedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GeneratedAssetWhereInput
+}
+
+/**
+ * MediaCountOutputType without action
+ */
 export type MediaCountOutputTypeCountPublishTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PublishTaskWhereInput
 }
@@ -2309,6 +4079,7 @@ export type MediaCountOutputTypeCountPublishTasksArgs<ExtArgs extends runtime.Ty
 export type MediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  workspaceId?: boolean
   type?: boolean
   title?: boolean
   description?: boolean
@@ -2323,10 +4094,12 @@ export type MediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   mimeType?: boolean
   width?: boolean
   height?: boolean
+  metadata?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
   processingJobs?: boolean | Prisma.Media$processingJobsArgs<ExtArgs>
   transcripts?: boolean | Prisma.Media$transcriptsArgs<ExtArgs>
   transcriptSegments?: boolean | Prisma.Media$transcriptSegmentsArgs<ExtArgs>
@@ -2334,6 +4107,12 @@ export type MediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   videoChapters?: boolean | Prisma.Media$videoChaptersArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.Media$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Media$shortClipsArgs<ExtArgs>
+  sourceProjects?: boolean | Prisma.Media$sourceProjectsArgs<ExtArgs>
+  thumbnailProjects?: boolean | Prisma.Media$thumbnailProjectsArgs<ExtArgs>
+  projectMedia?: boolean | Prisma.Media$projectMediaArgs<ExtArgs>
+  canvasLayers?: boolean | Prisma.Media$canvasLayersArgs<ExtArgs>
+  timelineSegments?: boolean | Prisma.Media$timelineSegmentsArgs<ExtArgs>
+  generatedAssets?: boolean | Prisma.Media$generatedAssetsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.Media$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.MediaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["media"]>
@@ -2341,6 +4120,7 @@ export type MediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type MediaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  workspaceId?: boolean
   type?: boolean
   title?: boolean
   description?: boolean
@@ -2355,15 +4135,18 @@ export type MediaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   mimeType?: boolean
   width?: boolean
   height?: boolean
+  metadata?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
 }, ExtArgs["result"]["media"]>
 
 export type MediaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  workspaceId?: boolean
   type?: boolean
   title?: boolean
   description?: boolean
@@ -2378,15 +4161,18 @@ export type MediaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   mimeType?: boolean
   width?: boolean
   height?: boolean
+  metadata?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
 }, ExtArgs["result"]["media"]>
 
 export type MediaSelectScalar = {
   id?: boolean
   userId?: boolean
+  workspaceId?: boolean
   type?: boolean
   title?: boolean
   description?: boolean
@@ -2401,14 +4187,16 @@ export type MediaSelectScalar = {
   mimeType?: boolean
   width?: boolean
   height?: boolean
+  metadata?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "title" | "description" | "originalFilename" | "s3Bucket" | "s3Key" | "s3Region" | "s3Etag" | "uploadId" | "duration" | "fileSizeBytes" | "mimeType" | "width" | "height" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["media"]>
+export type MediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "workspaceId" | "type" | "title" | "description" | "originalFilename" | "s3Bucket" | "s3Key" | "s3Region" | "s3Etag" | "uploadId" | "duration" | "fileSizeBytes" | "mimeType" | "width" | "height" | "metadata" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["media"]>
 export type MediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
   processingJobs?: boolean | Prisma.Media$processingJobsArgs<ExtArgs>
   transcripts?: boolean | Prisma.Media$transcriptsArgs<ExtArgs>
   transcriptSegments?: boolean | Prisma.Media$transcriptSegmentsArgs<ExtArgs>
@@ -2416,20 +4204,29 @@ export type MediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   videoChapters?: boolean | Prisma.Media$videoChaptersArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.Media$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Media$shortClipsArgs<ExtArgs>
+  sourceProjects?: boolean | Prisma.Media$sourceProjectsArgs<ExtArgs>
+  thumbnailProjects?: boolean | Prisma.Media$thumbnailProjectsArgs<ExtArgs>
+  projectMedia?: boolean | Prisma.Media$projectMediaArgs<ExtArgs>
+  canvasLayers?: boolean | Prisma.Media$canvasLayersArgs<ExtArgs>
+  timelineSegments?: boolean | Prisma.Media$timelineSegmentsArgs<ExtArgs>
+  generatedAssets?: boolean | Prisma.Media$generatedAssetsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.Media$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.MediaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MediaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
 }
 export type MediaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
 }
 
 export type $MediaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Media"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    workspace: Prisma.$WorkspacePayload<ExtArgs> | null
     processingJobs: Prisma.$ProcessingJobPayload<ExtArgs>[]
     transcripts: Prisma.$TranscriptPayload<ExtArgs>[]
     transcriptSegments: Prisma.$TranscriptSegmentPayload<ExtArgs>[]
@@ -2437,11 +4234,18 @@ export type $MediaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     videoChapters: Prisma.$VideoChapterPayload<ExtArgs>[]
     clipCandidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
     shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
+    sourceProjects: Prisma.$ProjectPayload<ExtArgs>[]
+    thumbnailProjects: Prisma.$ProjectPayload<ExtArgs>[]
+    projectMedia: Prisma.$ProjectMediaPayload<ExtArgs>[]
+    canvasLayers: Prisma.$CanvasLayerPayload<ExtArgs>[]
+    timelineSegments: Prisma.$TimelineSegmentPayload<ExtArgs>[]
+    generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
+    workspaceId: string | null
     type: $Enums.MediaType
     title: string | null
     description: string | null
@@ -2456,6 +4260,7 @@ export type $MediaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     mimeType: string | null
     width: number | null
     height: number | null
+    metadata: runtime.JsonValue | null
     status: $Enums.MediaStatus
     createdAt: Date
     updatedAt: Date
@@ -2854,6 +4659,7 @@ readonly fields: MediaFieldRefs;
 export interface Prisma__MediaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  workspace<T extends Prisma.Media$workspaceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$workspaceArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   processingJobs<T extends Prisma.Media$processingJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$processingJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcripts<T extends Prisma.Media$transcriptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$transcriptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcriptSegments<T extends Prisma.Media$transcriptSegmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$transcriptSegmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2861,6 +4667,12 @@ export interface Prisma__MediaClient<T, Null = never, ExtArgs extends runtime.Ty
   videoChapters<T extends Prisma.Media$videoChaptersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$videoChaptersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clipCandidates<T extends Prisma.Media$clipCandidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$clipCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shortClips<T extends Prisma.Media$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sourceProjects<T extends Prisma.Media$sourceProjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$sourceProjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  thumbnailProjects<T extends Prisma.Media$thumbnailProjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$thumbnailProjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  projectMedia<T extends Prisma.Media$projectMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$projectMediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  canvasLayers<T extends Prisma.Media$canvasLayersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$canvasLayersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CanvasLayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  timelineSegments<T extends Prisma.Media$timelineSegmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$timelineSegmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimelineSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  generatedAssets<T extends Prisma.Media$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   publishTasks<T extends Prisma.Media$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2893,6 +4705,7 @@ export interface Prisma__MediaClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface MediaFieldRefs {
   readonly id: Prisma.FieldRef<"Media", 'String'>
   readonly userId: Prisma.FieldRef<"Media", 'String'>
+  readonly workspaceId: Prisma.FieldRef<"Media", 'String'>
   readonly type: Prisma.FieldRef<"Media", 'MediaType'>
   readonly title: Prisma.FieldRef<"Media", 'String'>
   readonly description: Prisma.FieldRef<"Media", 'String'>
@@ -2907,6 +4720,7 @@ export interface MediaFieldRefs {
   readonly mimeType: Prisma.FieldRef<"Media", 'String'>
   readonly width: Prisma.FieldRef<"Media", 'Int'>
   readonly height: Prisma.FieldRef<"Media", 'Int'>
+  readonly metadata: Prisma.FieldRef<"Media", 'Json'>
   readonly status: Prisma.FieldRef<"Media", 'MediaStatus'>
   readonly createdAt: Prisma.FieldRef<"Media", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Media", 'DateTime'>
@@ -3311,6 +5125,25 @@ export type MediaDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Media.workspace
+ */
+export type Media$workspaceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Workspace
+   */
+  select?: Prisma.WorkspaceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Workspace
+   */
+  omit?: Prisma.WorkspaceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceWhereInput
+}
+
+/**
  * Media.processingJobs
  */
 export type Media$processingJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3476,6 +5309,150 @@ export type Media$shortClipsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ShortClipScalarFieldEnum | Prisma.ShortClipScalarFieldEnum[]
+}
+
+/**
+ * Media.sourceProjects
+ */
+export type Media$sourceProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
+  orderBy?: Prisma.ProjectOrderByWithRelationInput | Prisma.ProjectOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
+}
+
+/**
+ * Media.thumbnailProjects
+ */
+export type Media$thumbnailProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
+  orderBy?: Prisma.ProjectOrderByWithRelationInput | Prisma.ProjectOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
+}
+
+/**
+ * Media.projectMedia
+ */
+export type Media$projectMediaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectMedia
+   */
+  select?: Prisma.ProjectMediaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectMedia
+   */
+  omit?: Prisma.ProjectMediaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMediaInclude<ExtArgs> | null
+  where?: Prisma.ProjectMediaWhereInput
+  orderBy?: Prisma.ProjectMediaOrderByWithRelationInput | Prisma.ProjectMediaOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectMediaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectMediaScalarFieldEnum | Prisma.ProjectMediaScalarFieldEnum[]
+}
+
+/**
+ * Media.canvasLayers
+ */
+export type Media$canvasLayersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CanvasLayer
+   */
+  select?: Prisma.CanvasLayerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CanvasLayer
+   */
+  omit?: Prisma.CanvasLayerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CanvasLayerInclude<ExtArgs> | null
+  where?: Prisma.CanvasLayerWhereInput
+  orderBy?: Prisma.CanvasLayerOrderByWithRelationInput | Prisma.CanvasLayerOrderByWithRelationInput[]
+  cursor?: Prisma.CanvasLayerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CanvasLayerScalarFieldEnum | Prisma.CanvasLayerScalarFieldEnum[]
+}
+
+/**
+ * Media.timelineSegments
+ */
+export type Media$timelineSegmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimelineSegment
+   */
+  select?: Prisma.TimelineSegmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimelineSegment
+   */
+  omit?: Prisma.TimelineSegmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimelineSegmentInclude<ExtArgs> | null
+  where?: Prisma.TimelineSegmentWhereInput
+  orderBy?: Prisma.TimelineSegmentOrderByWithRelationInput | Prisma.TimelineSegmentOrderByWithRelationInput[]
+  cursor?: Prisma.TimelineSegmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TimelineSegmentScalarFieldEnum | Prisma.TimelineSegmentScalarFieldEnum[]
+}
+
+/**
+ * Media.generatedAssets
+ */
+export type Media$generatedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GeneratedAsset
+   */
+  select?: Prisma.GeneratedAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GeneratedAsset
+   */
+  omit?: Prisma.GeneratedAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GeneratedAssetInclude<ExtArgs> | null
+  where?: Prisma.GeneratedAssetWhereInput
+  orderBy?: Prisma.GeneratedAssetOrderByWithRelationInput | Prisma.GeneratedAssetOrderByWithRelationInput[]
+  cursor?: Prisma.GeneratedAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GeneratedAssetScalarFieldEnum | Prisma.GeneratedAssetScalarFieldEnum[]
 }
 
 /**

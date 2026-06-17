@@ -40,9 +40,11 @@ export type ProcessingJobMinAggregateOutputType = {
   id: string | null
   mediaId: string | null
   userId: string | null
+  projectId: string | null
   jobType: $Enums.JobType | null
   status: $Enums.JobStatus | null
   progress: number | null
+  currentStep: string | null
   errorMessage: string | null
   queueName: string | null
   taskName: string | null
@@ -58,9 +60,11 @@ export type ProcessingJobMaxAggregateOutputType = {
   id: string | null
   mediaId: string | null
   userId: string | null
+  projectId: string | null
   jobType: $Enums.JobType | null
   status: $Enums.JobStatus | null
   progress: number | null
+  currentStep: string | null
   errorMessage: string | null
   queueName: string | null
   taskName: string | null
@@ -76,9 +80,11 @@ export type ProcessingJobCountAggregateOutputType = {
   id: number
   mediaId: number
   userId: number
+  projectId: number
   jobType: number
   status: number
   progress: number
+  currentStep: number
   errorMessage: number
   queueName: number
   taskName: number
@@ -108,9 +114,11 @@ export type ProcessingJobMinAggregateInputType = {
   id?: true
   mediaId?: true
   userId?: true
+  projectId?: true
   jobType?: true
   status?: true
   progress?: true
+  currentStep?: true
   errorMessage?: true
   queueName?: true
   taskName?: true
@@ -126,9 +134,11 @@ export type ProcessingJobMaxAggregateInputType = {
   id?: true
   mediaId?: true
   userId?: true
+  projectId?: true
   jobType?: true
   status?: true
   progress?: true
+  currentStep?: true
   errorMessage?: true
   queueName?: true
   taskName?: true
@@ -144,9 +154,11 @@ export type ProcessingJobCountAggregateInputType = {
   id?: true
   mediaId?: true
   userId?: true
+  projectId?: true
   jobType?: true
   status?: true
   progress?: true
+  currentStep?: true
   errorMessage?: true
   queueName?: true
   taskName?: true
@@ -251,9 +263,11 @@ export type ProcessingJobGroupByOutputType = {
   id: string
   mediaId: string
   userId: string
+  projectId: string | null
   jobType: $Enums.JobType
   status: $Enums.JobStatus
   progress: number | null
+  currentStep: string | null
   errorMessage: string | null
   queueName: string | null
   taskName: string | null
@@ -294,9 +308,11 @@ export type ProcessingJobWhereInput = {
   id?: Prisma.UuidFilter<"ProcessingJob"> | string
   mediaId?: Prisma.UuidFilter<"ProcessingJob"> | string
   userId?: Prisma.UuidFilter<"ProcessingJob"> | string
+  projectId?: Prisma.UuidNullableFilter<"ProcessingJob"> | string | null
   jobType?: Prisma.EnumJobTypeFilter<"ProcessingJob"> | $Enums.JobType
   status?: Prisma.EnumJobStatusFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableFilter<"ProcessingJob"> | number | null
+  currentStep?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
@@ -310,19 +326,24 @@ export type ProcessingJobWhereInput = {
   completedAt?: Prisma.DateTimeNullableFilter<"ProcessingJob"> | Date | string | null
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   transcripts?: Prisma.TranscriptListRelationFilter
   videoChapters?: Prisma.VideoChapterListRelationFilter
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
+  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
+  events?: Prisma.JobEventListRelationFilter
 }
 
 export type ProcessingJobOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   jobType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentStep?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   queueName?: Prisma.SortOrderInput | Prisma.SortOrder
   taskName?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -336,10 +357,13 @@ export type ProcessingJobOrderByWithRelationInput = {
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   media?: Prisma.MediaOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
   transcripts?: Prisma.TranscriptOrderByRelationAggregateInput
   videoChapters?: Prisma.VideoChapterOrderByRelationAggregateInput
   clipCandidates?: Prisma.ClipCandidateOrderByRelationAggregateInput
+  generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
+  events?: Prisma.JobEventOrderByRelationAggregateInput
 }
 
 export type ProcessingJobWhereUniqueInput = Prisma.AtLeast<{
@@ -349,9 +373,11 @@ export type ProcessingJobWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProcessingJobWhereInput | Prisma.ProcessingJobWhereInput[]
   mediaId?: Prisma.UuidFilter<"ProcessingJob"> | string
   userId?: Prisma.UuidFilter<"ProcessingJob"> | string
+  projectId?: Prisma.UuidNullableFilter<"ProcessingJob"> | string | null
   jobType?: Prisma.EnumJobTypeFilter<"ProcessingJob"> | $Enums.JobType
   status?: Prisma.EnumJobStatusFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableFilter<"ProcessingJob"> | number | null
+  currentStep?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
@@ -365,19 +391,24 @@ export type ProcessingJobWhereUniqueInput = Prisma.AtLeast<{
   completedAt?: Prisma.DateTimeNullableFilter<"ProcessingJob"> | Date | string | null
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   transcripts?: Prisma.TranscriptListRelationFilter
   videoChapters?: Prisma.VideoChapterListRelationFilter
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
+  generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
+  events?: Prisma.JobEventListRelationFilter
 }, "id">
 
 export type ProcessingJobOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   jobType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentStep?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   queueName?: Prisma.SortOrderInput | Prisma.SortOrder
   taskName?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -403,9 +434,11 @@ export type ProcessingJobScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"ProcessingJob"> | string
   mediaId?: Prisma.UuidWithAggregatesFilter<"ProcessingJob"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"ProcessingJob"> | string
+  projectId?: Prisma.UuidNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   jobType?: Prisma.EnumJobTypeWithAggregatesFilter<"ProcessingJob"> | $Enums.JobType
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableWithAggregatesFilter<"ProcessingJob"> | number | null
+  currentStep?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
@@ -424,6 +457,7 @@ export type ProcessingJobCreateInput = {
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -437,19 +471,24 @@ export type ProcessingJobCreateInput = {
   completedAt?: Date | string | null
   media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
   user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobUncheckedCreateInput = {
   id?: string
   mediaId: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -464,7 +503,9 @@ export type ProcessingJobUncheckedCreateInput = {
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobUpdateInput = {
@@ -472,6 +513,7 @@ export type ProcessingJobUpdateInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -485,19 +527,24 @@ export type ProcessingJobUpdateInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -512,16 +559,20 @@ export type ProcessingJobUncheckedUpdateInput = {
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobCreateManyInput = {
   id?: string
   mediaId: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -540,6 +591,7 @@ export type ProcessingJobUpdateManyMutationInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -557,9 +609,11 @@ export type ProcessingJobUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -587,9 +641,11 @@ export type ProcessingJobCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   jobType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrder
+  currentStep?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   queueName?: Prisma.SortOrder
   taskName?: Prisma.SortOrder
@@ -612,9 +668,11 @@ export type ProcessingJobMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   jobType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrder
+  currentStep?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   queueName?: Prisma.SortOrder
   taskName?: Prisma.SortOrder
@@ -630,9 +688,11 @@ export type ProcessingJobMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   jobType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrder
+  currentStep?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   queueName?: Prisma.SortOrder
   taskName?: Prisma.SortOrder
@@ -647,6 +707,11 @@ export type ProcessingJobMinOrderByAggregateInput = {
 export type ProcessingJobSumOrderByAggregateInput = {
   progress?: Prisma.SortOrder
   attemptCount?: Prisma.SortOrder
+}
+
+export type ProcessingJobScalarRelationFilter = {
+  is?: Prisma.ProcessingJobWhereInput
+  isNot?: Prisma.ProcessingJobWhereInput
 }
 
 export type ProcessingJobNullableScalarRelationFilter = {
@@ -738,6 +803,48 @@ export type ProcessingJobUncheckedUpdateManyWithoutMediaNestedInput = {
   deleteMany?: Prisma.ProcessingJobScalarWhereInput | Prisma.ProcessingJobScalarWhereInput[]
 }
 
+export type ProcessingJobCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutProjectInput, Prisma.ProcessingJobUncheckedCreateWithoutProjectInput> | Prisma.ProcessingJobCreateWithoutProjectInput[] | Prisma.ProcessingJobUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutProjectInput | Prisma.ProcessingJobCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.ProcessingJobCreateManyProjectInputEnvelope
+  connect?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+}
+
+export type ProcessingJobUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutProjectInput, Prisma.ProcessingJobUncheckedCreateWithoutProjectInput> | Prisma.ProcessingJobCreateWithoutProjectInput[] | Prisma.ProcessingJobUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutProjectInput | Prisma.ProcessingJobCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.ProcessingJobCreateManyProjectInputEnvelope
+  connect?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+}
+
+export type ProcessingJobUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutProjectInput, Prisma.ProcessingJobUncheckedCreateWithoutProjectInput> | Prisma.ProcessingJobCreateWithoutProjectInput[] | Prisma.ProcessingJobUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutProjectInput | Prisma.ProcessingJobCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.ProcessingJobUpsertWithWhereUniqueWithoutProjectInput | Prisma.ProcessingJobUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.ProcessingJobCreateManyProjectInputEnvelope
+  set?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  disconnect?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  delete?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  connect?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  update?: Prisma.ProcessingJobUpdateWithWhereUniqueWithoutProjectInput | Prisma.ProcessingJobUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.ProcessingJobUpdateManyWithWhereWithoutProjectInput | Prisma.ProcessingJobUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.ProcessingJobScalarWhereInput | Prisma.ProcessingJobScalarWhereInput[]
+}
+
+export type ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutProjectInput, Prisma.ProcessingJobUncheckedCreateWithoutProjectInput> | Prisma.ProcessingJobCreateWithoutProjectInput[] | Prisma.ProcessingJobUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutProjectInput | Prisma.ProcessingJobCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.ProcessingJobUpsertWithWhereUniqueWithoutProjectInput | Prisma.ProcessingJobUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.ProcessingJobCreateManyProjectInputEnvelope
+  set?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  disconnect?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  delete?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  connect?: Prisma.ProcessingJobWhereUniqueInput | Prisma.ProcessingJobWhereUniqueInput[]
+  update?: Prisma.ProcessingJobUpdateWithWhereUniqueWithoutProjectInput | Prisma.ProcessingJobUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.ProcessingJobUpdateManyWithWhereWithoutProjectInput | Prisma.ProcessingJobUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.ProcessingJobScalarWhereInput | Prisma.ProcessingJobScalarWhereInput[]
+}
+
 export type EnumJobTypeFieldUpdateOperationsInput = {
   set?: $Enums.JobType
 }
@@ -746,12 +853,18 @@ export type EnumJobStatusFieldUpdateOperationsInput = {
   set?: $Enums.JobStatus
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type ProcessingJobCreateNestedOneWithoutEventsInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutEventsInput, Prisma.ProcessingJobUncheckedCreateWithoutEventsInput>
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutEventsInput
+  connect?: Prisma.ProcessingJobWhereUniqueInput
+}
+
+export type ProcessingJobUpdateOneRequiredWithoutEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutEventsInput, Prisma.ProcessingJobUncheckedCreateWithoutEventsInput>
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutEventsInput
+  upsert?: Prisma.ProcessingJobUpsertWithoutEventsInput
+  connect?: Prisma.ProcessingJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProcessingJobUpdateToOneWithWhereWithoutEventsInput, Prisma.ProcessingJobUpdateWithoutEventsInput>, Prisma.ProcessingJobUncheckedUpdateWithoutEventsInput>
 }
 
 export type ProcessingJobCreateNestedOneWithoutTranscriptsInput = {
@@ -802,6 +915,22 @@ export type ProcessingJobUpdateOneWithoutClipCandidatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProcessingJobUpdateToOneWithWhereWithoutClipCandidatesInput, Prisma.ProcessingJobUpdateWithoutClipCandidatesInput>, Prisma.ProcessingJobUncheckedUpdateWithoutClipCandidatesInput>
 }
 
+export type ProcessingJobCreateNestedOneWithoutGeneratedAssetsInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutGeneratedAssetsInput, Prisma.ProcessingJobUncheckedCreateWithoutGeneratedAssetsInput>
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutGeneratedAssetsInput
+  connect?: Prisma.ProcessingJobWhereUniqueInput
+}
+
+export type ProcessingJobUpdateOneWithoutGeneratedAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutGeneratedAssetsInput, Prisma.ProcessingJobUncheckedCreateWithoutGeneratedAssetsInput>
+  connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutGeneratedAssetsInput
+  upsert?: Prisma.ProcessingJobUpsertWithoutGeneratedAssetsInput
+  disconnect?: Prisma.ProcessingJobWhereInput | boolean
+  delete?: Prisma.ProcessingJobWhereInput | boolean
+  connect?: Prisma.ProcessingJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProcessingJobUpdateToOneWithWhereWithoutGeneratedAssetsInput, Prisma.ProcessingJobUpdateWithoutGeneratedAssetsInput>, Prisma.ProcessingJobUncheckedUpdateWithoutGeneratedAssetsInput>
+}
+
 export type ProcessingJobCreateNestedOneWithoutPublishTasksInput = {
   create?: Prisma.XOR<Prisma.ProcessingJobCreateWithoutPublishTasksInput, Prisma.ProcessingJobUncheckedCreateWithoutPublishTasksInput>
   connectOrCreate?: Prisma.ProcessingJobCreateOrConnectWithoutPublishTasksInput
@@ -823,6 +952,7 @@ export type ProcessingJobCreateWithoutUserInput = {
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -835,18 +965,23 @@ export type ProcessingJobCreateWithoutUserInput = {
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobUncheckedCreateWithoutUserInput = {
   id?: string
   mediaId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -861,7 +996,9 @@ export type ProcessingJobUncheckedCreateWithoutUserInput = {
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobCreateOrConnectWithoutUserInput = {
@@ -897,9 +1034,11 @@ export type ProcessingJobScalarWhereInput = {
   id?: Prisma.UuidFilter<"ProcessingJob"> | string
   mediaId?: Prisma.UuidFilter<"ProcessingJob"> | string
   userId?: Prisma.UuidFilter<"ProcessingJob"> | string
+  projectId?: Prisma.UuidNullableFilter<"ProcessingJob"> | string | null
   jobType?: Prisma.EnumJobTypeFilter<"ProcessingJob"> | $Enums.JobType
   status?: Prisma.EnumJobStatusFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableFilter<"ProcessingJob"> | number | null
+  currentStep?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
@@ -918,6 +1057,7 @@ export type ProcessingJobCreateWithoutMediaInput = {
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -930,18 +1070,23 @@ export type ProcessingJobCreateWithoutMediaInput = {
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobUncheckedCreateWithoutMediaInput = {
   id?: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -956,7 +1101,9 @@ export type ProcessingJobUncheckedCreateWithoutMediaInput = {
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobCreateOrConnectWithoutMediaInput = {
@@ -985,11 +1132,12 @@ export type ProcessingJobUpdateManyWithWhereWithoutMediaInput = {
   data: Prisma.XOR<Prisma.ProcessingJobUpdateManyMutationInput, Prisma.ProcessingJobUncheckedUpdateManyWithoutMediaInput>
 }
 
-export type ProcessingJobCreateWithoutTranscriptsInput = {
+export type ProcessingJobCreateWithoutProjectInput = {
   id?: string
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1003,18 +1151,227 @@ export type ProcessingJobCreateWithoutTranscriptsInput = {
   completedAt?: Date | string | null
   media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
   user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
-export type ProcessingJobUncheckedCreateWithoutTranscriptsInput = {
+export type ProcessingJobUncheckedCreateWithoutProjectInput = {
   id?: string
   mediaId: string
   userId: string
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ProcessingJobCreateOrConnectWithoutProjectInput = {
+  where: Prisma.ProcessingJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProcessingJobCreateWithoutProjectInput, Prisma.ProcessingJobUncheckedCreateWithoutProjectInput>
+}
+
+export type ProcessingJobCreateManyProjectInputEnvelope = {
+  data: Prisma.ProcessingJobCreateManyProjectInput | Prisma.ProcessingJobCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProcessingJobUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.ProcessingJobWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProcessingJobUpdateWithoutProjectInput, Prisma.ProcessingJobUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.ProcessingJobCreateWithoutProjectInput, Prisma.ProcessingJobUncheckedCreateWithoutProjectInput>
+}
+
+export type ProcessingJobUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.ProcessingJobWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProcessingJobUpdateWithoutProjectInput, Prisma.ProcessingJobUncheckedUpdateWithoutProjectInput>
+}
+
+export type ProcessingJobUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.ProcessingJobScalarWhereInput
+  data: Prisma.XOR<Prisma.ProcessingJobUpdateManyMutationInput, Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectInput>
+}
+
+export type ProcessingJobCreateWithoutEventsInput = {
+  id?: string
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
+  user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+}
+
+export type ProcessingJobUncheckedCreateWithoutEventsInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  projectId?: string | null
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ProcessingJobCreateOrConnectWithoutEventsInput = {
+  where: Prisma.ProcessingJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProcessingJobCreateWithoutEventsInput, Prisma.ProcessingJobUncheckedCreateWithoutEventsInput>
+}
+
+export type ProcessingJobUpsertWithoutEventsInput = {
+  update: Prisma.XOR<Prisma.ProcessingJobUpdateWithoutEventsInput, Prisma.ProcessingJobUncheckedUpdateWithoutEventsInput>
+  create: Prisma.XOR<Prisma.ProcessingJobCreateWithoutEventsInput, Prisma.ProcessingJobUncheckedCreateWithoutEventsInput>
+  where?: Prisma.ProcessingJobWhereInput
+}
+
+export type ProcessingJobUpdateToOneWithWhereWithoutEventsInput = {
+  where?: Prisma.ProcessingJobWhereInput
+  data: Prisma.XOR<Prisma.ProcessingJobUpdateWithoutEventsInput, Prisma.ProcessingJobUncheckedUpdateWithoutEventsInput>
+}
+
+export type ProcessingJobUpdateWithoutEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+}
+
+export type ProcessingJobUncheckedUpdateWithoutEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ProcessingJobCreateWithoutTranscriptsInput = {
+  id?: string
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
+  user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
+}
+
+export type ProcessingJobUncheckedCreateWithoutTranscriptsInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  projectId?: string | null
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1028,7 +1385,9 @@ export type ProcessingJobUncheckedCreateWithoutTranscriptsInput = {
   completedAt?: Date | string | null
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobCreateOrConnectWithoutTranscriptsInput = {
@@ -1052,6 +1411,7 @@ export type ProcessingJobUpdateWithoutTranscriptsInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1065,18 +1425,23 @@ export type ProcessingJobUpdateWithoutTranscriptsInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateWithoutTranscriptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1090,7 +1455,9 @@ export type ProcessingJobUncheckedUpdateWithoutTranscriptsInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobCreateWithoutVideoChaptersInput = {
@@ -1098,6 +1465,7 @@ export type ProcessingJobCreateWithoutVideoChaptersInput = {
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1111,18 +1479,23 @@ export type ProcessingJobCreateWithoutVideoChaptersInput = {
   completedAt?: Date | string | null
   media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
   user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobUncheckedCreateWithoutVideoChaptersInput = {
   id?: string
   mediaId: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1136,7 +1509,9 @@ export type ProcessingJobUncheckedCreateWithoutVideoChaptersInput = {
   completedAt?: Date | string | null
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobCreateOrConnectWithoutVideoChaptersInput = {
@@ -1160,6 +1535,7 @@ export type ProcessingJobUpdateWithoutVideoChaptersInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1173,18 +1549,23 @@ export type ProcessingJobUpdateWithoutVideoChaptersInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateWithoutVideoChaptersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1198,7 +1579,9 @@ export type ProcessingJobUncheckedUpdateWithoutVideoChaptersInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobCreateWithoutClipCandidatesInput = {
@@ -1206,6 +1589,7 @@ export type ProcessingJobCreateWithoutClipCandidatesInput = {
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1219,18 +1603,23 @@ export type ProcessingJobCreateWithoutClipCandidatesInput = {
   completedAt?: Date | string | null
   media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
   user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobUncheckedCreateWithoutClipCandidatesInput = {
   id?: string
   mediaId: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1244,7 +1633,9 @@ export type ProcessingJobUncheckedCreateWithoutClipCandidatesInput = {
   completedAt?: Date | string | null
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobCreateOrConnectWithoutClipCandidatesInput = {
@@ -1268,6 +1659,7 @@ export type ProcessingJobUpdateWithoutClipCandidatesInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1281,18 +1673,23 @@ export type ProcessingJobUpdateWithoutClipCandidatesInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateWithoutClipCandidatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1306,14 +1703,17 @@ export type ProcessingJobUncheckedUpdateWithoutClipCandidatesInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
-export type ProcessingJobCreateWithoutPublishTasksInput = {
+export type ProcessingJobCreateWithoutGeneratedAssetsInput = {
   id?: string
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1327,18 +1727,23 @@ export type ProcessingJobCreateWithoutPublishTasksInput = {
   completedAt?: Date | string | null
   media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
   user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
 }
 
-export type ProcessingJobUncheckedCreateWithoutPublishTasksInput = {
+export type ProcessingJobUncheckedCreateWithoutGeneratedAssetsInput = {
   id?: string
   mediaId: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1353,6 +1758,132 @@ export type ProcessingJobUncheckedCreateWithoutPublishTasksInput = {
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ProcessingJobCreateOrConnectWithoutGeneratedAssetsInput = {
+  where: Prisma.ProcessingJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProcessingJobCreateWithoutGeneratedAssetsInput, Prisma.ProcessingJobUncheckedCreateWithoutGeneratedAssetsInput>
+}
+
+export type ProcessingJobUpsertWithoutGeneratedAssetsInput = {
+  update: Prisma.XOR<Prisma.ProcessingJobUpdateWithoutGeneratedAssetsInput, Prisma.ProcessingJobUncheckedUpdateWithoutGeneratedAssetsInput>
+  create: Prisma.XOR<Prisma.ProcessingJobCreateWithoutGeneratedAssetsInput, Prisma.ProcessingJobUncheckedCreateWithoutGeneratedAssetsInput>
+  where?: Prisma.ProcessingJobWhereInput
+}
+
+export type ProcessingJobUpdateToOneWithWhereWithoutGeneratedAssetsInput = {
+  where?: Prisma.ProcessingJobWhereInput
+  data: Prisma.XOR<Prisma.ProcessingJobUpdateWithoutGeneratedAssetsInput, Prisma.ProcessingJobUncheckedUpdateWithoutGeneratedAssetsInput>
+}
+
+export type ProcessingJobUpdateWithoutGeneratedAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
+}
+
+export type ProcessingJobUncheckedUpdateWithoutGeneratedAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ProcessingJobCreateWithoutPublishTasksInput = {
+  id?: string
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  media: Prisma.MediaCreateNestedOneWithoutProcessingJobsInput
+  user: Prisma.UserCreateNestedOneWithoutProcessingJobsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutProcessingJobsInput
+  transcripts?: Prisma.TranscriptCreateNestedManyWithoutJobInput
+  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutJobInput
+  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventCreateNestedManyWithoutJobInput
+}
+
+export type ProcessingJobUncheckedCreateWithoutPublishTasksInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  projectId?: string | null
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutJobInput
+  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutJobInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutJobInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutJobInput
+  events?: Prisma.JobEventUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ProcessingJobCreateOrConnectWithoutPublishTasksInput = {
@@ -1376,6 +1907,7 @@ export type ProcessingJobUpdateWithoutPublishTasksInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1389,18 +1921,23 @@ export type ProcessingJobUpdateWithoutPublishTasksInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateWithoutPublishTasksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1415,14 +1952,18 @@ export type ProcessingJobUncheckedUpdateWithoutPublishTasksInput = {
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobCreateManyUserInput = {
   id?: string
   mediaId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1441,6 +1982,7 @@ export type ProcessingJobUpdateWithoutUserInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1453,18 +1995,23 @@ export type ProcessingJobUpdateWithoutUserInput = {
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1479,15 +2026,19 @@ export type ProcessingJobUncheckedUpdateWithoutUserInput = {
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1504,9 +2055,11 @@ export type ProcessingJobUncheckedUpdateManyWithoutUserInput = {
 export type ProcessingJobCreateManyMediaInput = {
   id?: string
   userId: string
+  projectId?: string | null
   jobType: $Enums.JobType
   status?: $Enums.JobStatus
   progress?: number | null
+  currentStep?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1525,6 +2078,7 @@ export type ProcessingJobUpdateWithoutMediaInput = {
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1537,18 +2091,23 @@ export type ProcessingJobUpdateWithoutMediaInput = {
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutProcessingJobsNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1563,15 +2122,115 @@ export type ProcessingJobUncheckedUpdateWithoutMediaInput = {
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ProcessingJobUncheckedUpdateManyWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type ProcessingJobCreateManyProjectInput = {
+  id?: string
+  mediaId: string
+  userId: string
+  jobType: $Enums.JobType
+  status?: $Enums.JobStatus
+  progress?: number | null
+  currentStep?: string | null
+  errorMessage?: string | null
+  queueName?: string | null
+  taskName?: string | null
+  externalTaskId?: string | null
+  attemptCount?: number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+}
+
+export type ProcessingJobUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  media?: Prisma.MediaUpdateOneRequiredWithoutProcessingJobsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutProcessingJobsNestedInput
+  transcripts?: Prisma.TranscriptUpdateManyWithoutJobNestedInput
+  videoChapters?: Prisma.VideoChapterUpdateManyWithoutJobNestedInput
+  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutJobNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUpdateManyWithoutJobNestedInput
+}
+
+export type ProcessingJobUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalTaskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  input?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  output?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutJobNestedInput
+  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutJobNestedInput
+  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutJobNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutJobNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutJobNestedInput
+  events?: Prisma.JobEventUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ProcessingJobUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobType?: Prisma.EnumJobTypeFieldUpdateOperationsInput | $Enums.JobType
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1594,14 +2253,18 @@ export type ProcessingJobCountOutputType = {
   transcripts: number
   videoChapters: number
   clipCandidates: number
+  generatedAssets: number
   publishTasks: number
+  events: number
 }
 
 export type ProcessingJobCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transcripts?: boolean | ProcessingJobCountOutputTypeCountTranscriptsArgs
   videoChapters?: boolean | ProcessingJobCountOutputTypeCountVideoChaptersArgs
   clipCandidates?: boolean | ProcessingJobCountOutputTypeCountClipCandidatesArgs
+  generatedAssets?: boolean | ProcessingJobCountOutputTypeCountGeneratedAssetsArgs
   publishTasks?: boolean | ProcessingJobCountOutputTypeCountPublishTasksArgs
+  events?: boolean | ProcessingJobCountOutputTypeCountEventsArgs
 }
 
 /**
@@ -1638,8 +2301,22 @@ export type ProcessingJobCountOutputTypeCountClipCandidatesArgs<ExtArgs extends 
 /**
  * ProcessingJobCountOutputType without action
  */
+export type ProcessingJobCountOutputTypeCountGeneratedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GeneratedAssetWhereInput
+}
+
+/**
+ * ProcessingJobCountOutputType without action
+ */
 export type ProcessingJobCountOutputTypeCountPublishTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PublishTaskWhereInput
+}
+
+/**
+ * ProcessingJobCountOutputType without action
+ */
+export type ProcessingJobCountOutputTypeCountEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobEventWhereInput
 }
 
 
@@ -1647,9 +2324,11 @@ export type ProcessingJobSelect<ExtArgs extends runtime.Types.Extensions.Interna
   id?: boolean
   mediaId?: boolean
   userId?: boolean
+  projectId?: boolean
   jobType?: boolean
   status?: boolean
   progress?: boolean
+  currentStep?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -1663,10 +2342,13 @@ export type ProcessingJobSelect<ExtArgs extends runtime.Types.Extensions.Interna
   completedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProcessingJob$projectArgs<ExtArgs>
   transcripts?: boolean | Prisma.ProcessingJob$transcriptsArgs<ExtArgs>
   videoChapters?: boolean | Prisma.ProcessingJob$videoChaptersArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.ProcessingJob$clipCandidatesArgs<ExtArgs>
+  generatedAssets?: boolean | Prisma.ProcessingJob$generatedAssetsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.ProcessingJob$publishTasksArgs<ExtArgs>
+  events?: boolean | Prisma.ProcessingJob$eventsArgs<ExtArgs>
   _count?: boolean | Prisma.ProcessingJobCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["processingJob"]>
 
@@ -1674,9 +2356,11 @@ export type ProcessingJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   id?: boolean
   mediaId?: boolean
   userId?: boolean
+  projectId?: boolean
   jobType?: boolean
   status?: boolean
   progress?: boolean
+  currentStep?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -1690,15 +2374,18 @@ export type ProcessingJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   completedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProcessingJob$projectArgs<ExtArgs>
 }, ExtArgs["result"]["processingJob"]>
 
 export type ProcessingJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   mediaId?: boolean
   userId?: boolean
+  projectId?: boolean
   jobType?: boolean
   status?: boolean
   progress?: boolean
+  currentStep?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -1712,15 +2399,18 @@ export type ProcessingJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   completedAt?: boolean
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProcessingJob$projectArgs<ExtArgs>
 }, ExtArgs["result"]["processingJob"]>
 
 export type ProcessingJobSelectScalar = {
   id?: boolean
   mediaId?: boolean
   userId?: boolean
+  projectId?: boolean
   jobType?: boolean
   status?: boolean
   progress?: boolean
+  currentStep?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -1734,23 +2424,28 @@ export type ProcessingJobSelectScalar = {
   completedAt?: boolean
 }
 
-export type ProcessingJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "userId" | "jobType" | "status" | "progress" | "errorMessage" | "queueName" | "taskName" | "externalTaskId" | "attemptCount" | "input" | "output" | "createdAt" | "updatedAt" | "startedAt" | "completedAt", ExtArgs["result"]["processingJob"]>
+export type ProcessingJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "userId" | "projectId" | "jobType" | "status" | "progress" | "currentStep" | "errorMessage" | "queueName" | "taskName" | "externalTaskId" | "attemptCount" | "input" | "output" | "createdAt" | "updatedAt" | "startedAt" | "completedAt", ExtArgs["result"]["processingJob"]>
 export type ProcessingJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProcessingJob$projectArgs<ExtArgs>
   transcripts?: boolean | Prisma.ProcessingJob$transcriptsArgs<ExtArgs>
   videoChapters?: boolean | Prisma.ProcessingJob$videoChaptersArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.ProcessingJob$clipCandidatesArgs<ExtArgs>
+  generatedAssets?: boolean | Prisma.ProcessingJob$generatedAssetsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.ProcessingJob$publishTasksArgs<ExtArgs>
+  events?: boolean | Prisma.ProcessingJob$eventsArgs<ExtArgs>
   _count?: boolean | Prisma.ProcessingJobCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProcessingJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProcessingJob$projectArgs<ExtArgs>
 }
 export type ProcessingJobIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProcessingJob$projectArgs<ExtArgs>
 }
 
 export type $ProcessingJobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1758,18 +2453,23 @@ export type $ProcessingJobPayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     media: Prisma.$MediaPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
+    project: Prisma.$ProjectPayload<ExtArgs> | null
     transcripts: Prisma.$TranscriptPayload<ExtArgs>[]
     videoChapters: Prisma.$VideoChapterPayload<ExtArgs>[]
     clipCandidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
+    generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
+    events: Prisma.$JobEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     mediaId: string
     userId: string
+    projectId: string | null
     jobType: $Enums.JobType
     status: $Enums.JobStatus
     progress: number | null
+    currentStep: string | null
     errorMessage: string | null
     queueName: string | null
     taskName: string | null
@@ -2177,10 +2877,13 @@ export interface Prisma__ProcessingJobClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   media<T extends Prisma.MediaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaDefaultArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.ProcessingJob$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transcripts<T extends Prisma.ProcessingJob$transcriptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$transcriptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   videoChapters<T extends Prisma.ProcessingJob$videoChaptersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$videoChaptersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clipCandidates<T extends Prisma.ProcessingJob$clipCandidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$clipCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  generatedAssets<T extends Prisma.ProcessingJob$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   publishTasks<T extends Prisma.ProcessingJob$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  events<T extends Prisma.ProcessingJob$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProcessingJob$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2213,9 +2916,11 @@ export interface ProcessingJobFieldRefs {
   readonly id: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly mediaId: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly userId: Prisma.FieldRef<"ProcessingJob", 'String'>
+  readonly projectId: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly jobType: Prisma.FieldRef<"ProcessingJob", 'JobType'>
   readonly status: Prisma.FieldRef<"ProcessingJob", 'JobStatus'>
   readonly progress: Prisma.FieldRef<"ProcessingJob", 'Int'>
+  readonly currentStep: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly errorMessage: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly queueName: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly taskName: Prisma.FieldRef<"ProcessingJob", 'String'>
@@ -2628,6 +3333,25 @@ export type ProcessingJobDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
+ * ProcessingJob.project
+ */
+export type ProcessingJob$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
+}
+
+/**
  * ProcessingJob.transcripts
  */
 export type ProcessingJob$transcriptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2700,6 +3424,30 @@ export type ProcessingJob$clipCandidatesArgs<ExtArgs extends runtime.Types.Exten
 }
 
 /**
+ * ProcessingJob.generatedAssets
+ */
+export type ProcessingJob$generatedAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GeneratedAsset
+   */
+  select?: Prisma.GeneratedAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GeneratedAsset
+   */
+  omit?: Prisma.GeneratedAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GeneratedAssetInclude<ExtArgs> | null
+  where?: Prisma.GeneratedAssetWhereInput
+  orderBy?: Prisma.GeneratedAssetOrderByWithRelationInput | Prisma.GeneratedAssetOrderByWithRelationInput[]
+  cursor?: Prisma.GeneratedAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GeneratedAssetScalarFieldEnum | Prisma.GeneratedAssetScalarFieldEnum[]
+}
+
+/**
  * ProcessingJob.publishTasks
  */
 export type ProcessingJob$publishTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2721,6 +3469,30 @@ export type ProcessingJob$publishTasksArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.PublishTaskScalarFieldEnum | Prisma.PublishTaskScalarFieldEnum[]
+}
+
+/**
+ * ProcessingJob.events
+ */
+export type ProcessingJob$eventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobEvent
+   */
+  select?: Prisma.JobEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobEvent
+   */
+  omit?: Prisma.JobEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobEventInclude<ExtArgs> | null
+  where?: Prisma.JobEventWhereInput
+  orderBy?: Prisma.JobEventOrderByWithRelationInput | Prisma.JobEventOrderByWithRelationInput[]
+  cursor?: Prisma.JobEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobEventScalarFieldEnum | Prisma.JobEventScalarFieldEnum[]
 }
 
 /**

@@ -27,6 +27,7 @@ export type AggregateAiSuggestion = {
 export type AiSuggestionMinAggregateOutputType = {
   id: string | null
   userId: string | null
+  projectId: string | null
   targetType: $Enums.TargetType | null
   targetId: string | null
   suggestionType: $Enums.SuggestionType | null
@@ -38,6 +39,7 @@ export type AiSuggestionMinAggregateOutputType = {
 export type AiSuggestionMaxAggregateOutputType = {
   id: string | null
   userId: string | null
+  projectId: string | null
   targetType: $Enums.TargetType | null
   targetId: string | null
   suggestionType: $Enums.SuggestionType | null
@@ -49,6 +51,7 @@ export type AiSuggestionMaxAggregateOutputType = {
 export type AiSuggestionCountAggregateOutputType = {
   id: number
   userId: number
+  projectId: number
   targetType: number
   targetId: number
   suggestionType: number
@@ -63,6 +66,7 @@ export type AiSuggestionCountAggregateOutputType = {
 export type AiSuggestionMinAggregateInputType = {
   id?: true
   userId?: true
+  projectId?: true
   targetType?: true
   targetId?: true
   suggestionType?: true
@@ -74,6 +78,7 @@ export type AiSuggestionMinAggregateInputType = {
 export type AiSuggestionMaxAggregateInputType = {
   id?: true
   userId?: true
+  projectId?: true
   targetType?: true
   targetId?: true
   suggestionType?: true
@@ -85,6 +90,7 @@ export type AiSuggestionMaxAggregateInputType = {
 export type AiSuggestionCountAggregateInputType = {
   id?: true
   userId?: true
+  projectId?: true
   targetType?: true
   targetId?: true
   suggestionType?: true
@@ -170,6 +176,7 @@ export type AiSuggestionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type AiSuggestionGroupByOutputType = {
   id: string
   userId: string
+  projectId: string | null
   targetType: $Enums.TargetType
   targetId: string
   suggestionType: $Enums.SuggestionType
@@ -203,6 +210,7 @@ export type AiSuggestionWhereInput = {
   NOT?: Prisma.AiSuggestionWhereInput | Prisma.AiSuggestionWhereInput[]
   id?: Prisma.UuidFilter<"AiSuggestion"> | string
   userId?: Prisma.UuidFilter<"AiSuggestion"> | string
+  projectId?: Prisma.UuidNullableFilter<"AiSuggestion"> | string | null
   targetType?: Prisma.EnumTargetTypeFilter<"AiSuggestion"> | $Enums.TargetType
   targetId?: Prisma.UuidFilter<"AiSuggestion"> | string
   suggestionType?: Prisma.EnumSuggestionTypeFilter<"AiSuggestion"> | $Enums.SuggestionType
@@ -211,11 +219,13 @@ export type AiSuggestionWhereInput = {
   model?: Prisma.StringNullableFilter<"AiSuggestion"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AiSuggestion"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
 }
 
 export type AiSuggestionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   targetType?: Prisma.SortOrder
   targetId?: Prisma.SortOrder
   suggestionType?: Prisma.SortOrder
@@ -224,6 +234,7 @@ export type AiSuggestionOrderByWithRelationInput = {
   model?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
 }
 
 export type AiSuggestionWhereUniqueInput = Prisma.AtLeast<{
@@ -232,6 +243,7 @@ export type AiSuggestionWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AiSuggestionWhereInput[]
   NOT?: Prisma.AiSuggestionWhereInput | Prisma.AiSuggestionWhereInput[]
   userId?: Prisma.UuidFilter<"AiSuggestion"> | string
+  projectId?: Prisma.UuidNullableFilter<"AiSuggestion"> | string | null
   targetType?: Prisma.EnumTargetTypeFilter<"AiSuggestion"> | $Enums.TargetType
   targetId?: Prisma.UuidFilter<"AiSuggestion"> | string
   suggestionType?: Prisma.EnumSuggestionTypeFilter<"AiSuggestion"> | $Enums.SuggestionType
@@ -240,11 +252,13 @@ export type AiSuggestionWhereUniqueInput = Prisma.AtLeast<{
   model?: Prisma.StringNullableFilter<"AiSuggestion"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AiSuggestion"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
 }, "id">
 
 export type AiSuggestionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrderInput | Prisma.SortOrder
   targetType?: Prisma.SortOrder
   targetId?: Prisma.SortOrder
   suggestionType?: Prisma.SortOrder
@@ -263,6 +277,7 @@ export type AiSuggestionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AiSuggestionScalarWhereWithAggregatesInput | Prisma.AiSuggestionScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"AiSuggestion"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"AiSuggestion"> | string
+  projectId?: Prisma.UuidNullableWithAggregatesFilter<"AiSuggestion"> | string | null
   targetType?: Prisma.EnumTargetTypeWithAggregatesFilter<"AiSuggestion"> | $Enums.TargetType
   targetId?: Prisma.UuidWithAggregatesFilter<"AiSuggestion"> | string
   suggestionType?: Prisma.EnumSuggestionTypeWithAggregatesFilter<"AiSuggestion"> | $Enums.SuggestionType
@@ -282,11 +297,13 @@ export type AiSuggestionCreateInput = {
   model?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAiSuggestionsInput
+  project?: Prisma.ProjectCreateNestedOneWithoutAiSuggestionsInput
 }
 
 export type AiSuggestionUncheckedCreateInput = {
   id?: string
   userId: string
+  projectId?: string | null
   targetType: $Enums.TargetType
   targetId: string
   suggestionType: $Enums.SuggestionType
@@ -306,11 +323,13 @@ export type AiSuggestionUpdateInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAiSuggestionsNestedInput
+  project?: Prisma.ProjectUpdateOneWithoutAiSuggestionsNestedInput
 }
 
 export type AiSuggestionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
   targetId?: Prisma.StringFieldUpdateOperationsInput | string
   suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
@@ -323,6 +342,7 @@ export type AiSuggestionUncheckedUpdateInput = {
 export type AiSuggestionCreateManyInput = {
   id?: string
   userId: string
+  projectId?: string | null
   targetType: $Enums.TargetType
   targetId: string
   suggestionType: $Enums.SuggestionType
@@ -346,6 +366,7 @@ export type AiSuggestionUpdateManyMutationInput = {
 export type AiSuggestionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
   targetId?: Prisma.StringFieldUpdateOperationsInput | string
   suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
@@ -368,6 +389,7 @@ export type AiSuggestionOrderByRelationAggregateInput = {
 export type AiSuggestionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   targetType?: Prisma.SortOrder
   targetId?: Prisma.SortOrder
   suggestionType?: Prisma.SortOrder
@@ -380,6 +402,7 @@ export type AiSuggestionCountOrderByAggregateInput = {
 export type AiSuggestionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   targetType?: Prisma.SortOrder
   targetId?: Prisma.SortOrder
   suggestionType?: Prisma.SortOrder
@@ -391,6 +414,7 @@ export type AiSuggestionMaxOrderByAggregateInput = {
 export type AiSuggestionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   targetType?: Prisma.SortOrder
   targetId?: Prisma.SortOrder
   suggestionType?: Prisma.SortOrder
@@ -441,6 +465,48 @@ export type AiSuggestionUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.AiSuggestionScalarWhereInput | Prisma.AiSuggestionScalarWhereInput[]
 }
 
+export type AiSuggestionCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.AiSuggestionCreateWithoutProjectInput, Prisma.AiSuggestionUncheckedCreateWithoutProjectInput> | Prisma.AiSuggestionCreateWithoutProjectInput[] | Prisma.AiSuggestionUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.AiSuggestionCreateOrConnectWithoutProjectInput | Prisma.AiSuggestionCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.AiSuggestionCreateManyProjectInputEnvelope
+  connect?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+}
+
+export type AiSuggestionUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.AiSuggestionCreateWithoutProjectInput, Prisma.AiSuggestionUncheckedCreateWithoutProjectInput> | Prisma.AiSuggestionCreateWithoutProjectInput[] | Prisma.AiSuggestionUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.AiSuggestionCreateOrConnectWithoutProjectInput | Prisma.AiSuggestionCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.AiSuggestionCreateManyProjectInputEnvelope
+  connect?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+}
+
+export type AiSuggestionUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.AiSuggestionCreateWithoutProjectInput, Prisma.AiSuggestionUncheckedCreateWithoutProjectInput> | Prisma.AiSuggestionCreateWithoutProjectInput[] | Prisma.AiSuggestionUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.AiSuggestionCreateOrConnectWithoutProjectInput | Prisma.AiSuggestionCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.AiSuggestionUpsertWithWhereUniqueWithoutProjectInput | Prisma.AiSuggestionUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.AiSuggestionCreateManyProjectInputEnvelope
+  set?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  disconnect?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  delete?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  connect?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  update?: Prisma.AiSuggestionUpdateWithWhereUniqueWithoutProjectInput | Prisma.AiSuggestionUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.AiSuggestionUpdateManyWithWhereWithoutProjectInput | Prisma.AiSuggestionUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.AiSuggestionScalarWhereInput | Prisma.AiSuggestionScalarWhereInput[]
+}
+
+export type AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.AiSuggestionCreateWithoutProjectInput, Prisma.AiSuggestionUncheckedCreateWithoutProjectInput> | Prisma.AiSuggestionCreateWithoutProjectInput[] | Prisma.AiSuggestionUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.AiSuggestionCreateOrConnectWithoutProjectInput | Prisma.AiSuggestionCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.AiSuggestionUpsertWithWhereUniqueWithoutProjectInput | Prisma.AiSuggestionUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.AiSuggestionCreateManyProjectInputEnvelope
+  set?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  disconnect?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  delete?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  connect?: Prisma.AiSuggestionWhereUniqueInput | Prisma.AiSuggestionWhereUniqueInput[]
+  update?: Prisma.AiSuggestionUpdateWithWhereUniqueWithoutProjectInput | Prisma.AiSuggestionUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.AiSuggestionUpdateManyWithWhereWithoutProjectInput | Prisma.AiSuggestionUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.AiSuggestionScalarWhereInput | Prisma.AiSuggestionScalarWhereInput[]
+}
+
 export type EnumTargetTypeFieldUpdateOperationsInput = {
   set?: $Enums.TargetType
 }
@@ -462,10 +528,12 @@ export type AiSuggestionCreateWithoutUserInput = {
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
   model?: string | null
   createdAt?: Date | string
+  project?: Prisma.ProjectCreateNestedOneWithoutAiSuggestionsInput
 }
 
 export type AiSuggestionUncheckedCreateWithoutUserInput = {
   id?: string
+  projectId?: string | null
   targetType: $Enums.TargetType
   targetId: string
   suggestionType: $Enums.SuggestionType
@@ -507,6 +575,7 @@ export type AiSuggestionScalarWhereInput = {
   NOT?: Prisma.AiSuggestionScalarWhereInput | Prisma.AiSuggestionScalarWhereInput[]
   id?: Prisma.UuidFilter<"AiSuggestion"> | string
   userId?: Prisma.UuidFilter<"AiSuggestion"> | string
+  projectId?: Prisma.UuidNullableFilter<"AiSuggestion"> | string | null
   targetType?: Prisma.EnumTargetTypeFilter<"AiSuggestion"> | $Enums.TargetType
   targetId?: Prisma.UuidFilter<"AiSuggestion"> | string
   suggestionType?: Prisma.EnumSuggestionTypeFilter<"AiSuggestion"> | $Enums.SuggestionType
@@ -516,8 +585,59 @@ export type AiSuggestionScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AiSuggestion"> | Date | string
 }
 
+export type AiSuggestionCreateWithoutProjectInput = {
+  id?: string
+  targetType: $Enums.TargetType
+  targetId: string
+  suggestionType: $Enums.SuggestionType
+  platform?: $Enums.Platform | null
+  content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  model?: string | null
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutAiSuggestionsInput
+}
+
+export type AiSuggestionUncheckedCreateWithoutProjectInput = {
+  id?: string
+  userId: string
+  targetType: $Enums.TargetType
+  targetId: string
+  suggestionType: $Enums.SuggestionType
+  platform?: $Enums.Platform | null
+  content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  model?: string | null
+  createdAt?: Date | string
+}
+
+export type AiSuggestionCreateOrConnectWithoutProjectInput = {
+  where: Prisma.AiSuggestionWhereUniqueInput
+  create: Prisma.XOR<Prisma.AiSuggestionCreateWithoutProjectInput, Prisma.AiSuggestionUncheckedCreateWithoutProjectInput>
+}
+
+export type AiSuggestionCreateManyProjectInputEnvelope = {
+  data: Prisma.AiSuggestionCreateManyProjectInput | Prisma.AiSuggestionCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type AiSuggestionUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.AiSuggestionWhereUniqueInput
+  update: Prisma.XOR<Prisma.AiSuggestionUpdateWithoutProjectInput, Prisma.AiSuggestionUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.AiSuggestionCreateWithoutProjectInput, Prisma.AiSuggestionUncheckedCreateWithoutProjectInput>
+}
+
+export type AiSuggestionUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.AiSuggestionWhereUniqueInput
+  data: Prisma.XOR<Prisma.AiSuggestionUpdateWithoutProjectInput, Prisma.AiSuggestionUncheckedUpdateWithoutProjectInput>
+}
+
+export type AiSuggestionUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.AiSuggestionScalarWhereInput
+  data: Prisma.XOR<Prisma.AiSuggestionUpdateManyMutationInput, Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectInput>
+}
+
 export type AiSuggestionCreateManyUserInput = {
   id?: string
+  projectId?: string | null
   targetType: $Enums.TargetType
   targetId: string
   suggestionType: $Enums.SuggestionType
@@ -536,10 +656,12 @@ export type AiSuggestionUpdateWithoutUserInput = {
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneWithoutAiSuggestionsNestedInput
 }
 
 export type AiSuggestionUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
   targetId?: Prisma.StringFieldUpdateOperationsInput | string
   suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
@@ -551,6 +673,55 @@ export type AiSuggestionUncheckedUpdateWithoutUserInput = {
 
 export type AiSuggestionUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
+  targetId?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
+  platform?: Prisma.NullableEnumPlatformFieldUpdateOperationsInput | $Enums.Platform | null
+  content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AiSuggestionCreateManyProjectInput = {
+  id?: string
+  userId: string
+  targetType: $Enums.TargetType
+  targetId: string
+  suggestionType: $Enums.SuggestionType
+  platform?: $Enums.Platform | null
+  content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  model?: string | null
+  createdAt?: Date | string
+}
+
+export type AiSuggestionUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
+  targetId?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
+  platform?: Prisma.NullableEnumPlatformFieldUpdateOperationsInput | $Enums.Platform | null
+  content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutAiSuggestionsNestedInput
+}
+
+export type AiSuggestionUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
+  targetId?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
+  platform?: Prisma.NullableEnumPlatformFieldUpdateOperationsInput | $Enums.Platform | null
+  content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AiSuggestionUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   targetType?: Prisma.EnumTargetTypeFieldUpdateOperationsInput | $Enums.TargetType
   targetId?: Prisma.StringFieldUpdateOperationsInput | string
   suggestionType?: Prisma.EnumSuggestionTypeFieldUpdateOperationsInput | $Enums.SuggestionType
@@ -565,6 +736,7 @@ export type AiSuggestionUncheckedUpdateManyWithoutUserInput = {
 export type AiSuggestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  projectId?: boolean
   targetType?: boolean
   targetId?: boolean
   suggestionType?: boolean
@@ -573,11 +745,13 @@ export type AiSuggestionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   model?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.AiSuggestion$projectArgs<ExtArgs>
 }, ExtArgs["result"]["aiSuggestion"]>
 
 export type AiSuggestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  projectId?: boolean
   targetType?: boolean
   targetId?: boolean
   suggestionType?: boolean
@@ -586,11 +760,13 @@ export type AiSuggestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   model?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.AiSuggestion$projectArgs<ExtArgs>
 }, ExtArgs["result"]["aiSuggestion"]>
 
 export type AiSuggestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  projectId?: boolean
   targetType?: boolean
   targetId?: boolean
   suggestionType?: boolean
@@ -599,11 +775,13 @@ export type AiSuggestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   model?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.AiSuggestion$projectArgs<ExtArgs>
 }, ExtArgs["result"]["aiSuggestion"]>
 
 export type AiSuggestionSelectScalar = {
   id?: boolean
   userId?: boolean
+  projectId?: boolean
   targetType?: boolean
   targetId?: boolean
   suggestionType?: boolean
@@ -613,25 +791,30 @@ export type AiSuggestionSelectScalar = {
   createdAt?: boolean
 }
 
-export type AiSuggestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "targetType" | "targetId" | "suggestionType" | "platform" | "content" | "model" | "createdAt", ExtArgs["result"]["aiSuggestion"]>
+export type AiSuggestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "projectId" | "targetType" | "targetId" | "suggestionType" | "platform" | "content" | "model" | "createdAt", ExtArgs["result"]["aiSuggestion"]>
 export type AiSuggestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.AiSuggestion$projectArgs<ExtArgs>
 }
 export type AiSuggestionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.AiSuggestion$projectArgs<ExtArgs>
 }
 export type AiSuggestionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.AiSuggestion$projectArgs<ExtArgs>
 }
 
 export type $AiSuggestionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AiSuggestion"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    project: Prisma.$ProjectPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
+    projectId: string | null
     targetType: $Enums.TargetType
     targetId: string
     suggestionType: $Enums.SuggestionType
@@ -1034,6 +1217,7 @@ readonly fields: AiSuggestionFieldRefs;
 export interface Prisma__AiSuggestionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.AiSuggestion$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AiSuggestion$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1065,6 +1249,7 @@ export interface Prisma__AiSuggestionClient<T, Null = never, ExtArgs extends run
 export interface AiSuggestionFieldRefs {
   readonly id: Prisma.FieldRef<"AiSuggestion", 'String'>
   readonly userId: Prisma.FieldRef<"AiSuggestion", 'String'>
+  readonly projectId: Prisma.FieldRef<"AiSuggestion", 'String'>
   readonly targetType: Prisma.FieldRef<"AiSuggestion", 'TargetType'>
   readonly targetId: Prisma.FieldRef<"AiSuggestion", 'String'>
   readonly suggestionType: Prisma.FieldRef<"AiSuggestion", 'SuggestionType'>
@@ -1470,6 +1655,25 @@ export type AiSuggestionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many AiSuggestions to delete.
    */
   limit?: number
+}
+
+/**
+ * AiSuggestion.project
+ */
+export type AiSuggestion$projectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
 }
 
 /**

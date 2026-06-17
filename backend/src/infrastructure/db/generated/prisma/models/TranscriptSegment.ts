@@ -615,14 +615,6 @@ export type TranscriptSegmentUncheckedUpdateManyWithoutTranscriptNestedInput = {
   deleteMany?: Prisma.TranscriptSegmentScalarWhereInput | Prisma.TranscriptSegmentScalarWhereInput[]
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TranscriptSegmentCreateNestedOneWithoutWordsInput = {
   create?: Prisma.XOR<Prisma.TranscriptSegmentCreateWithoutWordsInput, Prisma.TranscriptSegmentUncheckedCreateWithoutWordsInput>
   connectOrCreate?: Prisma.TranscriptSegmentCreateOrConnectWithoutWordsInput
