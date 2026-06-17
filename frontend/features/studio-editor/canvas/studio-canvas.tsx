@@ -21,7 +21,7 @@ import { useCanvasMediaSync } from "./hooks/use-canvas-media-sync"
 import { usePreviewSize } from "./hooks/use-preview-size"
 
 export function StudioCanvas() {
-  const [textDragGuide, setTextDragGuide] = useState<{
+  const [layerDragGuide, setLayerDragGuide] = useState<{
     horizontal: boolean
     vertical: boolean
   } | null>(null)
@@ -33,7 +33,7 @@ export function StudioCanvas() {
     seekToTime,
   } = useStudioPlaybackState()
   const { project } = useStudioProjectState()
-  const { updateTextLayerPosition } = useStudioLayerActions()
+  const { updateCanvasLayerPosition } = useStudioLayerActions()
   const { selectedItem, selectedTargetId, setSelectedItemId } =
     useStudioSelectionState()
   const { setActiveTool } = useStudioToolState()
@@ -115,18 +115,18 @@ export function StudioCanvas() {
               captionCues={captionCues}
               currentTime={currentTime}
               layers={project.layers}
-              onMoveTextLayer={updateTextLayerPosition}
+              onLayerDragGuideChange={setLayerDragGuide}
+              onMoveLayer={updateCanvasLayerPosition}
               onSelectLayer={handleSelectLayer}
-              onTextDragGuideChange={setTextDragGuide}
               selectedTargetId={selectedTargetId}
             />
 
-            {textDragGuide ? (
+            {layerDragGuide ? (
               <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-40">
-                {textDragGuide.vertical ? (
+                {layerDragGuide.vertical ? (
                   <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 border-l border-dashed border-sky-300/85 shadow-[0_0_12px_rgba(125,211,252,0.35)]" />
                 ) : null}
-                {textDragGuide.horizontal ? (
+                {layerDragGuide.horizontal ? (
                   <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 border-t border-dashed border-sky-300/85 shadow-[0_0_12px_rgba(125,211,252,0.35)]" />
                 ) : null}
               </div>

@@ -174,7 +174,7 @@ export function createLayerActions(
         },
       }))
     },
-    updateTextLayerPosition: (
+    updateCanvasLayerPosition: (
       layerId: string,
       position: {
         xPercent: number
@@ -186,7 +186,7 @@ export function createLayerActions(
     ) => {
       const layer = get().project.layers.find((item) => item.id === layerId)
 
-      if (!layer || layer.kind !== "text") {
+      if (!layer || (layer.kind !== "text" && layer.kind !== "captions")) {
         return
       }
 
@@ -198,7 +198,7 @@ export function createLayerActions(
         project: {
           ...state.project,
           layers: state.project.layers.map((layer) =>
-            layer.id === layerId && layer.kind === "text"
+            layer.id === layerId && (layer.kind === "text" || layer.kind === "captions")
               ? { ...layer, ...position }
               : layer
           ),

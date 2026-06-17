@@ -28,7 +28,7 @@ export function TextInspector({
   const fontSize = layer.fontSize ?? 16
   const backgroundColor = layer.backgroundColor ?? "#101010"
   const backgroundEnabled = layer.backgroundEnabled === true
-  const backgroundRadius = layer.backgroundRadius ?? 16
+  const backgroundRadius = layer.backgroundRadius ?? 0
   const boxWidth = layer.boxWidth ?? 46
   const textColor = layer.textColor ?? "#ffffff"
 

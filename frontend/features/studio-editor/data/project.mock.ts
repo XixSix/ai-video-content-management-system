@@ -225,7 +225,7 @@ export const studioEditorProject: StudioEditorProject = {
       animationDuration: 0.8,
       animationName: "blurInUp",
       backgroundColor: "#101010",
-      backgroundRadius: 18,
+      backgroundRadius: 0,
       backgroundStyle: "box",
       boxWidth: 46,
       className:
@@ -249,10 +249,11 @@ export const studioEditorProject: StudioEditorProject = {
       label: "Live caption preview",
       summary: "Caption layer near lower safe area",
       className:
-        "absolute inset-x-[13%] bottom-[8.5%] rounded-2xl px-4 py-3 text-center shadow-xl transition",
+        "absolute rounded-2xl px-4 py-3 text-center shadow-xl transition",
       backgroundEnabled: false,
       backgroundColor: "#111111",
-      backgroundRadius: 20,
+      backgroundRadius: 0,
+      boxWidth: 74,
       enabled: true,
       frameClassName:
         "absolute inset-x-[12%] bottom-[7.5%] h-[15%] rounded-[28px] border border-sky-300/90 shadow-[0_0_0_1px_rgba(125,211,252,0.2)]",
@@ -274,6 +275,8 @@ export const studioEditorProject: StudioEditorProject = {
       textColor: "#ffffff",
       textDecoration: "none",
       textTransform: "uppercase",
+      xPercent: 50,
+      yPercent: 82,
     },
   ],
   timelineTracks: [

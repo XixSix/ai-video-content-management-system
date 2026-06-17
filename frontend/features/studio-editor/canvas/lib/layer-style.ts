@@ -64,17 +64,27 @@ export function getTextLayerStyle(layer: StudioCanvasLayer): CSSProperties {
 export function getCaptionContainerStyle(
   layer: StudioCanvasLayer
 ): CSSProperties {
+  const hasPosition =
+    typeof layer.xPercent === "number" && typeof layer.yPercent === "number"
+
   return {
     backgroundColor:
       layer.backgroundEnabled === false ? "transparent" : layer.backgroundColor,
     borderRadius: layer.backgroundRadius,
+    boxSizing: "border-box",
     color: layer.textColor,
     fontFamily: getFontFamilyValue(layer.fontFamily),
     fontSize: layer.fontSize,
     fontStyle: layer.fontStyle,
     fontWeight: layer.fontWeight === "bold" ? 700 : 500,
+    left: hasPosition ? `${layer.xPercent}%` : undefined,
+    right: hasPosition ? "auto" : undefined,
     textDecoration: layer.textDecoration,
     textTransform: layer.textTransform,
+    top: hasPosition ? `${layer.yPercent}%` : undefined,
+    bottom: hasPosition ? "auto" : undefined,
+    transform: hasPosition ? "translate(-50%, -50%)" : undefined,
+    width: layer.boxWidth ? `${Math.min(layer.boxWidth, 92)}%` : undefined,
   }
 }
 
