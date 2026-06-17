@@ -47,7 +47,9 @@ export function getImportableMediaLibraryItems(
   )
 
   return mediaLibraryItems.filter(
-    (item) => item.type !== "TRANSCRIPT" && !importedLibraryItemIds.has(item.id)
+    (item) =>
+      item.type !== "TRANSCRIPT" &&
+      !importedLibraryItemIds.has(item.id)
   )
 }
 

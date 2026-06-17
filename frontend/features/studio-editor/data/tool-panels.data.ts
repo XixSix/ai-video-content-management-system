@@ -27,7 +27,6 @@ export function getStudioToolPanels(
           id: "imports",
           title: "Imported",
           items: [
-            { id: "images", label: "Images", meta: "12 files", selectionId: "brand-mark" },
             { id: "captions", label: "Captions", meta: "2 styles", selectionId: "captions" },
           ],
         },
@@ -35,24 +34,7 @@ export function getStudioToolPanels(
     },
     assets: {
       title: "Assets",
-      sections: [
-        {
-          id: "logos",
-          title: "Brand",
-          items: [
-            { id: "logo-1", label: "Primary logo", meta: "PNG", selectionId: "brand-mark" },
-            { id: "lower-third", label: "Lower third", meta: "Template" },
-          ],
-        },
-        {
-          id: "stills",
-          title: "Still frames",
-          items: [
-            { id: "still-1", label: "Desk close-up", meta: "Marked" },
-            { id: "still-2", label: "Wide room", meta: "Draft" },
-          ],
-        },
-      ],
+      sections: [],
     },
     text: {
       title: "Text",

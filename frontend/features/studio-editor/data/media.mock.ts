@@ -81,7 +81,7 @@ export function createStudioMediaItem(
         : studioType === "AUDIO"
           ? "Audio from the media library ready for editing."
           : studioType === "IMAGE"
-            ? "Image asset from the media library ready for overlays."
+            ? "Image media from the media library ready for overlays."
             : "Text-based generated asset from the media library.",
     origin: item.libraryGroup === "ORIGINAL" ? "LIBRARY" : "UPLOAD",
     status: getStudioMediaStatus(item),

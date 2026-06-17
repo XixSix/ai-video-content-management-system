@@ -1,5 +1,6 @@
 "use client"
 
+import { StudioAssetsPanel } from "@/features/studio-editor/assets/studio-assets-panel"
 import { StudioCaptionsPanel } from "@/features/studio-editor/captions/studio-captions-panel"
 import { StudioChaptersPanel } from "@/features/studio-editor/chapters/studio-chapters-panel"
 import { StudioMediaPanel } from "@/features/studio-editor/media-panel/studio-media-panel"
@@ -12,6 +13,10 @@ export function StudioToolPanel() {
 
   if (activeTool === "media") {
     return <StudioMediaPanel />
+  }
+
+  if (activeTool === "assets") {
+    return <StudioAssetsPanel />
   }
 
   if (activeTool === "text") {
