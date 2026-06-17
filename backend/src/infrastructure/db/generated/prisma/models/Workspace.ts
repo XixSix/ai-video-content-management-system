@@ -365,11 +365,6 @@ export type WorkspaceScalarRelationFilter = {
   isNot?: Prisma.WorkspaceWhereInput
 }
 
-export type WorkspaceNullableScalarRelationFilter = {
-  is?: Prisma.WorkspaceWhereInput | null
-  isNot?: Prisma.WorkspaceWhereInput | null
-}
-
 export type WorkspaceCreateNestedManyWithoutOwnerInput = {
   create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutOwnerInput, Prisma.WorkspaceUncheckedCreateWithoutOwnerInput> | Prisma.WorkspaceCreateWithoutOwnerInput[] | Prisma.WorkspaceUncheckedCreateWithoutOwnerInput[]
   connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutOwnerInput | Prisma.WorkspaceCreateOrConnectWithoutOwnerInput[]
@@ -432,12 +427,10 @@ export type WorkspaceCreateNestedOneWithoutMediaInput = {
   connect?: Prisma.WorkspaceWhereUniqueInput
 }
 
-export type WorkspaceUpdateOneWithoutMediaNestedInput = {
+export type WorkspaceUpdateOneRequiredWithoutMediaNestedInput = {
   create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutMediaInput, Prisma.WorkspaceUncheckedCreateWithoutMediaInput>
   connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutMediaInput
   upsert?: Prisma.WorkspaceUpsertWithoutMediaInput
-  disconnect?: Prisma.WorkspaceWhereInput | boolean
-  delete?: Prisma.WorkspaceWhereInput | boolean
   connect?: Prisma.WorkspaceWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutMediaInput, Prisma.WorkspaceUpdateWithoutMediaInput>, Prisma.WorkspaceUncheckedUpdateWithoutMediaInput>
 }
@@ -448,12 +441,10 @@ export type WorkspaceCreateNestedOneWithoutProjectsInput = {
   connect?: Prisma.WorkspaceWhereUniqueInput
 }
 
-export type WorkspaceUpdateOneWithoutProjectsNestedInput = {
+export type WorkspaceUpdateOneRequiredWithoutProjectsNestedInput = {
   create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutProjectsInput, Prisma.WorkspaceUncheckedCreateWithoutProjectsInput>
   connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutProjectsInput
   upsert?: Prisma.WorkspaceUpsertWithoutProjectsInput
-  disconnect?: Prisma.WorkspaceWhereInput | boolean
-  delete?: Prisma.WorkspaceWhereInput | boolean
   connect?: Prisma.WorkspaceWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutProjectsInput, Prisma.WorkspaceUpdateWithoutProjectsInput>, Prisma.WorkspaceUncheckedUpdateWithoutProjectsInput>
 }

@@ -1,11 +1,36 @@
 import { prisma } from '../../infrastructure/db/prisma'
-import type { Media, MediaStatus, Prisma } from '../../infrastructure/db/generated/prisma/client'
+import type { Media, MediaStatus, Prisma, Workspace } from '../../infrastructure/db/generated/prisma/client'
 
 type MediaSortField = 'createdAt' | 'title' | 'duration'
 type SortOrder = 'asc' | 'desc'
 
 export const createMedia = async (data: Prisma.MediaCreateInput | Prisma.MediaUncheckedCreateInput): Promise<Media> =>
   prisma.media.create({ data })
+
+export const findOrCreateDefaultWorkspace = async (userId: string): Promise<Workspace> => {
+  const existingWorkspace = await prisma.workspace.findFirst({
+    where: { ownerId: userId },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
+  })
+
+  if (existingWorkspace) {
+    return existingWorkspace
+  }
+
+  return prisma.workspace.create({
+    data: {
+      ownerId: userId,
+      name: 'Workspace',
+      slug: `workspace-${userId.replaceAll('-', '')}`,
+      members: {
+        create: {
+          userId,
+          role: 'OWNER'
+        }
+      }
+    }
+  })
+}
 
 export const findMediaByUserId = async (
   userId: string,

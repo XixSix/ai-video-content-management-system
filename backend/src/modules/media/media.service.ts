@@ -117,6 +117,7 @@ export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<Cr
   const bucket: string = config.s3.bucket
   const key: string = createUploadObjectKey(input.userId, input.mediaType, input.originalFilename)
   const mode: 'SINGLE' | 'MULTIPART' = getUploadMode(input.fileSizeBytes)
+  const workspace = await mediaRepo.findOrCreateDefaultWorkspace(input.userId)
 
   let mediaId: string
 
@@ -125,6 +126,7 @@ export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<Cr
 
     const media = await mediaRepo.createMedia({
       userId: input.userId,
+      workspaceId: workspace.id,
       title: input.title,
       description: input.description,
       originalFilename: input.originalFilename,
@@ -157,6 +159,7 @@ export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<Cr
 
   const media = await mediaRepo.createMedia({
     userId: input.userId,
+    workspaceId: workspace.id,
     title: input.title,
     description: input.description,
     originalFilename: input.originalFilename,

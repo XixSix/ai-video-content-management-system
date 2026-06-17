@@ -234,7 +234,7 @@ export type ProjectGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type ProjectGroupByOutputType = {
   id: string
   userId: string
-  workspaceId: string | null
+  workspaceId: string
   sourceMediaId: string | null
   thumbnailMediaId: string | null
   title: string
@@ -273,7 +273,7 @@ export type ProjectWhereInput = {
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   id?: Prisma.UuidFilter<"Project"> | string
   userId?: Prisma.UuidFilter<"Project"> | string
-  workspaceId?: Prisma.UuidNullableFilter<"Project"> | string | null
+  workspaceId?: Prisma.UuidFilter<"Project"> | string
   sourceMediaId?: Prisma.UuidNullableFilter<"Project"> | string | null
   thumbnailMediaId?: Prisma.UuidNullableFilter<"Project"> | string | null
   title?: Prisma.StringFilter<"Project"> | string
@@ -285,7 +285,7 @@ export type ProjectWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   sourceMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   thumbnailMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   projectMedia?: Prisma.ProjectMediaListRelationFilter
@@ -307,7 +307,7 @@ export type ProjectWhereInput = {
 export type ProjectOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   sourceMediaId?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailMediaId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -340,12 +340,12 @@ export type ProjectOrderByWithRelationInput = {
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_slug?: Prisma.ProjectUserIdSlugCompoundUniqueInput
+  workspaceId_slug?: Prisma.ProjectWorkspaceIdSlugCompoundUniqueInput
   AND?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   OR?: Prisma.ProjectWhereInput[]
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   userId?: Prisma.UuidFilter<"Project"> | string
-  workspaceId?: Prisma.UuidNullableFilter<"Project"> | string | null
+  workspaceId?: Prisma.UuidFilter<"Project"> | string
   sourceMediaId?: Prisma.UuidNullableFilter<"Project"> | string | null
   thumbnailMediaId?: Prisma.UuidNullableFilter<"Project"> | string | null
   title?: Prisma.StringFilter<"Project"> | string
@@ -357,7 +357,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   sourceMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   thumbnailMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   projectMedia?: Prisma.ProjectMediaListRelationFilter
@@ -374,12 +374,12 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   aiSuggestions?: Prisma.AiSuggestionListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
-}, "id" | "userId_slug">
+}, "id" | "workspaceId_slug">
 
 export type ProjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   sourceMediaId?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailMediaId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -403,7 +403,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ProjectScalarWhereWithAggregatesInput | Prisma.ProjectScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"Project"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"Project"> | string
-  workspaceId?: Prisma.UuidNullableWithAggregatesFilter<"Project"> | string | null
+  workspaceId?: Prisma.UuidWithAggregatesFilter<"Project"> | string
   sourceMediaId?: Prisma.UuidNullableWithAggregatesFilter<"Project"> | string | null
   thumbnailMediaId?: Prisma.UuidNullableWithAggregatesFilter<"Project"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Project"> | string
@@ -427,7 +427,7 @@ export type ProjectCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -449,7 +449,7 @@ export type ProjectCreateInput = {
 export type ProjectUncheckedCreateInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -487,7 +487,7 @@ export type ProjectUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -509,7 +509,7 @@ export type ProjectUpdateInput = {
 export type ProjectUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -539,7 +539,7 @@ export type ProjectUncheckedUpdateInput = {
 export type ProjectCreateManyInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -567,7 +567,7 @@ export type ProjectUpdateManyMutationInput = {
 export type ProjectUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -590,8 +590,8 @@ export type ProjectOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ProjectUserIdSlugCompoundUniqueInput = {
-  userId: string
+export type ProjectWorkspaceIdSlugCompoundUniqueInput = {
+  workspaceId: string
   slug: string
 }
 
@@ -1065,7 +1065,7 @@ export type ProjectCreateWithoutUserInput = {
   currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -1086,7 +1086,7 @@ export type ProjectCreateWithoutUserInput = {
 
 export type ProjectUncheckedCreateWithoutUserInput = {
   id?: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -1145,7 +1145,7 @@ export type ProjectScalarWhereInput = {
   NOT?: Prisma.ProjectScalarWhereInput | Prisma.ProjectScalarWhereInput[]
   id?: Prisma.UuidFilter<"Project"> | string
   userId?: Prisma.UuidFilter<"Project"> | string
-  workspaceId?: Prisma.UuidNullableFilter<"Project"> | string | null
+  workspaceId?: Prisma.UuidFilter<"Project"> | string
   sourceMediaId?: Prisma.UuidNullableFilter<"Project"> | string | null
   thumbnailMediaId?: Prisma.UuidNullableFilter<"Project"> | string | null
   title?: Prisma.StringFilter<"Project"> | string
@@ -1253,7 +1253,7 @@ export type ProjectCreateWithoutSourceMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
   editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
@@ -1274,7 +1274,7 @@ export type ProjectCreateWithoutSourceMediaInput = {
 export type ProjectUncheckedCreateWithoutSourceMediaInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   thumbnailMediaId?: string | null
   title: string
   slug: string
@@ -1321,7 +1321,7 @@ export type ProjectCreateWithoutThumbnailMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
   editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
@@ -1342,7 +1342,7 @@ export type ProjectCreateWithoutThumbnailMediaInput = {
 export type ProjectUncheckedCreateWithoutThumbnailMediaInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   title: string
   slug: string
@@ -1421,7 +1421,7 @@ export type ProjectCreateWithoutProjectMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
@@ -1442,7 +1442,7 @@ export type ProjectCreateWithoutProjectMediaInput = {
 export type ProjectUncheckedCreateWithoutProjectMediaInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -1495,7 +1495,7 @@ export type ProjectUpdateWithoutProjectMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
@@ -1516,7 +1516,7 @@ export type ProjectUpdateWithoutProjectMediaInput = {
 export type ProjectUncheckedUpdateWithoutProjectMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1553,7 +1553,7 @@ export type ProjectCreateWithoutEditorDocumentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -1574,7 +1574,7 @@ export type ProjectCreateWithoutEditorDocumentInput = {
 export type ProjectUncheckedCreateWithoutEditorDocumentInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -1627,7 +1627,7 @@ export type ProjectUpdateWithoutEditorDocumentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -1648,7 +1648,7 @@ export type ProjectUpdateWithoutEditorDocumentInput = {
 export type ProjectUncheckedUpdateWithoutEditorDocumentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1685,7 +1685,7 @@ export type ProjectCreateWithoutDocumentVersionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -1706,7 +1706,7 @@ export type ProjectCreateWithoutDocumentVersionsInput = {
 export type ProjectUncheckedCreateWithoutDocumentVersionsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -1759,7 +1759,7 @@ export type ProjectUpdateWithoutDocumentVersionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -1780,7 +1780,7 @@ export type ProjectUpdateWithoutDocumentVersionsInput = {
 export type ProjectUncheckedUpdateWithoutDocumentVersionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1817,7 +1817,7 @@ export type ProjectCreateWithoutCanvasLayersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -1838,7 +1838,7 @@ export type ProjectCreateWithoutCanvasLayersInput = {
 export type ProjectUncheckedCreateWithoutCanvasLayersInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -1891,7 +1891,7 @@ export type ProjectUpdateWithoutCanvasLayersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -1912,7 +1912,7 @@ export type ProjectUpdateWithoutCanvasLayersInput = {
 export type ProjectUncheckedUpdateWithoutCanvasLayersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1949,7 +1949,7 @@ export type ProjectCreateWithoutTimelineTracksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -1970,7 +1970,7 @@ export type ProjectCreateWithoutTimelineTracksInput = {
 export type ProjectUncheckedCreateWithoutTimelineTracksInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2023,7 +2023,7 @@ export type ProjectUpdateWithoutTimelineTracksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2044,7 +2044,7 @@ export type ProjectUpdateWithoutTimelineTracksInput = {
 export type ProjectUncheckedUpdateWithoutTimelineTracksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2081,7 +2081,7 @@ export type ProjectCreateWithoutTimelineSegmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2102,7 +2102,7 @@ export type ProjectCreateWithoutTimelineSegmentsInput = {
 export type ProjectUncheckedCreateWithoutTimelineSegmentsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2155,7 +2155,7 @@ export type ProjectUpdateWithoutTimelineSegmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2176,7 +2176,7 @@ export type ProjectUpdateWithoutTimelineSegmentsInput = {
 export type ProjectUncheckedUpdateWithoutTimelineSegmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2213,7 +2213,7 @@ export type ProjectCreateWithoutProcessingJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2234,7 +2234,7 @@ export type ProjectCreateWithoutProcessingJobsInput = {
 export type ProjectUncheckedCreateWithoutProcessingJobsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2287,7 +2287,7 @@ export type ProjectUpdateWithoutProcessingJobsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2308,7 +2308,7 @@ export type ProjectUpdateWithoutProcessingJobsInput = {
 export type ProjectUncheckedUpdateWithoutProcessingJobsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2345,7 +2345,7 @@ export type ProjectCreateWithoutTranscriptsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2366,7 +2366,7 @@ export type ProjectCreateWithoutTranscriptsInput = {
 export type ProjectUncheckedCreateWithoutTranscriptsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2419,7 +2419,7 @@ export type ProjectUpdateWithoutTranscriptsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2440,7 +2440,7 @@ export type ProjectUpdateWithoutTranscriptsInput = {
 export type ProjectUncheckedUpdateWithoutTranscriptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2477,7 +2477,7 @@ export type ProjectCreateWithoutVideoChaptersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2498,7 +2498,7 @@ export type ProjectCreateWithoutVideoChaptersInput = {
 export type ProjectUncheckedCreateWithoutVideoChaptersInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2551,7 +2551,7 @@ export type ProjectUpdateWithoutVideoChaptersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2572,7 +2572,7 @@ export type ProjectUpdateWithoutVideoChaptersInput = {
 export type ProjectUncheckedUpdateWithoutVideoChaptersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2609,7 +2609,7 @@ export type ProjectCreateWithoutClipCandidatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2630,7 +2630,7 @@ export type ProjectCreateWithoutClipCandidatesInput = {
 export type ProjectUncheckedCreateWithoutClipCandidatesInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2683,7 +2683,7 @@ export type ProjectUpdateWithoutClipCandidatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2704,7 +2704,7 @@ export type ProjectUpdateWithoutClipCandidatesInput = {
 export type ProjectUncheckedUpdateWithoutClipCandidatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2741,7 +2741,7 @@ export type ProjectCreateWithoutShortClipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2762,7 +2762,7 @@ export type ProjectCreateWithoutShortClipsInput = {
 export type ProjectUncheckedCreateWithoutShortClipsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2815,7 +2815,7 @@ export type ProjectUpdateWithoutShortClipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2836,7 +2836,7 @@ export type ProjectUpdateWithoutShortClipsInput = {
 export type ProjectUncheckedUpdateWithoutShortClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2873,7 +2873,7 @@ export type ProjectCreateWithoutGeneratedAssetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -2894,7 +2894,7 @@ export type ProjectCreateWithoutGeneratedAssetsInput = {
 export type ProjectUncheckedCreateWithoutGeneratedAssetsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -2947,7 +2947,7 @@ export type ProjectUpdateWithoutGeneratedAssetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -2968,7 +2968,7 @@ export type ProjectUpdateWithoutGeneratedAssetsInput = {
 export type ProjectUncheckedUpdateWithoutGeneratedAssetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3005,7 +3005,7 @@ export type ProjectCreateWithoutAiSuggestionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -3026,7 +3026,7 @@ export type ProjectCreateWithoutAiSuggestionsInput = {
 export type ProjectUncheckedCreateWithoutAiSuggestionsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -3079,7 +3079,7 @@ export type ProjectUpdateWithoutAiSuggestionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -3100,7 +3100,7 @@ export type ProjectUpdateWithoutAiSuggestionsInput = {
 export type ProjectUncheckedUpdateWithoutAiSuggestionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3137,7 +3137,7 @@ export type ProjectCreateWithoutPublishTasksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
@@ -3158,7 +3158,7 @@ export type ProjectCreateWithoutPublishTasksInput = {
 export type ProjectUncheckedCreateWithoutPublishTasksInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -3211,7 +3211,7 @@ export type ProjectUpdateWithoutPublishTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -3232,7 +3232,7 @@ export type ProjectUpdateWithoutPublishTasksInput = {
 export type ProjectUncheckedUpdateWithoutPublishTasksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3260,7 +3260,7 @@ export type ProjectUncheckedUpdateWithoutPublishTasksInput = {
 
 export type ProjectCreateManyUserInput = {
   id?: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   thumbnailMediaId?: string | null
   title: string
@@ -3283,7 +3283,7 @@ export type ProjectUpdateWithoutUserInput = {
   currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
@@ -3304,7 +3304,7 @@ export type ProjectUpdateWithoutUserInput = {
 
 export type ProjectUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3333,7 +3333,7 @@ export type ProjectUncheckedUpdateWithoutUserInput = {
 
 export type ProjectUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3437,7 +3437,7 @@ export type ProjectUncheckedUpdateManyWithoutWorkspaceInput = {
 export type ProjectCreateManySourceMediaInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   thumbnailMediaId?: string | null
   title: string
   slug: string
@@ -3452,7 +3452,7 @@ export type ProjectCreateManySourceMediaInput = {
 export type ProjectCreateManyThumbnailMediaInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   sourceMediaId?: string | null
   title: string
   slug: string
@@ -3475,7 +3475,7 @@ export type ProjectUpdateWithoutSourceMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
   editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
@@ -3496,7 +3496,7 @@ export type ProjectUpdateWithoutSourceMediaInput = {
 export type ProjectUncheckedUpdateWithoutSourceMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3525,7 +3525,7 @@ export type ProjectUncheckedUpdateWithoutSourceMediaInput = {
 export type ProjectUncheckedUpdateManyWithoutSourceMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3548,7 +3548,7 @@ export type ProjectUpdateWithoutThumbnailMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutProjectsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
   editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
@@ -3569,7 +3569,7 @@ export type ProjectUpdateWithoutThumbnailMediaInput = {
 export type ProjectUncheckedUpdateWithoutThumbnailMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3598,7 +3598,7 @@ export type ProjectUncheckedUpdateWithoutThumbnailMediaInput = {
 export type ProjectUncheckedUpdateManyWithoutThumbnailMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3764,7 +3764,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Project$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
   projectMedia?: boolean | Prisma.Project$projectMediaArgs<ExtArgs>
@@ -3799,7 +3799,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Project$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -3819,7 +3819,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Project$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -3843,7 +3843,7 @@ export type ProjectSelectScalar = {
 export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "workspaceId" | "sourceMediaId" | "thumbnailMediaId" | "title" | "slug" | "status" | "aspectRatio" | "duration" | "currentDocumentVersion" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Project$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
   projectMedia?: boolean | Prisma.Project$projectMediaArgs<ExtArgs>
@@ -3864,13 +3864,13 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Project$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
 }
 export type ProjectIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Project$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
 }
@@ -3879,7 +3879,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Project"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
-    workspace: Prisma.$WorkspacePayload<ExtArgs> | null
+    workspace: Prisma.$WorkspacePayload<ExtArgs>
     sourceMedia: Prisma.$MediaPayload<ExtArgs> | null
     thumbnailMedia: Prisma.$MediaPayload<ExtArgs> | null
     projectMedia: Prisma.$ProjectMediaPayload<ExtArgs>[]
@@ -3900,7 +3900,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    workspaceId: string | null
+    workspaceId: string
     sourceMediaId: string | null
     thumbnailMediaId: string | null
     title: string
@@ -4306,7 +4306,7 @@ readonly fields: ProjectFieldRefs;
 export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  workspace<T extends Prisma.Project$workspaceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$workspaceArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  workspace<T extends Prisma.WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkspaceDefaultArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sourceMedia<T extends Prisma.Project$sourceMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$sourceMediaArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   thumbnailMedia<T extends Prisma.Project$thumbnailMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$thumbnailMediaArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   projectMedia<T extends Prisma.Project$projectMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$projectMediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4763,25 +4763,6 @@ export type ProjectDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Projects to delete.
    */
   limit?: number
-}
-
-/**
- * Project.workspace
- */
-export type Project$workspaceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Workspace
-   */
-  select?: Prisma.WorkspaceSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Workspace
-   */
-  omit?: Prisma.WorkspaceOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.WorkspaceInclude<ExtArgs> | null
-  where?: Prisma.WorkspaceWhereInput
 }
 
 /**

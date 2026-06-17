@@ -286,7 +286,7 @@ export type MediaGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type MediaGroupByOutputType = {
   id: string
   userId: string
-  workspaceId: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title: string | null
   description: string | null
@@ -333,7 +333,7 @@ export type MediaWhereInput = {
   NOT?: Prisma.MediaWhereInput | Prisma.MediaWhereInput[]
   id?: Prisma.UuidFilter<"Media"> | string
   userId?: Prisma.UuidFilter<"Media"> | string
-  workspaceId?: Prisma.UuidNullableFilter<"Media"> | string | null
+  workspaceId?: Prisma.UuidFilter<"Media"> | string
   type?: Prisma.EnumMediaTypeFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableFilter<"Media"> | string | null
   description?: Prisma.StringNullableFilter<"Media"> | string | null
@@ -353,7 +353,7 @@ export type MediaWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   processingJobs?: Prisma.ProcessingJobListRelationFilter
   transcripts?: Prisma.TranscriptListRelationFilter
   transcriptSegments?: Prisma.TranscriptSegmentListRelationFilter
@@ -373,7 +373,7 @@ export type MediaWhereInput = {
 export type MediaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -417,7 +417,7 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MediaWhereInput[]
   NOT?: Prisma.MediaWhereInput | Prisma.MediaWhereInput[]
   userId?: Prisma.UuidFilter<"Media"> | string
-  workspaceId?: Prisma.UuidNullableFilter<"Media"> | string | null
+  workspaceId?: Prisma.UuidFilter<"Media"> | string
   type?: Prisma.EnumMediaTypeFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableFilter<"Media"> | string | null
   description?: Prisma.StringNullableFilter<"Media"> | string | null
@@ -437,7 +437,7 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Media"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   processingJobs?: Prisma.ProcessingJobListRelationFilter
   transcripts?: Prisma.TranscriptListRelationFilter
   transcriptSegments?: Prisma.TranscriptSegmentListRelationFilter
@@ -457,7 +457,7 @@ export type MediaWhereUniqueInput = Prisma.AtLeast<{
 export type MediaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -489,7 +489,7 @@ export type MediaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MediaScalarWhereWithAggregatesInput | Prisma.MediaScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"Media"> | string
   userId?: Prisma.UuidWithAggregatesFilter<"Media"> | string
-  workspaceId?: Prisma.UuidNullableWithAggregatesFilter<"Media"> | string | null
+  workspaceId?: Prisma.UuidWithAggregatesFilter<"Media"> | string
   type?: Prisma.EnumMediaTypeWithAggregatesFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableWithAggregatesFilter<"Media"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Media"> | string | null
@@ -531,7 +531,7 @@ export type MediaCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -551,7 +551,7 @@ export type MediaCreateInput = {
 export type MediaUncheckedCreateInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -607,7 +607,7 @@ export type MediaUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -627,7 +627,7 @@ export type MediaUpdateInput = {
 export type MediaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -665,7 +665,7 @@ export type MediaUncheckedUpdateInput = {
 export type MediaCreateManyInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -711,7 +711,7 @@ export type MediaUpdateManyMutationInput = {
 export type MediaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1185,7 +1185,7 @@ export type MediaCreateWithoutUserInput = {
   status?: $Enums.MediaStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -1204,7 +1204,7 @@ export type MediaCreateWithoutUserInput = {
 
 export type MediaUncheckedCreateWithoutUserInput = {
   id?: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1271,7 +1271,7 @@ export type MediaScalarWhereInput = {
   NOT?: Prisma.MediaScalarWhereInput | Prisma.MediaScalarWhereInput[]
   id?: Prisma.UuidFilter<"Media"> | string
   userId?: Prisma.UuidFilter<"Media"> | string
-  workspaceId?: Prisma.UuidNullableFilter<"Media"> | string | null
+  workspaceId?: Prisma.UuidFilter<"Media"> | string
   type?: Prisma.EnumMediaTypeFilter<"Media"> | $Enums.MediaType
   title?: Prisma.StringNullableFilter<"Media"> | string | null
   description?: Prisma.StringNullableFilter<"Media"> | string | null
@@ -1413,7 +1413,7 @@ export type MediaCreateWithoutSourceProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -1432,7 +1432,7 @@ export type MediaCreateWithoutSourceProjectsInput = {
 export type MediaUncheckedCreateWithoutSourceProjectsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1492,7 +1492,7 @@ export type MediaCreateWithoutThumbnailProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -1511,7 +1511,7 @@ export type MediaCreateWithoutThumbnailProjectsInput = {
 export type MediaUncheckedCreateWithoutThumbnailProjectsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1582,7 +1582,7 @@ export type MediaUpdateWithoutSourceProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -1601,7 +1601,7 @@ export type MediaUpdateWithoutSourceProjectsInput = {
 export type MediaUncheckedUpdateWithoutSourceProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1667,7 +1667,7 @@ export type MediaUpdateWithoutThumbnailProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -1686,7 +1686,7 @@ export type MediaUpdateWithoutThumbnailProjectsInput = {
 export type MediaUncheckedUpdateWithoutThumbnailProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1741,7 +1741,7 @@ export type MediaCreateWithoutProjectMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -1760,7 +1760,7 @@ export type MediaCreateWithoutProjectMediaInput = {
 export type MediaUncheckedCreateWithoutProjectMediaInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1831,7 +1831,7 @@ export type MediaUpdateWithoutProjectMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -1850,7 +1850,7 @@ export type MediaUpdateWithoutProjectMediaInput = {
 export type MediaUncheckedUpdateWithoutProjectMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1905,7 +1905,7 @@ export type MediaCreateWithoutCanvasLayersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -1924,7 +1924,7 @@ export type MediaCreateWithoutCanvasLayersInput = {
 export type MediaUncheckedCreateWithoutCanvasLayersInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -1995,7 +1995,7 @@ export type MediaUpdateWithoutCanvasLayersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -2014,7 +2014,7 @@ export type MediaUpdateWithoutCanvasLayersInput = {
 export type MediaUncheckedUpdateWithoutCanvasLayersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2069,7 +2069,7 @@ export type MediaCreateWithoutTimelineSegmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -2088,7 +2088,7 @@ export type MediaCreateWithoutTimelineSegmentsInput = {
 export type MediaUncheckedCreateWithoutTimelineSegmentsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2159,7 +2159,7 @@ export type MediaUpdateWithoutTimelineSegmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -2178,7 +2178,7 @@ export type MediaUpdateWithoutTimelineSegmentsInput = {
 export type MediaUncheckedUpdateWithoutTimelineSegmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2233,7 +2233,7 @@ export type MediaCreateWithoutProcessingJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
@@ -2252,7 +2252,7 @@ export type MediaCreateWithoutProcessingJobsInput = {
 export type MediaUncheckedCreateWithoutProcessingJobsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2323,7 +2323,7 @@ export type MediaUpdateWithoutProcessingJobsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
@@ -2342,7 +2342,7 @@ export type MediaUpdateWithoutProcessingJobsInput = {
 export type MediaUncheckedUpdateWithoutProcessingJobsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2397,7 +2397,7 @@ export type MediaCreateWithoutTranscriptsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
@@ -2416,7 +2416,7 @@ export type MediaCreateWithoutTranscriptsInput = {
 export type MediaUncheckedCreateWithoutTranscriptsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2487,7 +2487,7 @@ export type MediaUpdateWithoutTranscriptsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
@@ -2506,7 +2506,7 @@ export type MediaUpdateWithoutTranscriptsInput = {
 export type MediaUncheckedUpdateWithoutTranscriptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2561,7 +2561,7 @@ export type MediaCreateWithoutTranscriptSegmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptWords?: Prisma.TranscriptWordCreateNestedManyWithoutMediaInput
@@ -2580,7 +2580,7 @@ export type MediaCreateWithoutTranscriptSegmentsInput = {
 export type MediaUncheckedCreateWithoutTranscriptSegmentsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2651,7 +2651,7 @@ export type MediaUpdateWithoutTranscriptSegmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptWords?: Prisma.TranscriptWordUpdateManyWithoutMediaNestedInput
@@ -2670,7 +2670,7 @@ export type MediaUpdateWithoutTranscriptSegmentsInput = {
 export type MediaUncheckedUpdateWithoutTranscriptSegmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2725,7 +2725,7 @@ export type MediaCreateWithoutTranscriptWordsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -2744,7 +2744,7 @@ export type MediaCreateWithoutTranscriptWordsInput = {
 export type MediaUncheckedCreateWithoutTranscriptWordsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2815,7 +2815,7 @@ export type MediaUpdateWithoutTranscriptWordsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -2834,7 +2834,7 @@ export type MediaUpdateWithoutTranscriptWordsInput = {
 export type MediaUncheckedUpdateWithoutTranscriptWordsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2889,7 +2889,7 @@ export type MediaCreateWithoutVideoChaptersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -2908,7 +2908,7 @@ export type MediaCreateWithoutVideoChaptersInput = {
 export type MediaUncheckedCreateWithoutVideoChaptersInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -2979,7 +2979,7 @@ export type MediaUpdateWithoutVideoChaptersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -2998,7 +2998,7 @@ export type MediaUpdateWithoutVideoChaptersInput = {
 export type MediaUncheckedUpdateWithoutVideoChaptersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3053,7 +3053,7 @@ export type MediaCreateWithoutClipCandidatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -3072,7 +3072,7 @@ export type MediaCreateWithoutClipCandidatesInput = {
 export type MediaUncheckedCreateWithoutClipCandidatesInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -3143,7 +3143,7 @@ export type MediaUpdateWithoutClipCandidatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -3162,7 +3162,7 @@ export type MediaUpdateWithoutClipCandidatesInput = {
 export type MediaUncheckedUpdateWithoutClipCandidatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3217,7 +3217,7 @@ export type MediaCreateWithoutShortClipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -3236,7 +3236,7 @@ export type MediaCreateWithoutShortClipsInput = {
 export type MediaUncheckedCreateWithoutShortClipsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -3307,7 +3307,7 @@ export type MediaUpdateWithoutShortClipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -3326,7 +3326,7 @@ export type MediaUpdateWithoutShortClipsInput = {
 export type MediaUncheckedUpdateWithoutShortClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3381,7 +3381,7 @@ export type MediaCreateWithoutGeneratedAssetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -3400,7 +3400,7 @@ export type MediaCreateWithoutGeneratedAssetsInput = {
 export type MediaUncheckedCreateWithoutGeneratedAssetsInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -3471,7 +3471,7 @@ export type MediaUpdateWithoutGeneratedAssetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -3490,7 +3490,7 @@ export type MediaUpdateWithoutGeneratedAssetsInput = {
 export type MediaUncheckedUpdateWithoutGeneratedAssetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3545,7 +3545,7 @@ export type MediaCreateWithoutPublishTasksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMediaInput
-  workspace?: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMediaInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutMediaInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutMediaInput
   transcriptSegments?: Prisma.TranscriptSegmentCreateNestedManyWithoutMediaInput
@@ -3564,7 +3564,7 @@ export type MediaCreateWithoutPublishTasksInput = {
 export type MediaUncheckedCreateWithoutPublishTasksInput = {
   id?: string
   userId: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -3635,7 +3635,7 @@ export type MediaUpdateWithoutPublishTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMediaNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -3654,7 +3654,7 @@ export type MediaUpdateWithoutPublishTasksInput = {
 export type MediaUncheckedUpdateWithoutPublishTasksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3690,7 +3690,7 @@ export type MediaUncheckedUpdateWithoutPublishTasksInput = {
 
 export type MediaCreateManyUserInput = {
   id?: string
-  workspaceId?: string | null
+  workspaceId: string
   type: $Enums.MediaType
   title?: string | null
   description?: string | null
@@ -3731,7 +3731,7 @@ export type MediaUpdateWithoutUserInput = {
   status?: Prisma.EnumMediaStatusFieldUpdateOperationsInput | $Enums.MediaStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workspace?: Prisma.WorkspaceUpdateOneWithoutMediaNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMediaNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutMediaNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutMediaNestedInput
   transcriptSegments?: Prisma.TranscriptSegmentUpdateManyWithoutMediaNestedInput
@@ -3750,7 +3750,7 @@ export type MediaUpdateWithoutUserInput = {
 
 export type MediaUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3787,7 +3787,7 @@ export type MediaUncheckedUpdateWithoutUserInput = {
 
 export type MediaUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4099,7 +4099,7 @@ export type MediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   processingJobs?: boolean | Prisma.Media$processingJobsArgs<ExtArgs>
   transcripts?: boolean | Prisma.Media$transcriptsArgs<ExtArgs>
   transcriptSegments?: boolean | Prisma.Media$transcriptSegmentsArgs<ExtArgs>
@@ -4140,7 +4140,7 @@ export type MediaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["media"]>
 
 export type MediaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -4166,7 +4166,7 @@ export type MediaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["media"]>
 
 export type MediaSelectScalar = {
@@ -4196,7 +4196,7 @@ export type MediaSelectScalar = {
 export type MediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "workspaceId" | "type" | "title" | "description" | "originalFilename" | "s3Bucket" | "s3Key" | "s3Region" | "s3Etag" | "uploadId" | "duration" | "fileSizeBytes" | "mimeType" | "width" | "height" | "metadata" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["media"]>
 export type MediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   processingJobs?: boolean | Prisma.Media$processingJobsArgs<ExtArgs>
   transcripts?: boolean | Prisma.Media$transcriptsArgs<ExtArgs>
   transcriptSegments?: boolean | Prisma.Media$transcriptSegmentsArgs<ExtArgs>
@@ -4215,18 +4215,18 @@ export type MediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 }
 export type MediaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
 }
 export type MediaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  workspace?: boolean | Prisma.Media$workspaceArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
 }
 
 export type $MediaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Media"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
-    workspace: Prisma.$WorkspacePayload<ExtArgs> | null
+    workspace: Prisma.$WorkspacePayload<ExtArgs>
     processingJobs: Prisma.$ProcessingJobPayload<ExtArgs>[]
     transcripts: Prisma.$TranscriptPayload<ExtArgs>[]
     transcriptSegments: Prisma.$TranscriptSegmentPayload<ExtArgs>[]
@@ -4245,7 +4245,7 @@ export type $MediaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    workspaceId: string | null
+    workspaceId: string
     type: $Enums.MediaType
     title: string | null
     description: string | null
@@ -4659,7 +4659,7 @@ readonly fields: MediaFieldRefs;
 export interface Prisma__MediaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  workspace<T extends Prisma.Media$workspaceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$workspaceArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  workspace<T extends Prisma.WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkspaceDefaultArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   processingJobs<T extends Prisma.Media$processingJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$processingJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcripts<T extends Prisma.Media$transcriptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$transcriptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcriptSegments<T extends Prisma.Media$transcriptSegmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Media$transcriptSegmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5122,25 +5122,6 @@ export type MediaDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Media to delete.
    */
   limit?: number
-}
-
-/**
- * Media.workspace
- */
-export type Media$workspaceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Workspace
-   */
-  select?: Prisma.WorkspaceSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Workspace
-   */
-  omit?: Prisma.WorkspaceOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.WorkspaceInclude<ExtArgs> | null
-  where?: Prisma.WorkspaceWhereInput
 }
 
 /**

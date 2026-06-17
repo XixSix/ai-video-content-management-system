@@ -285,7 +285,7 @@ model WorkspaceMember {
 model Media {
   id          String    @id @default(uuid()) @db.Uuid
   userId      String    @map("user_id") @db.Uuid
-  workspaceId String?   @map("workspace_id") @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
   type        MediaType
 
   title            String? @db.VarChar(255)
@@ -310,8 +310,8 @@ model Media {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   processingJobs     ProcessingJob[]
   transcripts        Transcript[]
@@ -337,9 +337,9 @@ model Media {
 }
 
 model Project {
-  id          String  @id @default(uuid()) @db.Uuid
-  userId      String  @map("user_id") @db.Uuid
-  workspaceId String? @map("workspace_id") @db.Uuid
+  id          String @id @default(uuid()) @db.Uuid
+  userId      String @map("user_id") @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
 
   sourceMediaId    String? @map("source_media_id") @db.Uuid
   thumbnailMediaId String? @map("thumbnail_media_id") @db.Uuid
@@ -355,10 +355,10 @@ model Project {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace      Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
-  sourceMedia    Media?     @relation("ProjectSourceMedia", fields: [sourceMediaId], references: [id], onDelete: SetNull)
-  thumbnailMedia Media?     @relation("ProjectThumbnailMedia", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sourceMedia    Media?    @relation("ProjectSourceMedia", fields: [sourceMediaId], references: [id], onDelete: SetNull)
+  thumbnailMedia Media?    @relation("ProjectThumbnailMedia", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
 
   projectMedia     ProjectMedia[]
   editorDocument   EditorDocument?
@@ -375,7 +375,7 @@ model Project {
   aiSuggestions    AiSuggestion[]
   publishTasks     PublishTask[]
 
-  @@unique([userId, slug])
+  @@unique([workspaceId, slug])
   @@index([workspaceId])
   @@index([sourceMediaId])
   @@index([thumbnailMediaId])
