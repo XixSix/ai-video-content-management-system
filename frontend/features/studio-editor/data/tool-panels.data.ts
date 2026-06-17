@@ -27,7 +27,6 @@ export function getStudioToolPanels(
           id: "imports",
           title: "Imported",
           items: [
-            { id: "images", label: "Images", meta: "12 files", selectionId: "brand-mark" },
             { id: "captions", label: "Captions", meta: "2 styles", selectionId: "captions" },
           ],
         },
@@ -35,24 +34,7 @@ export function getStudioToolPanels(
     },
     assets: {
       title: "Assets",
-      sections: [
-        {
-          id: "logos",
-          title: "Brand",
-          items: [
-            { id: "logo-1", label: "Primary logo", meta: "PNG", selectionId: "brand-mark" },
-            { id: "lower-third", label: "Lower third", meta: "Template" },
-          ],
-        },
-        {
-          id: "stills",
-          title: "Still frames",
-          items: [
-            { id: "still-1", label: "Desk close-up", meta: "Marked" },
-            { id: "still-2", label: "Wide room", meta: "Draft" },
-          ],
-        },
-      ],
+      sections: [],
     },
     text: {
       title: "Text",
@@ -119,24 +101,7 @@ export function getStudioToolPanels(
     },
     audio: {
       title: "Audio",
-      sections: [
-        {
-          id: "tracks",
-          title: "Tracks",
-          items: [
-            { id: "guide", label: "English guide", meta: "-3 dB", selectionId: "audio-bed" },
-            { id: "music", label: "Music bed", meta: "-18 dB" },
-          ],
-        },
-        {
-          id: "tools",
-          title: "Tools",
-          items: [
-            { id: "ducking", label: "Ducking", meta: "On" },
-            { id: "cleanup", label: "Cleanup", meta: "Ready" },
-          ],
-        },
-      ],
+      sections: [],
     },
     clips: {
       title: "Clips",
@@ -161,24 +126,7 @@ export function getStudioToolPanels(
     },
     ai: {
       title: "AI",
-      sections: [
-        {
-          id: "ideas",
-          title: "Ideas",
-          items: [
-            { id: "ai-1", label: "Hook rewrite", meta: "2 options" },
-            { id: "ai-2", label: "Caption polish", meta: "Ready" },
-          ],
-        },
-        {
-          id: "automation",
-          title: "Automation",
-          items: [
-            { id: "auto-1", label: "Clip finder", meta: "Queued" },
-            { id: "auto-2", label: "Silence trim", meta: "Idle" },
-          ],
-        },
-      ],
+      sections: [],
     },
   }
 }

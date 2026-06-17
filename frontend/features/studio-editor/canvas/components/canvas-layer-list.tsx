@@ -9,15 +9,19 @@ export function CanvasLayerList({
   captionCues,
   currentTime,
   layers,
-  onMoveTextLayer,
+  onLayerDragGuideChange,
+  onMoveLayer,
   onSelectLayer,
-  onTextDragGuideChange,
   selectedTargetId,
 }: {
   captionCues: StudioCaptionCue[]
   currentTime: number
   layers: StudioCanvasLayer[]
-  onMoveTextLayer: (
+  onLayerDragGuideChange: (guide: {
+    horizontal: boolean
+    vertical: boolean
+  } | null) => void
+  onMoveLayer: (
     layerId: string,
     position: {
       xPercent: number
@@ -28,10 +32,6 @@ export function CanvasLayerList({
     }
   ) => void
   onSelectLayer: (layer: StudioCanvasLayer) => void
-  onTextDragGuideChange: (guide: {
-    horizontal: boolean
-    vertical: boolean
-  } | null) => void
   selectedTargetId: string
 }) {
   return layers.map((layer) => (
@@ -45,9 +45,9 @@ export function CanvasLayerList({
       currentTime={currentTime}
       isSelected={selectedTargetId === layer.id}
       layer={layer}
-      onMoveTextLayer={onMoveTextLayer}
+      onLayerDragGuideChange={onLayerDragGuideChange}
+      onMoveLayer={onMoveLayer}
       onSelect={onSelectLayer}
-      onTextDragGuideChange={onTextDragGuideChange}
     />
   ))
 }

@@ -21,6 +21,7 @@ export function CaptionFontTab({
   const textColor = layer.textColor ?? "#ffffff"
   const backgroundColor = layer.backgroundColor ?? "#111111"
   const backgroundEnabled = layer.backgroundEnabled !== false
+  const backgroundRadius = layer.backgroundRadius ?? 0
   const strokeColor = layer.strokeColor ?? "#000000"
   const strokeWidth = Number((layer.strokeWidth ?? 1).toFixed(1))
 
@@ -186,11 +187,23 @@ export function CaptionFontTab({
             </Button>
           </div>
         </div>
-        <ColorField
-          label="Fill"
-          value={backgroundColor}
-          onChange={(value) => onUpdate({ backgroundColor: value })}
-        />
+        {backgroundEnabled ? (
+          <>
+            <ColorField
+              label="Fill"
+              value={backgroundColor}
+              onChange={(value) => onUpdate({ backgroundColor: value })}
+            />
+            <SliderField
+              label="Radius"
+              min={0}
+              max={40}
+              value={backgroundRadius}
+              suffix="px"
+              onChange={(value) => onUpdate({ backgroundRadius: value })}
+            />
+          </>
+        ) : null}
       </div>
 
       <div className="h-px bg-border/80" />

@@ -148,9 +148,7 @@ export type StudioEditorActions = {
       startTime?: number
     }
   ) => void
-  updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => void
-  updateTextLayerContent: (layerId: string, content: string) => void
-  updateTextLayerPosition: (
+  updateCanvasLayerPosition: (
     layerId: string,
     position: {
       xPercent: number
@@ -160,6 +158,8 @@ export type StudioEditorActions = {
       recordHistory?: boolean
     }
   ) => void
+  updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => void
+  updateTextLayerContent: (layerId: string, content: string) => void
   updateTextLayerStyle: (layerId: string, style: TextLayerStyleUpdate) => void
   updateTimelineSegmentTiming: (
     segmentId: string,

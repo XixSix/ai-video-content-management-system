@@ -1,5 +1,6 @@
 "use client"
 
+import { AssetsPlaceholderInspector } from "@/features/studio-editor/inspector/components/assets-placeholder-inspector"
 import { CaptionInspector } from "@/features/studio-editor/inspector/components/caption-inspector"
 import { ChapterInspector } from "@/features/studio-editor/inspector/components/chapter-inspector"
 import { DefaultInspector } from "@/features/studio-editor/inspector/components/default-inspector"
@@ -36,6 +37,8 @@ export function StudioInspector() {
       <div className="flex flex-1 flex-col gap-4 overflow-auto p-4">
         {activeTool === "chapters" && selectedChapter ? (
           <ChapterInspector key={selectedChapter.id} chapter={selectedChapter} />
+        ) : activeTool === "assets" ? (
+          <AssetsPlaceholderInspector />
         ) : selectedTextLayer ? (
           <TextInspector layer={selectedTextLayer} />
         ) : selectedItem.kind === "layer" && selectedItem.layer.kind === "captions" ? (

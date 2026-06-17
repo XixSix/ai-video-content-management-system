@@ -23,15 +23,19 @@ export function CanvasLayer({
   currentTime,
   isSelected,
   layer,
-  onMoveTextLayer,
+  onLayerDragGuideChange,
+  onMoveLayer,
   onSelect,
-  onTextDragGuideChange,
 }: {
   activeCue: StudioCaptionCue | null
   currentTime: number
   isSelected: boolean
   layer: StudioCanvasLayer
-  onMoveTextLayer: (
+  onLayerDragGuideChange: (guide: {
+    horizontal: boolean
+    vertical: boolean
+  } | null) => void
+  onMoveLayer: (
     layerId: string,
     position: {
       xPercent: number
@@ -42,10 +46,6 @@ export function CanvasLayer({
     }
   ) => void
   onSelect: (layer: StudioCanvasLayer) => void
-  onTextDragGuideChange: (guide: {
-    horizontal: boolean
-    vertical: boolean
-  } | null) => void
 }) {
   const didDragRef = useRef(false)
 
@@ -53,10 +53,13 @@ export function CanvasLayer({
     return null
   }
 
-  const handleTextPointerDown = (
+  const handleLayerPointerDown = (
     event: ReactPointerEvent<HTMLButtonElement>
   ) => {
-    if (event.button !== 0 || layer.kind !== "text") {
+    if (
+      event.button !== 0 ||
+      (layer.kind !== "text" && layer.kind !== "captions")
+    ) {
       return
     }
 
@@ -141,7 +144,7 @@ export function CanvasLayer({
         yPercent: shouldSnapHorizontal ? 50 : unsnappedPosition.yPercent,
       })
 
-      onTextDragGuideChange(
+      onLayerDragGuideChange(
         shouldSnapHorizontal || shouldSnapVertical
           ? {
               horizontal: shouldSnapHorizontal,
@@ -150,14 +153,14 @@ export function CanvasLayer({
           : null
       )
 
-      onMoveTextLayer(layer.id, nextPosition, {
+      onMoveLayer(layer.id, nextPosition, {
         recordHistory: !hasRecordedHistory,
       })
       hasRecordedHistory = true
     }
 
     const cleanup = () => {
-      onTextDragGuideChange(null)
+      onLayerDragGuideChange(null)
       window.removeEventListener("pointermove", handlePointerMove)
       window.removeEventListener("pointerup", handlePointerUp)
       window.removeEventListener("pointercancel", handlePointerCancel)
@@ -184,7 +187,7 @@ export function CanvasLayer({
     <button
       type="button"
       aria-label={layer.label}
-      onPointerDown={handleTextPointerDown}
+      onPointerDown={handleLayerPointerDown}
       onClick={(event) => {
         event.stopPropagation()
 
@@ -206,7 +209,7 @@ export function CanvasLayer({
         isSelected
           ? "ring-2 ring-sky-300/75 ring-offset-0"
           : "hover:ring-2 hover:ring-white/20",
-        layer.kind === "text" ? "cursor-move" : null
+        layer.kind === "text" || layer.kind === "captions" ? "cursor-move" : null
       )}
       style={
         layer.kind === "text"

@@ -104,7 +104,7 @@ export function createHistorySnapshot(
 export function createInitialStudioEditorState(): StudioEditorState {
   return {
     activeTool: "media",
-    currentTime: 18.22,
+    currentTime: 0,
     hasUnsavedTranscriptChanges: false,
     historyFuture: [],
     historyPast: [],

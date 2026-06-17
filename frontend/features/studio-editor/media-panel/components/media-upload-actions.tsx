@@ -95,7 +95,7 @@ export function MediaUploadActions({
           <DialogHeader className="border-b border-border px-5 pb-4 pr-12 pt-5">
             <DialogTitle>Import media</DialogTitle>
             <DialogDescription>
-              Add existing library assets to this edit.
+              Add existing library media to this edit.
             </DialogDescription>
           </DialogHeader>
           <div className="min-h-0 overflow-auto px-5 pb-5">

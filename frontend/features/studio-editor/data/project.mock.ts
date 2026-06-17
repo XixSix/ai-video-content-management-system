@@ -207,16 +207,6 @@ export const studioEditorProject: StudioEditorProject = {
   },
   layers: [
     {
-      id: "brand-mark",
-      kind: "image",
-      label: "Brand mark",
-      summary: "Top-left image layer",
-      className:
-        "absolute left-[8%] top-[9%] rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-[11px] font-medium text-white shadow-lg backdrop-blur-sm transition",
-      frameClassName:
-        "absolute left-[7.2%] top-[8.2%] h-[10%] w-[15%] rounded-xl border border-sky-300/90 shadow-[0_0_0_1px_rgba(125,211,252,0.2)]",
-    },
-    {
       id: "hook-copy",
       kind: "text",
       label: "Hook text",
@@ -225,7 +215,7 @@ export const studioEditorProject: StudioEditorProject = {
       animationDuration: 0.8,
       animationName: "blurInUp",
       backgroundColor: "#101010",
-      backgroundRadius: 18,
+      backgroundRadius: 0,
       backgroundStyle: "box",
       boxWidth: 46,
       className:
@@ -249,10 +239,11 @@ export const studioEditorProject: StudioEditorProject = {
       label: "Live caption preview",
       summary: "Caption layer near lower safe area",
       className:
-        "absolute inset-x-[13%] bottom-[8.5%] rounded-2xl px-4 py-3 text-center shadow-xl transition",
+        "absolute rounded-2xl px-4 py-3 text-center shadow-xl transition",
       backgroundEnabled: false,
       backgroundColor: "#111111",
-      backgroundRadius: 20,
+      backgroundRadius: 0,
+      boxWidth: 74,
       enabled: true,
       frameClassName:
         "absolute inset-x-[12%] bottom-[7.5%] h-[15%] rounded-[28px] border border-sky-300/90 shadow-[0_0_0_1px_rgba(125,211,252,0.2)]",
@@ -274,6 +265,8 @@ export const studioEditorProject: StudioEditorProject = {
       textColor: "#ffffff",
       textDecoration: "none",
       textTransform: "uppercase",
+      xPercent: 50,
+      yPercent: 82,
     },
   ],
   timelineTracks: [
@@ -297,20 +290,9 @@ export const studioEditorProject: StudioEditorProject = {
     },
     {
       id: "OVERLAY_MEDIA",
-      label: "Overlay media",
-      selectionId: "brand-mark",
-      segments: [
-        {
-          id: "overlay-logo",
-          label: "Logo",
-          durationSeconds: 4,
-          widthClassName: "w-[14.29%]",
-          tone: "muted",
-          selectionId: "brand-mark",
-          summary: "Brand mark entrance layer",
-          startTime: 0,
-        },
-      ],
+      label: "Images",
+      selectionId: "source-media",
+      segments: [],
     },
     {
       id: "SOURCE",

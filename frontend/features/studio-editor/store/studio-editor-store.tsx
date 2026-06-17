@@ -178,9 +178,9 @@ export function useStudioLayerActions() {
     useShallow((state) => ({
       addTextLayerFromPreset: state.addTextLayerFromPreset,
       applyCaptionPreset: state.applyCaptionPreset,
+      updateCanvasLayerPosition: state.updateCanvasLayerPosition,
       updateCaptionLayerStyle: state.updateCaptionLayerStyle,
       updateTextLayerContent: state.updateTextLayerContent,
-      updateTextLayerPosition: state.updateTextLayerPosition,
       updateTextLayerStyle: state.updateTextLayerStyle,
     }))
   )

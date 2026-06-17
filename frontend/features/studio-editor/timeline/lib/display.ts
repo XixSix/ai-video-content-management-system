@@ -20,10 +20,6 @@ export function getSelectionToolId(
   trackId: StudioTimelineTrack["id"],
   selectionId: string
 ) {
-  if (selectionId === "brand-mark") {
-    return "assets"
-  }
-
   if (selectionId === "hook-copy") {
     return "text"
   }
