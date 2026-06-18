@@ -69,6 +69,7 @@ const envSchema = z.object({
   PRESIGNED_UPLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
   PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: z.coerce.number().int().positive().default(900),
   RABBITMQ_URL: z.url().default('amqp://localhost:5672'),
+  REDIS_URL: z.url().default('redis://localhost:6379'),
   YOUTUBE_CLIENT_ID: z.string().min(1, 'YOUTUBE_CLIENT_ID is required'),
   YOUTUBE_CLIENT_SECRET: z.string().min(1, 'YOUTUBE_CLIENT_SECRET is required'),
   YOUTUBE_REDIRECT_URI: z.url('YOUTUBE_REDIRECT_URI must be a valid URL'),
@@ -156,6 +157,9 @@ export const config = {
   },
   rabbitmq: {
     url: env.RABBITMQ_URL
+  },
+  redis: {
+    url: env.REDIS_URL
   },
   platform: {
     youtubeClientId: env.YOUTUBE_CLIENT_ID,

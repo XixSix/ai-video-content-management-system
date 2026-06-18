@@ -60,6 +60,23 @@ services:
     networks:
       - app_network
 
+  redis:
+    image: redis:7-alpine
+    container_name: vidpilot-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+
 networks:
   app_network:
     driver: bridge
@@ -68,3 +85,4 @@ volumes:
   pg_data:
   minio_data:
   rabbitmq_data:
+  redis_data:
