@@ -158,7 +158,7 @@ describe('short clip routes', () => {
     }))
     getShortClipMock.mockImplementation(async () => createShortClip())
     createShortClipDownloadUrlMock.mockResolvedValue({
-      url: 'http://localhost:9000/avcms-media/clips/media/clip.mp4?signature=test',
+      url: 'http://localhost:9000/vidpilot-media/clips/media/clip.mp4?signature=test',
       expiresInSeconds: 900
     })
   })
@@ -366,7 +366,7 @@ describe('short clip routes', () => {
     expect(response.body).toEqual({
       success: true,
       data: {
-        url: 'http://localhost:9000/avcms-media/clips/media/clip.mp4?signature=test',
+        url: 'http://localhost:9000/vidpilot-media/clips/media/clip.mp4?signature=test',
         expiresInSeconds: 900
       }
     })

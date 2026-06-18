@@ -68,7 +68,7 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
   title: 'Video test',
   description: null,
   originalFilename: 'video.mp4',
-  s3Bucket: 'avcms-media',
+  s3Bucket: 'vidpilot-media',
   s3Key,
   s3Region: 'us-east-1',
   s3Etag: null,

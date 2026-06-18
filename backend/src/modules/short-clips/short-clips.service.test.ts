@@ -82,7 +82,7 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
   title: 'Video test',
   description: null,
   originalFilename: 'video.mp4',
-  s3Bucket: 'avcms-media',
+  s3Bucket: 'vidpilot-media',
   s3Key: 'uploads/users/user/videos/video.mp4',
   s3Region: 'us-east-1',
   s3Etag: null,
@@ -555,13 +555,15 @@ describe('short clips service', () => {
 
   it('creates a download URL for ready short clips with a video path', async () => {
     findShortClipByIdMock.mockResolvedValue(createShortClip())
-    createPresignedGetUrlMock.mockResolvedValue('http://localhost:9000/avcms-media/clips/media/clip.mp4?signature=test')
+    createPresignedGetUrlMock.mockResolvedValue(
+      'http://localhost:9000/vidpilot-media/clips/media/clip.mp4?signature=test'
+    )
 
     const result = await shortClipsService.createShortClipDownloadUrl(userId, shortClipId)
 
-    expect(createPresignedGetUrlMock).toHaveBeenCalledWith('avcms-media', 'clips/media/clip.mp4')
+    expect(createPresignedGetUrlMock).toHaveBeenCalledWith('vidpilot-media', 'clips/media/clip.mp4')
     expect(result).toEqual({
-      url: 'http://localhost:9000/avcms-media/clips/media/clip.mp4?signature=test',
+      url: 'http://localhost:9000/vidpilot-media/clips/media/clip.mp4?signature=test',
       expiresInSeconds: 900
     })
   })

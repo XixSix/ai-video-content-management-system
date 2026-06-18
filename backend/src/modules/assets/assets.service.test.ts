@@ -44,7 +44,7 @@ const createAsset = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset =>
   chapterId: null,
   assetType: 'SUBTITLE_SRT',
   transcriptVersion: 2,
-  s3Bucket: 'avcms-media',
+  s3Bucket: 'vidpilot-media',
   s3Key: 'generated/users/user/subtitle.srt',
   s3Region: 'us-east-1',
   s3Etag: '"etag"',
@@ -116,7 +116,7 @@ describe('assets service', () => {
 
     const result = await assetsService.createDownloadUrl(userId, assetId)
 
-    expect(createPresignedGetUrlMock).toHaveBeenCalledWith('avcms-media', 'generated/users/user/subtitle.srt')
+    expect(createPresignedGetUrlMock).toHaveBeenCalledWith('vidpilot-media', 'generated/users/user/subtitle.srt')
     expect(result).toEqual({
       url: 'https://storage.example.com/generated/subtitle.srt',
       expiresInSeconds: 900
@@ -162,7 +162,7 @@ describe('assets service', () => {
 
     await assetsService.deleteAsset(userId, assetId)
 
-    expect(deleteObjectMock).toHaveBeenCalledWith('avcms-media', 'generated/users/user/subtitle.srt')
+    expect(deleteObjectMock).toHaveBeenCalledWith('vidpilot-media', 'generated/users/user/subtitle.srt')
     expect(deleteAssetMock).toHaveBeenCalledWith(assetId)
   })
 
