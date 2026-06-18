@@ -22,7 +22,7 @@ class FakeClient:
 
 def _service_with_error(error: Exception) -> S3Service:
     service = S3Service.__new__(S3Service)
-    service.bucket = "avcms-media"
+    service.bucket = "vidpilot-media"
     service.client = FakeClient(error)
     return service
 
