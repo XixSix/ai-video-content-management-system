@@ -228,8 +228,7 @@ export type UserWhereInput = {
   authSessions?: Prisma.AuthSessionListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
   transcriptEditDrafts?: Prisma.TranscriptEditDraftListRelationFilter
-  savedEditorDocuments?: Prisma.EditorDocumentListRelationFilter
-  editorDocumentVersions?: Prisma.EditorDocumentVersionListRelationFilter
+  savedEditorSnapshots?: Prisma.EditorSnapshotListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -256,8 +255,7 @@ export type UserOrderByWithRelationInput = {
   authSessions?: Prisma.AuthSessionOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftOrderByRelationAggregateInput
-  savedEditorDocuments?: Prisma.EditorDocumentOrderByRelationAggregateInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionOrderByRelationAggregateInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -287,8 +285,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   authSessions?: Prisma.AuthSessionListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
   transcriptEditDrafts?: Prisma.TranscriptEditDraftListRelationFilter
-  savedEditorDocuments?: Prisma.EditorDocumentListRelationFilter
-  editorDocumentVersions?: Prisma.EditorDocumentVersionListRelationFilter
+  savedEditorSnapshots?: Prisma.EditorSnapshotListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -345,8 +342,7 @@ export type UserCreateInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -373,8 +369,7 @@ export type UserUncheckedCreateInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUpdateInput = {
@@ -401,8 +396,7 @@ export type UserUpdateInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -429,8 +423,7 @@ export type UserUncheckedUpdateInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -605,36 +598,20 @@ export type UserUpdateOneRequiredWithoutProjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProjectsInput, Prisma.UserUpdateWithoutProjectsInput>, Prisma.UserUncheckedUpdateWithoutProjectsInput>
 }
 
-export type UserCreateNestedOneWithoutSavedEditorDocumentsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorDocumentsInput, Prisma.UserUncheckedCreateWithoutSavedEditorDocumentsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedEditorDocumentsInput
+export type UserCreateNestedOneWithoutSavedEditorSnapshotsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorSnapshotsInput, Prisma.UserUncheckedCreateWithoutSavedEditorSnapshotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedEditorSnapshotsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneWithoutSavedEditorDocumentsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorDocumentsInput, Prisma.UserUncheckedCreateWithoutSavedEditorDocumentsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedEditorDocumentsInput
-  upsert?: Prisma.UserUpsertWithoutSavedEditorDocumentsInput
+export type UserUpdateOneWithoutSavedEditorSnapshotsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorSnapshotsInput, Prisma.UserUncheckedCreateWithoutSavedEditorSnapshotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedEditorSnapshotsInput
+  upsert?: Prisma.UserUpsertWithoutSavedEditorSnapshotsInput
   disconnect?: Prisma.UserWhereInput | boolean
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedEditorDocumentsInput, Prisma.UserUpdateWithoutSavedEditorDocumentsInput>, Prisma.UserUncheckedUpdateWithoutSavedEditorDocumentsInput>
-}
-
-export type UserCreateNestedOneWithoutEditorDocumentVersionsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutEditorDocumentVersionsInput, Prisma.UserUncheckedCreateWithoutEditorDocumentVersionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEditorDocumentVersionsInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneWithoutEditorDocumentVersionsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutEditorDocumentVersionsInput, Prisma.UserUncheckedCreateWithoutEditorDocumentVersionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEditorDocumentVersionsInput
-  upsert?: Prisma.UserUpsertWithoutEditorDocumentVersionsInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEditorDocumentVersionsInput, Prisma.UserUpdateWithoutEditorDocumentVersionsInput>, Prisma.UserUncheckedUpdateWithoutEditorDocumentVersionsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedEditorSnapshotsInput, Prisma.UserUpdateWithoutSavedEditorSnapshotsInput>, Prisma.UserUncheckedUpdateWithoutSavedEditorSnapshotsInput>
 }
 
 export type UserCreateNestedOneWithoutProcessingJobsInput = {
@@ -788,8 +765,7 @@ export type UserCreateWithoutAuthSessionsInput = {
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutAuthSessionsInput = {
@@ -815,8 +791,7 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutAuthSessionsInput = {
@@ -858,8 +833,7 @@ export type UserUpdateWithoutAuthSessionsInput = {
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthSessionsInput = {
@@ -885,8 +859,7 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutOwnedWorkspacesInput = {
@@ -912,8 +885,7 @@ export type UserCreateWithoutOwnedWorkspacesInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutOwnedWorkspacesInput = {
@@ -939,8 +911,7 @@ export type UserUncheckedCreateWithoutOwnedWorkspacesInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutOwnedWorkspacesInput = {
@@ -982,8 +953,7 @@ export type UserUpdateWithoutOwnedWorkspacesInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
@@ -1009,8 +979,7 @@ export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutWorkspaceMembershipsInput = {
@@ -1036,8 +1005,7 @@ export type UserCreateWithoutWorkspaceMembershipsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutWorkspaceMembershipsInput = {
@@ -1063,8 +1031,7 @@ export type UserUncheckedCreateWithoutWorkspaceMembershipsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutWorkspaceMembershipsInput = {
@@ -1106,8 +1073,7 @@ export type UserUpdateWithoutWorkspaceMembershipsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkspaceMembershipsInput = {
@@ -1133,8 +1099,7 @@ export type UserUncheckedUpdateWithoutWorkspaceMembershipsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutMediaInput = {
@@ -1160,8 +1125,7 @@ export type UserCreateWithoutMediaInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutMediaInput = {
@@ -1187,8 +1151,7 @@ export type UserUncheckedCreateWithoutMediaInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutMediaInput = {
@@ -1230,8 +1193,7 @@ export type UserUpdateWithoutMediaInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaInput = {
@@ -1257,8 +1219,7 @@ export type UserUncheckedUpdateWithoutMediaInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutProjectsInput = {
@@ -1284,8 +1245,7 @@ export type UserCreateWithoutProjectsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutProjectsInput = {
@@ -1311,8 +1271,7 @@ export type UserUncheckedCreateWithoutProjectsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutProjectsInput = {
@@ -1354,8 +1313,7 @@ export type UserUpdateWithoutProjectsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProjectsInput = {
@@ -1381,11 +1339,10 @@ export type UserUncheckedUpdateWithoutProjectsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
-export type UserCreateWithoutSavedEditorDocumentsInput = {
+export type UserCreateWithoutSavedEditorSnapshotsInput = {
   id?: string
   email: string
   passwordHash: string
@@ -1409,10 +1366,9 @@ export type UserCreateWithoutSavedEditorDocumentsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
 }
 
-export type UserUncheckedCreateWithoutSavedEditorDocumentsInput = {
+export type UserUncheckedCreateWithoutSavedEditorSnapshotsInput = {
   id?: string
   email: string
   passwordHash: string
@@ -1436,26 +1392,25 @@ export type UserUncheckedCreateWithoutSavedEditorDocumentsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
 }
 
-export type UserCreateOrConnectWithoutSavedEditorDocumentsInput = {
+export type UserCreateOrConnectWithoutSavedEditorSnapshotsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorDocumentsInput, Prisma.UserUncheckedCreateWithoutSavedEditorDocumentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorSnapshotsInput, Prisma.UserUncheckedCreateWithoutSavedEditorSnapshotsInput>
 }
 
-export type UserUpsertWithoutSavedEditorDocumentsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedEditorDocumentsInput, Prisma.UserUncheckedUpdateWithoutSavedEditorDocumentsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorDocumentsInput, Prisma.UserUncheckedCreateWithoutSavedEditorDocumentsInput>
+export type UserUpsertWithoutSavedEditorSnapshotsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedEditorSnapshotsInput, Prisma.UserUncheckedUpdateWithoutSavedEditorSnapshotsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedEditorSnapshotsInput, Prisma.UserUncheckedCreateWithoutSavedEditorSnapshotsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutSavedEditorDocumentsInput = {
+export type UserUpdateToOneWithWhereWithoutSavedEditorSnapshotsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedEditorDocumentsInput, Prisma.UserUncheckedUpdateWithoutSavedEditorDocumentsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedEditorSnapshotsInput, Prisma.UserUncheckedUpdateWithoutSavedEditorSnapshotsInput>
 }
 
-export type UserUpdateWithoutSavedEditorDocumentsInput = {
+export type UserUpdateWithoutSavedEditorSnapshotsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1479,10 +1434,9 @@ export type UserUpdateWithoutSavedEditorDocumentsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
 }
 
-export type UserUncheckedUpdateWithoutSavedEditorDocumentsInput = {
+export type UserUncheckedUpdateWithoutSavedEditorSnapshotsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1506,131 +1460,6 @@ export type UserUncheckedUpdateWithoutSavedEditorDocumentsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
-}
-
-export type UserCreateWithoutEditorDocumentVersionsInput = {
-  id?: string
-  email: string
-  passwordHash: string
-  fullName?: string | null
-  avatarUrl?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  media?: Prisma.MediaCreateNestedManyWithoutUserInput
-  ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
-  workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
-  projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
-  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
-  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
-  transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-}
-
-export type UserUncheckedCreateWithoutEditorDocumentVersionsInput = {
-  id?: string
-  email: string
-  passwordHash: string
-  fullName?: string | null
-  avatarUrl?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
-  ownedWorkspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
-  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
-  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutUserInput
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
-  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
-  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
-  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-}
-
-export type UserCreateOrConnectWithoutEditorDocumentVersionsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutEditorDocumentVersionsInput, Prisma.UserUncheckedCreateWithoutEditorDocumentVersionsInput>
-}
-
-export type UserUpsertWithoutEditorDocumentVersionsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutEditorDocumentVersionsInput, Prisma.UserUncheckedUpdateWithoutEditorDocumentVersionsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutEditorDocumentVersionsInput, Prisma.UserUncheckedCreateWithoutEditorDocumentVersionsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutEditorDocumentVersionsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutEditorDocumentVersionsInput, Prisma.UserUncheckedUpdateWithoutEditorDocumentVersionsInput>
-}
-
-export type UserUpdateWithoutEditorDocumentVersionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
-  ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
-  workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
-  projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
-  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
-  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
-  transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-}
-
-export type UserUncheckedUpdateWithoutEditorDocumentVersionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
-  ownedWorkspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
-  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
-  projects?: Prisma.ProjectUncheckedUpdateManyWithoutUserNestedInput
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
-  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
-  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
-  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutProcessingJobsInput = {
@@ -1656,8 +1485,7 @@ export type UserCreateWithoutProcessingJobsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutProcessingJobsInput = {
@@ -1683,8 +1511,7 @@ export type UserUncheckedCreateWithoutProcessingJobsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutProcessingJobsInput = {
@@ -1726,8 +1553,7 @@ export type UserUpdateWithoutProcessingJobsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProcessingJobsInput = {
@@ -1753,8 +1579,7 @@ export type UserUncheckedUpdateWithoutProcessingJobsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutTranscriptEditDraftsInput = {
@@ -1780,8 +1605,7 @@ export type UserCreateWithoutTranscriptEditDraftsInput = {
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutTranscriptEditDraftsInput = {
@@ -1807,8 +1631,7 @@ export type UserUncheckedCreateWithoutTranscriptEditDraftsInput = {
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutTranscriptEditDraftsInput = {
@@ -1850,8 +1673,7 @@ export type UserUpdateWithoutTranscriptEditDraftsInput = {
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTranscriptEditDraftsInput = {
@@ -1877,8 +1699,7 @@ export type UserUncheckedUpdateWithoutTranscriptEditDraftsInput = {
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutShortClipsInput = {
@@ -1904,8 +1725,7 @@ export type UserCreateWithoutShortClipsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutShortClipsInput = {
@@ -1931,8 +1751,7 @@ export type UserUncheckedCreateWithoutShortClipsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutShortClipsInput = {
@@ -1974,8 +1793,7 @@ export type UserUpdateWithoutShortClipsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortClipsInput = {
@@ -2001,8 +1819,7 @@ export type UserUncheckedUpdateWithoutShortClipsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutGeneratedAssetsInput = {
@@ -2028,8 +1845,7 @@ export type UserCreateWithoutGeneratedAssetsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutGeneratedAssetsInput = {
@@ -2055,8 +1871,7 @@ export type UserUncheckedCreateWithoutGeneratedAssetsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutGeneratedAssetsInput = {
@@ -2098,8 +1913,7 @@ export type UserUpdateWithoutGeneratedAssetsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGeneratedAssetsInput = {
@@ -2125,8 +1939,7 @@ export type UserUncheckedUpdateWithoutGeneratedAssetsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutAiSuggestionsInput = {
@@ -2152,8 +1965,7 @@ export type UserCreateWithoutAiSuggestionsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutAiSuggestionsInput = {
@@ -2179,8 +1991,7 @@ export type UserUncheckedCreateWithoutAiSuggestionsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutAiSuggestionsInput = {
@@ -2222,8 +2033,7 @@ export type UserUpdateWithoutAiSuggestionsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
@@ -2249,8 +2059,7 @@ export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutPlatformAccountsInput = {
@@ -2276,8 +2085,7 @@ export type UserCreateWithoutPlatformAccountsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutPlatformAccountsInput = {
@@ -2303,8 +2111,7 @@ export type UserUncheckedCreateWithoutPlatformAccountsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutPlatformAccountsInput = {
@@ -2346,8 +2153,7 @@ export type UserUpdateWithoutPlatformAccountsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
@@ -2373,8 +2179,7 @@ export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutPlatformOAuthStatesInput = {
@@ -2400,8 +2205,7 @@ export type UserCreateWithoutPlatformOAuthStatesInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
@@ -2427,8 +2231,7 @@ export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutPlatformOAuthStatesInput = {
@@ -2470,8 +2273,7 @@ export type UserUpdateWithoutPlatformOAuthStatesInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
@@ -2497,8 +2299,7 @@ export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutPublishTasksInput = {
@@ -2524,8 +2325,7 @@ export type UserCreateWithoutPublishTasksInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutPublishTasksInput = {
@@ -2551,8 +2351,7 @@ export type UserUncheckedCreateWithoutPublishTasksInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutPublishTasksInput = {
@@ -2594,8 +2393,7 @@ export type UserUpdateWithoutPublishTasksInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPublishTasksInput = {
@@ -2621,8 +2419,7 @@ export type UserUncheckedUpdateWithoutPublishTasksInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -2648,8 +2445,7 @@ export type UserCreateWithoutAuditLogsInput = {
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -2675,8 +2471,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedCreateNestedManyWithoutSavedByInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutSavedByInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -2718,8 +2513,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -2745,8 +2539,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
-  savedEditorDocuments?: Prisma.EditorDocumentUncheckedUpdateManyWithoutSavedByNestedInput
-  editorDocumentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutSavedByNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
 }
 
 
@@ -2769,8 +2562,7 @@ export type UserCountOutputType = {
   authSessions: number
   auditLogs: number
   transcriptEditDrafts: number
-  savedEditorDocuments: number
-  editorDocumentVersions: number
+  savedEditorSnapshots: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2788,8 +2580,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   authSessions?: boolean | UserCountOutputTypeCountAuthSessionsArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
   transcriptEditDrafts?: boolean | UserCountOutputTypeCountTranscriptEditDraftsArgs
-  savedEditorDocuments?: boolean | UserCountOutputTypeCountSavedEditorDocumentsArgs
-  editorDocumentVersions?: boolean | UserCountOutputTypeCountEditorDocumentVersionsArgs
+  savedEditorSnapshots?: boolean | UserCountOutputTypeCountSavedEditorSnapshotsArgs
 }
 
 /**
@@ -2903,15 +2694,8 @@ export type UserCountOutputTypeCountTranscriptEditDraftsArgs<ExtArgs extends run
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountSavedEditorDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EditorDocumentWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountEditorDocumentVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EditorDocumentVersionWhereInput
+export type UserCountOutputTypeCountSavedEditorSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EditorSnapshotWhereInput
 }
 
 
@@ -2939,8 +2723,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   transcriptEditDrafts?: boolean | Prisma.User$transcriptEditDraftsArgs<ExtArgs>
-  savedEditorDocuments?: boolean | Prisma.User$savedEditorDocumentsArgs<ExtArgs>
-  editorDocumentVersions?: boolean | Prisma.User$editorDocumentVersionsArgs<ExtArgs>
+  savedEditorSnapshots?: boolean | Prisma.User$savedEditorSnapshotsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2996,8 +2779,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   transcriptEditDrafts?: boolean | Prisma.User$transcriptEditDraftsArgs<ExtArgs>
-  savedEditorDocuments?: boolean | Prisma.User$savedEditorDocumentsArgs<ExtArgs>
-  editorDocumentVersions?: boolean | Prisma.User$editorDocumentVersionsArgs<ExtArgs>
+  savedEditorSnapshots?: boolean | Prisma.User$savedEditorSnapshotsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3020,8 +2802,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     authSessions: Prisma.$AuthSessionPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     transcriptEditDrafts: Prisma.$TranscriptEditDraftPayload<ExtArgs>[]
-    savedEditorDocuments: Prisma.$EditorDocumentPayload<ExtArgs>[]
-    editorDocumentVersions: Prisma.$EditorDocumentVersionPayload<ExtArgs>[]
+    savedEditorSnapshots: Prisma.$EditorSnapshotPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3441,8 +3222,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   authSessions<T extends Prisma.User$authSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcriptEditDrafts<T extends Prisma.User$transcriptEditDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transcriptEditDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptEditDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  savedEditorDocuments<T extends Prisma.User$savedEditorDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedEditorDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EditorDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  editorDocumentVersions<T extends Prisma.User$editorDocumentVersionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$editorDocumentVersionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EditorDocumentVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedEditorSnapshots<T extends Prisma.User$savedEditorSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedEditorSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EditorSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4210,51 +3990,27 @@ export type User$transcriptEditDraftsArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 /**
- * User.savedEditorDocuments
+ * User.savedEditorSnapshots
  */
-export type User$savedEditorDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$savedEditorSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the EditorDocument
+   * Select specific fields to fetch from the EditorSnapshot
    */
-  select?: Prisma.EditorDocumentSelect<ExtArgs> | null
+  select?: Prisma.EditorSnapshotSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the EditorDocument
+   * Omit specific fields from the EditorSnapshot
    */
-  omit?: Prisma.EditorDocumentOmit<ExtArgs> | null
+  omit?: Prisma.EditorSnapshotOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.EditorDocumentInclude<ExtArgs> | null
-  where?: Prisma.EditorDocumentWhereInput
-  orderBy?: Prisma.EditorDocumentOrderByWithRelationInput | Prisma.EditorDocumentOrderByWithRelationInput[]
-  cursor?: Prisma.EditorDocumentWhereUniqueInput
+  include?: Prisma.EditorSnapshotInclude<ExtArgs> | null
+  where?: Prisma.EditorSnapshotWhereInput
+  orderBy?: Prisma.EditorSnapshotOrderByWithRelationInput | Prisma.EditorSnapshotOrderByWithRelationInput[]
+  cursor?: Prisma.EditorSnapshotWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.EditorDocumentScalarFieldEnum | Prisma.EditorDocumentScalarFieldEnum[]
-}
-
-/**
- * User.editorDocumentVersions
- */
-export type User$editorDocumentVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the EditorDocumentVersion
-   */
-  select?: Prisma.EditorDocumentVersionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the EditorDocumentVersion
-   */
-  omit?: Prisma.EditorDocumentVersionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.EditorDocumentVersionInclude<ExtArgs> | null
-  where?: Prisma.EditorDocumentVersionWhereInput
-  orderBy?: Prisma.EditorDocumentVersionOrderByWithRelationInput | Prisma.EditorDocumentVersionOrderByWithRelationInput[]
-  cursor?: Prisma.EditorDocumentVersionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.EditorDocumentVersionScalarFieldEnum | Prisma.EditorDocumentVersionScalarFieldEnum[]
+  distinct?: Prisma.EditorSnapshotScalarFieldEnum | Prisma.EditorSnapshotScalarFieldEnum[]
 }
 
 /**

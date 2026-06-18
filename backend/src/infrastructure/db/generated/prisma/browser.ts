@@ -53,30 +53,10 @@ export type Project = Prisma.ProjectModel
  */
 export type ProjectMedia = Prisma.ProjectMediaModel
 /**
- * Model EditorDocument
+ * Model EditorSnapshot
  * 
  */
-export type EditorDocument = Prisma.EditorDocumentModel
-/**
- * Model EditorDocumentVersion
- * 
- */
-export type EditorDocumentVersion = Prisma.EditorDocumentVersionModel
-/**
- * Model CanvasLayer
- * 
- */
-export type CanvasLayer = Prisma.CanvasLayerModel
-/**
- * Model TimelineTrack
- * 
- */
-export type TimelineTrack = Prisma.TimelineTrackModel
-/**
- * Model TimelineSegment
- * 
- */
-export type TimelineSegment = Prisma.TimelineSegmentModel
+export type EditorSnapshot = Prisma.EditorSnapshotModel
 /**
  * Model ProcessingJob
  * 

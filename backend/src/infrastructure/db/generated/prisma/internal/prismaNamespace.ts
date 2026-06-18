@@ -391,11 +391,7 @@ export const ModelName = {
   Media: 'Media',
   Project: 'Project',
   ProjectMedia: 'ProjectMedia',
-  EditorDocument: 'EditorDocument',
-  EditorDocumentVersion: 'EditorDocumentVersion',
-  CanvasLayer: 'CanvasLayer',
-  TimelineTrack: 'TimelineTrack',
-  TimelineSegment: 'TimelineSegment',
+  EditorSnapshot: 'EditorSnapshot',
   ProcessingJob: 'ProcessingJob',
   JobEvent: 'JobEvent',
   Transcript: 'Transcript',
@@ -426,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "workspace" | "workspaceMember" | "media" | "project" | "projectMedia" | "editorDocument" | "editorDocumentVersion" | "canvasLayer" | "timelineTrack" | "timelineSegment" | "processingJob" | "jobEvent" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "platformOAuthState" | "publishTask" | "auditLog"
+    modelProps: "user" | "authSession" | "workspace" | "workspaceMember" | "media" | "project" | "projectMedia" | "editorSnapshot" | "processingJob" | "jobEvent" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "platformOAuthState" | "publishTask" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -948,373 +944,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    EditorDocument: {
-      payload: Prisma.$EditorDocumentPayload<ExtArgs>
-      fields: Prisma.EditorDocumentFieldRefs
+    EditorSnapshot: {
+      payload: Prisma.$EditorSnapshotPayload<ExtArgs>
+      fields: Prisma.EditorSnapshotFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.EditorDocumentFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload> | null
+          args: Prisma.EditorSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.EditorDocumentFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>
+          args: Prisma.EditorSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>
         }
         findFirst: {
-          args: Prisma.EditorDocumentFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload> | null
+          args: Prisma.EditorSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.EditorDocumentFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>
+          args: Prisma.EditorSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>
         }
         findMany: {
-          args: Prisma.EditorDocumentFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>[]
+          args: Prisma.EditorSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>[]
         }
         create: {
-          args: Prisma.EditorDocumentCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>
+          args: Prisma.EditorSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>
         }
         createMany: {
-          args: Prisma.EditorDocumentCreateManyArgs<ExtArgs>
+          args: Prisma.EditorSnapshotCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.EditorDocumentCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>[]
+          args: Prisma.EditorSnapshotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>[]
         }
         delete: {
-          args: Prisma.EditorDocumentDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>
+          args: Prisma.EditorSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>
         }
         update: {
-          args: Prisma.EditorDocumentUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>
+          args: Prisma.EditorSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>
         }
         deleteMany: {
-          args: Prisma.EditorDocumentDeleteManyArgs<ExtArgs>
+          args: Prisma.EditorSnapshotDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.EditorDocumentUpdateManyArgs<ExtArgs>
+          args: Prisma.EditorSnapshotUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.EditorDocumentUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>[]
+          args: Prisma.EditorSnapshotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>[]
         }
         upsert: {
-          args: Prisma.EditorDocumentUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentPayload>
+          args: Prisma.EditorSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorSnapshotPayload>
         }
         aggregate: {
-          args: Prisma.EditorDocumentAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateEditorDocument>
+          args: Prisma.EditorSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEditorSnapshot>
         }
         groupBy: {
-          args: Prisma.EditorDocumentGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.EditorDocumentGroupByOutputType>[]
+          args: Prisma.EditorSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EditorSnapshotGroupByOutputType>[]
         }
         count: {
-          args: Prisma.EditorDocumentCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.EditorDocumentCountAggregateOutputType> | number
-        }
-      }
-    }
-    EditorDocumentVersion: {
-      payload: Prisma.$EditorDocumentVersionPayload<ExtArgs>
-      fields: Prisma.EditorDocumentVersionFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.EditorDocumentVersionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.EditorDocumentVersionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>
-        }
-        findFirst: {
-          args: Prisma.EditorDocumentVersionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.EditorDocumentVersionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>
-        }
-        findMany: {
-          args: Prisma.EditorDocumentVersionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>[]
-        }
-        create: {
-          args: Prisma.EditorDocumentVersionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>
-        }
-        createMany: {
-          args: Prisma.EditorDocumentVersionCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.EditorDocumentVersionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>[]
-        }
-        delete: {
-          args: Prisma.EditorDocumentVersionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>
-        }
-        update: {
-          args: Prisma.EditorDocumentVersionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>
-        }
-        deleteMany: {
-          args: Prisma.EditorDocumentVersionDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.EditorDocumentVersionUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.EditorDocumentVersionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>[]
-        }
-        upsert: {
-          args: Prisma.EditorDocumentVersionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EditorDocumentVersionPayload>
-        }
-        aggregate: {
-          args: Prisma.EditorDocumentVersionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateEditorDocumentVersion>
-        }
-        groupBy: {
-          args: Prisma.EditorDocumentVersionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.EditorDocumentVersionGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.EditorDocumentVersionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.EditorDocumentVersionCountAggregateOutputType> | number
-        }
-      }
-    }
-    CanvasLayer: {
-      payload: Prisma.$CanvasLayerPayload<ExtArgs>
-      fields: Prisma.CanvasLayerFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.CanvasLayerFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.CanvasLayerFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>
-        }
-        findFirst: {
-          args: Prisma.CanvasLayerFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.CanvasLayerFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>
-        }
-        findMany: {
-          args: Prisma.CanvasLayerFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>[]
-        }
-        create: {
-          args: Prisma.CanvasLayerCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>
-        }
-        createMany: {
-          args: Prisma.CanvasLayerCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.CanvasLayerCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>[]
-        }
-        delete: {
-          args: Prisma.CanvasLayerDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>
-        }
-        update: {
-          args: Prisma.CanvasLayerUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>
-        }
-        deleteMany: {
-          args: Prisma.CanvasLayerDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.CanvasLayerUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.CanvasLayerUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>[]
-        }
-        upsert: {
-          args: Prisma.CanvasLayerUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CanvasLayerPayload>
-        }
-        aggregate: {
-          args: Prisma.CanvasLayerAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateCanvasLayer>
-        }
-        groupBy: {
-          args: Prisma.CanvasLayerGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CanvasLayerGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.CanvasLayerCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CanvasLayerCountAggregateOutputType> | number
-        }
-      }
-    }
-    TimelineTrack: {
-      payload: Prisma.$TimelineTrackPayload<ExtArgs>
-      fields: Prisma.TimelineTrackFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.TimelineTrackFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.TimelineTrackFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>
-        }
-        findFirst: {
-          args: Prisma.TimelineTrackFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.TimelineTrackFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>
-        }
-        findMany: {
-          args: Prisma.TimelineTrackFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>[]
-        }
-        create: {
-          args: Prisma.TimelineTrackCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>
-        }
-        createMany: {
-          args: Prisma.TimelineTrackCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.TimelineTrackCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>[]
-        }
-        delete: {
-          args: Prisma.TimelineTrackDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>
-        }
-        update: {
-          args: Prisma.TimelineTrackUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>
-        }
-        deleteMany: {
-          args: Prisma.TimelineTrackDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.TimelineTrackUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.TimelineTrackUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>[]
-        }
-        upsert: {
-          args: Prisma.TimelineTrackUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineTrackPayload>
-        }
-        aggregate: {
-          args: Prisma.TimelineTrackAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateTimelineTrack>
-        }
-        groupBy: {
-          args: Prisma.TimelineTrackGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TimelineTrackGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.TimelineTrackCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TimelineTrackCountAggregateOutputType> | number
-        }
-      }
-    }
-    TimelineSegment: {
-      payload: Prisma.$TimelineSegmentPayload<ExtArgs>
-      fields: Prisma.TimelineSegmentFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.TimelineSegmentFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.TimelineSegmentFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>
-        }
-        findFirst: {
-          args: Prisma.TimelineSegmentFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.TimelineSegmentFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>
-        }
-        findMany: {
-          args: Prisma.TimelineSegmentFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>[]
-        }
-        create: {
-          args: Prisma.TimelineSegmentCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>
-        }
-        createMany: {
-          args: Prisma.TimelineSegmentCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.TimelineSegmentCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>[]
-        }
-        delete: {
-          args: Prisma.TimelineSegmentDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>
-        }
-        update: {
-          args: Prisma.TimelineSegmentUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>
-        }
-        deleteMany: {
-          args: Prisma.TimelineSegmentDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.TimelineSegmentUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.TimelineSegmentUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>[]
-        }
-        upsert: {
-          args: Prisma.TimelineSegmentUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimelineSegmentPayload>
-        }
-        aggregate: {
-          args: Prisma.TimelineSegmentAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateTimelineSegment>
-        }
-        groupBy: {
-          args: Prisma.TimelineSegmentGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TimelineSegmentGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.TimelineSegmentCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TimelineSegmentCountAggregateOutputType> | number
+          args: Prisma.EditorSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EditorSnapshotCountAggregateOutputType> | number
         }
       }
     }
@@ -2559,7 +2259,6 @@ export const ProjectScalarFieldEnum = {
   status: 'status',
   aspectRatio: 'aspectRatio',
   duration: 'duration',
-  currentDocumentVersion: 'currentDocumentVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2572,93 +2271,24 @@ export const ProjectMediaScalarFieldEnum = {
   projectId: 'projectId',
   mediaId: 'mediaId',
   role: 'role',
-  displayName: 'displayName',
-  startTime: 'startTime',
-  duration: 'duration',
-  metadata: 'metadata',
   createdAt: 'createdAt'
 } as const
 
 export type ProjectMediaScalarFieldEnum = (typeof ProjectMediaScalarFieldEnum)[keyof typeof ProjectMediaScalarFieldEnum]
 
 
-export const EditorDocumentScalarFieldEnum = {
+export const EditorSnapshotScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   version: 'version',
-  document: 'document',
+  snapshot: 'snapshot',
   savedByUserId: 'savedByUserId',
   savedAt: 'savedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type EditorDocumentScalarFieldEnum = (typeof EditorDocumentScalarFieldEnum)[keyof typeof EditorDocumentScalarFieldEnum]
-
-
-export const EditorDocumentVersionScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  version: 'version',
-  document: 'document',
-  savedByUserId: 'savedByUserId',
-  createdAt: 'createdAt'
-} as const
-
-export type EditorDocumentVersionScalarFieldEnum = (typeof EditorDocumentVersionScalarFieldEnum)[keyof typeof EditorDocumentVersionScalarFieldEnum]
-
-
-export const CanvasLayerScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  mediaId: 'mediaId',
-  kind: 'kind',
-  label: 'label',
-  content: 'content',
-  enabled: 'enabled',
-  xPercent: 'xPercent',
-  yPercent: 'yPercent',
-  boxWidthPercent: 'boxWidthPercent',
-  rotation: 'rotation',
-  scale: 'scale',
-  zIndex: 'zIndex',
-  style: 'style',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type CanvasLayerScalarFieldEnum = (typeof CanvasLayerScalarFieldEnum)[keyof typeof CanvasLayerScalarFieldEnum]
-
-
-export const TimelineTrackScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  label: 'label',
-  sortOrder: 'sortOrder',
-  createdAt: 'createdAt'
-} as const
-
-export type TimelineTrackScalarFieldEnum = (typeof TimelineTrackScalarFieldEnum)[keyof typeof TimelineTrackScalarFieldEnum]
-
-
-export const TimelineSegmentScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  trackId: 'trackId',
-  layerId: 'layerId',
-  mediaId: 'mediaId',
-  label: 'label',
-  content: 'content',
-  startTime: 'startTime',
-  duration: 'duration',
-  laneIndex: 'laneIndex',
-  metadata: 'metadata',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TimelineSegmentScalarFieldEnum = (typeof TimelineSegmentScalarFieldEnum)[keyof typeof TimelineSegmentScalarFieldEnum]
+export type EditorSnapshotScalarFieldEnum = (typeof EditorSnapshotScalarFieldEnum)[keyof typeof EditorSnapshotScalarFieldEnum]
 
 
 export const ProcessingJobScalarFieldEnum = {
@@ -3089,6 +2719,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'WorkspaceMemberRole'
+ */
+export type EnumWorkspaceMemberRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkspaceMemberRole'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkspaceMemberRole[]'
+ */
+export type ListEnumWorkspaceMemberRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkspaceMemberRole[]'>
+    
+
+
+/**
  * Reference to a field of type 'MediaType'
  */
 export type EnumMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MediaType'>
@@ -3201,41 +2845,6 @@ export type ListEnumProjectMediaRoleFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
- * Reference to a field of type 'EditorLayerKind'
- */
-export type EnumEditorLayerKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EditorLayerKind'>
-    
-
-
-/**
- * Reference to a field of type 'EditorLayerKind[]'
- */
-export type ListEnumEditorLayerKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EditorLayerKind[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
- * Reference to a field of type 'TimelineTrackType'
- */
-export type EnumTimelineTrackTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TimelineTrackType'>
-    
-
-
-/**
- * Reference to a field of type 'TimelineTrackType[]'
- */
-export type ListEnumTimelineTrackTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TimelineTrackType[]'>
-    
-
-
-/**
  * Reference to a field of type 'JobType'
  */
 export type EnumJobTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobType'>
@@ -3302,6 +2911,13 @@ export type EnumModelSizeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'ModelSize[]'
  */
 export type ListEnumModelSizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModelSize[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -3547,11 +3163,7 @@ export type GlobalOmitConfig = {
   media?: Prisma.MediaOmit
   project?: Prisma.ProjectOmit
   projectMedia?: Prisma.ProjectMediaOmit
-  editorDocument?: Prisma.EditorDocumentOmit
-  editorDocumentVersion?: Prisma.EditorDocumentVersionOmit
-  canvasLayer?: Prisma.CanvasLayerOmit
-  timelineTrack?: Prisma.TimelineTrackOmit
-  timelineSegment?: Prisma.TimelineSegmentOmit
+  editorSnapshot?: Prisma.EditorSnapshotOmit
   processingJob?: Prisma.ProcessingJobOmit
   jobEvent?: Prisma.JobEventOmit
   transcript?: Prisma.TranscriptOmit

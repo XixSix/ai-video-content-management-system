@@ -788,6 +788,10 @@ export type NullableEnumModelSizeFieldUpdateOperationsInput = {
   set?: $Enums.ModelSize | null
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type TranscriptCreateNestedOneWithoutSegmentsInput = {
   create?: Prisma.XOR<Prisma.TranscriptCreateWithoutSegmentsInput, Prisma.TranscriptUncheckedCreateWithoutSegmentsInput>
   connectOrCreate?: Prisma.TranscriptCreateOrConnectWithoutSegmentsInput

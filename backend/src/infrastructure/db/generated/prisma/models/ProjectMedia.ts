@@ -20,20 +20,8 @@ export type ProjectMediaModel = runtime.Types.Result.DefaultSelection<Prisma.$Pr
 
 export type AggregateProjectMedia = {
   _count: ProjectMediaCountAggregateOutputType | null
-  _avg: ProjectMediaAvgAggregateOutputType | null
-  _sum: ProjectMediaSumAggregateOutputType | null
   _min: ProjectMediaMinAggregateOutputType | null
   _max: ProjectMediaMaxAggregateOutputType | null
-}
-
-export type ProjectMediaAvgAggregateOutputType = {
-  startTime: number | null
-  duration: number | null
-}
-
-export type ProjectMediaSumAggregateOutputType = {
-  startTime: number | null
-  duration: number | null
 }
 
 export type ProjectMediaMinAggregateOutputType = {
@@ -41,9 +29,6 @@ export type ProjectMediaMinAggregateOutputType = {
   projectId: string | null
   mediaId: string | null
   role: $Enums.ProjectMediaRole | null
-  displayName: string | null
-  startTime: number | null
-  duration: number | null
   createdAt: Date | null
 }
 
@@ -52,9 +37,6 @@ export type ProjectMediaMaxAggregateOutputType = {
   projectId: string | null
   mediaId: string | null
   role: $Enums.ProjectMediaRole | null
-  displayName: string | null
-  startTime: number | null
-  duration: number | null
   createdAt: Date | null
 }
 
@@ -63,33 +45,16 @@ export type ProjectMediaCountAggregateOutputType = {
   projectId: number
   mediaId: number
   role: number
-  displayName: number
-  startTime: number
-  duration: number
-  metadata: number
   createdAt: number
   _all: number
 }
 
-
-export type ProjectMediaAvgAggregateInputType = {
-  startTime?: true
-  duration?: true
-}
-
-export type ProjectMediaSumAggregateInputType = {
-  startTime?: true
-  duration?: true
-}
 
 export type ProjectMediaMinAggregateInputType = {
   id?: true
   projectId?: true
   mediaId?: true
   role?: true
-  displayName?: true
-  startTime?: true
-  duration?: true
   createdAt?: true
 }
 
@@ -98,9 +63,6 @@ export type ProjectMediaMaxAggregateInputType = {
   projectId?: true
   mediaId?: true
   role?: true
-  displayName?: true
-  startTime?: true
-  duration?: true
   createdAt?: true
 }
 
@@ -109,10 +71,6 @@ export type ProjectMediaCountAggregateInputType = {
   projectId?: true
   mediaId?: true
   role?: true
-  displayName?: true
-  startTime?: true
-  duration?: true
-  metadata?: true
   createdAt?: true
   _all?: true
 }
@@ -155,18 +113,6 @@ export type ProjectMediaAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ProjectMediaAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ProjectMediaSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProjectMediaMinAggregateInputType
@@ -197,8 +143,6 @@ export type ProjectMediaGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   _count?: ProjectMediaCountAggregateInputType | true
-  _avg?: ProjectMediaAvgAggregateInputType
-  _sum?: ProjectMediaSumAggregateInputType
   _min?: ProjectMediaMinAggregateInputType
   _max?: ProjectMediaMaxAggregateInputType
 }
@@ -208,14 +152,8 @@ export type ProjectMediaGroupByOutputType = {
   projectId: string
   mediaId: string
   role: $Enums.ProjectMediaRole
-  displayName: string | null
-  startTime: number | null
-  duration: number | null
-  metadata: runtime.JsonValue | null
   createdAt: Date
   _count: ProjectMediaCountAggregateOutputType | null
-  _avg: ProjectMediaAvgAggregateOutputType | null
-  _sum: ProjectMediaSumAggregateOutputType | null
   _min: ProjectMediaMinAggregateOutputType | null
   _max: ProjectMediaMaxAggregateOutputType | null
 }
@@ -243,10 +181,6 @@ export type ProjectMediaWhereInput = {
   projectId?: Prisma.UuidFilter<"ProjectMedia"> | string
   mediaId?: Prisma.UuidFilter<"ProjectMedia"> | string
   role?: Prisma.EnumProjectMediaRoleFilter<"ProjectMedia"> | $Enums.ProjectMediaRole
-  displayName?: Prisma.StringNullableFilter<"ProjectMedia"> | string | null
-  startTime?: Prisma.FloatNullableFilter<"ProjectMedia"> | number | null
-  duration?: Prisma.FloatNullableFilter<"ProjectMedia"> | number | null
-  metadata?: Prisma.JsonNullableFilter<"ProjectMedia">
   createdAt?: Prisma.DateTimeFilter<"ProjectMedia"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
@@ -257,10 +191,6 @@ export type ProjectMediaOrderByWithRelationInput = {
   projectId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   role?: Prisma.SortOrder
-  displayName?: Prisma.SortOrderInput | Prisma.SortOrder
-  startTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  duration?: Prisma.SortOrderInput | Prisma.SortOrder
-  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
   media?: Prisma.MediaOrderByWithRelationInput
@@ -268,36 +198,27 @@ export type ProjectMediaOrderByWithRelationInput = {
 
 export type ProjectMediaWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  projectId_mediaId_role?: Prisma.ProjectMediaProjectIdMediaIdRoleCompoundUniqueInput
   AND?: Prisma.ProjectMediaWhereInput | Prisma.ProjectMediaWhereInput[]
   OR?: Prisma.ProjectMediaWhereInput[]
   NOT?: Prisma.ProjectMediaWhereInput | Prisma.ProjectMediaWhereInput[]
   projectId?: Prisma.UuidFilter<"ProjectMedia"> | string
   mediaId?: Prisma.UuidFilter<"ProjectMedia"> | string
   role?: Prisma.EnumProjectMediaRoleFilter<"ProjectMedia"> | $Enums.ProjectMediaRole
-  displayName?: Prisma.StringNullableFilter<"ProjectMedia"> | string | null
-  startTime?: Prisma.FloatNullableFilter<"ProjectMedia"> | number | null
-  duration?: Prisma.FloatNullableFilter<"ProjectMedia"> | number | null
-  metadata?: Prisma.JsonNullableFilter<"ProjectMedia">
   createdAt?: Prisma.DateTimeFilter<"ProjectMedia"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   media?: Prisma.XOR<Prisma.MediaScalarRelationFilter, Prisma.MediaWhereInput>
-}, "id">
+}, "id" | "projectId_mediaId_role">
 
 export type ProjectMediaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   role?: Prisma.SortOrder
-  displayName?: Prisma.SortOrderInput | Prisma.SortOrder
-  startTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  duration?: Prisma.SortOrderInput | Prisma.SortOrder
-  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ProjectMediaCountOrderByAggregateInput
-  _avg?: Prisma.ProjectMediaAvgOrderByAggregateInput
   _max?: Prisma.ProjectMediaMaxOrderByAggregateInput
   _min?: Prisma.ProjectMediaMinOrderByAggregateInput
-  _sum?: Prisma.ProjectMediaSumOrderByAggregateInput
 }
 
 export type ProjectMediaScalarWhereWithAggregatesInput = {
@@ -308,20 +229,12 @@ export type ProjectMediaScalarWhereWithAggregatesInput = {
   projectId?: Prisma.UuidWithAggregatesFilter<"ProjectMedia"> | string
   mediaId?: Prisma.UuidWithAggregatesFilter<"ProjectMedia"> | string
   role?: Prisma.EnumProjectMediaRoleWithAggregatesFilter<"ProjectMedia"> | $Enums.ProjectMediaRole
-  displayName?: Prisma.StringNullableWithAggregatesFilter<"ProjectMedia"> | string | null
-  startTime?: Prisma.FloatNullableWithAggregatesFilter<"ProjectMedia"> | number | null
-  duration?: Prisma.FloatNullableWithAggregatesFilter<"ProjectMedia"> | number | null
-  metadata?: Prisma.JsonNullableWithAggregatesFilter<"ProjectMedia">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectMedia"> | Date | string
 }
 
 export type ProjectMediaCreateInput = {
   id?: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutProjectMediaInput
   media: Prisma.MediaCreateNestedOneWithoutProjectMediaInput
@@ -331,21 +244,13 @@ export type ProjectMediaUncheckedCreateInput = {
   id?: string
   projectId: string
   mediaId: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
 }
 
 export type ProjectMediaUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutProjectMediaNestedInput
   media?: Prisma.MediaUpdateOneRequiredWithoutProjectMediaNestedInput
@@ -356,10 +261,6 @@ export type ProjectMediaUncheckedUpdateInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -367,21 +268,13 @@ export type ProjectMediaCreateManyInput = {
   id?: string
   projectId: string
   mediaId: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
 }
 
 export type ProjectMediaUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -390,10 +283,6 @@ export type ProjectMediaUncheckedUpdateManyInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -407,21 +296,18 @@ export type ProjectMediaOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type ProjectMediaProjectIdMediaIdRoleCompoundUniqueInput = {
+  projectId: string
+  mediaId: string
+  role: $Enums.ProjectMediaRole
+}
+
 export type ProjectMediaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   role?: Prisma.SortOrder
-  displayName?: Prisma.SortOrder
-  startTime?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
-  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-}
-
-export type ProjectMediaAvgOrderByAggregateInput = {
-  startTime?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
 }
 
 export type ProjectMediaMaxOrderByAggregateInput = {
@@ -429,9 +315,6 @@ export type ProjectMediaMaxOrderByAggregateInput = {
   projectId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   role?: Prisma.SortOrder
-  displayName?: Prisma.SortOrder
-  startTime?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -440,15 +323,7 @@ export type ProjectMediaMinOrderByAggregateInput = {
   projectId?: Prisma.SortOrder
   mediaId?: Prisma.SortOrder
   role?: Prisma.SortOrder
-  displayName?: Prisma.SortOrder
-  startTime?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-}
-
-export type ProjectMediaSumOrderByAggregateInput = {
-  startTime?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
 }
 
 export type ProjectMediaCreateNestedManyWithoutMediaInput = {
@@ -541,11 +416,7 @@ export type EnumProjectMediaRoleFieldUpdateOperationsInput = {
 
 export type ProjectMediaCreateWithoutMediaInput = {
   id?: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutProjectMediaInput
 }
@@ -553,11 +424,7 @@ export type ProjectMediaCreateWithoutMediaInput = {
 export type ProjectMediaUncheckedCreateWithoutMediaInput = {
   id?: string
   projectId: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
 }
 
@@ -595,20 +462,12 @@ export type ProjectMediaScalarWhereInput = {
   projectId?: Prisma.UuidFilter<"ProjectMedia"> | string
   mediaId?: Prisma.UuidFilter<"ProjectMedia"> | string
   role?: Prisma.EnumProjectMediaRoleFilter<"ProjectMedia"> | $Enums.ProjectMediaRole
-  displayName?: Prisma.StringNullableFilter<"ProjectMedia"> | string | null
-  startTime?: Prisma.FloatNullableFilter<"ProjectMedia"> | number | null
-  duration?: Prisma.FloatNullableFilter<"ProjectMedia"> | number | null
-  metadata?: Prisma.JsonNullableFilter<"ProjectMedia">
   createdAt?: Prisma.DateTimeFilter<"ProjectMedia"> | Date | string
 }
 
 export type ProjectMediaCreateWithoutProjectInput = {
   id?: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
   media: Prisma.MediaCreateNestedOneWithoutProjectMediaInput
 }
@@ -616,11 +475,7 @@ export type ProjectMediaCreateWithoutProjectInput = {
 export type ProjectMediaUncheckedCreateWithoutProjectInput = {
   id?: string
   mediaId: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
 }
 
@@ -653,21 +508,13 @@ export type ProjectMediaUpdateManyWithWhereWithoutProjectInput = {
 export type ProjectMediaCreateManyMediaInput = {
   id?: string
   projectId: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
 }
 
 export type ProjectMediaUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutProjectMediaNestedInput
 }
@@ -676,10 +523,6 @@ export type ProjectMediaUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -687,31 +530,19 @@ export type ProjectMediaUncheckedUpdateManyWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ProjectMediaCreateManyProjectInput = {
   id?: string
   mediaId: string
-  role?: $Enums.ProjectMediaRole
-  displayName?: string | null
-  startTime?: number | null
-  duration?: number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  role: $Enums.ProjectMediaRole
   createdAt?: Date | string
 }
 
 export type ProjectMediaUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneRequiredWithoutProjectMediaNestedInput
 }
@@ -720,10 +551,6 @@ export type ProjectMediaUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -731,10 +558,6 @@ export type ProjectMediaUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   mediaId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumProjectMediaRoleFieldUpdateOperationsInput | $Enums.ProjectMediaRole
-  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startTime?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -745,10 +568,6 @@ export type ProjectMediaSelect<ExtArgs extends runtime.Types.Extensions.Internal
   projectId?: boolean
   mediaId?: boolean
   role?: boolean
-  displayName?: boolean
-  startTime?: boolean
-  duration?: boolean
-  metadata?: boolean
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -759,10 +578,6 @@ export type ProjectMediaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   projectId?: boolean
   mediaId?: boolean
   role?: boolean
-  displayName?: boolean
-  startTime?: boolean
-  duration?: boolean
-  metadata?: boolean
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -773,10 +588,6 @@ export type ProjectMediaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   projectId?: boolean
   mediaId?: boolean
   role?: boolean
-  displayName?: boolean
-  startTime?: boolean
-  duration?: boolean
-  metadata?: boolean
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -787,14 +598,10 @@ export type ProjectMediaSelectScalar = {
   projectId?: boolean
   mediaId?: boolean
   role?: boolean
-  displayName?: boolean
-  startTime?: boolean
-  duration?: boolean
-  metadata?: boolean
   createdAt?: boolean
 }
 
-export type ProjectMediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "mediaId" | "role" | "displayName" | "startTime" | "duration" | "metadata" | "createdAt", ExtArgs["result"]["projectMedia"]>
+export type ProjectMediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "mediaId" | "role" | "createdAt", ExtArgs["result"]["projectMedia"]>
 export type ProjectMediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
@@ -819,10 +626,6 @@ export type $ProjectMediaPayload<ExtArgs extends runtime.Types.Extensions.Intern
     projectId: string
     mediaId: string
     role: $Enums.ProjectMediaRole
-    displayName: string | null
-    startTime: number | null
-    duration: number | null
-    metadata: runtime.JsonValue | null
     createdAt: Date
   }, ExtArgs["result"]["projectMedia"]>
   composites: {}
@@ -1253,10 +1056,6 @@ export interface ProjectMediaFieldRefs {
   readonly projectId: Prisma.FieldRef<"ProjectMedia", 'String'>
   readonly mediaId: Prisma.FieldRef<"ProjectMedia", 'String'>
   readonly role: Prisma.FieldRef<"ProjectMedia", 'ProjectMediaRole'>
-  readonly displayName: Prisma.FieldRef<"ProjectMedia", 'String'>
-  readonly startTime: Prisma.FieldRef<"ProjectMedia", 'Float'>
-  readonly duration: Prisma.FieldRef<"ProjectMedia", 'Float'>
-  readonly metadata: Prisma.FieldRef<"ProjectMedia", 'Json'>
   readonly createdAt: Prisma.FieldRef<"ProjectMedia", 'DateTime'>
 }
     

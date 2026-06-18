@@ -56,6 +56,14 @@ export const ProjectStatus = {
 export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
 
 
+export const WorkspaceMemberRole = {
+  OWNER: 'OWNER',
+  MEMBER: 'MEMBER'
+} as const
+
+export type WorkspaceMemberRole = (typeof WorkspaceMemberRole)[keyof typeof WorkspaceMemberRole]
+
+
 export const ProjectMediaRole = {
   SOURCE: 'SOURCE',
   OVERLAY: 'OVERLAY',
@@ -65,25 +73,6 @@ export const ProjectMediaRole = {
 } as const
 
 export type ProjectMediaRole = (typeof ProjectMediaRole)[keyof typeof ProjectMediaRole]
-
-
-export const EditorLayerKind = {
-  TEXT: 'TEXT',
-  CAPTIONS: 'CAPTIONS',
-  IMAGE: 'IMAGE'
-} as const
-
-export type EditorLayerKind = (typeof EditorLayerKind)[keyof typeof EditorLayerKind]
-
-
-export const TimelineTrackType = {
-  TEXT: 'TEXT',
-  IMAGES: 'IMAGES',
-  SOURCE: 'SOURCE',
-  AUDIO: 'AUDIO'
-} as const
-
-export type TimelineTrackType = (typeof TimelineTrackType)[keyof typeof TimelineTrackType]
 
 
 export const JobType = {

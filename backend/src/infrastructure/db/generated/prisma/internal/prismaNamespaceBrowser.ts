@@ -58,11 +58,7 @@ export const ModelName = {
   Media: 'Media',
   Project: 'Project',
   ProjectMedia: 'ProjectMedia',
-  EditorDocument: 'EditorDocument',
-  EditorDocumentVersion: 'EditorDocumentVersion',
-  CanvasLayer: 'CanvasLayer',
-  TimelineTrack: 'TimelineTrack',
-  TimelineSegment: 'TimelineSegment',
+  EditorSnapshot: 'EditorSnapshot',
   ProcessingJob: 'ProcessingJob',
   JobEvent: 'JobEvent',
   Transcript: 'Transcript',
@@ -188,7 +184,6 @@ export const ProjectScalarFieldEnum = {
   status: 'status',
   aspectRatio: 'aspectRatio',
   duration: 'duration',
-  currentDocumentVersion: 'currentDocumentVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -201,93 +196,24 @@ export const ProjectMediaScalarFieldEnum = {
   projectId: 'projectId',
   mediaId: 'mediaId',
   role: 'role',
-  displayName: 'displayName',
-  startTime: 'startTime',
-  duration: 'duration',
-  metadata: 'metadata',
   createdAt: 'createdAt'
 } as const
 
 export type ProjectMediaScalarFieldEnum = (typeof ProjectMediaScalarFieldEnum)[keyof typeof ProjectMediaScalarFieldEnum]
 
 
-export const EditorDocumentScalarFieldEnum = {
+export const EditorSnapshotScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   version: 'version',
-  document: 'document',
+  snapshot: 'snapshot',
   savedByUserId: 'savedByUserId',
   savedAt: 'savedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type EditorDocumentScalarFieldEnum = (typeof EditorDocumentScalarFieldEnum)[keyof typeof EditorDocumentScalarFieldEnum]
-
-
-export const EditorDocumentVersionScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  version: 'version',
-  document: 'document',
-  savedByUserId: 'savedByUserId',
-  createdAt: 'createdAt'
-} as const
-
-export type EditorDocumentVersionScalarFieldEnum = (typeof EditorDocumentVersionScalarFieldEnum)[keyof typeof EditorDocumentVersionScalarFieldEnum]
-
-
-export const CanvasLayerScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  mediaId: 'mediaId',
-  kind: 'kind',
-  label: 'label',
-  content: 'content',
-  enabled: 'enabled',
-  xPercent: 'xPercent',
-  yPercent: 'yPercent',
-  boxWidthPercent: 'boxWidthPercent',
-  rotation: 'rotation',
-  scale: 'scale',
-  zIndex: 'zIndex',
-  style: 'style',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type CanvasLayerScalarFieldEnum = (typeof CanvasLayerScalarFieldEnum)[keyof typeof CanvasLayerScalarFieldEnum]
-
-
-export const TimelineTrackScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  type: 'type',
-  label: 'label',
-  sortOrder: 'sortOrder',
-  createdAt: 'createdAt'
-} as const
-
-export type TimelineTrackScalarFieldEnum = (typeof TimelineTrackScalarFieldEnum)[keyof typeof TimelineTrackScalarFieldEnum]
-
-
-export const TimelineSegmentScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  trackId: 'trackId',
-  layerId: 'layerId',
-  mediaId: 'mediaId',
-  label: 'label',
-  content: 'content',
-  startTime: 'startTime',
-  duration: 'duration',
-  laneIndex: 'laneIndex',
-  metadata: 'metadata',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TimelineSegmentScalarFieldEnum = (typeof TimelineSegmentScalarFieldEnum)[keyof typeof TimelineSegmentScalarFieldEnum]
+export type EditorSnapshotScalarFieldEnum = (typeof EditorSnapshotScalarFieldEnum)[keyof typeof EditorSnapshotScalarFieldEnum]
 
 
 export const ProcessingJobScalarFieldEnum = {

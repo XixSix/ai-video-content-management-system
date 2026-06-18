@@ -28,12 +28,10 @@ export type AggregateProject = {
 
 export type ProjectAvgAggregateOutputType = {
   duration: number | null
-  currentDocumentVersion: number | null
 }
 
 export type ProjectSumAggregateOutputType = {
   duration: number | null
-  currentDocumentVersion: number | null
 }
 
 export type ProjectMinAggregateOutputType = {
@@ -47,7 +45,6 @@ export type ProjectMinAggregateOutputType = {
   status: $Enums.ProjectStatus | null
   aspectRatio: string | null
   duration: number | null
-  currentDocumentVersion: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,7 +60,6 @@ export type ProjectMaxAggregateOutputType = {
   status: $Enums.ProjectStatus | null
   aspectRatio: string | null
   duration: number | null
-  currentDocumentVersion: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -79,7 +75,6 @@ export type ProjectCountAggregateOutputType = {
   status: number
   aspectRatio: number
   duration: number
-  currentDocumentVersion: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -88,12 +83,10 @@ export type ProjectCountAggregateOutputType = {
 
 export type ProjectAvgAggregateInputType = {
   duration?: true
-  currentDocumentVersion?: true
 }
 
 export type ProjectSumAggregateInputType = {
   duration?: true
-  currentDocumentVersion?: true
 }
 
 export type ProjectMinAggregateInputType = {
@@ -107,7 +100,6 @@ export type ProjectMinAggregateInputType = {
   status?: true
   aspectRatio?: true
   duration?: true
-  currentDocumentVersion?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -123,7 +115,6 @@ export type ProjectMaxAggregateInputType = {
   status?: true
   aspectRatio?: true
   duration?: true
-  currentDocumentVersion?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -139,7 +130,6 @@ export type ProjectCountAggregateInputType = {
   status?: true
   aspectRatio?: true
   duration?: true
-  currentDocumentVersion?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -242,7 +232,6 @@ export type ProjectGroupByOutputType = {
   status: $Enums.ProjectStatus
   aspectRatio: string
   duration: number | null
-  currentDocumentVersion: number
   createdAt: Date
   updatedAt: Date
   _count: ProjectCountAggregateOutputType | null
@@ -281,7 +270,6 @@ export type ProjectWhereInput = {
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFilter<"Project"> | string
   duration?: Prisma.FloatNullableFilter<"Project"> | number | null
-  currentDocumentVersion?: Prisma.IntFilter<"Project"> | number
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -289,11 +277,7 @@ export type ProjectWhereInput = {
   sourceMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   thumbnailMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   projectMedia?: Prisma.ProjectMediaListRelationFilter
-  editorDocument?: Prisma.XOR<Prisma.EditorDocumentNullableScalarRelationFilter, Prisma.EditorDocumentWhereInput> | null
-  documentVersions?: Prisma.EditorDocumentVersionListRelationFilter
-  canvasLayers?: Prisma.CanvasLayerListRelationFilter
-  timelineTracks?: Prisma.TimelineTrackListRelationFilter
-  timelineSegments?: Prisma.TimelineSegmentListRelationFilter
+  editorSnapshot?: Prisma.XOR<Prisma.EditorSnapshotNullableScalarRelationFilter, Prisma.EditorSnapshotWhereInput> | null
   processingJobs?: Prisma.ProcessingJobListRelationFilter
   transcripts?: Prisma.TranscriptListRelationFilter
   videoChapters?: Prisma.VideoChapterListRelationFilter
@@ -315,7 +299,6 @@ export type ProjectOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   aspectRatio?: Prisma.SortOrder
   duration?: Prisma.SortOrderInput | Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -323,11 +306,7 @@ export type ProjectOrderByWithRelationInput = {
   sourceMedia?: Prisma.MediaOrderByWithRelationInput
   thumbnailMedia?: Prisma.MediaOrderByWithRelationInput
   projectMedia?: Prisma.ProjectMediaOrderByRelationAggregateInput
-  editorDocument?: Prisma.EditorDocumentOrderByWithRelationInput
-  documentVersions?: Prisma.EditorDocumentVersionOrderByRelationAggregateInput
-  canvasLayers?: Prisma.CanvasLayerOrderByRelationAggregateInput
-  timelineTracks?: Prisma.TimelineTrackOrderByRelationAggregateInput
-  timelineSegments?: Prisma.TimelineSegmentOrderByRelationAggregateInput
+  editorSnapshot?: Prisma.EditorSnapshotOrderByWithRelationInput
   processingJobs?: Prisma.ProcessingJobOrderByRelationAggregateInput
   transcripts?: Prisma.TranscriptOrderByRelationAggregateInput
   videoChapters?: Prisma.VideoChapterOrderByRelationAggregateInput
@@ -353,7 +332,6 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFilter<"Project"> | string
   duration?: Prisma.FloatNullableFilter<"Project"> | number | null
-  currentDocumentVersion?: Prisma.IntFilter<"Project"> | number
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -361,11 +339,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   sourceMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   thumbnailMedia?: Prisma.XOR<Prisma.MediaNullableScalarRelationFilter, Prisma.MediaWhereInput> | null
   projectMedia?: Prisma.ProjectMediaListRelationFilter
-  editorDocument?: Prisma.XOR<Prisma.EditorDocumentNullableScalarRelationFilter, Prisma.EditorDocumentWhereInput> | null
-  documentVersions?: Prisma.EditorDocumentVersionListRelationFilter
-  canvasLayers?: Prisma.CanvasLayerListRelationFilter
-  timelineTracks?: Prisma.TimelineTrackListRelationFilter
-  timelineSegments?: Prisma.TimelineSegmentListRelationFilter
+  editorSnapshot?: Prisma.XOR<Prisma.EditorSnapshotNullableScalarRelationFilter, Prisma.EditorSnapshotWhereInput> | null
   processingJobs?: Prisma.ProcessingJobListRelationFilter
   transcripts?: Prisma.TranscriptListRelationFilter
   videoChapters?: Prisma.VideoChapterListRelationFilter
@@ -387,7 +361,6 @@ export type ProjectOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   aspectRatio?: Prisma.SortOrder
   duration?: Prisma.SortOrderInput | Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
@@ -411,7 +384,6 @@ export type ProjectScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumProjectStatusWithAggregatesFilter<"Project"> | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringWithAggregatesFilter<"Project"> | string
   duration?: Prisma.FloatNullableWithAggregatesFilter<"Project"> | number | null
-  currentDocumentVersion?: Prisma.IntWithAggregatesFilter<"Project"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
 }
@@ -423,7 +395,6 @@ export type ProjectCreateInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -431,11 +402,7 @@ export type ProjectCreateInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -457,15 +424,10 @@ export type ProjectUncheckedCreateInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -483,7 +445,6 @@ export type ProjectUpdateInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -491,11 +452,7 @@ export type ProjectUpdateInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -517,15 +474,10 @@ export type ProjectUncheckedUpdateInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -547,7 +499,6 @@ export type ProjectCreateManyInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -559,7 +510,6 @@ export type ProjectUpdateManyMutationInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -575,7 +525,6 @@ export type ProjectUncheckedUpdateManyInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -606,14 +555,12 @@ export type ProjectCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   aspectRatio?: Prisma.SortOrder
   duration?: Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ProjectAvgOrderByAggregateInput = {
   duration?: Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
 }
 
 export type ProjectMaxOrderByAggregateInput = {
@@ -627,7 +574,6 @@ export type ProjectMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   aspectRatio?: Prisma.SortOrder
   duration?: Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -643,14 +589,12 @@ export type ProjectMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   aspectRatio?: Prisma.SortOrder
   duration?: Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ProjectSumOrderByAggregateInput = {
   duration?: Prisma.SortOrder
-  currentDocumentVersion?: Prisma.SortOrder
 }
 
 export type ProjectScalarRelationFilter = {
@@ -835,14 +779,6 @@ export type EnumProjectStatusFieldUpdateOperationsInput = {
   set?: $Enums.ProjectStatus
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ProjectCreateNestedOneWithoutProjectMediaInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutProjectMediaInput, Prisma.ProjectUncheckedCreateWithoutProjectMediaInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutProjectMediaInput
@@ -857,74 +793,18 @@ export type ProjectUpdateOneRequiredWithoutProjectMediaNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutProjectMediaInput, Prisma.ProjectUpdateWithoutProjectMediaInput>, Prisma.ProjectUncheckedUpdateWithoutProjectMediaInput>
 }
 
-export type ProjectCreateNestedOneWithoutEditorDocumentInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutEditorDocumentInput, Prisma.ProjectUncheckedCreateWithoutEditorDocumentInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutEditorDocumentInput
+export type ProjectCreateNestedOneWithoutEditorSnapshotInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutEditorSnapshotInput, Prisma.ProjectUncheckedCreateWithoutEditorSnapshotInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutEditorSnapshotInput
   connect?: Prisma.ProjectWhereUniqueInput
 }
 
-export type ProjectUpdateOneRequiredWithoutEditorDocumentNestedInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutEditorDocumentInput, Prisma.ProjectUncheckedCreateWithoutEditorDocumentInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutEditorDocumentInput
-  upsert?: Prisma.ProjectUpsertWithoutEditorDocumentInput
+export type ProjectUpdateOneRequiredWithoutEditorSnapshotNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutEditorSnapshotInput, Prisma.ProjectUncheckedCreateWithoutEditorSnapshotInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutEditorSnapshotInput
+  upsert?: Prisma.ProjectUpsertWithoutEditorSnapshotInput
   connect?: Prisma.ProjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutEditorDocumentInput, Prisma.ProjectUpdateWithoutEditorDocumentInput>, Prisma.ProjectUncheckedUpdateWithoutEditorDocumentInput>
-}
-
-export type ProjectCreateNestedOneWithoutDocumentVersionsInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDocumentVersionsInput, Prisma.ProjectUncheckedCreateWithoutDocumentVersionsInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDocumentVersionsInput
-  connect?: Prisma.ProjectWhereUniqueInput
-}
-
-export type ProjectUpdateOneRequiredWithoutDocumentVersionsNestedInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDocumentVersionsInput, Prisma.ProjectUncheckedCreateWithoutDocumentVersionsInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDocumentVersionsInput
-  upsert?: Prisma.ProjectUpsertWithoutDocumentVersionsInput
-  connect?: Prisma.ProjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutDocumentVersionsInput, Prisma.ProjectUpdateWithoutDocumentVersionsInput>, Prisma.ProjectUncheckedUpdateWithoutDocumentVersionsInput>
-}
-
-export type ProjectCreateNestedOneWithoutCanvasLayersInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutCanvasLayersInput, Prisma.ProjectUncheckedCreateWithoutCanvasLayersInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutCanvasLayersInput
-  connect?: Prisma.ProjectWhereUniqueInput
-}
-
-export type ProjectUpdateOneRequiredWithoutCanvasLayersNestedInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutCanvasLayersInput, Prisma.ProjectUncheckedCreateWithoutCanvasLayersInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutCanvasLayersInput
-  upsert?: Prisma.ProjectUpsertWithoutCanvasLayersInput
-  connect?: Prisma.ProjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutCanvasLayersInput, Prisma.ProjectUpdateWithoutCanvasLayersInput>, Prisma.ProjectUncheckedUpdateWithoutCanvasLayersInput>
-}
-
-export type ProjectCreateNestedOneWithoutTimelineTracksInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineTracksInput, Prisma.ProjectUncheckedCreateWithoutTimelineTracksInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTimelineTracksInput
-  connect?: Prisma.ProjectWhereUniqueInput
-}
-
-export type ProjectUpdateOneRequiredWithoutTimelineTracksNestedInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineTracksInput, Prisma.ProjectUncheckedCreateWithoutTimelineTracksInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTimelineTracksInput
-  upsert?: Prisma.ProjectUpsertWithoutTimelineTracksInput
-  connect?: Prisma.ProjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutTimelineTracksInput, Prisma.ProjectUpdateWithoutTimelineTracksInput>, Prisma.ProjectUncheckedUpdateWithoutTimelineTracksInput>
-}
-
-export type ProjectCreateNestedOneWithoutTimelineSegmentsInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineSegmentsInput, Prisma.ProjectUncheckedCreateWithoutTimelineSegmentsInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTimelineSegmentsInput
-  connect?: Prisma.ProjectWhereUniqueInput
-}
-
-export type ProjectUpdateOneRequiredWithoutTimelineSegmentsNestedInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineSegmentsInput, Prisma.ProjectUncheckedCreateWithoutTimelineSegmentsInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTimelineSegmentsInput
-  upsert?: Prisma.ProjectUpsertWithoutTimelineSegmentsInput
-  connect?: Prisma.ProjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutTimelineSegmentsInput, Prisma.ProjectUpdateWithoutTimelineSegmentsInput>, Prisma.ProjectUncheckedUpdateWithoutTimelineSegmentsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutEditorSnapshotInput, Prisma.ProjectUpdateWithoutEditorSnapshotInput>, Prisma.ProjectUncheckedUpdateWithoutEditorSnapshotInput>
 }
 
 export type ProjectCreateNestedOneWithoutProcessingJobsInput = {
@@ -1062,18 +942,13 @@ export type ProjectCreateWithoutUserInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -1094,15 +969,10 @@ export type ProjectUncheckedCreateWithoutUserInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1153,7 +1023,6 @@ export type ProjectScalarWhereInput = {
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFilter<"Project"> | string
   duration?: Prisma.FloatNullableFilter<"Project"> | number | null
-  currentDocumentVersion?: Prisma.IntFilter<"Project"> | number
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
 }
@@ -1165,18 +1034,13 @@ export type ProjectCreateWithoutWorkspaceInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -1197,15 +1061,10 @@ export type ProjectUncheckedCreateWithoutWorkspaceInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1249,18 +1108,13 @@ export type ProjectCreateWithoutSourceMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -1281,15 +1135,10 @@ export type ProjectUncheckedCreateWithoutSourceMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1317,18 +1166,13 @@ export type ProjectCreateWithoutThumbnailMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -1349,15 +1193,10 @@ export type ProjectUncheckedCreateWithoutThumbnailMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1417,18 +1256,13 @@ export type ProjectCreateWithoutProjectMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -1450,14 +1284,9 @@ export type ProjectUncheckedCreateWithoutProjectMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1491,18 +1320,13 @@ export type ProjectUpdateWithoutProjectMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -1524,14 +1348,9 @@ export type ProjectUncheckedUpdateWithoutProjectMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -1542,14 +1361,13 @@ export type ProjectUncheckedUpdateWithoutProjectMediaInput = {
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
-export type ProjectCreateWithoutEditorDocumentInput = {
+export type ProjectCreateWithoutEditorSnapshotInput = {
   id?: string
   title: string
   slug: string
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -1557,10 +1375,6 @@ export type ProjectCreateWithoutEditorDocumentInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -1571,7 +1385,7 @@ export type ProjectCreateWithoutEditorDocumentInput = {
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
-export type ProjectUncheckedCreateWithoutEditorDocumentInput = {
+export type ProjectUncheckedCreateWithoutEditorSnapshotInput = {
   id?: string
   userId: string
   workspaceId: string
@@ -1582,14 +1396,9 @@ export type ProjectUncheckedCreateWithoutEditorDocumentInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1600,30 +1409,29 @@ export type ProjectUncheckedCreateWithoutEditorDocumentInput = {
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
-export type ProjectCreateOrConnectWithoutEditorDocumentInput = {
+export type ProjectCreateOrConnectWithoutEditorSnapshotInput = {
   where: Prisma.ProjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutEditorDocumentInput, Prisma.ProjectUncheckedCreateWithoutEditorDocumentInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutEditorSnapshotInput, Prisma.ProjectUncheckedCreateWithoutEditorSnapshotInput>
 }
 
-export type ProjectUpsertWithoutEditorDocumentInput = {
-  update: Prisma.XOR<Prisma.ProjectUpdateWithoutEditorDocumentInput, Prisma.ProjectUncheckedUpdateWithoutEditorDocumentInput>
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutEditorDocumentInput, Prisma.ProjectUncheckedCreateWithoutEditorDocumentInput>
+export type ProjectUpsertWithoutEditorSnapshotInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutEditorSnapshotInput, Prisma.ProjectUncheckedUpdateWithoutEditorSnapshotInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutEditorSnapshotInput, Prisma.ProjectUncheckedCreateWithoutEditorSnapshotInput>
   where?: Prisma.ProjectWhereInput
 }
 
-export type ProjectUpdateToOneWithWhereWithoutEditorDocumentInput = {
+export type ProjectUpdateToOneWithWhereWithoutEditorSnapshotInput = {
   where?: Prisma.ProjectWhereInput
-  data: Prisma.XOR<Prisma.ProjectUpdateWithoutEditorDocumentInput, Prisma.ProjectUncheckedUpdateWithoutEditorDocumentInput>
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutEditorSnapshotInput, Prisma.ProjectUncheckedUpdateWithoutEditorSnapshotInput>
 }
 
-export type ProjectUpdateWithoutEditorDocumentInput = {
+export type ProjectUpdateWithoutEditorSnapshotInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -1631,10 +1439,6 @@ export type ProjectUpdateWithoutEditorDocumentInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -1645,7 +1449,7 @@ export type ProjectUpdateWithoutEditorDocumentInput = {
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
-export type ProjectUncheckedUpdateWithoutEditorDocumentInput = {
+export type ProjectUncheckedUpdateWithoutEditorSnapshotInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1656,542 +1460,9 @@ export type ProjectUncheckedUpdateWithoutEditorDocumentInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectCreateWithoutDocumentVersionsInput = {
-  id?: string
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
-  sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
-  thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
-  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectUncheckedCreateWithoutDocumentVersionsInput = {
-  id?: string
-  userId: string
-  workspaceId: string
-  sourceMediaId?: string | null
-  thumbnailMediaId?: string | null
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectCreateOrConnectWithoutDocumentVersionsInput = {
-  where: Prisma.ProjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutDocumentVersionsInput, Prisma.ProjectUncheckedCreateWithoutDocumentVersionsInput>
-}
-
-export type ProjectUpsertWithoutDocumentVersionsInput = {
-  update: Prisma.XOR<Prisma.ProjectUpdateWithoutDocumentVersionsInput, Prisma.ProjectUncheckedUpdateWithoutDocumentVersionsInput>
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutDocumentVersionsInput, Prisma.ProjectUncheckedCreateWithoutDocumentVersionsInput>
-  where?: Prisma.ProjectWhereInput
-}
-
-export type ProjectUpdateToOneWithWhereWithoutDocumentVersionsInput = {
-  where?: Prisma.ProjectWhereInput
-  data: Prisma.XOR<Prisma.ProjectUpdateWithoutDocumentVersionsInput, Prisma.ProjectUncheckedUpdateWithoutDocumentVersionsInput>
-}
-
-export type ProjectUpdateWithoutDocumentVersionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
-  sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
-  thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
-  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectUncheckedUpdateWithoutDocumentVersionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectCreateWithoutCanvasLayersInput = {
-  id?: string
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
-  sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
-  thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
-  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectUncheckedCreateWithoutCanvasLayersInput = {
-  id?: string
-  userId: string
-  workspaceId: string
-  sourceMediaId?: string | null
-  thumbnailMediaId?: string | null
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectCreateOrConnectWithoutCanvasLayersInput = {
-  where: Prisma.ProjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutCanvasLayersInput, Prisma.ProjectUncheckedCreateWithoutCanvasLayersInput>
-}
-
-export type ProjectUpsertWithoutCanvasLayersInput = {
-  update: Prisma.XOR<Prisma.ProjectUpdateWithoutCanvasLayersInput, Prisma.ProjectUncheckedUpdateWithoutCanvasLayersInput>
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutCanvasLayersInput, Prisma.ProjectUncheckedCreateWithoutCanvasLayersInput>
-  where?: Prisma.ProjectWhereInput
-}
-
-export type ProjectUpdateToOneWithWhereWithoutCanvasLayersInput = {
-  where?: Prisma.ProjectWhereInput
-  data: Prisma.XOR<Prisma.ProjectUpdateWithoutCanvasLayersInput, Prisma.ProjectUncheckedUpdateWithoutCanvasLayersInput>
-}
-
-export type ProjectUpdateWithoutCanvasLayersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
-  sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
-  thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
-  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectUncheckedUpdateWithoutCanvasLayersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectCreateWithoutTimelineTracksInput = {
-  id?: string
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
-  sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
-  thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
-  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectUncheckedCreateWithoutTimelineTracksInput = {
-  id?: string
-  userId: string
-  workspaceId: string
-  sourceMediaId?: string | null
-  thumbnailMediaId?: string | null
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectCreateOrConnectWithoutTimelineTracksInput = {
-  where: Prisma.ProjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineTracksInput, Prisma.ProjectUncheckedCreateWithoutTimelineTracksInput>
-}
-
-export type ProjectUpsertWithoutTimelineTracksInput = {
-  update: Prisma.XOR<Prisma.ProjectUpdateWithoutTimelineTracksInput, Prisma.ProjectUncheckedUpdateWithoutTimelineTracksInput>
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineTracksInput, Prisma.ProjectUncheckedCreateWithoutTimelineTracksInput>
-  where?: Prisma.ProjectWhereInput
-}
-
-export type ProjectUpdateToOneWithWhereWithoutTimelineTracksInput = {
-  where?: Prisma.ProjectWhereInput
-  data: Prisma.XOR<Prisma.ProjectUpdateWithoutTimelineTracksInput, Prisma.ProjectUncheckedUpdateWithoutTimelineTracksInput>
-}
-
-export type ProjectUpdateWithoutTimelineTracksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
-  sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
-  thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
-  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectUncheckedUpdateWithoutTimelineTracksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectCreateWithoutTimelineSegmentsInput = {
-  id?: string
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
-  sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
-  thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
-  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectUncheckedCreateWithoutTimelineSegmentsInput = {
-  id?: string
-  userId: string
-  workspaceId: string
-  sourceMediaId?: string | null
-  thumbnailMediaId?: string | null
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  currentDocumentVersion?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectCreateOrConnectWithoutTimelineSegmentsInput = {
-  where: Prisma.ProjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineSegmentsInput, Prisma.ProjectUncheckedCreateWithoutTimelineSegmentsInput>
-}
-
-export type ProjectUpsertWithoutTimelineSegmentsInput = {
-  update: Prisma.XOR<Prisma.ProjectUpdateWithoutTimelineSegmentsInput, Prisma.ProjectUncheckedUpdateWithoutTimelineSegmentsInput>
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutTimelineSegmentsInput, Prisma.ProjectUncheckedCreateWithoutTimelineSegmentsInput>
-  where?: Prisma.ProjectWhereInput
-}
-
-export type ProjectUpdateToOneWithWhereWithoutTimelineSegmentsInput = {
-  where?: Prisma.ProjectWhereInput
-  data: Prisma.XOR<Prisma.ProjectUpdateWithoutTimelineSegmentsInput, Prisma.ProjectUncheckedUpdateWithoutTimelineSegmentsInput>
-}
-
-export type ProjectUpdateWithoutTimelineSegmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
-  sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
-  thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
-  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectUncheckedUpdateWithoutTimelineSegmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -2209,7 +1480,6 @@ export type ProjectCreateWithoutProcessingJobsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -2217,11 +1487,7 @@ export type ProjectCreateWithoutProcessingJobsInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
@@ -2242,15 +1508,10 @@ export type ProjectUncheckedCreateWithoutProcessingJobsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
@@ -2283,7 +1544,6 @@ export type ProjectUpdateWithoutProcessingJobsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -2291,11 +1551,7 @@ export type ProjectUpdateWithoutProcessingJobsInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
@@ -2316,15 +1572,10 @@ export type ProjectUncheckedUpdateWithoutProcessingJobsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
@@ -2341,7 +1592,6 @@ export type ProjectCreateWithoutTranscriptsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -2349,11 +1599,7 @@ export type ProjectCreateWithoutTranscriptsInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
@@ -2374,15 +1620,10 @@ export type ProjectUncheckedCreateWithoutTranscriptsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
@@ -2415,7 +1656,6 @@ export type ProjectUpdateWithoutTranscriptsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -2423,11 +1663,7 @@ export type ProjectUpdateWithoutTranscriptsInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
@@ -2448,15 +1684,10 @@ export type ProjectUncheckedUpdateWithoutTranscriptsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
@@ -2473,7 +1704,6 @@ export type ProjectCreateWithoutVideoChaptersInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -2481,11 +1711,7 @@ export type ProjectCreateWithoutVideoChaptersInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
@@ -2506,15 +1732,10 @@ export type ProjectUncheckedCreateWithoutVideoChaptersInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
@@ -2547,7 +1768,6 @@ export type ProjectUpdateWithoutVideoChaptersInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -2555,11 +1775,7 @@ export type ProjectUpdateWithoutVideoChaptersInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
@@ -2580,15 +1796,10 @@ export type ProjectUncheckedUpdateWithoutVideoChaptersInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
@@ -2605,7 +1816,6 @@ export type ProjectCreateWithoutClipCandidatesInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -2613,11 +1823,7 @@ export type ProjectCreateWithoutClipCandidatesInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -2638,15 +1844,10 @@ export type ProjectUncheckedCreateWithoutClipCandidatesInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -2679,7 +1880,6 @@ export type ProjectUpdateWithoutClipCandidatesInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -2687,11 +1887,7 @@ export type ProjectUpdateWithoutClipCandidatesInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -2712,15 +1908,10 @@ export type ProjectUncheckedUpdateWithoutClipCandidatesInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -2737,7 +1928,6 @@ export type ProjectCreateWithoutShortClipsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -2745,11 +1935,7 @@ export type ProjectCreateWithoutShortClipsInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -2770,15 +1956,10 @@ export type ProjectUncheckedCreateWithoutShortClipsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -2811,7 +1992,6 @@ export type ProjectUpdateWithoutShortClipsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -2819,11 +1999,7 @@ export type ProjectUpdateWithoutShortClipsInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -2844,15 +2020,10 @@ export type ProjectUncheckedUpdateWithoutShortClipsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -2869,7 +2040,6 @@ export type ProjectCreateWithoutGeneratedAssetsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -2877,11 +2047,7 @@ export type ProjectCreateWithoutGeneratedAssetsInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -2902,15 +2068,10 @@ export type ProjectUncheckedCreateWithoutGeneratedAssetsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -2943,7 +2104,6 @@ export type ProjectUpdateWithoutGeneratedAssetsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -2951,11 +2111,7 @@ export type ProjectUpdateWithoutGeneratedAssetsInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -2976,15 +2132,10 @@ export type ProjectUncheckedUpdateWithoutGeneratedAssetsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3001,7 +2152,6 @@ export type ProjectCreateWithoutAiSuggestionsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -3009,11 +2159,7 @@ export type ProjectCreateWithoutAiSuggestionsInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -3034,15 +2180,10 @@ export type ProjectUncheckedCreateWithoutAiSuggestionsInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -3075,7 +2216,6 @@ export type ProjectUpdateWithoutAiSuggestionsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -3083,11 +2223,7 @@ export type ProjectUpdateWithoutAiSuggestionsInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -3108,15 +2244,10 @@ export type ProjectUncheckedUpdateWithoutAiSuggestionsInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3133,7 +2264,6 @@ export type ProjectCreateWithoutPublishTasksInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -3141,11 +2271,7 @@ export type ProjectCreateWithoutPublishTasksInput = {
   sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
   thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
   projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
@@ -3166,15 +2292,10 @@ export type ProjectUncheckedCreateWithoutPublishTasksInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorDocument?: Prisma.EditorDocumentUncheckedCreateNestedOneWithoutProjectInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedCreateNestedManyWithoutProjectInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedCreateNestedManyWithoutProjectInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedCreateNestedManyWithoutProjectInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedCreateNestedManyWithoutProjectInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
   transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -3207,7 +2328,6 @@ export type ProjectUpdateWithoutPublishTasksInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -3215,11 +2335,7 @@ export type ProjectUpdateWithoutPublishTasksInput = {
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -3240,15 +2356,10 @@ export type ProjectUncheckedUpdateWithoutPublishTasksInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3268,7 +2379,6 @@ export type ProjectCreateManyUserInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3280,18 +2390,13 @@ export type ProjectUpdateWithoutUserInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -3312,15 +2417,10 @@ export type ProjectUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3341,7 +2441,6 @@ export type ProjectUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3356,7 +2455,6 @@ export type ProjectCreateManyWorkspaceInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3368,18 +2466,13 @@ export type ProjectUpdateWithoutWorkspaceInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -3400,15 +2493,10 @@ export type ProjectUncheckedUpdateWithoutWorkspaceInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3429,7 +2517,6 @@ export type ProjectUncheckedUpdateManyWithoutWorkspaceInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3444,7 +2531,6 @@ export type ProjectCreateManySourceMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3459,7 +2545,6 @@ export type ProjectCreateManyThumbnailMediaInput = {
   status?: $Enums.ProjectStatus
   aspectRatio?: string
   duration?: number | null
-  currentDocumentVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3471,18 +2556,13 @@ export type ProjectUpdateWithoutSourceMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -3503,15 +2583,10 @@ export type ProjectUncheckedUpdateWithoutSourceMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3532,7 +2607,6 @@ export type ProjectUncheckedUpdateManyWithoutSourceMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3544,18 +2618,13 @@ export type ProjectUpdateWithoutThumbnailMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
   sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
   projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
@@ -3576,15 +2645,10 @@ export type ProjectUncheckedUpdateWithoutThumbnailMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorDocument?: Prisma.EditorDocumentUncheckedUpdateOneWithoutProjectNestedInput
-  documentVersions?: Prisma.EditorDocumentVersionUncheckedUpdateManyWithoutProjectNestedInput
-  canvasLayers?: Prisma.CanvasLayerUncheckedUpdateManyWithoutProjectNestedInput
-  timelineTracks?: Prisma.TimelineTrackUncheckedUpdateManyWithoutProjectNestedInput
-  timelineSegments?: Prisma.TimelineSegmentUncheckedUpdateManyWithoutProjectNestedInput
+  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
   transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -3605,7 +2669,6 @@ export type ProjectUncheckedUpdateManyWithoutThumbnailMediaInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
   duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  currentDocumentVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3617,10 +2680,6 @@ export type ProjectUncheckedUpdateManyWithoutThumbnailMediaInput = {
 
 export type ProjectCountOutputType = {
   projectMedia: number
-  documentVersions: number
-  canvasLayers: number
-  timelineTracks: number
-  timelineSegments: number
   processingJobs: number
   transcripts: number
   videoChapters: number
@@ -3633,10 +2692,6 @@ export type ProjectCountOutputType = {
 
 export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projectMedia?: boolean | ProjectCountOutputTypeCountProjectMediaArgs
-  documentVersions?: boolean | ProjectCountOutputTypeCountDocumentVersionsArgs
-  canvasLayers?: boolean | ProjectCountOutputTypeCountCanvasLayersArgs
-  timelineTracks?: boolean | ProjectCountOutputTypeCountTimelineTracksArgs
-  timelineSegments?: boolean | ProjectCountOutputTypeCountTimelineSegmentsArgs
   processingJobs?: boolean | ProjectCountOutputTypeCountProcessingJobsArgs
   transcripts?: boolean | ProjectCountOutputTypeCountTranscriptsArgs
   videoChapters?: boolean | ProjectCountOutputTypeCountVideoChaptersArgs
@@ -3662,34 +2717,6 @@ export type ProjectCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type ProjectCountOutputTypeCountProjectMediaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ProjectMediaWhereInput
-}
-
-/**
- * ProjectCountOutputType without action
- */
-export type ProjectCountOutputTypeCountDocumentVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EditorDocumentVersionWhereInput
-}
-
-/**
- * ProjectCountOutputType without action
- */
-export type ProjectCountOutputTypeCountCanvasLayersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CanvasLayerWhereInput
-}
-
-/**
- * ProjectCountOutputType without action
- */
-export type ProjectCountOutputTypeCountTimelineTracksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TimelineTrackWhereInput
-}
-
-/**
- * ProjectCountOutputType without action
- */
-export type ProjectCountOutputTypeCountTimelineSegmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TimelineSegmentWhereInput
 }
 
 /**
@@ -3760,7 +2787,6 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   status?: boolean
   aspectRatio?: boolean
   duration?: boolean
-  currentDocumentVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3768,11 +2794,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
   projectMedia?: boolean | Prisma.Project$projectMediaArgs<ExtArgs>
-  editorDocument?: boolean | Prisma.Project$editorDocumentArgs<ExtArgs>
-  documentVersions?: boolean | Prisma.Project$documentVersionsArgs<ExtArgs>
-  canvasLayers?: boolean | Prisma.Project$canvasLayersArgs<ExtArgs>
-  timelineTracks?: boolean | Prisma.Project$timelineTracksArgs<ExtArgs>
-  timelineSegments?: boolean | Prisma.Project$timelineSegmentsArgs<ExtArgs>
+  editorSnapshot?: boolean | Prisma.Project$editorSnapshotArgs<ExtArgs>
   processingJobs?: boolean | Prisma.Project$processingJobsArgs<ExtArgs>
   transcripts?: boolean | Prisma.Project$transcriptsArgs<ExtArgs>
   videoChapters?: boolean | Prisma.Project$videoChaptersArgs<ExtArgs>
@@ -3795,7 +2817,6 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   aspectRatio?: boolean
   duration?: boolean
-  currentDocumentVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3815,7 +2836,6 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   aspectRatio?: boolean
   duration?: boolean
-  currentDocumentVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3835,23 +2855,18 @@ export type ProjectSelectScalar = {
   status?: boolean
   aspectRatio?: boolean
   duration?: boolean
-  currentDocumentVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "workspaceId" | "sourceMediaId" | "thumbnailMediaId" | "title" | "slug" | "status" | "aspectRatio" | "duration" | "currentDocumentVersion" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "workspaceId" | "sourceMediaId" | "thumbnailMediaId" | "title" | "slug" | "status" | "aspectRatio" | "duration" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceMedia?: boolean | Prisma.Project$sourceMediaArgs<ExtArgs>
   thumbnailMedia?: boolean | Prisma.Project$thumbnailMediaArgs<ExtArgs>
   projectMedia?: boolean | Prisma.Project$projectMediaArgs<ExtArgs>
-  editorDocument?: boolean | Prisma.Project$editorDocumentArgs<ExtArgs>
-  documentVersions?: boolean | Prisma.Project$documentVersionsArgs<ExtArgs>
-  canvasLayers?: boolean | Prisma.Project$canvasLayersArgs<ExtArgs>
-  timelineTracks?: boolean | Prisma.Project$timelineTracksArgs<ExtArgs>
-  timelineSegments?: boolean | Prisma.Project$timelineSegmentsArgs<ExtArgs>
+  editorSnapshot?: boolean | Prisma.Project$editorSnapshotArgs<ExtArgs>
   processingJobs?: boolean | Prisma.Project$processingJobsArgs<ExtArgs>
   transcripts?: boolean | Prisma.Project$transcriptsArgs<ExtArgs>
   videoChapters?: boolean | Prisma.Project$videoChaptersArgs<ExtArgs>
@@ -3883,11 +2898,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     sourceMedia: Prisma.$MediaPayload<ExtArgs> | null
     thumbnailMedia: Prisma.$MediaPayload<ExtArgs> | null
     projectMedia: Prisma.$ProjectMediaPayload<ExtArgs>[]
-    editorDocument: Prisma.$EditorDocumentPayload<ExtArgs> | null
-    documentVersions: Prisma.$EditorDocumentVersionPayload<ExtArgs>[]
-    canvasLayers: Prisma.$CanvasLayerPayload<ExtArgs>[]
-    timelineTracks: Prisma.$TimelineTrackPayload<ExtArgs>[]
-    timelineSegments: Prisma.$TimelineSegmentPayload<ExtArgs>[]
+    editorSnapshot: Prisma.$EditorSnapshotPayload<ExtArgs> | null
     processingJobs: Prisma.$ProcessingJobPayload<ExtArgs>[]
     transcripts: Prisma.$TranscriptPayload<ExtArgs>[]
     videoChapters: Prisma.$VideoChapterPayload<ExtArgs>[]
@@ -3908,7 +2919,6 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     status: $Enums.ProjectStatus
     aspectRatio: string
     duration: number | null
-    currentDocumentVersion: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["project"]>
@@ -4310,11 +3320,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   sourceMedia<T extends Prisma.Project$sourceMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$sourceMediaArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   thumbnailMedia<T extends Prisma.Project$thumbnailMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$thumbnailMediaArgs<ExtArgs>>): Prisma.Prisma__MediaClient<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   projectMedia<T extends Prisma.Project$projectMediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$projectMediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  editorDocument<T extends Prisma.Project$editorDocumentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$editorDocumentArgs<ExtArgs>>): Prisma.Prisma__EditorDocumentClient<runtime.Types.Result.GetResult<Prisma.$EditorDocumentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  documentVersions<T extends Prisma.Project$documentVersionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$documentVersionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EditorDocumentVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  canvasLayers<T extends Prisma.Project$canvasLayersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$canvasLayersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CanvasLayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  timelineTracks<T extends Prisma.Project$timelineTracksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$timelineTracksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimelineTrackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  timelineSegments<T extends Prisma.Project$timelineSegmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$timelineSegmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimelineSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  editorSnapshot<T extends Prisma.Project$editorSnapshotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$editorSnapshotArgs<ExtArgs>>): Prisma.Prisma__EditorSnapshotClient<runtime.Types.Result.GetResult<Prisma.$EditorSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   processingJobs<T extends Prisma.Project$processingJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$processingJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcripts<T extends Prisma.Project$transcriptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$transcriptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   videoChapters<T extends Prisma.Project$videoChaptersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$videoChaptersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoChapterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4362,7 +3368,6 @@ export interface ProjectFieldRefs {
   readonly status: Prisma.FieldRef<"Project", 'ProjectStatus'>
   readonly aspectRatio: Prisma.FieldRef<"Project", 'String'>
   readonly duration: Prisma.FieldRef<"Project", 'Float'>
-  readonly currentDocumentVersion: Prisma.FieldRef<"Project", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
 }
@@ -4828,118 +3833,22 @@ export type Project$projectMediaArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
- * Project.editorDocument
+ * Project.editorSnapshot
  */
-export type Project$editorDocumentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Project$editorSnapshotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the EditorDocument
+   * Select specific fields to fetch from the EditorSnapshot
    */
-  select?: Prisma.EditorDocumentSelect<ExtArgs> | null
+  select?: Prisma.EditorSnapshotSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the EditorDocument
+   * Omit specific fields from the EditorSnapshot
    */
-  omit?: Prisma.EditorDocumentOmit<ExtArgs> | null
+  omit?: Prisma.EditorSnapshotOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.EditorDocumentInclude<ExtArgs> | null
-  where?: Prisma.EditorDocumentWhereInput
-}
-
-/**
- * Project.documentVersions
- */
-export type Project$documentVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the EditorDocumentVersion
-   */
-  select?: Prisma.EditorDocumentVersionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the EditorDocumentVersion
-   */
-  omit?: Prisma.EditorDocumentVersionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.EditorDocumentVersionInclude<ExtArgs> | null
-  where?: Prisma.EditorDocumentVersionWhereInput
-  orderBy?: Prisma.EditorDocumentVersionOrderByWithRelationInput | Prisma.EditorDocumentVersionOrderByWithRelationInput[]
-  cursor?: Prisma.EditorDocumentVersionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.EditorDocumentVersionScalarFieldEnum | Prisma.EditorDocumentVersionScalarFieldEnum[]
-}
-
-/**
- * Project.canvasLayers
- */
-export type Project$canvasLayersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the CanvasLayer
-   */
-  select?: Prisma.CanvasLayerSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the CanvasLayer
-   */
-  omit?: Prisma.CanvasLayerOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.CanvasLayerInclude<ExtArgs> | null
-  where?: Prisma.CanvasLayerWhereInput
-  orderBy?: Prisma.CanvasLayerOrderByWithRelationInput | Prisma.CanvasLayerOrderByWithRelationInput[]
-  cursor?: Prisma.CanvasLayerWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.CanvasLayerScalarFieldEnum | Prisma.CanvasLayerScalarFieldEnum[]
-}
-
-/**
- * Project.timelineTracks
- */
-export type Project$timelineTracksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the TimelineTrack
-   */
-  select?: Prisma.TimelineTrackSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the TimelineTrack
-   */
-  omit?: Prisma.TimelineTrackOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.TimelineTrackInclude<ExtArgs> | null
-  where?: Prisma.TimelineTrackWhereInput
-  orderBy?: Prisma.TimelineTrackOrderByWithRelationInput | Prisma.TimelineTrackOrderByWithRelationInput[]
-  cursor?: Prisma.TimelineTrackWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.TimelineTrackScalarFieldEnum | Prisma.TimelineTrackScalarFieldEnum[]
-}
-
-/**
- * Project.timelineSegments
- */
-export type Project$timelineSegmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the TimelineSegment
-   */
-  select?: Prisma.TimelineSegmentSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the TimelineSegment
-   */
-  omit?: Prisma.TimelineSegmentOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.TimelineSegmentInclude<ExtArgs> | null
-  where?: Prisma.TimelineSegmentWhereInput
-  orderBy?: Prisma.TimelineSegmentOrderByWithRelationInput | Prisma.TimelineSegmentOrderByWithRelationInput[]
-  cursor?: Prisma.TimelineSegmentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.TimelineSegmentScalarFieldEnum | Prisma.TimelineSegmentScalarFieldEnum[]
+  include?: Prisma.EditorSnapshotInclude<ExtArgs> | null
+  where?: Prisma.EditorSnapshotWhereInput
 }
 
 /**
