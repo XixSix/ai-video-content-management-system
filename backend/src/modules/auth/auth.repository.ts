@@ -3,9 +3,10 @@ import {
   Prisma,
   WorkspaceMemberRole,
   type AuthSession,
-  type User
+  type User,
+  type WorkspaceMember
 } from '../../infrastructure/db/generated/prisma/client'
-import type { AuthSessionWithUser } from './auth.types'
+import type { AuthSessionWithUser, RegisteredUserResult } from './auth.types'
 
 export interface CreateUserData {
   id: string
@@ -37,7 +38,15 @@ export const findUserByEmail = async (email: string): Promise<User | null> =>
 
 export const findUserById = async (id: string): Promise<User | null> => prisma.user.findUnique({ where: { id } })
 
-export const registerUserWithWorkspaceAndSession = async (data: RegisterUserData): Promise<User | null> =>
+export const findDefaultWorkspaceMembership = async (userId: string): Promise<WorkspaceMember | null> =>
+  prisma.workspaceMember.findFirst({
+    where: { userId },
+    orderBy: { createdAt: 'asc' }
+  })
+
+export const registerUserWithWorkspaceAndSession = async (
+  data: RegisterUserData
+): Promise<RegisteredUserResult | null> =>
   prisma.$transaction(async (transaction) => {
     const existingUser = await transaction.user.findUnique({
       where: { email: data.email }
@@ -55,7 +64,7 @@ export const registerUserWithWorkspaceAndSession = async (data: RegisterUserData
       }
     })
 
-    await transaction.workspace.create({
+    const workspace = await transaction.workspace.create({
       data: {
         ownerId: user.id,
         name: 'Workspace',
@@ -76,7 +85,10 @@ export const registerUserWithWorkspaceAndSession = async (data: RegisterUserData
       }
     })
 
-    return user
+    return {
+      user,
+      workspaceId: workspace.id
+    }
   })
 
 export const findActiveSessionWithUser = async (jti: string, userId: string): Promise<AuthSessionWithUser | null> =>

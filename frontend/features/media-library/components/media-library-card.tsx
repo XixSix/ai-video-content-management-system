@@ -21,6 +21,10 @@ type MediaLibraryCardProps = {
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
   onRename?: (itemId: string, title: string) => void
+  onDelete?: (item: MediaLibraryItem) => void
+  onDownload?: (item: MediaLibraryItem) => void
+  onRetry?: (item: MediaLibraryItem) => void
+  onDismiss?: (item: MediaLibraryItem) => void
   showActions?: boolean
 }
 
@@ -87,9 +91,13 @@ export function MediaLibraryCard({
   item,
   onOpen,
   onRename,
+  onDelete,
+  onDownload,
+  onRetry,
+  onDismiss,
   showActions = true,
 }: MediaLibraryCardProps) {
-  const isUploading = item.status === "UPLOADING"
+  const isUploading = item.status === "UPLOADING" && !item.uploadInterrupted
   const openItem = () => onOpen?.(item)
   const defaultHref = href ?? "/studio"
 
@@ -126,6 +134,7 @@ export function MediaLibraryCard({
               <MediaLibraryActionsMenu
                 item={item}
                 onRename={(title) => onRename?.(item.id, title)}
+                onDelete={() => onDelete?.(item)}
               />
             ) : null}
           </div>
@@ -179,9 +188,22 @@ export function MediaLibraryCard({
             <MediaLibraryActionsMenu
               item={item}
               onRename={(title) => onRename?.(item.id, title)}
+              onDelete={() => onDelete?.(item)}
+              onDownload={() => onDownload?.(item)}
+              onRetry={() => onRetry?.(item)}
+              onDismiss={() => onDismiss?.(item)}
             />
           ) : null}
         </div>
+        {item.uploadInterrupted ? (
+          <p className="text-xs leading-5 text-amber-600 dark:text-amber-400">
+            Upload was interrupted. Delete this record and upload the file again.
+          </p>
+        ) : item.uploadError ? (
+          <p className="line-clamp-2 text-xs leading-5 text-destructive">
+            {item.uploadError}
+          </p>
+        ) : null}
       </CardHeader>
     </Card>
   )

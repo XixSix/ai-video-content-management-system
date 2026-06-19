@@ -14,6 +14,26 @@ type MediaLibraryFilterState = {
   sortKey: MediaLibrarySortKey
 }
 
+export function getMediaItemsForTab(
+  realItems: MediaLibraryItem[],
+  demoItems: MediaLibraryItem[],
+  activeTab: MediaLibraryTab
+) {
+  if (activeTab === "EDITOR_OUTPUTS") {
+    return demoItems.filter((item) => item.libraryGroup === "EDITOR_OUTPUT")
+  }
+
+  if (activeTab === "LONG_TO_SHORT") {
+    return demoItems.filter(
+      (item) =>
+        item.libraryGroup === "ORIGINAL" &&
+        Boolean(item.longToShortSourceId)
+    )
+  }
+
+  return realItems
+}
+
 export function formatDuration(seconds: number | null | undefined) {
   if (!seconds && seconds !== 0) {
     return "Pending"
@@ -94,7 +114,7 @@ export function filterAndSortMediaItems(
     switch (filters.sortKey) {
       case "oldest":
         return (
-          new Date(left.updatedAt).getTime() - new Date(right.updatedAt).getTime()
+          new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
         )
       case "name":
         return left.title.localeCompare(right.title)
@@ -103,7 +123,7 @@ export function filterAndSortMediaItems(
       case "newest":
       default:
         return (
-          new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
+          new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
         )
     }
   })

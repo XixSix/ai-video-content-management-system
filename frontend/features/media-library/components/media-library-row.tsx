@@ -24,6 +24,10 @@ type MediaLibraryRowProps = {
   item: MediaLibraryItem
   onOpen?: (item: MediaLibraryItem) => void
   onRename?: (itemId: string, title: string) => void
+  onDelete?: (item: MediaLibraryItem) => void
+  onDownload?: (item: MediaLibraryItem) => void
+  onRetry?: (item: MediaLibraryItem) => void
+  onDismiss?: (item: MediaLibraryItem) => void
   actionLabel?: string
 }
 
@@ -87,9 +91,13 @@ export function MediaLibraryRow({
   item,
   onOpen,
   onRename,
+  onDelete,
+  onDownload,
+  onRetry,
+  onDismiss,
   actionLabel = "Open Studio",
 }: MediaLibraryRowProps) {
-  const isUploading = item.status === "UPLOADING"
+  const isUploading = item.status === "UPLOADING" && !item.uploadInterrupted
   const content = (
     <>
       <MediaRowPreview eagerThumbnail={eagerThumbnail} item={item} />
@@ -130,6 +138,13 @@ export function MediaLibraryRow({
               />
             </div>
           </div>
+        ) : null}
+        {item.uploadInterrupted ? (
+          <p className="text-xs leading-5 text-amber-600 dark:text-amber-400">
+            Upload interrupted. Remove this record and upload the source again.
+          </p>
+        ) : item.uploadError ? (
+          <p className="text-xs leading-5 text-destructive">{item.uploadError}</p>
         ) : null}
       </div>
     </>
@@ -187,6 +202,10 @@ export function MediaLibraryRow({
             <MediaLibraryActionsMenu
               item={item}
               onRename={(title) => onRename?.(item.id, title)}
+              onDelete={() => onDelete?.(item)}
+              onDownload={() => onDownload?.(item)}
+              onRetry={() => onRetry?.(item)}
+              onDismiss={() => onDismiss?.(item)}
             />
           </div>
         </div>

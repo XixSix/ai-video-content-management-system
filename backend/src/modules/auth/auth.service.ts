@@ -24,10 +24,10 @@ export const register = async (input: RegisterBody, metadata: RequestMetadata): 
   const passwordHash: string = await bcrypt.hash(password, config.security.saltRounds)
   const userId: string = crypto.randomUUID()
   const session: SessionTokenResult = createRefreshToken(userId)
-  let user
+  let registeredUser
 
   try {
-    user = await authRepo.registerUserWithWorkspaceAndSession({
+    registeredUser = await authRepo.registerUserWithWorkspaceAndSession({
       id: userId,
       email,
       passwordHash,
@@ -47,17 +47,18 @@ export const register = async (input: RegisterBody, metadata: RequestMetadata): 
     throw error
   }
 
-  if (!user) {
+  if (!registeredUser) {
     throw AuthError.conflict('Email is already registered')
   }
 
-  const accessToken: string = signAccessToken(user.id)
+  const accessToken: string = signAccessToken(registeredUser.user.id)
 
   return {
     accessToken,
     refreshToken: session.refreshToken,
     refreshExpiresAt: session.refreshExpiresAt,
-    user
+    user: registeredUser.user,
+    workspaceId: registeredUser.workspaceId
   }
 }
 
@@ -75,13 +76,15 @@ export const login = async (input: LoginBody, metadata: RequestMetadata): Promis
     throw AuthError.unauthorized('Invalid email or password')
   }
 
+  const workspaceId = await getDefaultWorkspaceId(user.id)
   const session: SessionTokenResult = await createRefreshSession(user.id, metadata)
 
   return {
     accessToken: signAccessToken(user.id),
     refreshToken: session.refreshToken,
     refreshExpiresAt: session.refreshExpiresAt,
-    user
+    user,
+    workspaceId
   }
 }
 
@@ -150,7 +153,19 @@ export const getAuthenticatedUser = async (accessToken: string): Promise<Authent
     throw AuthError.unauthorized('Invalid access token')
   }
 
-  return toAuthenticatedUser(user)
+  const workspaceId = await getDefaultWorkspaceId(user.id)
+
+  return toAuthenticatedUser(user, workspaceId)
+}
+
+const getDefaultWorkspaceId = async (userId: string): Promise<string> => {
+  const membership = await authRepo.findDefaultWorkspaceMembership(userId)
+
+  if (!membership) {
+    throw AuthError.forbidden('User does not belong to a workspace')
+  }
+
+  return membership.workspaceId
 }
 
 const createRefreshSession = async (userId: string, metadata: RequestMetadata): Promise<SessionTokenResult> => {

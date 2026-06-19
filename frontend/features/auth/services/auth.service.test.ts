@@ -16,6 +16,7 @@ const user = {
   email: credentials.email,
   role: "USER",
   status: "ACTIVE",
+  workspaceId: "123e4567-e89b-12d3-a456-426614174001",
 }
 
 describe("auth service", () => {
@@ -40,10 +41,12 @@ describe("auth service", () => {
     publicMock.onPost("/auth/register", credentials).reply(201, response)
     publicMock.onPost("/auth/login", credentials).reply(200, response)
 
-    await expect(authService.register(credentials)).resolves.toEqual(
-      response.data
-    )
-    await expect(authService.login(credentials)).resolves.toEqual(response.data)
+    const registeredSession = await authService.register(credentials)
+    const loggedInSession = await authService.login(credentials)
+
+    expect(registeredSession).toEqual(response.data)
+    expect(loggedInSession).toEqual(response.data)
+    expect(loggedInSession.user.workspaceId).toBe(user.workspaceId)
   })
 
   it("calls refresh and current-user endpoints", async () => {
@@ -57,7 +60,10 @@ describe("auth service", () => {
     })
 
     await expect(authService.refreshAccessToken()).resolves.toBe("access-token")
-    await expect(authService.getCurrentUser()).resolves.toEqual({ user })
+    const currentUser = await authService.getCurrentUser()
+
+    expect(currentUser).toEqual({ user })
+    expect(currentUser.user.workspaceId).toBe(user.workspaceId)
   })
 
   it("calls logout and logout-all endpoints", async () => {

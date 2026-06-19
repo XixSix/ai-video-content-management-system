@@ -89,6 +89,16 @@ export const createDownloadUrl: ParamsRequestHandler<MediaParams> = async (req, 
   }
 }
 
+export const createPreviewUrl: ParamsRequestHandler<MediaParams> = async (req, res, next): Promise<void> => {
+  try {
+    const result: CreateDownloadUrlResult = await mediaService.createPreviewUrl(req.user!.id, req.params.mediaId)
+
+    sendSuccess<CreateDownloadUrlResult>(res, result)
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
 export const createUploadUrl: BodyRequestHandler<CreateUploadUrlBody> = async (req, res, next): Promise<void> => {
   try {
     const result: CreateUploadUrlResult = await mediaService.createUploadUrl({

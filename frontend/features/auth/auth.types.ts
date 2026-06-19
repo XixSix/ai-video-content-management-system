@@ -7,6 +7,7 @@ export type AuthenticatedUser = {
   email: string
   role: "USER" | "ADMIN"
   status: "ACTIVE" | "DISABLED"
+  workspaceId: string
 }
 
 export type AuthResponseData = {

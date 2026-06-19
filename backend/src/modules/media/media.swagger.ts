@@ -355,9 +355,33 @@
 
 /**
  * @swagger
+ * /media/{mediaId}/preview-url:
+ *   get:
+ *     summary: Create an inline preview URL for uploaded media
+ *     tags: [Media]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: mediaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Short-lived inline preview URL.
+ *       404:
+ *         description: Media not found.
+ *       409:
+ *         description: Media is not uploaded.
+ */
+
+/**
+ * @swagger
  * /media/{mediaId}/download-url:
  *   get:
- *     summary: Create a download URL for uploaded media
+ *     summary: Create an attachment download URL for uploaded media
  *     description: Available to any member of the Media workspace.
  *     tags: [Media]
  *     security:

@@ -13,6 +13,8 @@ import {
   Copy,
   Download,
   Edit3,
+  AlertCircle,
+  Loader2,
   Maximize2,
   MoreHorizontal,
   Play,
@@ -53,8 +55,11 @@ type MediaLibraryPreviewDialogProps = {
   hasPreviousItem?: boolean
   open: boolean
   onNextItem?: () => void
+  onDownload?: () => void
   onOpenChange: (open: boolean) => void
   onPreviousItem?: () => void
+  previewError?: string | null
+  previewLoading?: boolean
 }
 
 function formatSecondsAsClock(totalSeconds: number | null) {
@@ -186,6 +191,7 @@ function NativeAssetPreview({
         width={item.width ?? 1600}
         height={item.height ?? 900}
         loading="eager"
+        unoptimized
         className={cn(
           "mx-auto rounded-xl bg-black object-contain shadow-[0_24px_80px_rgba(0,0,0,0.2)]",
           isVertical
@@ -449,6 +455,8 @@ function MediaPlayerPanel({
   hasPreviousItem,
   onNextItem,
   onPreviousItem,
+  previewError,
+  previewLoading,
 }: {
   item: MediaLibraryItem
   candidate: LongToShortCandidate | null
@@ -457,6 +465,8 @@ function MediaPlayerPanel({
   hasPreviousItem: boolean
   onNextItem: () => void
   onPreviousItem: () => void
+  previewError?: string | null
+  previewLoading?: boolean
 }) {
   const playerPanelRef = useRef<HTMLElement | null>(null)
   const hasNativeAssetPreview = Boolean(item.assetUrl) && !candidate
@@ -484,7 +494,24 @@ function MediaPlayerPanel({
       className="flex min-h-0 flex-col gap-3 border-b border-border/70 bg-black/[0.03] p-4 dark:bg-black/25 lg:border-b-0 lg:border-r"
     >
       <div className="flex min-h-0 flex-1 items-center justify-center">
-        {candidate && hasCandidateNativeAssetPreview ? (
+        {previewLoading ? (
+          <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
+            <Loader2 className="size-6 animate-spin" />
+            Preparing secure preview…
+          </div>
+        ) : previewError ? (
+          <div className="mx-auto flex max-w-sm flex-col items-center gap-3 text-center">
+            <AlertCircle className="size-7 text-destructive" />
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-foreground">
+                Preview unavailable
+              </p>
+              <p className="text-xs leading-5 text-muted-foreground">
+                {previewError}
+              </p>
+            </div>
+          </div>
+        ) : candidate && hasCandidateNativeAssetPreview ? (
           <CandidateNativeAssetPreview item={item} candidate={candidate} />
         ) : hasNativeAssetPreview ? (
           <NativeAssetPreview item={item} />
@@ -605,8 +632,10 @@ function ContextPanel({
 
 function ActionRail({
   isLongToShort,
+  onDownload,
 }: {
   isLongToShort: boolean
+  onDownload?: () => void
 }) {
   const actions = isLongToShort
     ? [
@@ -637,6 +666,7 @@ function ActionRail({
               size="icon-lg"
               className="rounded-xl"
               asChild={Boolean(action.href)}
+              onClick={action.label === "Download" ? onDownload : undefined}
             >
               {action.href ? (
                 <Link href={action.href}>
@@ -745,8 +775,11 @@ export function MediaLibraryPreviewDialog({
   hasPreviousItem = false,
   open,
   onNextItem,
+  onDownload,
   onOpenChange,
   onPreviousItem,
+  previewError,
+  previewLoading,
 }: MediaLibraryPreviewDialogProps) {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
 
@@ -811,12 +844,17 @@ export function MediaLibraryPreviewDialog({
             hasPreviousItem={hasPreviousItem}
             onNextItem={onNextItem ?? (() => undefined)}
             onPreviousItem={onPreviousItem ?? (() => undefined)}
+            previewError={previewError}
+            previewLoading={previewLoading}
           />
           <ContextPanel
             activeTab={activeTab}
             candidate={selectedCandidate}
           />
-          <ActionRail isLongToShort={isLongToShortPreview} />
+          <ActionRail
+            isLongToShort={isLongToShortPreview}
+            onDownload={onDownload}
+          />
           {isLongToShortPreview ? (
             <ClipSelector
               candidates={candidates}

@@ -10,8 +10,8 @@ import type {
 export const mediaLibraryTabOptions: FilterChipOption<MediaLibraryTab>[] = [
   { label: "All", value: "ALL" },
   { label: "Original", value: "ORIGINAL" },
-  { label: "Editor Outputs", value: "EDITOR_OUTPUTS" },
-  { label: "Long to Short", value: "LONG_TO_SHORT" },
+  { label: "Editor Outputs · Demo", value: "EDITOR_OUTPUTS" },
+  { label: "Long to Short · Demo", value: "LONG_TO_SHORT" },
 ]
 
 export const mediaTypeFilterOptions: FilterChipOption<MediaTypeFilter>[] = [

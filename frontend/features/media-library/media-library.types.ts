@@ -42,6 +42,9 @@ export type MediaLibraryItem = {
   longToShortSourceId?: string
   ownerName?: string
   uploadProgress?: number
+  uploadError?: string
+  uploadInterrupted?: boolean
+  isDemo?: boolean
 }
 
 export type FilterChipOption<TValue extends string> = {
@@ -50,3 +53,90 @@ export type FilterChipOption<TValue extends string> = {
 }
 
 export type SortOption = FilterChipOption<MediaLibrarySortKey>
+
+export type MediaApiType = "VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE"
+
+export type MediaApiStatus = MediaFileStatus
+
+export type MediaResponseData = {
+  id: string
+  workspaceId: string
+  type: MediaApiType
+  title: string | null
+  description: string | null
+  originalFilename: string
+  duration: number | null
+  fileSizeBytes: string | null
+  mimeType: string | null
+  width: number | null
+  height: number | null
+  metadata: Record<string, unknown> | null
+  status: MediaApiStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export type MediaListMeta = {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type MediaListResponseData = {
+  items: MediaResponseData[]
+  meta: MediaListMeta
+}
+
+export type MediaListQuery = {
+  page?: number
+  limit?: number
+  status?: Exclude<MediaApiStatus, "DELETED">
+  sortBy?: "createdAt" | "title" | "duration"
+  sortOrder?: "asc" | "desc"
+}
+
+export type CreateUploadUrlInput = {
+  workspaceId: string
+  mediaType: MediaApiType
+  originalFilename: string
+  mimeType: string
+  fileSizeBytes: number
+  title?: string
+  description?: string
+}
+
+export type SingleUploadSession = {
+  mode: "SINGLE"
+  mediaId: string
+  url: string
+  headers: Record<string, string>
+  expiresInSeconds: number
+}
+
+export type MultipartUploadSession = {
+  mode: "MULTIPART"
+  mediaId: string
+  partSizeBytes: number
+  parts: Array<{
+    partNumber: number
+    url: string
+  }>
+  expiresInSeconds: number
+}
+
+export type CreateUploadUrlResult =
+  | SingleUploadSession
+  | MultipartUploadSession
+
+export type CompletedUploadPart = {
+  partNumber: number
+  etag: string
+}
+
+export type MediaUploadOptions = {
+  file: File
+  workspaceId: string
+  signal?: AbortSignal
+  onProgress?: (progress: number) => void
+}

@@ -22,6 +22,7 @@ router.post(
   mediaController.completeUpload
 )
 router.post('/:mediaId/abort-upload', validateRequest({ params: mediaParamsSchema }), mediaController.abortUpload)
+router.get('/:mediaId/preview-url', validateRequest({ params: mediaParamsSchema }), mediaController.createPreviewUrl)
 router.get('/:mediaId/download-url', validateRequest({ params: mediaParamsSchema }), mediaController.createDownloadUrl)
 router.get('/:mediaId', validateRequest({ params: mediaParamsSchema }), mediaController.get)
 router.patch(
