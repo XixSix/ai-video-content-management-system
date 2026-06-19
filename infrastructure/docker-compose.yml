@@ -40,6 +40,25 @@ services:
     networks:
       - app_network
 
+  minio-init:
+    container_name: vidpilot-minio-init
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      S3_BUCKET: ${S3_BUCKET:-vidpilot-media}
+      MINIO_CORS_ALLOWED_ORIGINS: ${MINIO_CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    entrypoint: ["/bin/sh", "/opt/minio/init.sh"]
+    volumes:
+      - ./minio/init.sh:/opt/minio/init.sh:ro
+    networks:
+      - app_network
+    restart: "no"
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq_broker
