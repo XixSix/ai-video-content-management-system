@@ -18,6 +18,17 @@ const envPath: string | undefined = envPaths.find((candidate: string): boolean =
 
 loadDotenv(envPath ? { path: envPath, quiet: true } : { quiet: true })
 
+const corsOriginsSchema = z
+  .string()
+  .default('http://localhost:5173')
+  .transform((value: string): string[] =>
+    value
+      .split(',')
+      .map((origin: string): string => origin.trim())
+      .filter(Boolean)
+  )
+  .pipe(z.array(z.url()).min(1))
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().max(65535).default(3000),
@@ -26,13 +37,22 @@ const envSchema = z.object({
     .string()
     .min(32, 'JWT_SECRET must be at least 32 characters')
     .default('development-secret-change-me-32-chars'),
-  ACCESS_TOKEN_EXPIRES_IN: z.string().min(1).default('15m'),
-  SALT_ROUNDS: z.coerce.number().int().positive().default(12),
-  REFRESH_TOKEN_TTL_MS: z.coerce
+  REFRESH_TOKEN_SECRET: z
+    .string()
+    .min(32, 'REFRESH_TOKEN_SECRET must be at least 32 characters')
+    .default('development-refresh-secret-change-me-32-chars'),
+  JWT_ALGORITHM: z.enum(['HS256', 'HS384', 'HS512']).default('HS256'),
+  ACCESS_TOKEN_EXPIRES_IN: z.coerce
     .number()
     .int()
     .positive()
-    .default(1000 * 60 * 60 * 24 * 30),
+    .default(60 * 15),
+  REFRESH_TOKEN_EXPIRES_IN: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(60 * 60 * 24 * 30),
+  SALT_ROUNDS: z.coerce.number().int().positive().default(12),
   REFRESH_COOKIE_NAME: z.string().min(1).default('refreshToken'),
   AUTH_RATE_LIMIT_WINDOW_MS: z.coerce
     .number()
@@ -42,6 +62,7 @@ const envSchema = z.object({
   AUTH_REGISTER_RATE_LIMIT: z.coerce.number().int().positive().default(5),
   AUTH_LOGIN_RATE_LIMIT: z.coerce.number().int().positive().default(10),
   AUTH_REFRESH_RATE_LIMIT: z.coerce.number().int().positive().default(30),
+  CORS_ORIGINS: corsOriginsSchema,
   TRANSCRIPT_GENERATE_RATE_LIMIT_WINDOW_MS: z.coerce
     .number()
     .int()
@@ -117,9 +138,11 @@ export const config = {
   },
   security: {
     jwtSecret: env.JWT_SECRET,
+    refreshTokenSecret: env.REFRESH_TOKEN_SECRET,
+    jwtAlgorithm: env.JWT_ALGORITHM,
     accessTokenExpiresIn: env.ACCESS_TOKEN_EXPIRES_IN,
-    saltRounds: env.SALT_ROUNDS,
-    refreshTokenTTLMs: env.REFRESH_TOKEN_TTL_MS
+    refreshTokenExpiresIn: env.REFRESH_TOKEN_EXPIRES_IN,
+    saltRounds: env.SALT_ROUNDS
   },
   cookie: {
     refreshName: env.REFRESH_COOKIE_NAME,
@@ -128,7 +151,7 @@ export const config = {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
-      maxAge: env.REFRESH_TOKEN_TTL_MS
+      maxAge: env.REFRESH_TOKEN_EXPIRES_IN * 1000
     }
   },
   rateLimit: {
@@ -138,6 +161,9 @@ export const config = {
     refreshLimit: env.AUTH_REFRESH_RATE_LIMIT,
     transcriptGenerateWindowMs: env.TRANSCRIPT_GENERATE_RATE_LIMIT_WINDOW_MS,
     transcriptGenerateLimit: env.TRANSCRIPT_GENERATE_RATE_LIMIT
+  },
+  cors: {
+    origins: env.CORS_ORIGINS
   },
   s3: {
     endpoint: env.S3_ENDPOINT,

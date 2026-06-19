@@ -1,33 +1,56 @@
+import crypto from 'node:crypto'
 import bcrypt from 'bcrypt'
 
 import type {
   AuthenticatedUser,
   AuthResult,
   AuthSessionWithUser,
+  RefreshResult,
+  RefreshTokenPayload,
   RequestMetadata,
   SessionTokenResult
 } from './auth.types'
-import { generateRefreshToken, signAccessToken, verifyAccessToken } from './auth.tokens'
+import { createRefreshToken, signAccessToken, verifyAccessToken, verifyRefreshToken } from './auth.tokens'
 import type { LoginBody, RegisterBody } from './auth.schema'
 import { AuthError } from './auth.error'
 import { config } from '../../config'
 import { toAuthenticatedUser } from './auth.mapper'
-import { getRefreshExpiresAt } from './auth.request'
 import * as authRepo from './auth.repository'
 import { UserStatus } from '../../infrastructure/db/generated/prisma/client'
+import { blacklistRefreshSession, blacklistRefreshSessions, isRefreshTokenBlacklisted } from './auth.blacklist'
 
 export const register = async (input: RegisterBody, metadata: RequestMetadata): Promise<AuthResult> => {
   const { email, password } = input
-  const existing = await authRepo.findUserByEmail(email)
+  const passwordHash: string = await bcrypt.hash(password, config.security.saltRounds)
+  const userId: string = crypto.randomUUID()
+  const session: SessionTokenResult = createRefreshToken(userId)
+  let user
 
-  if (existing) {
+  try {
+    user = await authRepo.registerUserWithWorkspaceAndSession({
+      id: userId,
+      email,
+      passwordHash,
+      session: {
+        jti: session.jti,
+        userAgent: metadata.userAgent,
+        ipAddress: metadata.ipAddress,
+        expiresAt: session.refreshExpiresAt,
+        lastUsedAt: new Date()
+      }
+    })
+  } catch (error: unknown) {
+    if (authRepo.isUniqueConstraintError(error)) {
+      throw AuthError.conflict('Email is already registered')
+    }
+
+    throw error
+  }
+
+  if (!user) {
     throw AuthError.conflict('Email is already registered')
   }
 
-  const passwordHash: string = await bcrypt.hash(password, config.security.saltRounds)
-  const user = await authRepo.createUser({ email, passwordHash })
-
-  const session: SessionTokenResult = await createRefreshSession(user.id, metadata)
   const accessToken: string = signAccessToken(user.id)
 
   return {
@@ -62,34 +85,33 @@ export const login = async (input: LoginBody, metadata: RequestMetadata): Promis
   }
 }
 
-export const refresh = async (refreshToken: string, metadata: RequestMetadata): Promise<AuthResult> => {
-  const session: AuthSessionWithUser | null = await authRepo.findActiveSessionWithUser(refreshToken)
+export const refresh = async (refreshToken: string, metadata: RequestMetadata): Promise<RefreshResult> => {
+  const payload: RefreshTokenPayload = verifyRefreshToken(refreshToken)
+
+  if (await isRefreshTokenBlacklisted(payload.jti)) {
+    throw AuthError.unauthorized('Invalid refresh token')
+  }
+
+  const session: AuthSessionWithUser | null = await authRepo.findActiveSessionWithUser(payload.jti, payload.sub)
 
   if (!session) {
     throw AuthError.unauthorized('Invalid refresh token')
   }
 
   if (session.user.status !== UserStatus.ACTIVE) {
+    await blacklistRefreshSession(session.jti, session.expiresAt)
     await authRepo.revokeSession(session.id)
     throw AuthError.forbidden('User account is disabled')
   }
 
-  const nextRefreshToken: string = generateRefreshToken()
-  const refreshExpiresAt: Date = getRefreshExpiresAt()
-
-  await authRepo.updateSession(session.id, {
-    refreshToken: nextRefreshToken,
+  await authRepo.updateSessionMetadata(session.id, {
     userAgent: metadata.userAgent,
     ipAddress: metadata.ipAddress,
-    expiresAt: refreshExpiresAt,
     lastUsedAt: new Date()
   })
 
   return {
-    accessToken: signAccessToken(session.user.id),
-    refreshToken: nextRefreshToken,
-    refreshExpiresAt,
-    user: session.user
+    accessToken: signAccessToken(session.user.id)
   }
 }
 
@@ -98,16 +120,25 @@ export const logout = async (refreshToken?: string): Promise<void> => {
     return
   }
 
-  const session = await authRepo.findActiveSessionByToken(refreshToken)
+  let payload: RefreshTokenPayload
 
-  if (!session) {
+  try {
+    payload = verifyRefreshToken(refreshToken)
+  } catch {
     return
   }
 
-  await authRepo.revokeSession(session.id)
+  await blacklistRefreshSession(payload.jti, new Date(payload.exp * 1000))
+
+  const session = await authRepo.findActiveSessionWithUser(payload.jti, payload.sub)
+  if (session) {
+    await authRepo.revokeSession(session.id)
+  }
 }
 
 export const logoutAll = async (userId: string): Promise<void> => {
+  const sessions = await authRepo.findActiveSessionsByUserId(userId)
+  await blacklistRefreshSessions(sessions)
   await authRepo.revokeAllUserSessions(userId)
 }
 
@@ -123,17 +154,16 @@ export const getAuthenticatedUser = async (accessToken: string): Promise<Authent
 }
 
 const createRefreshSession = async (userId: string, metadata: RequestMetadata): Promise<SessionTokenResult> => {
-  const refreshToken: string = generateRefreshToken()
-  const refreshExpiresAt: Date = getRefreshExpiresAt()
+  const session: SessionTokenResult = createRefreshToken(userId)
 
   await authRepo.createSession({
     userId,
-    refreshToken,
+    jti: session.jti,
     userAgent: metadata.userAgent,
     ipAddress: metadata.ipAddress,
-    expiresAt: refreshExpiresAt,
+    expiresAt: session.refreshExpiresAt,
     lastUsedAt: new Date()
   })
 
-  return { refreshToken, refreshExpiresAt }
+  return session
 }

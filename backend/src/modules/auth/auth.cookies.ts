@@ -10,6 +10,9 @@ export const setRefreshCookie = (res: Response, refreshToken: string): void => {
 
 export const clearRefreshCookie = (res: Response): void => {
   res.clearCookie(config.cookie.refreshName, {
-    path: config.cookie.refreshPath
+    httpOnly: config.cookie.refreshOptions.httpOnly,
+    path: config.cookie.refreshPath,
+    sameSite: config.cookie.refreshOptions.sameSite,
+    secure: config.cookie.refreshOptions.secure
   })
 }

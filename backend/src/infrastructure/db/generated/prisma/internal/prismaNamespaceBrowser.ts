@@ -110,7 +110,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const AuthSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  refreshToken: 'refreshToken',
+  jti: 'jti',
   userAgent: 'userAgent',
   ipAddress: 'ipAddress',
   expiresAt: 'expiresAt',

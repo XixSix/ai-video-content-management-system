@@ -126,7 +126,7 @@
  *     description: Get a paginated list of media files for the authenticated user
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -198,7 +198,7 @@
  *     description: Generate a presigned URL for uploading media files to S3. Supports both single-part and multipart uploads.
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -272,7 +272,7 @@
  *     description: Mark a media upload as complete. For multipart uploads, provide the parts array with ETags.
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -346,7 +346,7 @@
  *     description: Abort an in-progress multipart upload and clean up S3 resources
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -406,7 +406,7 @@
  *     description: Get detailed information about a specific media file
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: mediaId
@@ -454,7 +454,7 @@
  *     description: Update media title and/or description
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: mediaId
@@ -521,7 +521,7 @@
  *     description: Soft delete a media file (marks as DELETED status)
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: mediaId
@@ -575,7 +575,7 @@
  *     description: Generate a presigned URL for downloading a media file from S3
  *     tags: [Media]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: mediaId

@@ -12,9 +12,14 @@ export interface DatabaseConfig {
 
 export interface SecurityConfig {
   jwtSecret: string
-  accessTokenExpiresIn: string
+  refreshTokenSecret: string
+  accessTokenExpiresIn: number
+  refreshTokenExpiresIn: number
   saltRounds: number
-  refreshTokenTTLMs: number
+}
+
+export interface CorsConfig {
+  origins: string[]
 }
 
 export interface CookieConfig {
@@ -61,6 +66,7 @@ export interface Config {
   security: SecurityConfig
   cookie: CookieConfig
   rateLimit: RateLimitConfig
+  cors: CorsConfig
   s3: S3Config
   upload: UploadConfig
 }

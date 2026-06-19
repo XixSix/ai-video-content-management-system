@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import express, { type Express } from 'express'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -12,6 +13,15 @@ export const createApp = (): Express => {
   const app = express()
 
   app.use(helmet())
+  app.use(
+    cors({
+      allowedHeaders: ['Authorization', 'Content-Type'],
+      credentials: true,
+      origin: (origin, callback): void => {
+        callback(null, !origin || config.cors.origins.includes(origin))
+      }
+    })
+  )
   app.use(express.json({ limit: '10mb' }))
   app.use(express.urlencoded({ extended: true }))
   app.use(cookieParser())

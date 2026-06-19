@@ -33,12 +33,6 @@ const options: swaggerJsdoc.Options = {
           bearerFormat: 'JWT',
           description: 'Access token sent in the Authorization header'
         },
-        cookieAuth: {
-          type: 'apiKey',
-          in: 'cookie',
-          name: 'accessToken',
-          description: 'Access token stored in HTTP-only cookie'
-        },
         refreshCookieAuth: {
           type: 'apiKey',
           in: 'cookie',
