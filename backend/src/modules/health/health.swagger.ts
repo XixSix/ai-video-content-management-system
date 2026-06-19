@@ -3,11 +3,11 @@
  * /health:
  *   get:
  *     summary: Health check
- *     description: Check if the API is running and healthy
+ *     description: Check PostgreSQL, Redis, RabbitMQ, and S3-compatible object storage readiness
  *     tags: [Health]
  *     responses:
  *       200:
- *         description: API and database are healthy
+ *         description: API and all required dependencies are healthy
  *         content:
  *           application/json:
  *             schema:
@@ -38,6 +38,12 @@
  *                             latencyMs:
  *                               type: integer
  *                               example: 5
+ *                         redis:
+ *                           $ref: '#/components/schemas/DependencyHealth'
+ *                         rabbitmq:
+ *                           $ref: '#/components/schemas/DependencyHealth'
+ *                         objectStorage:
+ *                           $ref: '#/components/schemas/DependencyHealth'
  *       503:
  *         description: API is reachable but a dependency is unavailable
  *         content:
@@ -61,15 +67,30 @@
  *                       type: object
  *                       properties:
  *                         database:
- *                           type: object
- *                           properties:
- *                             status:
- *                               type: string
- *                               example: down
- *                             latencyMs:
- *                               type: integer
- *                               example: 12
- *                             message:
- *                               type: string
- *                               example: connection refused
+ *                           $ref: '#/components/schemas/DependencyHealth'
+ *                         redis:
+ *                           $ref: '#/components/schemas/DependencyHealth'
+ *                         rabbitmq:
+ *                           $ref: '#/components/schemas/DependencyHealth'
+ *                         objectStorage:
+ *                           $ref: '#/components/schemas/DependencyHealth'
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     DependencyHealth:
+ *       type: object
+ *       required: [status, latencyMs]
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [ok, down]
+ *         latencyMs:
+ *           type: integer
+ *           minimum: 0
+ *         message:
+ *           type: string
+ *           description: Present when the dependency check fails.
  */

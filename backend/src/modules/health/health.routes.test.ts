@@ -19,6 +19,18 @@ describe('health routes', () => {
         database: {
           status: 'ok',
           latencyMs: 5
+        },
+        redis: {
+          status: 'ok',
+          latencyMs: 2
+        },
+        rabbitmq: {
+          status: 'ok',
+          latencyMs: 3
+        },
+        objectStorage: {
+          status: 'ok',
+          latencyMs: 4
         }
       }
     })
@@ -37,6 +49,18 @@ describe('health routes', () => {
           database: {
             status: 'ok',
             latencyMs: 5
+          },
+          redis: {
+            status: 'ok',
+            latencyMs: 2
+          },
+          rabbitmq: {
+            status: 'ok',
+            latencyMs: 3
+          },
+          objectStorage: {
+            status: 'ok',
+            latencyMs: 4
           }
         }
       }
@@ -52,6 +76,18 @@ describe('health routes', () => {
           status: 'down',
           latencyMs: 12,
           message: 'connection refused'
+        },
+        redis: {
+          status: 'ok',
+          latencyMs: 2
+        },
+        rabbitmq: {
+          status: 'ok',
+          latencyMs: 3
+        },
+        objectStorage: {
+          status: 'ok',
+          latencyMs: 4
         }
       }
     })
@@ -69,6 +105,18 @@ describe('health routes', () => {
             status: 'down',
             latencyMs: 12,
             message: 'connection refused'
+          },
+          redis: {
+            status: 'ok',
+            latencyMs: 2
+          },
+          rabbitmq: {
+            status: 'ok',
+            latencyMs: 3
+          },
+          objectStorage: {
+            status: 'ok',
+            latencyMs: 4
           }
         }
       }
