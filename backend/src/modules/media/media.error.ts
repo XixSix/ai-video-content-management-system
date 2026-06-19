@@ -21,6 +21,10 @@ export class MediaError extends AppError {
     return new MediaError(message, 409, 'INVALID_MEDIA_STATE')
   }
 
+  static multipartUploadNotFound(message = 'Multipart upload session was not found'): MediaError {
+    return new MediaError(message, 409, 'MULTIPART_UPLOAD_NOT_FOUND')
+  }
+
   static storageFailure(message = 'Storage operation failed'): MediaError {
     return new MediaError(message, 502, 'STORAGE_FAILURE')
   }

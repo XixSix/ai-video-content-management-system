@@ -1,5 +1,5 @@
 import { prisma } from '../../infrastructure/db/prisma'
-import type { Media, MediaStatus, Prisma, Workspace } from '../../infrastructure/db/generated/prisma/client'
+import { Media, MediaStatus, Prisma, WorkspaceMember } from '../../infrastructure/db/generated/prisma/client'
 
 type MediaSortField = 'createdAt' | 'title' | 'duration'
 type SortOrder = 'asc' | 'desc'
@@ -7,10 +7,14 @@ type SortOrder = 'asc' | 'desc'
 export const createMedia = async (data: Prisma.MediaCreateInput | Prisma.MediaUncheckedCreateInput): Promise<Media> =>
   prisma.media.create({ data })
 
-export const findDefaultWorkspace = async (userId: string): Promise<Workspace | null> =>
-  prisma.workspace.findFirst({
-    where: { ownerId: userId },
-    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
+export const findWorkspaceMembership = async (workspaceId: string, userId: string): Promise<WorkspaceMember | null> =>
+  prisma.workspaceMember.findUnique({
+    where: {
+      workspaceId_userId: {
+        workspaceId,
+        userId
+      }
+    }
   })
 
 export const findMediaByUserId = async (
@@ -54,15 +58,39 @@ export const findMediaById = async (id: string): Promise<Media | null> =>
     where: { id }
   })
 
+export const findWorkspaceAccessibleMediaById = async (id: string, userId: string): Promise<Media | null> =>
+  prisma.media.findFirst({
+    where: {
+      id,
+      workspace: {
+        members: {
+          some: {
+            userId
+          }
+        }
+      }
+    }
+  })
+
 export const updateMedia = async (id: string, data: Prisma.MediaUpdateInput): Promise<Media> =>
   prisma.media.update({
     where: { id },
     data
   })
 
-export const findExistingUploadedMediaById = async (id: string): Promise<{ media?: Media } | undefined> => {
-  const media = await findMediaById(id)
-  if (media) return { media }
+export const updateUploadingMedia = async (
+  id: string,
+  userId: string,
+  data: Prisma.MediaUpdateManyMutationInput
+): Promise<Media | null> => {
+  const [updatedMedia] = await prisma.media.updateManyAndReturn({
+    where: {
+      id,
+      userId,
+      status: MediaStatus.UPLOADING
+    },
+    data
+  })
 
-  return undefined
+  return updatedMedia ?? null
 }
