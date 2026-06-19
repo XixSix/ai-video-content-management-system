@@ -3,7 +3,6 @@ import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
 import * as mediaController from './media.controller'
 import {
-  abortMultipartUploadSchema,
   completeUploadSchema,
   createUploadUrlSchema,
   listMediaQuerySchema,
@@ -17,12 +16,12 @@ router.use(authenticate)
 
 router.get('/', validateRequest({ query: listMediaQuerySchema }), mediaController.list)
 router.post('/upload-url', validateRequest({ body: createUploadUrlSchema }), mediaController.createUploadUrl)
-router.post('/complete-upload', validateRequest({ body: completeUploadSchema }), mediaController.completeUpload)
 router.post(
-  '/abort-upload',
-  validateRequest({ body: abortMultipartUploadSchema }),
-  mediaController.abortMultipartUpload
+  '/:mediaId/complete-upload',
+  validateRequest({ params: mediaParamsSchema, body: completeUploadSchema }),
+  mediaController.completeUpload
 )
+router.post('/:mediaId/abort-upload', validateRequest({ params: mediaParamsSchema }), mediaController.abortUpload)
 router.get('/:mediaId/download-url', validateRequest({ params: mediaParamsSchema }), mediaController.createDownloadUrl)
 router.get('/:mediaId', validateRequest({ params: mediaParamsSchema }), mediaController.get)
 router.patch(

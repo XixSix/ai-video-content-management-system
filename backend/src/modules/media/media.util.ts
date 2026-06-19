@@ -2,23 +2,28 @@ import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { config } from '../../config'
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from './media.constants'
 import { MediaError } from './media.error'
-import type { CompletedUploadPart, MediaResponseData, UploadMediaType, UploadedMediaResponse } from './media.types'
+import type { CompletedUploadPart, MediaResponseData, UploadMediaType } from './media.types'
 
-export const getMultipartPartCount = (fileSizeBytes: number): number => {
-  return Math.ceil(fileSizeBytes / config.upload.multipartPartSizeBytes)
-}
+export const getMultipartPartCount = (fileSizeBytes: number): number =>
+  Math.ceil(fileSizeBytes / config.upload.multipartPartSizeBytes)
 
 export const ensureSupportedFileSize = (fileSizeBytes: number): void => {
-  const partCount: number = getMultipartPartCount(fileSizeBytes)
-
-  if (partCount > config.upload.maxMultipartParts) {
-    throw MediaError.invalidUpload('File is too large for the configured multipart part size')
+  if (fileSizeBytes > MAX_UPLOAD_FILE_SIZE_BYTES) {
+    throw MediaError.invalidUpload(`File size cannot exceed ${MAX_UPLOAD_FILE_SIZE_BYTES} bytes`)
   }
 }
 
 export const getMediaFolder = (mediaType: UploadMediaType): string => {
-  return mediaType === 'VIDEO' ? 'videos' : 'images'
+  const folders: Record<UploadMediaType, string> = {
+    VIDEO: 'videos',
+    AUDIO: 'audio',
+    IMAGE: 'images',
+    SUBTITLE: 'subtitles'
+  }
+
+  return folders[mediaType]
 }
 
 export const getSafeFileExtension = (originalFilename: string): string => {
@@ -32,52 +37,21 @@ export const getSafeFileExtension = (originalFilename: string): string => {
   return extension
 }
 
-export const createUploadObjectKey = (userId: string, mediaType: UploadMediaType, originalFilename: string): string => {
+export const createUploadObjectKey = (
+  workspaceId: string,
+  userId: string,
+  mediaType: UploadMediaType,
+  originalFilename: string
+): string => {
   const uploadSessionId: string = randomUUID()
   const mediaFolder: string = getMediaFolder(mediaType)
   const extension: string = getSafeFileExtension(originalFilename)
 
-  return `uploads/users/${userId}/${mediaFolder}/${uploadSessionId}/original${extension}`
+  return `uploads/workspaces/${workspaceId}/users/${userId}/${mediaFolder}/${uploadSessionId}/original${extension}`
 }
 
-export const getUploadMode = (fileSizeBytes: number): 'SINGLE' | 'MULTIPART' => {
-  return fileSizeBytes > config.upload.multipartThresholdBytes ? 'MULTIPART' : 'SINGLE'
-}
-
-export const ensureExpectedUploadMode = (mode: 'SINGLE' | 'MULTIPART', fileSizeBytes: number): void => {
-  const expectedMode: 'SINGLE' | 'MULTIPART' = getUploadMode(fileSizeBytes)
-
-  if (mode !== expectedMode) {
-    throw MediaError.invalidUpload(`Upload mode must be ${expectedMode} for this file size`)
-  }
-}
-
-export const ensureUploadTargetIsAllowed = (
-  userId: string,
-  mediaType: UploadMediaType,
-  bucket: string,
-  key: string
-): void => {
-  ensureBucketAndUserKey(userId, bucket, key)
-
-  const expectedMediaPrefix: string = `uploads/users/${userId}/${getMediaFolder(mediaType)}/`
-
-  if (!key.startsWith(expectedMediaPrefix)) {
-    throw MediaError.forbidden()
-  }
-}
-
-export const ensureBucketAndUserKey = (userId: string, bucket: string, key: string): void => {
-  if (bucket !== config.s3.bucket) {
-    throw MediaError.invalidUpload('bucket does not match configured upload bucket')
-  }
-
-  const expectedUserPrefix: string = `uploads/users/${userId}/`
-
-  if (!key.startsWith(expectedUserPrefix)) {
-    throw MediaError.forbidden()
-  }
-}
+export const getUploadMode = (fileSizeBytes: number): 'SINGLE' | 'MULTIPART' =>
+  fileSizeBytes > config.upload.multipartThresholdBytes ? 'MULTIPART' : 'SINGLE'
 
 export const getValidCompletedParts = (
   fileSizeBytes: number,
@@ -108,38 +82,20 @@ export const getValidCompletedParts = (
   return parts
 }
 
-export const toUploadedMediaResponse = (media: Media): UploadedMediaResponse => {
-  return {
-    id: media.id,
-    title: media.title,
-    description: media.description,
-    originalFilename: media.originalFilename,
-    s3Bucket: media.s3Bucket,
-    s3Key: media.s3Key,
-    duration: media.duration,
-    fileSizeBytes: media.fileSizeBytes ? media.fileSizeBytes.toString() : null,
-    mimeType: media.mimeType,
-    width: media.width,
-    height: media.height,
-    status: media.status,
-    createdAt: media.createdAt,
-    updatedAt: media.updatedAt
-  }
-}
-
-export const toMediaResponseData = (media: Media): MediaResponseData => {
-  return {
-    id: media.id,
-    title: media.title,
-    description: media.description,
-    originalFilename: media.originalFilename,
-    duration: media.duration,
-    fileSizeBytes: media.fileSizeBytes ? media.fileSizeBytes.toString() : null,
-    mimeType: media.mimeType,
-    width: media.width,
-    height: media.height,
-    status: media.status,
-    createdAt: media.createdAt,
-    updatedAt: media.updatedAt
-  }
-}
+export const toMediaResponseData = (media: Media): MediaResponseData => ({
+  id: media.id,
+  workspaceId: media.workspaceId,
+  type: media.type as UploadMediaType,
+  title: media.title,
+  description: media.description,
+  originalFilename: media.originalFilename,
+  duration: media.duration,
+  fileSizeBytes: media.fileSizeBytes ? media.fileSizeBytes.toString() : null,
+  mimeType: media.mimeType,
+  width: media.width,
+  height: media.height,
+  metadata: media.metadata,
+  status: media.status,
+  createdAt: media.createdAt,
+  updatedAt: media.updatedAt
+})

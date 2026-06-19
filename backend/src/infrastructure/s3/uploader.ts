@@ -19,26 +19,34 @@ export const PRESIGNED_UPLOAD_EXPIRES_SECONDS: number = config.upload.presignedU
 export const PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: number = config.upload.presignedDownloadExpiredSeconds
 
 export const createPresignedPutUrl = async (bucket: string, key: string, mimeType: string): Promise<string> => {
-  const command = new PutObjectCommand({
-    Bucket: bucket,
-    Key: key,
-    ContentType: mimeType
-  })
+  try {
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: mimeType
+    })
 
-  return getSignedUrl(presignS3Client, command, {
-    expiresIn: config.upload.presignedUploadExpiredSeconds
-  })
+    return await getSignedUrl(presignS3Client, command, {
+      expiresIn: config.upload.presignedUploadExpiredSeconds
+    })
+  } catch (error: unknown) {
+    throw toStorageError(error, 'Failed to create upload URL')
+  }
 }
 
 export const createPresignedGetUrl = async (bucket: string, key: string): Promise<string> => {
-  const command = new GetObjectCommand({
-    Bucket: bucket,
-    Key: key
-  })
+  try {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key
+    })
 
-  return getSignedUrl(presignS3Client, command, {
-    expiresIn: config.upload.presignedDownloadExpiredSeconds
-  })
+    return await getSignedUrl(presignS3Client, command, {
+      expiresIn: config.upload.presignedDownloadExpiredSeconds
+    })
+  } catch (error: unknown) {
+    throw toStorageError(error, 'Failed to create download URL')
+  }
 }
 
 export const createMultipartUpload = async (bucket: string, key: string, mimeType: string): Promise<string> => {
@@ -66,26 +74,30 @@ export const createPresignedUploadPartUrls = async (
   multipartUploadId: string,
   partCount: number
 ): Promise<PresignedUploadPart[]> => {
-  const partNumbers: number[] = Array.from({ length: partCount }, (_, index) => index + 1)
+  try {
+    const partNumbers: number[] = Array.from({ length: partCount }, (_, index) => index + 1)
 
-  return Promise.all(
-    partNumbers.map(async (partNumber): Promise<PresignedUploadPart> => {
-      const command = new UploadPartCommand({
-        Bucket: bucket,
-        Key: key,
-        UploadId: multipartUploadId,
-        PartNumber: partNumber
-      })
-      const url: string = await getSignedUrl(presignS3Client, command, {
-        expiresIn: config.upload.presignedUploadExpiredSeconds
-      })
+    return await Promise.all(
+      partNumbers.map(async (partNumber): Promise<PresignedUploadPart> => {
+        const command = new UploadPartCommand({
+          Bucket: bucket,
+          Key: key,
+          UploadId: multipartUploadId,
+          PartNumber: partNumber
+        })
+        const url: string = await getSignedUrl(presignS3Client, command, {
+          expiresIn: config.upload.presignedUploadExpiredSeconds
+        })
 
-      return {
-        partNumber,
-        url
-      }
-    })
-  )
+        return {
+          partNumber,
+          url
+        }
+      })
+    )
+  } catch (error: unknown) {
+    throw toStorageError(error, 'Failed to create multipart upload URLs')
+  }
 }
 
 export const completeMultipartUpload = async (
@@ -110,6 +122,10 @@ export const completeMultipartUpload = async (
 
     await s3Client.send(command)
   } catch (error: unknown) {
+    if (isMultipartUploadNotFoundError(error)) {
+      throw MediaError.multipartUploadNotFound()
+    }
+
     throw toStorageError(error, 'Failed to complete multipart upload')
   }
 }
@@ -124,6 +140,10 @@ export const abortMultipartUpload = async (bucket: string, key: string, multipar
 
     await s3Client.send(command)
   } catch (error: unknown) {
+    if (isMultipartUploadNotFoundError(error)) {
+      return
+    }
+
     throw toStorageError(error, 'Failed to abort multipart upload')
   }
 }
@@ -160,7 +180,7 @@ export const headObject = async (bucket: string, key: string): Promise<StorageOb
     }
   } catch (error: unknown) {
     if (isObjectNotFoundError(error)) {
-      throw MediaError.notFound()
+      throw MediaError.invalidUpload('Uploaded object was not found')
     }
 
     throw toStorageError(error, 'Failed to inspect uploaded object')
@@ -174,6 +194,10 @@ const isObjectNotFoundError = (error: unknown): boolean => {
 
   return error.name === 'NotFound' || error.name === 'NoSuchKey' || error.$metadata.httpStatusCode === 404
 }
+
+const isMultipartUploadNotFoundError = (error: unknown): boolean =>
+  error instanceof S3ServiceException &&
+  (error.name === 'NoSuchUpload' || (error.$metadata.httpStatusCode === 404 && error.name === 'NotFound'))
 
 const toStorageError = (error: unknown, fallbackMessage: string): MediaError => {
   if (error instanceof MediaError) {

@@ -39,8 +39,8 @@ http://localhost:3000/api-docs.json
 
 - `GET /api/v1/media` - Lấy danh sách media files (có pagination)
 - `POST /api/v1/media/upload-url` - Tạo presigned URL để upload
-- `POST /api/v1/media/complete-upload` - Hoàn tất upload
-- `POST /api/v1/media/abort-upload` - Hủy multipart upload
+- `POST /api/v1/media/:mediaId/complete-upload` - Hoàn tất upload
+- `POST /api/v1/media/:mediaId/abort-upload` - Hủy single hoặc multipart upload
 - `GET /api/v1/media/:mediaId` - Lấy thông tin chi tiết media
 - `GET /api/v1/media/:mediaId/download-url` - Tạo presigned URL để download
 - `PATCH /api/v1/media/:mediaId` - Cập nhật media (title, description)

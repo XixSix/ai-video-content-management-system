@@ -6,7 +6,6 @@ import type {
 } from '../../types/express'
 import { sendSuccess } from '../../utils/response'
 import type {
-  AbortMultipartUploadBody,
   CompleteUploadBody,
   CreateUploadUrlBody,
   ListMediaQuery,
@@ -15,7 +14,7 @@ import type {
 } from './media.schema'
 import * as mediaService from './media.service'
 import type {
-  AbortMultipartUploadResult,
+  AbortUploadResult,
   CompleteUploadResult,
   CompleteUploadResponseData,
   CreateUploadUrlResult,
@@ -23,7 +22,7 @@ import type {
   MediaResponseData,
   PaginatedResult
 } from './media.types'
-import { toMediaResponseData, toUploadedMediaResponse } from './media.util'
+import { toMediaResponseData } from './media.util'
 
 export const list: QueryRequestHandler<ListMediaQuery> = async (req, res, next): Promise<void> => {
   try {
@@ -94,6 +93,7 @@ export const createUploadUrl: BodyRequestHandler<CreateUploadUrlBody> = async (r
   try {
     const result: CreateUploadUrlResult = await mediaService.createUploadUrl({
       userId: req.user!.id,
+      workspaceId: req.body.workspaceId,
       mediaType: req.body.mediaType,
       originalFilename: req.body.originalFilename,
       mimeType: req.body.mimeType,
@@ -108,40 +108,35 @@ export const createUploadUrl: BodyRequestHandler<CreateUploadUrlBody> = async (r
   }
 }
 
-export const completeUpload: BodyRequestHandler<CompleteUploadBody> = async (req, res, next): Promise<void> => {
+export const completeUpload: ParamsBodyRequestHandler<MediaParams, CompleteUploadBody> = async (
+  req,
+  res,
+  next
+): Promise<void> => {
   try {
     const result: CompleteUploadResult = await mediaService.completeUpload({
       userId: req.user!.id,
-      mediaId: req.body.mediaId,
+      mediaId: req.params.mediaId,
       parts: req.body.parts
     })
 
     sendSuccess<CompleteUploadResponseData>(
       res,
       {
-        media: toUploadedMediaResponse(result.media)
+        media: toMediaResponseData(result.media)
       },
-      201
+      200
     )
   } catch (error: unknown) {
     next(error)
   }
 }
 
-export const abortMultipartUpload: BodyRequestHandler<AbortMultipartUploadBody> = async (
-  req,
-  res,
-  next
-): Promise<void> => {
+export const abortUpload: ParamsRequestHandler<MediaParams> = async (req, res, next): Promise<void> => {
   try {
-    const result: AbortMultipartUploadResult = await mediaService.abortMultipartUpload({
-      userId: req.user!.id,
-      bucket: req.body.bucket,
-      key: req.body.key,
-      multipartUploadId: req.body.multipartUploadId
-    })
+    const result: AbortUploadResult = await mediaService.abortUpload(req.user!.id, req.params.mediaId)
 
-    sendSuccess<AbortMultipartUploadResult>(res, result)
+    sendSuccess<AbortUploadResult>(res, result)
   } catch (error: unknown) {
     next(error)
   }
