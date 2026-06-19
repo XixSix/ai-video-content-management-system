@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
-export const registerSchema = z.object({
-  email: z.email('Invalid email address'),
+const emailSchema = z.string().trim().toLowerCase().pipe(z.email('Invalid email address'))
+
+export const registerSchema = z.strictObject({
+  email: emailSchema,
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters long')
@@ -11,7 +13,7 @@ export const registerSchema = z.object({
 })
 
 export const loginSchema = z.strictObject({
-  email: z.email('Invalid email address'),
+  email: emailSchema,
   password: z.string().min(1, 'Password is required')
 })
 

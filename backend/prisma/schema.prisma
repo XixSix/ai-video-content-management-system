@@ -217,9 +217,9 @@ model AuthSession {
   id     String @id @default(uuid()) @db.Uuid
   userId String @map("user_id") @db.Uuid
 
-  refreshToken String  @unique @map("refresh_token") @db.Text
-  userAgent    String? @map("user_agent") @db.Text
-  ipAddress    String? @map("ip_address") @db.VarChar(100)
+  jti       String  @unique @db.Uuid
+  userAgent String? @map("user_agent") @db.Text
+  ipAddress String? @map("ip_address") @db.VarChar(100)
 
   expiresAt  DateTime  @map("expires_at")
   revokedAt  DateTime? @map("revoked_at")

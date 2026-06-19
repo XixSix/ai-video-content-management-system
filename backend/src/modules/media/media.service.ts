@@ -117,7 +117,11 @@ export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<Cr
   const bucket: string = config.s3.bucket
   const key: string = createUploadObjectKey(input.userId, input.mediaType, input.originalFilename)
   const mode: 'SINGLE' | 'MULTIPART' = getUploadMode(input.fileSizeBytes)
-  const workspace = await mediaRepo.findOrCreateDefaultWorkspace(input.userId)
+  const workspace = await mediaRepo.findDefaultWorkspace(input.userId)
+
+  if (!workspace) {
+    throw MediaError.invalidState('Default workspace is missing for the current user')
+  }
 
   let mediaId: string
 

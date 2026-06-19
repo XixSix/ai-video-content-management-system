@@ -1,5 +1,5 @@
 import type { JwtPayload } from 'jsonwebtoken'
-import type { AuthSession, User, UserRole, UserStatus } from '../../infrastructure/db/generated/prisma/client'
+import type { Prisma, User, UserRole, UserStatus } from '../../infrastructure/db/generated/prisma/client'
 
 export interface AuthenticatedUser {
   id: string
@@ -25,6 +25,10 @@ export interface AuthResult {
   user: User
 }
 
+export interface RefreshResult {
+  accessToken: string
+}
+
 export interface AuthResponseData {
   accessToken: string
   user: AuthenticatedUser
@@ -39,14 +43,25 @@ export interface MessageResponseData {
 }
 
 export interface SessionTokenResult {
+  jti: string
   refreshToken: string
   refreshExpiresAt: Date
 }
 
 export interface AccessTokenPayload extends JwtPayload {
+  type: 'access'
   userId: string
 }
 
-export interface AuthSessionWithUser extends AuthSession {
-  user: User
+export interface RefreshTokenPayload extends JwtPayload {
+  exp: number
+  jti: string
+  sub: string
+  type: 'refresh'
 }
+
+export type AuthSessionWithUser = Prisma.AuthSessionGetPayload<{
+  include: {
+    user: true
+  }
+}>

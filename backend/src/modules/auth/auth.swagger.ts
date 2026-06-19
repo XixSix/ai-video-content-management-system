@@ -2,25 +2,46 @@
  * @swagger
  * components:
  *   schemas:
- *     User:
+ *     AuthUser:
  *       type: object
+ *       required: [id, email, role, status]
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
- *           example: 123e4567-e89b-12d3-a456-426614174000
  *         email:
  *           type: string
  *           format: email
- *           example: user@gmail.com
- *         createdAt:
+ *         role:
  *           type: string
- *           format: date-time
- *           example: 2026-05-24T10:00:00.000Z
- *         updatedAt:
+ *           enum: [USER, ADMIN]
+ *         status:
  *           type: string
- *           format: date-time
- *           example: 2026-05-24T10:00:00.000Z
+ *           enum: [ACTIVE, DISABLED]
+ *     AuthResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         data:
+ *           type: object
+ *           properties:
+ *             accessToken:
+ *               type: string
+ *             user:
+ *               $ref: '#/components/schemas/AuthUser'
+ *     AccessTokenResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         data:
+ *           type: object
+ *           properties:
+ *             accessToken:
+ *               type: string
  */
 
 /**
@@ -28,7 +49,7 @@
  * /auth/register:
  *   post:
  *     summary: Register a new user
- *     description: Create a new user account with email and password
+ *     description: Creates the user, default workspace, owner membership, and refresh session.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -36,42 +57,29 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
- *                 example: user@gmail.com
  *               password:
  *                 type: string
  *                 format: password
  *                 minLength: 8
  *                 maxLength: 16
- *                 example: Abcd@1234
- *                 description: Must be 8-16 characters, contain at least one uppercase letter and one number
+ *                 description: Must contain at least one uppercase letter and one number.
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User registered successfully. The refresh JWT is set in an HttpOnly SameSite=Lax cookie.
  *         headers:
  *           Set-Cookie:
  *             schema:
  *               type: string
- *               example: refreshToken=...; HttpOnly; Secure; SameSite=Strict
+ *               example: refreshToken=...; Path=/api/v1/auth; HttpOnly; SameSite=Lax
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/AuthResponse'
  *       400:
  *         description: Validation error
  *         content:
@@ -79,25 +87,20 @@
  *             schema:
  *               $ref: '#/components/schemas/ValidationError'
  *       409:
- *         description: Email already exists
+ *         description: Email is already registered
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       429:
- *         description: Too many requests
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Too many registration attempts
  */
 
 /**
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Login user
- *     description: Authenticate user with email and password, returns access and refresh tokens in HTTP-only cookies
+ *     summary: Log in
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -105,183 +108,103 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
- *                 example: user@gmail.com
  *               password:
  *                 type: string
  *                 format: password
- *                 example: Abcd@1234
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Login successful. The refresh JWT is set in an HttpOnly SameSite=Lax cookie.
  *         headers:
  *           Set-Cookie:
  *             schema:
  *               type: string
- *               example: refreshToken=...; HttpOnly; Secure; SameSite=Strict
+ *               example: refreshToken=...; Path=/api/v1/auth; HttpOnly; SameSite=Lax
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/AuthResponse'
  *       400:
  *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ValidationError'
  *       401:
  *         description: Invalid credentials
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       429:
- *         description: Too many requests
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Too many login attempts
  */
 
 /**
  * @swagger
  * /auth/refresh:
  *   post:
- *     summary: Refresh access token
- *     description: Get a new access token using the refresh token from cookie
+ *     summary: Refresh the access token
+ *     description: Reuses the current non-rotating refresh JWT after DB session and Redis blacklist checks.
  *     tags: [Auth]
  *     security:
- *       - refreshToken: []
+ *       - refreshCookieAuth: []
  *     responses:
  *       200:
- *         description: Token refreshed successfully
- *         headers:
- *           Set-Cookie:
- *             schema:
- *               type: string
- *               example: refreshToken=...; HttpOnly; Secure; SameSite=Strict
+ *         description: Access token refreshed
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/AccessTokenResponse'
  *       401:
- *         description: Invalid or expired refresh token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Missing, invalid, expired, blacklisted, or revoked refresh token
+ *       403:
+ *         description: User account is disabled
  *       429:
- *         description: Too many requests
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Too many refresh attempts
+ *       503:
+ *         description: Redis session blacklist is unavailable
  */
 
 /**
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: Logout user
- *     description: Invalidate the current refresh token and clear authentication cookies
+ *     summary: Log out the current refresh session
  *     tags: [Auth]
  *     security:
- *       - accessToken: []
+ *       - refreshCookieAuth: []
  *     responses:
  *       200:
- *         description: Logout successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: Logged out successfully
- *       401:
- *         description: Invalid or expired refresh token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Current session revoked and refresh cookie cleared
+ *       503:
+ *         description: Redis session blacklist is unavailable
  */
 
 /**
  * @swagger
  * /auth/logout-all:
  *   post:
- *     summary: Logout from all devices
- *     description: Invalidate all refresh tokens for the authenticated user
+ *     summary: Log out all refresh sessions
  *     tags: [Auth]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Logged out from all devices successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: Logged out from all devices
+ *         description: All refresh sessions revoked and refresh cookie cleared
  *       401:
- *         description: Unauthorized - invalid or missing access token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Missing or invalid access token
+ *       503:
+ *         description: Redis session blacklist is unavailable
  */
 
 /**
  * @swagger
  * /auth/me:
  *   get:
- *     summary: Get current user
- *     description: Get the authenticated user's profile information
+ *     summary: Get the authenticated user
  *     tags: [Auth]
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User profile retrieved successfully
+ *         description: Authenticated user
  *         content:
  *           application/json:
  *             schema:
@@ -294,11 +217,7 @@
  *                   type: object
  *                   properties:
  *                     user:
- *                       $ref: '#/components/schemas/User'
+ *                       $ref: '#/components/schemas/AuthUser'
  *       401:
- *         description: Unauthorized - invalid or missing access token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Missing or invalid access token
  */

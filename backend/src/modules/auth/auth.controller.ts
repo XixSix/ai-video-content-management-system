@@ -44,7 +44,6 @@ export const refresh: AppRequestHandler = async (req, res, next): Promise<void> 
   try {
     const refreshToken = getRefreshTokenFromCookie(req)
     const result = await authService.refresh(refreshToken, getRequestMetadata(req))
-    setRefreshCookie(res, result.refreshToken)
     sendSuccess<AccessTokenResponseData>(res, {
       accessToken: result.accessToken
     })

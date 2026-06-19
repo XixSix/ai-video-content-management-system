@@ -16,4 +16,8 @@ export class AuthError extends AppError {
   static conflict(message = 'Resource already exists'): AuthError {
     return new AuthError(message, 409, 'CONFLICT')
   }
+
+  static sessionStoreUnavailable(message = 'Authentication session store is unavailable'): AuthError {
+    return new AuthError(message, 503, 'AUTH_SESSION_STORE_UNAVAILABLE')
+  }
 }

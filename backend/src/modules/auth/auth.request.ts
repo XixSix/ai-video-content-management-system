@@ -8,10 +8,6 @@ export const getRequestMetadata = (req: RequestMetadataSource): RequestMetadata 
   ipAddress: req.ip
 })
 
-export const getRefreshExpiresAt = (): Date => {
-  return new Date(Date.now() + config.security.refreshTokenTTLMs)
-}
-
 export const getRefreshTokenFromCookie = (req: Request): string => {
   const refreshToken = getOptionalRefreshTokenFromCookie(req)
 
