@@ -30,7 +30,8 @@ const authenticatedUser: AuthenticatedUser = {
   id: userId,
   email: 'user@example.com',
   role: 'USER',
-  status: 'ACTIVE'
+  status: 'ACTIVE',
+  workspaceId
 }
 
 const media: Media = {
@@ -86,6 +87,7 @@ describe('media routes', () => {
     ['POST', `/api/v1/media/${mediaId}/complete-upload`],
     ['POST', `/api/v1/media/${mediaId}/abort-upload`],
     ['GET', `/api/v1/media/${mediaId}`],
+    ['GET', `/api/v1/media/${mediaId}/preview-url`],
     ['GET', `/api/v1/media/${mediaId}/download-url`],
     ['PATCH', `/api/v1/media/${mediaId}`],
     ['DELETE', `/api/v1/media/${mediaId}`]

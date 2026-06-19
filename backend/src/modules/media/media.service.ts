@@ -108,7 +108,26 @@ export const createDownloadUrl = async (userId: string, mediaId: string): Promis
     throw MediaError.invalidState(`Cannot create download URL for media in status ${media.status}`)
   }
 
-  const url: string = await storageService.createPresignedGetUrl(media.s3Bucket, media.s3Key)
+  const url: string = await storageService.createPresignedDownloadUrl(
+    media.s3Bucket,
+    media.s3Key,
+    media.title ?? media.originalFilename
+  )
+
+  return {
+    url,
+    expiresInSeconds: storageService.PRESIGNED_DOWNLOAD_EXPIRES_SECONDS
+  }
+}
+
+export const createPreviewUrl = async (userId: string, mediaId: string): Promise<CreateDownloadUrlResult> => {
+  const media = await getWorkspaceAccessibleMedia(userId, mediaId)
+
+  if (media.status !== MediaStatus.UPLOADED) {
+    throw MediaError.invalidState(`Cannot create preview URL for media in status ${media.status}`)
+  }
+
+  const url: string = await storageService.createPresignedPreviewUrl(media.s3Bucket, media.s3Key)
 
   return {
     url,
@@ -247,6 +266,7 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
   const completedMedia = await mediaRepo.updateUploadingMedia(media.id, input.userId, {
     s3Etag: objectMetadata.etag,
     uploadId: null,
+    title: media.title ?? media.originalFilename,
     status: MediaStatus.UPLOADED
   })
 

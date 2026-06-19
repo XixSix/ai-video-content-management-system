@@ -49,6 +49,49 @@ export const createPresignedGetUrl = async (bucket: string, key: string): Promis
   }
 }
 
+export const createPresignedPreviewUrl = async (bucket: string, key: string): Promise<string> => {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ResponseContentDisposition: 'inline'
+    })
+
+    return await getSignedUrl(presignS3Client, command, {
+      expiresIn: config.upload.presignedDownloadExpiredSeconds
+    })
+  } catch (error: unknown) {
+    throw toStorageError(error, 'Failed to create preview URL')
+  }
+}
+
+export const createAttachmentContentDisposition = (filename: string): string => {
+  const normalizedFilename = filename.trim().replaceAll(/[/\\\r\n]/g, '_') || 'download'
+  const asciiFilename = normalizedFilename.replaceAll(/[^\x20-\x7E"]/g, '_').replaceAll('"', '_')
+  const encodedFilename = encodeURIComponent(normalizedFilename).replaceAll(
+    /[!'()*]/g,
+    (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`
+  )
+
+  return `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodedFilename}`
+}
+
+export const createPresignedDownloadUrl = async (bucket: string, key: string, filename: string): Promise<string> => {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ResponseContentDisposition: createAttachmentContentDisposition(filename)
+    })
+
+    return await getSignedUrl(presignS3Client, command, {
+      expiresIn: config.upload.presignedDownloadExpiredSeconds
+    })
+  } catch (error: unknown) {
+    throw toStorageError(error, 'Failed to create download URL')
+  }
+}
+
 export const createMultipartUpload = async (bucket: string, key: string, mimeType: string): Promise<string> => {
   try {
     const command = new CreateMultipartUploadCommand({

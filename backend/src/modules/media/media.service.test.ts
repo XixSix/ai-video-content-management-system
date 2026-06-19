@@ -10,7 +10,8 @@ const findWorkspaceAccessibleMediaByIdMock = jest.fn<(id: string, userId: string
 const updateMediaMock = jest.fn<(id: string, data: unknown) => Promise<Media>>()
 const updateUploadingMediaMock = jest.fn<(id: string, userId: string, data: unknown) => Promise<Media | null>>()
 const createPresignedPutUrlMock = jest.fn<(bucket: string, key: string, mimeType: string) => Promise<string>>()
-const createPresignedGetUrlMock = jest.fn<(bucket: string, key: string) => Promise<string>>()
+const createPresignedPreviewUrlMock = jest.fn<(bucket: string, key: string) => Promise<string>>()
+const createPresignedDownloadUrlMock = jest.fn<(bucket: string, key: string, filename: string) => Promise<string>>()
 const createMultipartUploadMock = jest.fn<(bucket: string, key: string, mimeType: string) => Promise<string>>()
 const createPresignedUploadPartUrlsMock =
   jest.fn<
@@ -43,7 +44,8 @@ jest.unstable_mockModule('../../infrastructure/s3/uploader', () => ({
   abortMultipartUpload: abortMultipartUploadMock,
   completeMultipartUpload: completeMultipartUploadMock,
   createMultipartUpload: createMultipartUploadMock,
-  createPresignedGetUrl: createPresignedGetUrlMock,
+  createPresignedPreviewUrl: createPresignedPreviewUrlMock,
+  createPresignedDownloadUrl: createPresignedDownloadUrlMock,
   createPresignedPutUrl: createPresignedPutUrlMock,
   createPresignedUploadPartUrls: createPresignedUploadPartUrlsMock,
   deleteObject: deleteObjectMock,
@@ -100,7 +102,8 @@ describe('media upload service', () => {
     updateMediaMock.mockReset()
     updateUploadingMediaMock.mockReset()
     createPresignedPutUrlMock.mockReset()
-    createPresignedGetUrlMock.mockReset()
+    createPresignedPreviewUrlMock.mockReset()
+    createPresignedDownloadUrlMock.mockReset()
     createMultipartUploadMock.mockReset()
     createPresignedUploadPartUrlsMock.mockReset()
     completeMultipartUploadMock.mockReset()
@@ -114,7 +117,8 @@ describe('media upload service', () => {
     updateMediaMock.mockImplementation(async (_id, data) => createMedia(data as Partial<Media>))
     updateUploadingMediaMock.mockImplementation(async (_id, _userId, data) => createMedia(data as Partial<Media>))
     createPresignedPutUrlMock.mockResolvedValue('https://storage.example.com/upload')
-    createPresignedGetUrlMock.mockResolvedValue('https://storage.example.com/download')
+    createPresignedPreviewUrlMock.mockResolvedValue('https://storage.example.com/preview')
+    createPresignedDownloadUrlMock.mockResolvedValue('https://storage.example.com/download')
     createMultipartUploadMock.mockResolvedValue('multipart-upload-id')
     createPresignedUploadPartUrlsMock.mockResolvedValue([{ partNumber: 1, url: 'https://storage.example.com/part/1' }])
     completeMultipartUploadMock.mockResolvedValue()
@@ -170,7 +174,39 @@ describe('media upload service', () => {
       url: 'https://storage.example.com/download',
       expiresInSeconds: 900
     })
-    expect(createPresignedGetUrlMock).toHaveBeenCalledWith(
+    expect(createPresignedDownloadUrlMock).toHaveBeenCalledWith(
+      'vidpilot-media',
+      `uploads/workspaces/${workspaceId}/users/${userId}/videos/session/original.mp4`,
+      'Upload'
+    )
+  })
+
+  it('falls back to the original filename when downloading legacy media without a title', async () => {
+    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(
+      createMedia({
+        title: null,
+        status: 'UPLOADED'
+      })
+    )
+
+    await mediaService.createDownloadUrl(userId, mediaId)
+
+    expect(createPresignedDownloadUrlMock).toHaveBeenCalledWith('vidpilot-media', expect.any(String), 'upload.mp4')
+  })
+
+  it('lets a workspace member create an inline preview URL for shared media', async () => {
+    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(
+      createMedia({
+        userId: otherUserId,
+        status: 'UPLOADED'
+      })
+    )
+
+    await expect(mediaService.createPreviewUrl(userId, mediaId)).resolves.toEqual({
+      url: 'https://storage.example.com/preview',
+      expiresInSeconds: 900
+    })
+    expect(createPresignedPreviewUrlMock).toHaveBeenCalledWith(
       'vidpilot-media',
       `uploads/workspaces/${workspaceId}/users/${userId}/videos/session/original.mp4`
     )
@@ -325,8 +361,8 @@ describe('media upload service', () => {
   })
 
   it('completes a single upload and returns the persisted media', async () => {
-    const uploadingMedia = createMedia()
-    const uploadedMedia = createMedia({ status: 'UPLOADED', s3Etag: '"etag"' })
+    const uploadingMedia = createMedia({ title: null })
+    const uploadedMedia = createMedia({ title: 'upload.mp4', status: 'UPLOADED', s3Etag: '"etag"' })
     findMediaByIdMock.mockResolvedValue(uploadingMedia)
     updateUploadingMediaMock.mockResolvedValue(uploadedMedia)
 
@@ -335,6 +371,7 @@ describe('media upload service', () => {
     expect(updateUploadingMediaMock).toHaveBeenCalledWith(mediaId, userId, {
       s3Etag: '"etag"',
       uploadId: null,
+      title: 'upload.mp4',
       status: 'UPLOADED'
     })
     expect(result).toEqual({ media: uploadedMedia })
