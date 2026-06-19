@@ -6,6 +6,7 @@ export interface AuthenticatedUser {
   email: string
   role: UserRole
   status: UserStatus
+  workspaceId: string
 }
 
 export interface RequestMetadata {
@@ -23,6 +24,7 @@ export interface AuthResult {
   refreshToken: string
   refreshExpiresAt: Date
   user: User
+  workspaceId: string
 }
 
 export interface RefreshResult {
@@ -32,6 +34,11 @@ export interface RefreshResult {
 export interface AuthResponseData {
   accessToken: string
   user: AuthenticatedUser
+}
+
+export interface RegisteredUserResult {
+  user: User
+  workspaceId: string
 }
 
 export interface AccessTokenResponseData {

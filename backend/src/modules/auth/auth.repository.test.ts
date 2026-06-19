@@ -64,7 +64,10 @@ beforeEach(() => {
 
 describe('auth repository registration transaction', () => {
   it('creates the user, default workspace owner, and session in one transaction', async () => {
-    await expect(authRepository.registerUserWithWorkspaceAndSession(input)).resolves.toEqual(user)
+    await expect(authRepository.registerUserWithWorkspaceAndSession(input)).resolves.toEqual({
+      user,
+      workspaceId: '123e4567-e89b-12d3-a456-426614174002'
+    })
 
     expect(transactionMock).toHaveBeenCalledTimes(1)
     expect(createWorkspaceMock).toHaveBeenCalledWith({

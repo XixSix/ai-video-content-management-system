@@ -4,7 +4,7 @@
  *   schemas:
  *     AuthUser:
  *       type: object
- *       required: [id, email, role, status]
+ *       required: [id, email, role, status, workspaceId]
  *       properties:
  *         id:
  *           type: string
@@ -18,6 +18,10 @@
  *         status:
  *           type: string
  *           enum: [ACTIVE, DISABLED]
+ *         workspaceId:
+ *           type: string
+ *           format: uuid
+ *           description: Default workspace used by the current MVP client.
  *     AuthResponse:
  *       type: object
  *       properties:

@@ -33,7 +33,8 @@ const createUser = (sequence: number): AuthenticatedUser => ({
   id: `00000000-0000-4000-8000-${sequence.toString().padStart(12, '0')}`,
   email: `user-${sequence}@example.com`,
   role: 'USER',
-  status: 'ACTIVE'
+  status: 'ACTIVE',
+  workspaceId: `10000000-0000-4000-8000-${sequence.toString().padStart(12, '0')}`
 })
 
 const createJobResult = (wasCreated = true): GenerateChaptersServiceResult => ({

@@ -13,6 +13,7 @@ const updateSessionMetadataMock = jest.fn()
 const revokeSessionMock = jest.fn()
 const revokeAllUserSessionsMock = jest.fn()
 const findUserByIdMock = jest.fn()
+const findDefaultWorkspaceMembershipMock = jest.fn()
 const isRefreshTokenBlacklistedMock = jest.fn()
 const blacklistRefreshSessionMock = jest.fn()
 const blacklistRefreshSessionsMock = jest.fn()
@@ -33,7 +34,8 @@ jest.unstable_mockModule('./auth.repository', () => ({
   updateSessionMetadata: updateSessionMetadataMock,
   revokeSession: revokeSessionMock,
   revokeAllUserSessions: revokeAllUserSessionsMock,
-  findUserById: findUserByIdMock
+  findUserById: findUserByIdMock,
+  findDefaultWorkspaceMembership: findDefaultWorkspaceMembershipMock
 }))
 
 jest.unstable_mockModule('./auth.blacklist', () => ({
@@ -59,6 +61,7 @@ jest.unstable_mockModule('bcrypt', () => ({
 const authService = await import('./auth.service')
 
 const userId = '123e4567-e89b-12d3-a456-426614174000'
+const workspaceId = '123e4567-e89b-12d3-a456-426614174030'
 const sessionId = '123e4567-e89b-12d3-a456-426614174010'
 const jti = '123e4567-e89b-12d3-a456-426614174020'
 const expiresAt = new Date(Date.now() + 60_000)
@@ -118,12 +121,22 @@ beforeEach(() => {
   updateSessionMetadataMock.mockResolvedValue(createSession())
   revokeSessionMock.mockResolvedValue(undefined)
   revokeAllUserSessionsMock.mockResolvedValue(undefined)
+  findDefaultWorkspaceMembershipMock.mockResolvedValue({
+    id: '123e4567-e89b-12d3-a456-426614174040',
+    userId,
+    workspaceId,
+    role: 'OWNER',
+    createdAt: new Date()
+  })
 })
 
 describe('auth service', () => {
   it('registers the user, workspace, owner membership, and session through one repository transaction', async () => {
     const user = createUser()
-    registerUserWithWorkspaceAndSessionMock.mockResolvedValue(user)
+    registerUserWithWorkspaceAndSessionMock.mockResolvedValue({
+      user,
+      workspaceId
+    })
 
     const result = await authService.register(
       {
@@ -152,7 +165,8 @@ describe('auth service', () => {
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
       refreshExpiresAt: expiresAt,
-      user
+      user,
+      workspaceId
     })
   })
 
@@ -223,6 +237,32 @@ describe('auth service', () => {
       })
     )
     expect(result.refreshToken).toBe('refresh-token')
+    expect(result.workspaceId).toBe(workspaceId)
+  })
+
+  it('rejects login when the user has no workspace membership', async () => {
+    findUserByEmailMock.mockResolvedValue(createUser())
+    findDefaultWorkspaceMembershipMock.mockResolvedValue(null)
+
+    await expect(authService.login({ email: 'user@example.com', password: 'Password1' }, {})).rejects.toMatchObject({
+      statusCode: 403,
+      code: 'FORBIDDEN',
+      message: 'User does not belong to a workspace'
+    })
+    expect(createSessionMock).not.toHaveBeenCalled()
+  })
+
+  it('returns the authenticated user with the default workspace', async () => {
+    findUserByIdMock.mockResolvedValue(createUser())
+    verifyAccessTokenMock.mockReturnValue({
+      type: 'access',
+      userId
+    })
+
+    await expect(authService.getAuthenticatedUser('access-token')).resolves.toMatchObject({
+      id: userId,
+      workspaceId
+    })
   })
 
   it('refreshes only the access token when the JWT session is active', async () => {

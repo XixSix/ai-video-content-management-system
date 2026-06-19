@@ -18,7 +18,7 @@ export const register: BodyRequestHandler<RegisterBody> = async (req, res, next)
       res,
       {
         accessToken: result.accessToken,
-        user: toAuthenticatedUser(result.user)
+        user: toAuthenticatedUser(result.user, result.workspaceId)
       },
       201
     )
@@ -33,7 +33,7 @@ export const login: BodyRequestHandler<LoginBody> = async (req, res, next): Prom
     setRefreshCookie(res, result.refreshToken)
     sendSuccess<AuthResponseData>(res, {
       accessToken: result.accessToken,
-      user: toAuthenticatedUser(result.user)
+      user: toAuthenticatedUser(result.user, result.workspaceId)
     })
   } catch (error: unknown) {
     next(error)

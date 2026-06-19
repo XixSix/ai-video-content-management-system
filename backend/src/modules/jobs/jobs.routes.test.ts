@@ -36,7 +36,8 @@ const user: AuthenticatedUser = {
   id: userId,
   email: 'user@example.com',
   role: 'USER',
-  status: 'ACTIVE'
+  status: 'ACTIVE',
+  workspaceId: '00000000-0000-4000-8000-000000000010'
 }
 
 const createJob = (overrides: Partial<JobResponseData> = {}): JobResponseData => ({

@@ -24,7 +24,8 @@ const user: AuthenticatedUser = {
   id: '123e4567-e89b-12d3-a456-426614174000',
   email: 'user@example.com',
   role: 'USER',
-  status: 'ACTIVE'
+  status: 'ACTIVE',
+  workspaceId: '123e4567-e89b-12d3-a456-426614174001'
 }
 
 const serviceUser = {
@@ -42,13 +43,15 @@ beforeEach(() => {
     accessToken: 'access-token',
     refreshToken: 'refresh-token',
     refreshExpiresAt: new Date(Date.now() + 60_000),
-    user: serviceUser
+    user: serviceUser,
+    workspaceId: user.workspaceId
   })
   loginMock.mockResolvedValue({
     accessToken: 'access-token',
     refreshToken: 'refresh-token',
     refreshExpiresAt: new Date(Date.now() + 60_000),
-    user: serviceUser
+    user: serviceUser,
+    workspaceId: user.workspaceId
   })
   refreshMock.mockResolvedValue({
     accessToken: 'new-access-token'
