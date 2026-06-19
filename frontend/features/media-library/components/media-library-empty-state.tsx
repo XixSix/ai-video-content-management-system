@@ -53,12 +53,12 @@ export function MediaLibraryEmptyState({
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-foreground">
                   {isEmpty
-                    ? "Drop video or audio to seed the library"
+                    ? "Drop source media to seed the library"
                     : "Filters narrowed the current results to zero"}
                 </p>
                 <p className="text-xs leading-5 text-muted-foreground">
                   {isEmpty
-                    ? "Supported formats can stay broad for now while the upload flow remains mocked on the frontend."
+                    ? "Supported uploads include video, audio, images, SRT, and VTT files."
                     : "The upload entry point stays available, even when the current query returns nothing."}
                 </p>
               </div>

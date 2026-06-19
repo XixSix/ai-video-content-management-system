@@ -6,14 +6,17 @@ import {
   type FormEvent,
 } from "react"
 import {
+  AlertTriangle,
   Download,
   FileText,
   HardDrive,
   Info,
   MoreHorizontal,
   PencilLine,
+  RefreshCw,
   Trash2,
   UserRound,
+  XCircle,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -50,19 +53,24 @@ import {
 type MediaLibraryActionsMenuProps = {
   item: MediaLibraryItem
   onRename?: (title: string) => void
+  onDelete?: () => void
+  onDownload?: () => void
+  onRetry?: () => void
+  onDismiss?: () => void
 }
 
 export function MediaLibraryActionsMenu({
   item,
   onRename,
+  onDelete,
+  onDownload,
+  onRetry,
+  onDismiss,
 }: MediaLibraryActionsMenuProps) {
   const [isRenameOpen, setIsRenameOpen] = useState(false)
   const [isPropertiesOpen, setIsPropertiesOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [titleDraft, setTitleDraft] = useState(item.title)
-
-  const preventMenuAction = (event: Event) => {
-    event.preventDefault()
-  }
 
   const openRenameDialog = (event: Event) => {
     event.preventDefault()
@@ -96,23 +104,45 @@ export function MediaLibraryActionsMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 min-w-44">
-          <DropdownMenuItem onSelect={openRenameDialog}>
-            <PencilLine className="size-4" />
-            Rename
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={preventMenuAction}>
-            <Download className="size-4" />
-            Download
-          </DropdownMenuItem>
+          {item.status === "FAILED" && onRetry ? (
+            <DropdownMenuItem onSelect={onRetry}>
+              <RefreshCw className="size-4" />
+              Retry upload
+            </DropdownMenuItem>
+          ) : null}
+          {item.status !== "UPLOADING" && item.status !== "FAILED" ? (
+            <DropdownMenuItem onSelect={openRenameDialog}>
+              <PencilLine className="size-4" />
+              Rename
+            </DropdownMenuItem>
+          ) : null}
+          {item.status === "UPLOADED" && onDownload ? (
+            <DropdownMenuItem onSelect={onDownload}>
+              <Download className="size-4" />
+              Download
+            </DropdownMenuItem>
+          ) : null}
           <DropdownMenuItem onSelect={() => setIsPropertiesOpen(true)}>
             <Info className="size-4" />
             Properties
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={preventMenuAction} variant="destructive">
-            <Trash2 className="size-4" />
-            Delete
-          </DropdownMenuItem>
+          {item.status === "FAILED" && onDismiss ? (
+            <DropdownMenuItem onSelect={onDismiss} variant="destructive">
+              <XCircle className="size-4" />
+              Dismiss
+            </DropdownMenuItem>
+          ) : onDelete ? (
+            <DropdownMenuItem
+              onSelect={() => setIsDeleteOpen(true)}
+              variant="destructive"
+            >
+              <Trash2 className="size-4" />
+              {item.status === "UPLOADING" && !item.uploadInterrupted
+                ? "Cancel upload"
+                : "Delete"}
+            </DropdownMenuItem>
+          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -144,6 +174,45 @@ export function MediaLibraryActionsMenu({
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+              <AlertTriangle className="size-5" />
+            </div>
+            <DialogTitle>
+              {item.status === "UPLOADING" && !item.uploadInterrupted
+                ? "Cancel this upload?"
+                : "Delete this media?"}
+            </DialogTitle>
+            <DialogDescription>
+              {item.status === "UPLOADING" && !item.uploadInterrupted
+                ? "The current transfer will stop and its temporary storage object will be cleaned up."
+                : "This removes the source file from Media Library and cannot be undone."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Keep media
+              </Button>
+            </DialogClose>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                onDelete?.()
+                setIsDeleteOpen(false)
+              }}
+            >
+              {item.status === "UPLOADING" && !item.uploadInterrupted
+                ? "Cancel upload"
+                : "Delete media"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
