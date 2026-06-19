@@ -13,17 +13,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAuthStore } from "@/features/auth/auth.store"
+import { useAuthSession } from "@/features/auth/hooks/use-auth-session"
+import { useLogout } from "@/features/auth/hooks/use-logout"
+import {
+  getEmailDisplayName,
+  getEmailInitials,
+} from "@/features/auth/auth.utils"
 
 export function HeaderAccountMenu() {
   const router = useRouter()
-  const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
+  const { data: user } = useAuthSession()
+  const logoutMutation = useLogout()
+  const email = user?.email ?? "user@example.com"
 
-  const handleLogout = () => {
-    logout()
-    router.replace("/login")
-    router.refresh()
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync()
+    } catch {
+      // Local auth state must still be cleared when the server is unavailable.
+    } finally {
+      router.replace("/login")
+    }
   }
 
   return (
@@ -38,7 +48,7 @@ export function HeaderAccountMenu() {
         >
           <Avatar size="sm">
             <AvatarFallback className="bg-primary/10 text-primary">
-              {user?.initials ?? "VC"}
+              {getEmailInitials(email)}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -47,10 +57,10 @@ export function HeaderAccountMenu() {
         <DropdownMenuLabel>
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="truncate text-sm font-medium text-foreground">
-              {user?.name ?? "VidPilot Creator"}
+              {getEmailDisplayName(email)}
             </span>
             <span className="truncate text-xs font-normal text-muted-foreground">
-              {user?.email ?? "creator@example.com"}
+              {email}
             </span>
           </div>
         </DropdownMenuLabel>
@@ -59,9 +69,12 @@ export function HeaderAccountMenu() {
           <UserRound className="size-4" />
           Account
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem
+          disabled={logoutMutation.isPending}
+          onClick={handleLogout}
+        >
           <LogOut className="size-4" />
-          Log out
+          {logoutMutation.isPending ? "Logging out..." : "Log out"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
