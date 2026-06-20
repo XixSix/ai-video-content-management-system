@@ -366,12 +366,21 @@ describe('media upload service', () => {
     findMediaByIdMock.mockResolvedValue(uploadingMedia)
     updateUploadingMediaMock.mockResolvedValue(uploadedMedia)
 
-    const result = await mediaService.completeUpload({ userId, mediaId })
+    const result = await mediaService.completeUpload({
+      userId,
+      mediaId,
+      duration: 120.5,
+      width: 1920,
+      height: 1080
+    })
 
     expect(updateUploadingMediaMock).toHaveBeenCalledWith(mediaId, userId, {
       s3Etag: '"etag"',
       uploadId: null,
       title: 'upload.mp4',
+      duration: 120.5,
+      width: 1920,
+      height: 1080,
       status: 'UPLOADED'
     })
     expect(result).toEqual({ media: uploadedMedia })

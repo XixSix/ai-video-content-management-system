@@ -134,9 +134,20 @@ export type CompletedUploadPart = {
   etag: string
 }
 
+export type MediaFileMetadata = {
+  duration?: number
+  width?: number
+  height?: number
+}
+
+export type CompleteUploadInput = MediaFileMetadata & {
+  parts?: CompletedUploadPart[]
+}
+
 export type MediaUploadOptions = {
   file: File
   workspaceId: string
+  metadata?: MediaFileMetadata
   signal?: AbortSignal
   onProgress?: (progress: number) => void
 }

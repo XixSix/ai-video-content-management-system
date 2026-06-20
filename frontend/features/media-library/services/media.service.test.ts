@@ -169,6 +169,9 @@ describe("media service", () => {
       .reply(200, undefined, { ETag: '"etag-3"' })
     apiMock.onPost(`/media/${mediaId}/complete-upload`).reply((config) => {
       expect(JSON.parse(config.data)).toEqual({
+        duration: 120.5,
+        width: 1920,
+        height: 1080,
         parts: [
           { partNumber: 1, etag: '"etag-1"' },
           { partNumber: 2, etag: '"etag-2"' },
@@ -178,7 +181,17 @@ describe("media service", () => {
       return [200, { success: true, data: { media } }]
     })
 
-    await expect(uploadMediaFile({ file, workspaceId })).resolves.toEqual(media)
+    await expect(
+      uploadMediaFile({
+        file,
+        workspaceId,
+        metadata: {
+          duration: 120.5,
+          width: 1920,
+          height: 1080,
+        },
+      })
+    ).resolves.toEqual(media)
     expect(storageMock.history.put).toHaveLength(3)
   })
 

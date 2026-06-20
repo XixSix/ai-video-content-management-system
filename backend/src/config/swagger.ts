@@ -115,6 +115,10 @@ const options: swaggerJsdoc.Options = {
         description: 'Media upload and management endpoints'
       },
       {
+        name: 'Projects',
+        description: 'Project lifecycle and project media management endpoints'
+      },
+      {
         name: 'Jobs',
         description: 'Processing job status and event stream endpoints'
       },

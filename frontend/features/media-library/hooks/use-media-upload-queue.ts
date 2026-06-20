@@ -9,6 +9,7 @@ import {
   getMediaUploadDescriptor,
   uploadMediaFile,
 } from "../services/media.service"
+import { readMediaFileMetadata } from "../lib/read-media-file-metadata"
 import { mediaQueryKeys } from "./media-query-keys"
 
 type UploadQueueEntry = {
@@ -90,9 +91,16 @@ export function useMediaUploadQueue(workspaceId: string | undefined) {
       })
 
       try {
+        const descriptor = getMediaUploadDescriptor(file)
+        const metadata = await readMediaFileMetadata(
+          file,
+          descriptor.mediaType
+        )
+
         await uploadMediaFile({
           file,
           workspaceId,
+          metadata,
           signal: controller.signal,
           onProgress: (progress) =>
             updateItem(entryId, { uploadProgress: progress }),

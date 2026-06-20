@@ -252,16 +252,24 @@ describe('auth service', () => {
     expect(createSessionMock).not.toHaveBeenCalled()
   })
 
-  it('returns the authenticated user with the default workspace', async () => {
+  it('authenticates an active user without requiring workspace membership', async () => {
     findUserByIdMock.mockResolvedValue(createUser())
+    findDefaultWorkspaceMembershipMock.mockResolvedValue(null)
     verifyAccessTokenMock.mockReturnValue({
       type: 'access',
       userId
     })
 
     await expect(authService.getAuthenticatedUser('access-token')).resolves.toMatchObject({
-      id: userId,
-      workspaceId
+      id: userId
+    })
+    expect(findDefaultWorkspaceMembershipMock).not.toHaveBeenCalled()
+  })
+
+  it('returns the default workspace context separately', async () => {
+    await expect(authService.getDefaultWorkspaceMembership(userId)).resolves.toEqual({
+      id: workspaceId,
+      role: 'OWNER'
     })
   })
 

@@ -30,8 +30,7 @@ const authenticatedUser: AuthenticatedUser = {
   id: userId,
   email: 'user@example.com',
   role: 'USER',
-  status: 'ACTIVE',
-  workspaceId
+  status: 'ACTIVE'
 }
 
 const media: Media = {
@@ -165,6 +164,11 @@ describe('media routes', () => {
     const response = await request(app)
       .post(`/api/v1/media/${mediaId}/complete-upload`)
       .set('Authorization', 'Bearer access-token')
+      .send({
+        duration: 120.5,
+        width: 1920,
+        height: 1080
+      })
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
@@ -192,7 +196,10 @@ describe('media routes', () => {
     expect(completeUploadMock).toHaveBeenCalledWith({
       userId,
       mediaId,
-      parts: undefined
+      parts: undefined,
+      duration: 120.5,
+      width: 1920,
+      height: 1080
     })
   })
 

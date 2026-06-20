@@ -267,6 +267,9 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
     s3Etag: objectMetadata.etag,
     uploadId: null,
     title: media.title ?? media.originalFilename,
+    ...(input.duration !== undefined ? { duration: input.duration } : {}),
+    ...(input.width !== undefined ? { width: input.width } : {}),
+    ...(input.height !== undefined ? { height: input.height } : {}),
     status: MediaStatus.UPLOADED
   })
 
