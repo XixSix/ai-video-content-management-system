@@ -1,70 +1,166 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useDeferredValue, useState } from "react"
+import { useRouter } from "next/navigation"
 import { FolderPlus, Upload } from "lucide-react"
+import { toast } from "sonner"
 
+import { DataPagination } from "@/components/shared/data-pagination"
 import { SectionHeader } from "@/components/shared/section-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useAuthSession } from "@/features/auth/hooks/use-auth-session"
+import {
+  ProjectCreateDialog,
+  type ProjectCreateMode,
+} from "@/features/studio-hub/components/project-create-dialog"
 import { StudioProjectCard } from "@/features/studio-hub/components/studio-project-card"
 import { StudioProjectToolbar } from "@/features/studio-hub/components/studio-project-toolbar"
-import { studioProjects } from "@/features/studio-hub/studio-projects.data"
+import {
+  useCreateProject,
+  useDeleteProject,
+  useProjectList,
+  useRenameProject,
+} from "@/features/studio-hub/hooks/use-projects"
+import { mapProjectToCard } from "@/features/studio-hub/studio-projects.mapper"
 import type {
-  StudioProject,
+  ProjectStatus,
+  StudioProjectCardData,
   StudioProjectSortKey,
-  StudioProjectStatus,
 } from "@/features/studio-hub/studio-projects.types"
 
-function sortProjects(
-  projects: StudioProject[],
-  sortKey: StudioProjectSortKey
-) {
-  const items = [...projects]
+const PROJECT_PAGE_SIZE = 9
 
-  if (sortKey === "name") {
-    return items.sort((left, right) => left.name.localeCompare(right.name))
+function getProjectSort(sortKey: StudioProjectSortKey) {
+  if (sortKey === "oldest") {
+    return { sortBy: "updatedAt" as const, sortOrder: "asc" as const }
   }
 
-  return items.sort((left, right) => {
-    const delta =
-      new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
-    return sortKey === "recent" ? delta : delta * -1
-  })
+  if (sortKey === "name") {
+    return { sortBy: "title" as const, sortOrder: "asc" as const }
+  }
+
+  return { sortBy: "updatedAt" as const, sortOrder: "desc" as const }
+}
+
+function ProjectGridLoading() {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <Skeleton key={index} className="aspect-[4/3] w-full rounded-xl" />
+      ))}
+    </div>
+  )
 }
 
 export function StudioProjectHub() {
-  const [projects, setProjects] = useState<StudioProject[]>(studioProjects)
+  const router = useRouter()
+  const authSession = useAuthSession()
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<StudioProjectStatus | "ALL">(
-    "ALL"
-  )
+  const [statusFilter, setStatusFilter] = useState<ProjectStatus | "ALL">("ALL")
   const [sortKey, setSortKey] = useState<StudioProjectSortKey>("recent")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [createDialog, setCreateDialog] = useState<{
+    open: boolean
+    mode: ProjectCreateMode
+  }>({ open: false, mode: "blank" })
+  const [projectToDelete, setProjectToDelete] =
+    useState<StudioProjectCardData | null>(null)
+  const deferredSearch = useDeferredValue(searchQuery.trim())
+  const sort = getProjectSort(sortKey)
+  const listQuery = useProjectList({
+    page: currentPage,
+    limit: PROJECT_PAGE_SIZE,
+    search: deferredSearch || undefined,
+    status: statusFilter === "ALL" ? undefined : statusFilter,
+    ...sort,
+  })
+  const featuredQuery = useProjectList({
+    page: 1,
+    limit: 1,
+    sortBy: "updatedAt",
+    sortOrder: "desc",
+  })
+  const createMutation = useCreateProject()
+  const renameMutation = useRenameProject()
+  const deleteMutation = useDeleteProject()
+  const projects = (listQuery.data?.items ?? []).map(mapProjectToCard)
+  const featuredProject = featuredQuery.data?.items[0]
+    ? mapProjectToCard(featuredQuery.data.items[0])
+    : null
+  const currentUserId = authSession.data?.id
 
-  const filteredProjects = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase()
+  const openCreateDialog = (mode: ProjectCreateMode) => {
+    setCreateDialog({ open: true, mode })
+  }
 
-    const matchingProjects = projects.filter((project) => {
-      const matchesStatus =
-        statusFilter === "ALL" ? true : project.status === statusFilter
-      const matchesQuery =
-        normalizedQuery.length < 1
-          ? true
-          : project.name.toLowerCase().includes(normalizedQuery) ||
-            project.mainSourceMedia.toLowerCase().includes(normalizedQuery)
-
-      return matchesStatus && matchesQuery
-    })
-
-    return sortProjects(matchingProjects, sortKey)
-  }, [projects, searchQuery, sortKey, statusFilter])
-
-  const featuredProject = filteredProjects[0] ?? null
-  const renameProject = (projectId: string, name: string) => {
-    setProjects((currentProjects) =>
-      currentProjects.map((project) =>
-        project.id === projectId ? { ...project, name } : project
-      )
+  const createProject = (
+    input:
+      | { mode: "blank"; title: string }
+      | { mode: "from-media"; title: string; mediaId: string }
+  ) => {
+    createMutation.mutate(
+      input.mode === "blank"
+        ? { mode: "blank", data: { title: input.title } }
+        : {
+            mode: "from-media",
+            data: { title: input.title, mediaId: input.mediaId },
+          },
+      {
+        onSuccess: ({ project }) => {
+          setCreateDialog((current) => ({ ...current, open: false }))
+          toast.success("Project created", { description: project.title })
+          router.push(`/editor/${project.id}`)
+        },
+        onError: (error) =>
+          toast.error("Unable to create project", {
+            description:
+              error instanceof Error ? error.message : "Please try again.",
+          }),
+      }
     )
+  }
+
+  const renameProject = (projectId: string, title: string) => {
+    renameMutation.mutate(
+      { projectId, title },
+      {
+        onSuccess: () => toast.success("Project renamed", { description: title }),
+        onError: (error) =>
+          toast.error("Unable to rename project", {
+            description:
+              error instanceof Error ? error.message : "Please try again.",
+          }),
+      }
+    )
+  }
+
+  const deleteProject = () => {
+    if (!projectToDelete) return
+
+    deleteMutation.mutate(projectToDelete.id, {
+      onSuccess: () => {
+        toast.success("Project deleted", {
+          description: projectToDelete.title,
+        })
+        setProjectToDelete(null)
+      },
+      onError: (error) =>
+        toast.error("Unable to delete project", {
+          description:
+            error instanceof Error ? error.message : "Please try again.",
+        }),
+    })
   }
 
   return (
@@ -80,18 +176,22 @@ export function StudioProjectHub() {
                 Studio
               </h1>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
-                Open a project, continue editing, or start a new content workspace
-                before dropping into the fullscreen studio editor.
+                Open a project, continue editing, or start a new content
+                workspace before dropping into the fullscreen studio editor.
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="lg">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => openCreateDialog("from-media")}
+            >
               <Upload className="size-4" />
               Import media
             </Button>
-            <Button size="lg">
+            <Button size="lg" onClick={() => openCreateDialog("blank")}>
               <FolderPlus className="size-4" />
               New project
             </Button>
@@ -101,14 +201,23 @@ export function StudioProjectHub() {
 
       <StudioProjectToolbar
         searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
+        onSearchQueryChange={(value) => {
+          setSearchQuery(value)
+          setCurrentPage(1)
+        }}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(value) => {
+          setStatusFilter(value)
+          setCurrentPage(1)
+        }}
         sortKey={sortKey}
-        onSortKeyChange={setSortKey}
+        onSortKeyChange={(value) => {
+          setSortKey(value)
+          setCurrentPage(1)
+        }}
       />
 
-      {featuredProject ? (
+      {!deferredSearch && statusFilter === "ALL" && featuredProject ? (
         <section className="space-y-4">
           <SectionHeader
             title="Continue editing"
@@ -117,7 +226,11 @@ export function StudioProjectHub() {
           <StudioProjectCard
             project={featuredProject}
             featured
+            canMutate={featuredProject.userId === currentUserId}
+            isRenaming={renameMutation.isPending}
+            isDeleting={deleteMutation.isPending}
             onRename={renameProject}
+            onDelete={setProjectToDelete}
           />
         </section>
       ) : null}
@@ -125,43 +238,113 @@ export function StudioProjectHub() {
       <section className="space-y-4">
         <SectionHeader
           title="All projects"
-          description="Browse every active workspace without dropping straight into the editor."
+          description="Browse every workspace without dropping straight into the editor."
         />
 
-        {projects.length < 1 ? (
-          <Card className="border-border/70 bg-card/95">
-            <CardContent className="p-6">
-              <p className="text-sm font-medium text-foreground">
-                Create your first project.
-              </p>
+        {listQuery.isLoading ? (
+          <ProjectGridLoading />
+        ) : listQuery.isError ? (
+          <Card className="border-destructive/30 bg-destructive/5">
+            <CardContent className="p-6 text-center">
+              <p className="text-sm font-semibold">Projects could not be loaded</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Start a workspace here before jumping into the fullscreen studio editor.
+                {listQuery.error instanceof Error
+                  ? listQuery.error.message
+                  : "Please check the API connection and try again."}
               </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-4"
+                onClick={() => void listQuery.refetch()}
+              >
+                Try again
+              </Button>
             </CardContent>
           </Card>
-        ) : filteredProjects.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredProjects.map((project) => (
-              <StudioProjectCard
-                key={project.id}
-                project={project}
-                onRename={renameProject}
-              />
-            ))}
-          </div>
+        ) : projects.length > 0 ? (
+          <>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {projects.map((project) => (
+                <StudioProjectCard
+                  key={project.id}
+                  project={project}
+                  canMutate={project.userId === currentUserId}
+                  isRenaming={renameMutation.isPending}
+                  isDeleting={deleteMutation.isPending}
+                  onRename={renameProject}
+                  onDelete={setProjectToDelete}
+                />
+              ))}
+            </div>
+            <DataPagination
+              page={listQuery.data?.meta.page ?? currentPage}
+              pageSize={PROJECT_PAGE_SIZE}
+              totalItems={listQuery.data?.meta.total ?? 0}
+              onPageChange={setCurrentPage}
+            />
+          </>
         ) : (
           <Card className="border-border/70 bg-card/95">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-foreground">
-                No projects match this view.
+                {deferredSearch || statusFilter !== "ALL"
+                  ? "No projects match this view."
+                  : "Create your first project."}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Try a different search or create your first project.
+                Start a workspace here before jumping into the fullscreen studio
+                editor.
               </p>
             </CardContent>
           </Card>
         )}
       </section>
+
+      {createDialog.open ? (
+        <ProjectCreateDialog
+          open
+          initialMode={createDialog.mode}
+          isSubmitting={createMutation.isPending}
+          onOpenChange={(open) =>
+            setCreateDialog((current) => ({ ...current, open }))
+          }
+          onSubmit={createProject}
+        />
+      ) : null}
+
+      <Dialog
+        open={Boolean(projectToDelete)}
+        onOpenChange={(open) => {
+          if (!open) setProjectToDelete(null)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete project?</DialogTitle>
+            <DialogDescription>
+              {projectToDelete
+                ? `${projectToDelete.title} will be removed from Studio. Its source media stays in Media Library.`
+                : "This project will be removed from Studio."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={deleteProject}
+            >
+              Delete project
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

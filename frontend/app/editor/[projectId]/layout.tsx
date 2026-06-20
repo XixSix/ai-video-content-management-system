@@ -2,7 +2,9 @@
 
 import type { ReactNode } from "react"
 import { useState } from "react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
+import { AlertTriangle, LoaderCircle } from "lucide-react"
 import {
   Group as PanelGroup,
   Panel,
@@ -22,7 +24,9 @@ import {
   TIMELINE_MAX_HEIGHT,
 } from "@/features/studio-editor/timeline/studio-timeline"
 import { StudioTopbar } from "@/features/studio-editor/shell/studio-topbar"
-import { getStudioProjectDisplayName } from "@/features/studio-hub/studio-projects.data"
+import { useProjectDetail } from "@/features/studio-hub/hooks/use-projects"
+import { Button } from "@/components/ui/button"
+import { ApiError } from "@/lib/api/api-error"
 import { cn } from "@/lib/utils"
 
 const STUDIO_RAIL_WIDTH = 78
@@ -106,12 +110,68 @@ export default function StudioLayout({
   children: ReactNode
 }) {
   const params = useParams<{ projectId: string }>()
-  const projectId = params.projectId ?? "untitled-project"
+  const projectId = params.projectId ?? ""
+  const projectQuery = useProjectDetail(projectId)
   const timelinePanelRef = usePanelRef()
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false)
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false)
-  const projectName = getStudioProjectDisplayName(projectId)
+  const project = projectQuery.data?.project
+
+  if (projectQuery.isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background text-foreground">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <LoaderCircle className="size-4 animate-spin" />
+          Loading Studio project...
+        </div>
+      </div>
+    )
+  }
+
+  if (projectQuery.isError || !project) {
+    const isNotFound =
+      projectQuery.error instanceof ApiError && projectQuery.error.status === 404
+
+    return (
+      <div className="flex h-screen items-center justify-center bg-background p-6 text-foreground">
+        <div className="w-full max-w-md rounded-xl border border-border/70 bg-card p-6 text-center shadow-[var(--shadow-panel)]">
+          <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertTriangle className="size-5" />
+          </span>
+          <h1 className="mt-4 text-lg font-semibold">
+            {isNotFound ? "Project not found" : "Studio could not be loaded"}
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {isNotFound
+              ? "This project may have been deleted or is not available in your workspace."
+              : projectQuery.error instanceof Error
+                ? projectQuery.error.message
+                : "Please check the API connection and try again."}
+          </p>
+          <div className="mt-5 flex justify-center gap-2">
+            {!isNotFound ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void projectQuery.refetch()}
+              >
+                Try again
+              </Button>
+            ) : null}
+            <Button asChild>
+              <Link href="/studio">Back to Studio</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const sourceLabel =
+    project.sourceMedia?.title ??
+    project.sourceMedia?.originalFilename ??
+    "No source media"
 
   const syncLeftPanelCollapsed = (panelSize: PanelSize) => {
     setIsLeftPanelCollapsed(panelSize.inPixels <= SIDE_PANEL_COLLAPSED_HANDLE_WIDTH)
@@ -139,7 +199,12 @@ export default function StudioLayout({
   return (
     <StudioEditorStoreProvider key={projectId}>
       <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-        <StudioTopbar projectName={projectName} />
+        <StudioTopbar
+          projectName={project.title}
+          projectStatus={project.status}
+          aspectRatio={project.aspectRatio}
+          sourceLabel={sourceLabel}
+        />
 
         <PanelGroup
           id="studio-editor-vertical-layout"
