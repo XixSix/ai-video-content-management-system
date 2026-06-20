@@ -4,7 +4,7 @@ import { clearRefreshCookie, setRefreshCookie } from './auth.cookies'
 import type { AccessTokenResponseData, AuthResponseData, MessageResponseData } from './auth.types'
 import type { AppRequestHandler, BodyRequestHandler } from '../../types/express'
 import { getOptionalRefreshTokenFromCookie, getRefreshTokenFromCookie, getRequestMetadata } from './auth.request'
-import { toAuthenticatedUser } from './auth.mapper'
+import { toWorkspaceAuthenticatedUser } from './auth.mapper'
 import type { LoginBody, RegisterBody } from './auth.schema'
 import { sendSuccess } from '../../utils/response'
 
@@ -18,7 +18,7 @@ export const register: BodyRequestHandler<RegisterBody> = async (req, res, next)
       res,
       {
         accessToken: result.accessToken,
-        user: toAuthenticatedUser(result.user, result.workspaceId)
+        user: toWorkspaceAuthenticatedUser(result.user, result.workspaceId)
       },
       201
     )
@@ -33,7 +33,7 @@ export const login: BodyRequestHandler<LoginBody> = async (req, res, next): Prom
     setRefreshCookie(res, result.refreshToken)
     sendSuccess<AuthResponseData>(res, {
       accessToken: result.accessToken,
-      user: toAuthenticatedUser(result.user, result.workspaceId)
+      user: toWorkspaceAuthenticatedUser(result.user, result.workspaceId)
     })
   } catch (error: unknown) {
     next(error)
@@ -79,7 +79,10 @@ export const logoutAll: AppRequestHandler = async (req, res, next): Promise<void
 export const me: AppRequestHandler = (req, res, next): void => {
   try {
     sendSuccess(res, {
-      user: req.user!
+      user: {
+        ...req.user!,
+        workspaceId: req.workspace!.id
+      }
     })
   } catch (error: unknown) {
     next(error)

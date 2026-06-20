@@ -4,6 +4,7 @@ import { loginSchema, registerSchema } from './auth.schema'
 import { authenticate } from '../../middleware/auth.middleware'
 import { loginRateLimiter, refreshRateLimiter, registerRateLimiter } from '../../middleware/auth-rate-limit.middleware'
 import { validateRequest } from '../../middleware/validate-request'
+import { requireWorkspaceMembership } from '../../middleware/workspace.middleware'
 
 const router = Router()
 
@@ -12,6 +13,6 @@ router.post('/login', loginRateLimiter, validateRequest({ body: loginSchema }), 
 router.post('/refresh', refreshRateLimiter, authController.refresh)
 router.post('/logout', authController.logout)
 router.post('/logout-all', authenticate, authController.logoutAll)
-router.get('/me', authenticate, authController.me)
+router.get('/me', authenticate, requireWorkspaceMembership, authController.me)
 
 export { router as authRoutes }

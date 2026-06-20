@@ -30,8 +30,7 @@ const authenticatedUser: AuthenticatedUser = {
   id: userId,
   email: 'user@example.com',
   role: 'USER',
-  status: 'ACTIVE',
-  workspaceId
+  status: 'ACTIVE'
 }
 
 const media: Media = {

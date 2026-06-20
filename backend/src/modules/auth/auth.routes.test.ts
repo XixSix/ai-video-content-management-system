@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import request from 'supertest'
-import type { AuthenticatedUser } from './auth.types'
+import type { AuthenticatedUser, WorkspaceAuthenticatedUser } from './auth.types'
+import { AuthError } from './auth.error'
 
 const registerMock = jest.fn()
 const loginMock = jest.fn()
@@ -8,6 +9,7 @@ const refreshMock = jest.fn()
 const logoutMock = jest.fn()
 const logoutAllMock = jest.fn()
 const getAuthenticatedUserMock = jest.fn()
+const getDefaultWorkspaceMembershipMock = jest.fn()
 
 jest.unstable_mockModule('./auth.service', () => ({
   register: registerMock,
@@ -15,17 +17,25 @@ jest.unstable_mockModule('./auth.service', () => ({
   refresh: refreshMock,
   logout: logoutMock,
   logoutAll: logoutAllMock,
-  getAuthenticatedUser: getAuthenticatedUserMock
+  getAuthenticatedUser: getAuthenticatedUserMock,
+  getDefaultWorkspaceMembership: getDefaultWorkspaceMembershipMock
 }))
 
 const { app } = await import('../../app')
 
-const user: AuthenticatedUser = {
+const user: WorkspaceAuthenticatedUser = {
   id: '123e4567-e89b-12d3-a456-426614174000',
   email: 'user@example.com',
   role: 'USER',
   status: 'ACTIVE',
   workspaceId: '123e4567-e89b-12d3-a456-426614174001'
+}
+
+const authenticatedUser: AuthenticatedUser = {
+  id: user.id,
+  email: user.email,
+  role: user.role,
+  status: user.status
 }
 
 const serviceUser = {
@@ -58,7 +68,11 @@ beforeEach(() => {
   })
   logoutMock.mockResolvedValue(undefined)
   logoutAllMock.mockResolvedValue(undefined)
-  getAuthenticatedUserMock.mockResolvedValue(user)
+  getAuthenticatedUserMock.mockResolvedValue(authenticatedUser)
+  getDefaultWorkspaceMembershipMock.mockResolvedValue({
+    id: user.workspaceId,
+    role: 'OWNER'
+  })
 })
 
 describe('auth routes', () => {
@@ -161,5 +175,23 @@ describe('auth routes', () => {
     expect(logoutAllResponse.status).toBe(200)
     expect(logoutAllMock).toHaveBeenCalledWith(user.id)
     expect(logoutAllResponse.headers['set-cookie'][0]).toContain('refreshToken=')
+  })
+
+  it('allows logout-all without workspace membership', async () => {
+    getDefaultWorkspaceMembershipMock.mockRejectedValue(AuthError.forbidden('No workspace'))
+
+    const response = await request(app).post('/api/v1/auth/logout-all').set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(logoutAllMock).toHaveBeenCalledWith(user.id)
+    expect(getDefaultWorkspaceMembershipMock).not.toHaveBeenCalled()
+  })
+
+  it('requires workspace membership for me', async () => {
+    getDefaultWorkspaceMembershipMock.mockRejectedValue(AuthError.forbidden('No workspace'))
+
+    const response = await request(app).get('/api/v1/auth/me').set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(403)
   })
 })
