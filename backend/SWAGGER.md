@@ -51,6 +51,18 @@ http://localhost:3000/api-docs.json
 - `POST /api/v1/media/:mediaId/chapters/generate` - Tạo job generate video chapters
 - `GET /api/v1/media/:mediaId/chapters` - Lấy danh sách chapters của media
 
+### 5. Projects
+
+- `GET /api/v1/projects` - Lấy danh sách project trong workspace
+- `POST /api/v1/projects/blank` - Tạo project rỗng
+- `POST /api/v1/projects/from-media` - Tạo project từ media đã upload
+- `GET /api/v1/projects/:projectId` - Lấy project và ProjectMedia
+- `PATCH /api/v1/projects/:projectId` - Cập nhật metadata project
+- `DELETE /api/v1/projects/:projectId` - Soft delete project
+- `PUT /api/v1/projects/:projectId/source-media` - Thêm hoặc thay source media
+- `POST /api/v1/projects/:projectId/media` - Gắn media phụ vào project
+- `DELETE /api/v1/projects/:projectId/media/:projectMediaId` - Gỡ media phụ
+
 ## Authentication trong Swagger UI
 
 API sử dụng HTTP-only cookies để authentication:
