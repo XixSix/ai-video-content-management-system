@@ -183,6 +183,19 @@
  *           schema:
  *             type: object
  *             properties:
+ *               duration:
+ *                 type: number
+ *                 format: double
+ *                 exclusiveMinimum: 0
+ *                 description: Media duration in seconds read by the client.
+ *               width:
+ *                 type: integer
+ *                 minimum: 1
+ *                 description: Video or image width in pixels. Must be sent with height.
+ *               height:
+ *                 type: integer
+ *                 minimum: 1
+ *                 description: Video or image height in pixels. Must be sent with width.
  *               parts:
  *                 type: array
  *                 description: Required only for multipart uploads.

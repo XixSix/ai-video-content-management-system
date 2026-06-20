@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from './media.constants'
-import { createUploadUrlSchema } from './media.schema'
+import { completeUploadSchema, createUploadUrlSchema } from './media.schema'
 
 const workspaceId = '00000000-0000-4000-8000-000000000001'
 
@@ -78,5 +78,27 @@ describe('media upload schema', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+
+  it('accepts client media metadata when completing an upload', () => {
+    expect(
+      completeUploadSchema.parse({
+        duration: 120.5,
+        width: 1920,
+        height: 1080
+      })
+    ).toEqual({
+      duration: 120.5,
+      width: 1920,
+      height: 1080
+    })
+  })
+
+  it('requires width and height together', () => {
+    expect(
+      completeUploadSchema.safeParse({
+        width: 1920
+      }).success
+    ).toBe(false)
   })
 })

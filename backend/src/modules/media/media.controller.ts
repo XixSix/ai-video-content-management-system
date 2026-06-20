@@ -127,7 +127,10 @@ export const completeUpload: ParamsBodyRequestHandler<MediaParams, CompleteUploa
     const result: CompleteUploadResult = await mediaService.completeUpload({
       userId: req.user!.id,
       mediaId: req.params.mediaId,
-      parts: req.body.parts
+      parts: req.body.parts,
+      duration: req.body.duration,
+      width: req.body.width,
+      height: req.body.height
     })
 
     sendSuccess<CompleteUploadResponseData>(

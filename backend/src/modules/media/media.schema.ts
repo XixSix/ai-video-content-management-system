@@ -38,7 +38,14 @@ const completedUploadPartSchema = z.strictObject({
 
 export const completeUploadSchema = z
   .strictObject({
-    parts: z.array(completedUploadPartSchema).optional()
+    parts: z.array(completedUploadPartSchema).optional(),
+    duration: z.number().positive().optional(),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional()
+  })
+  .refine((value) => (value.width === undefined) === (value.height === undefined), {
+    message: 'width and height must be provided together',
+    path: ['width']
   })
   .default({})
 
