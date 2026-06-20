@@ -28,34 +28,82 @@ import {
   getToolPanel,
 } from "./studio-editor-selectors"
 import type {
+  StudioEditorActions,
   StudioEditorStore,
   StudioEditorStoreApi,
 } from "./studio-editor-store.types"
+import type { StudioEditorProject } from "../studio.types"
 
 const StudioEditorStoreContext = createContext<StudioEditorStoreApi | null>(null)
 
-function createStudioEditorStore() {
+const READ_ONLY_ACTIONS: Partial<StudioEditorActions> = {
+  addChapterToEnd: () => undefined,
+  addProjectMediaToTimeline: () => undefined,
+  addTextLayerFromPreset: () => undefined,
+  applyCaptionPreset: () => undefined,
+  commitTranscriptWordText: () => undefined,
+  createDraftClipFromCandidate: () => undefined,
+  deleteTimelineSegment: () => undefined,
+  discardTranscriptChanges: () => undefined,
+  duplicateTimelineSegment: () => undefined,
+  markTranscriptDirty: () => undefined,
+  moveTimelineSegmentWithPush: () => undefined,
+  redoEditorChange: () => undefined,
+  removeProjectMedia: () => undefined,
+  saveTranscriptMock: () => undefined,
+  setClipCandidateStatus: () => undefined,
+  undoEditorChange: () => undefined,
+  updateCanvasLayerPosition: () => undefined,
+  updateCaptionLayerStyle: () => undefined,
+  updateChapterTiming: () => undefined,
+  updateChapterTitle: () => undefined,
+  updateClipCandidateDetails: () => undefined,
+  updateClipCandidateTiming: () => undefined,
+  updateProjectAspectRatio: () => undefined,
+  updateShortClipDetails: () => undefined,
+  updateShortClipTiming: () => undefined,
+  updateTextLayerContent: () => undefined,
+  updateTextLayerStyle: () => undefined,
+  updateTimelineSegmentTiming: () => undefined,
+  updateTranscriptWordText: () => undefined,
+  upsertProjectMedia: () => undefined,
+}
+
+export function createStudioEditorStore(
+  initialProject: StudioEditorProject,
+  canEdit: boolean
+) {
   return createStore<StudioEditorStore>((set, get) => ({
-    ...createInitialStudioEditorState(),
+    ...createInitialStudioEditorState(initialProject, canEdit),
     ...createToolActions(set),
-    ...createHistoryActions(set, get),
     ...createPlaybackActions(set, get),
-    ...createProjectActions(set, get),
     ...createSelectionActions(set, get),
-    ...createTimelineActions(set, get),
-    ...createLayerActions(set, get),
-    ...createChapterActions(set, get),
-    ...createClipActions(set, get),
-    ...createTranscriptActions(set, get),
+    ...(canEdit
+      ? {
+          ...createHistoryActions(set, get),
+          ...createProjectActions(set, get),
+          ...createTimelineActions(set, get),
+          ...createLayerActions(set, get),
+          ...createChapterActions(set, get),
+          ...createClipActions(set, get),
+          ...createTranscriptActions(set, get),
+        }
+      : (READ_ONLY_ACTIONS as StudioEditorActions)),
   }))
 }
 
 export function StudioEditorStoreProvider({
   children,
+  initialProject,
+  canEdit,
 }: {
   children: ReactNode
+  initialProject: StudioEditorProject
+  canEdit: boolean
 }) {
-  const [store] = useState(() => createStudioEditorStore())
+  const [store] = useState(() =>
+    createStudioEditorStore(initialProject, canEdit)
+  )
 
   return (
     <StudioEditorStoreContext.Provider value={store}>
@@ -64,7 +112,7 @@ export function StudioEditorStoreProvider({
   )
 }
 
-function useStudioEditorStore<T>(selector: (state: StudioEditorStore) => T): T {
+export function useStudioEditorStoreApi() {
   const store = useContext(StudioEditorStoreContext)
 
   if (!store) {
@@ -73,7 +121,17 @@ function useStudioEditorStore<T>(selector: (state: StudioEditorStore) => T): T {
     )
   }
 
+  return store
+}
+
+function useStudioEditorStore<T>(selector: (state: StudioEditorStore) => T): T {
+  const store = useStudioEditorStoreApi()
+
   return useStore(store, selector)
+}
+
+export function useStudioEditorPermission() {
+  return useStudioEditorStore((state) => state.canEdit)
 }
 
 export function useStudioProjectState() {

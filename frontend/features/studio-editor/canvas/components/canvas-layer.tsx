@@ -49,7 +49,10 @@ export function CanvasLayer({
 }) {
   const didDragRef = useRef(false)
 
-  if (layer.kind === "captions" && !layer.enabled) {
+  if (
+    layer.visible === false ||
+    (layer.kind === "captions" && !layer.enabled)
+  ) {
     return null
   }
 

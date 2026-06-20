@@ -4,6 +4,10 @@ export type ApiErrorDetail = {
   code?: string
 }
 
+export type ApiErrorDetails =
+  | ApiErrorDetail[]
+  | Record<string, unknown>
+
 export type ApiSuccess<TData> = {
   success: true
   data: TData
@@ -14,6 +18,6 @@ export type ApiFailure = {
   error: {
     code: string
     message: string
-    details?: ApiErrorDetail[]
+    details?: ApiErrorDetails
   }
 }

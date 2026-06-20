@@ -3,6 +3,11 @@
 import Link from "next/link"
 import {
   Beaker,
+  Check,
+  CloudAlert,
+  CloudUpload,
+  Eye,
+  LoaderCircle,
   Menu,
   MessageSquareText,
   Moon,
@@ -25,12 +30,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
-import { useStudioHistoryState } from "@/features/studio-editor/store/studio-editor-store"
+import {
+  useStudioHistoryState,
+  useStudioProjectState,
+} from "@/features/studio-editor/store/studio-editor-store"
+import { useEditorSnapshotPersistence } from "@/features/studio-editor/editor-snapshot/editor-snapshot-persistence"
 
 type StudioTopbarProps = {
   projectName: string
   projectStatus: string
-  aspectRatio: string
   sourceLabel: string
 }
 
@@ -75,11 +83,50 @@ function StudioMenu() {
 export function StudioTopbar({
   projectName,
   projectStatus,
-  aspectRatio,
   sourceLabel,
 }: StudioTopbarProps) {
   const { canRedo, canUndo, redoEditorChange, undoEditorChange } =
     useStudioHistoryState()
+  const { project } = useStudioProjectState()
+  const { retry, status } = useEditorSnapshotPersistence()
+  const saveIndicator = {
+    "view-only": {
+      icon: Eye,
+      label: "View only",
+      variant: "neutral" as const,
+    },
+    idle: {
+      icon: Check,
+      label: "Saved",
+      variant: "success" as const,
+    },
+    dirty: {
+      icon: CloudUpload,
+      label: "Unsaved changes",
+      variant: "warning" as const,
+    },
+    saving: {
+      icon: LoaderCircle,
+      label: "Saving…",
+      variant: "info" as const,
+    },
+    saved: {
+      icon: Check,
+      label: "Saved",
+      variant: "success" as const,
+    },
+    error: {
+      icon: CloudAlert,
+      label: "Save failed",
+      variant: "danger" as const,
+    },
+    conflict: {
+      icon: CloudAlert,
+      label: "Version conflict",
+      variant: "warning" as const,
+    },
+  }[status]
+  const SaveIndicatorIcon = saveIndicator.icon
 
   return (
     <header className="relative flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/88">
@@ -117,12 +164,29 @@ export function StudioTopbar({
             {projectName}
           </p>
           <p className="max-w-[36rem] truncate text-[11px] text-muted-foreground">
-            {projectStatus} · {aspectRatio} · {sourceLabel}
+            {projectStatus} · {project.media.aspectRatio} · {sourceLabel}
           </p>
         </div>
       </div>
 
       <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+        {status === "error" ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-destructive"
+            onClick={retry}
+          >
+            Retry save
+          </Button>
+        ) : null}
+        <Badge variant={saveIndicator.variant} className="gap-1">
+          <SaveIndicatorIcon
+            className={status === "saving" ? "size-3 animate-spin" : "size-3"}
+          />
+          {saveIndicator.label}
+        </Badge>
         <Badge variant="warning" className="hidden lg:inline-flex">
           Demo
         </Badge>

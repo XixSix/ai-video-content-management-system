@@ -23,6 +23,7 @@ export type StudioHistorySnapshot = {
 
 export type StudioEditorState = {
   activeTool: StudioToolId
+  canEdit: boolean
   currentTime: number
   hasUnsavedTranscriptChanges: boolean
   historyFuture: StudioHistorySnapshot[]
@@ -101,20 +102,24 @@ export function createHistorySnapshot(
   }
 }
 
-export function createInitialStudioEditorState(): StudioEditorState {
+export function createInitialStudioEditorState(
+  project: StudioEditorProject = studioEditorProject,
+  canEdit = true
+): StudioEditorState {
   return {
     activeTool: "media",
+    canEdit,
     currentTime: 0,
     hasUnsavedTranscriptChanges: false,
     historyFuture: [],
     historyPast: [],
     isPlaying: false,
     mutedTrackIds: [],
-    project: studioEditorProject,
-    savedTranscriptState: cloneSavedTranscriptState(studioEditorProject),
+    project,
+    savedTranscriptState: cloneSavedTranscriptState(project),
     selectedChapterId: null,
     selectedClipCandidateId: null,
-    selectedItemId: "source-media",
+    selectedItemId: project.sourceMedia.id,
     selectedShortClipId: null,
     selectedTranscriptSegmentId: null,
   }

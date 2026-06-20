@@ -1,17 +1,17 @@
 import axios from "axios"
 
-import type { ApiErrorDetail, ApiFailure } from "./api.types"
+import type { ApiErrorDetails, ApiFailure } from "./api.types"
 
 export class ApiError extends Error {
   readonly status: number
   readonly code: string
-  readonly details?: ApiErrorDetail[]
+  readonly details?: ApiErrorDetails
 
   constructor(
     message: string,
     status: number,
     code: string,
-    details?: ApiErrorDetail[]
+    details?: ApiErrorDetails
   ) {
     super(message)
     this.name = "ApiError"
