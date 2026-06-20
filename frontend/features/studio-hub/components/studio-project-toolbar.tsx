@@ -7,8 +7,8 @@ import {
   studioProjectStatusOptions,
 } from "@/features/studio-hub/studio-projects.data"
 import type {
+  ProjectStatus,
   StudioProjectSortKey,
-  StudioProjectStatus,
 } from "@/features/studio-hub/studio-projects.types"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,8 +22,8 @@ import { Input } from "@/components/ui/input"
 type StudioProjectToolbarProps = {
   searchQuery: string
   onSearchQueryChange: (value: string) => void
-  statusFilter: StudioProjectStatus | "ALL"
-  onStatusFilterChange: (value: StudioProjectStatus | "ALL") => void
+  statusFilter: ProjectStatus | "ALL"
+  onStatusFilterChange: (value: ProjectStatus | "ALL") => void
   sortKey: StudioProjectSortKey
   onSortKeyChange: (value: StudioProjectSortKey) => void
 }

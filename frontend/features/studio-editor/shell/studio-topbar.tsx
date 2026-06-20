@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import {
-  CloudCheck,
+  Beaker,
   Menu,
   MessageSquareText,
   Moon,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { useTheme } from "@/components/providers/theme-provider"
 import {
   DropdownMenu,
@@ -28,6 +29,9 @@ import { useStudioHistoryState } from "@/features/studio-editor/store/studio-edi
 
 type StudioTopbarProps = {
   projectName: string
+  projectStatus: string
+  aspectRatio: string
+  sourceLabel: string
 }
 
 function StudioMenu() {
@@ -68,7 +72,12 @@ function StudioMenu() {
   )
 }
 
-export function StudioTopbar({ projectName }: StudioTopbarProps) {
+export function StudioTopbar({
+  projectName,
+  projectStatus,
+  aspectRatio,
+  sourceLabel,
+}: StudioTopbarProps) {
   const { canRedo, canUndo, redoEditorChange, undoEditorChange } =
     useStudioHistoryState()
 
@@ -97,18 +106,26 @@ export function StudioTopbar({ projectName }: StudioTopbarProps) {
         </Button>
         <Separator orientation="vertical" className="hidden h-5 sm:block" />
         <div className="hidden items-center text-sm text-muted-foreground sm:flex">
-          <CloudCheck className="mr-1 size-4 text-muted-foreground" />
-          <span>All changes saved</span>
+          <Beaker className="mr-1 size-4 text-amber-500" />
+          <span>Demo editing canvas</span>
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 flex justify-center px-24">
-        <p className="max-w-[32rem] truncate text-sm font-semibold text-foreground">
-          {projectName}
-        </p>
+      <div className="pointer-events-none absolute inset-x-0 flex justify-center px-40">
+        <div className="min-w-0 text-center">
+          <p className="max-w-[32rem] truncate text-sm font-semibold text-foreground">
+            {projectName}
+          </p>
+          <p className="max-w-[36rem] truncate text-[11px] text-muted-foreground">
+            {projectStatus} · {aspectRatio} · {sourceLabel}
+          </p>
+        </div>
       </div>
 
       <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+        <Badge variant="warning" className="hidden lg:inline-flex">
+          Demo
+        </Badge>
         <Button variant="ghost" size="icon-sm" aria-label="Comments">
           <MessageSquareText />
         </Button>

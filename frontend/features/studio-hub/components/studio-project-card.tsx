@@ -1,28 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
-import {
-  type FormEvent,
-  useState,
-} from "react"
+import { type FormEvent, useState } from "react"
 import {
   AudioWaveform,
   Clapperboard,
-  Download,
+  FolderOpen,
   MoreHorizontal,
   PencilLine,
-  Send,
   Trash2,
 } from "lucide-react"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogClose,
@@ -40,40 +31,60 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 import { formatShortDate } from "@/features/home/home.utils"
-import type { StudioProject } from "@/features/studio-hub/studio-projects.types"
+import type { StudioProjectCardData } from "@/features/studio-hub/studio-projects.types"
+import { cn } from "@/lib/utils"
 
 type StudioProjectCardProps = {
-  project: StudioProject
+  project: StudioProjectCardData
   featured?: boolean
-  onRename?: (projectId: string, name: string) => void
+  canMutate: boolean
+  isRenaming?: boolean
+  isDeleting?: boolean
+  onRename?: (projectId: string, title: string) => void
+  onDelete?: (project: StudioProjectCardData) => void
 }
 
-const thumbnailVariantClassName = {
+const visualVariantClassName = {
   teal: "from-[#0f6278] via-[#17495b] to-[#0f2d3c]",
   slate: "from-[#30465e] via-[#1d2837] to-[#121821]",
   olive: "from-[#536746] via-[#364330] to-[#1c2419]",
   ember: "from-[#7a4831] via-[#42251b] to-[#1f130f]",
 } as const
 
+const statusVariant = {
+  DRAFT: "neutral",
+  ACTIVE: "success",
+  ARCHIVED: "warning",
+} as const
+
 export function StudioProjectCard({
   project,
   featured = false,
+  canMutate,
+  isRenaming,
+  isDeleting,
   onRename,
+  onDelete,
 }: StudioProjectCardProps) {
   const SourceIcon =
-    project.sourceType === "VIDEO" ? Clapperboard : AudioWaveform
+    project.sourceType === "VIDEO"
+      ? Clapperboard
+      : project.sourceType === "AUDIO"
+        ? AudioWaveform
+        : FolderOpen
 
   return (
     <Card
       className={cn(
         "border-border/70 bg-card/95 py-0 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-panel)]",
-        featured ? "lg:grid lg:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]" : ""
+        featured
+          ? "lg:grid lg:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]"
+          : ""
       )}
     >
       <Link
-        href={`/editor/${project.slug}`}
+        href={`/editor/${project.id}`}
         className={cn(
           "block border-b border-border/60",
           featured ? "lg:border-b-0 lg:border-r" : ""
@@ -82,53 +93,63 @@ export function StudioProjectCard({
         <div
           className={cn(
             "relative overflow-hidden bg-muted",
-            featured ? "aspect-[16/8.5] lg:h-full lg:min-h-[252px]" : "aspect-video"
+            featured
+              ? "aspect-[16/8.5] lg:h-full lg:min-h-[252px]"
+              : "aspect-video"
           )}
         >
-          {project.thumbnailUrl ? (
-            <Image
-              src={project.thumbnailUrl}
-              alt=""
-              fill
-              sizes={featured ? "(min-width: 1024px) 46vw, 100vw" : "(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"}
-              className="absolute inset-0 object-cover"
-            />
-          ) : (
-            <div
-              className={cn(
-                "absolute inset-0 bg-gradient-to-br",
-                thumbnailVariantClassName[project.thumbnailVariant]
-              )}
-            />
-          )}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.28))]" />
-          <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <div className="flex items-end justify-between gap-3">
-              <span className="inline-flex size-11 items-center justify-center rounded-lg border border-white/14 bg-black/18 text-white">
-                <SourceIcon className="size-4" />
-              </span>
+          <div
+            className={cn(
+              "absolute inset-0 bg-gradient-to-br",
+              visualVariantClassName[project.visualVariant]
+            )}
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.32))]" />
+          <div className="absolute inset-0 flex flex-col justify-between p-4">
+            <div className="flex justify-end">
+              <Badge
+                variant={statusVariant[project.status]}
+                className="border-white/15 bg-black/25 text-white backdrop-blur-sm"
+              >
+                {project.status}
+              </Badge>
             </div>
+            <span className="inline-flex size-11 items-center justify-center rounded-lg border border-white/14 bg-black/18 text-white">
+              <SourceIcon className="size-4" />
+            </span>
           </div>
         </div>
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <CardHeader className={cn("gap-2 pb-3", featured ? "lg:px-6 lg:pt-6" : "")}>
+        <CardHeader
+          className={cn("gap-2 pb-3", featured ? "lg:px-6 lg:pt-6" : "")}
+        >
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
             <CardTitle
               className={cn(
                 "line-clamp-2 text-[15px]",
-                featured ? "lg:max-w-[14ch] lg:text-[2rem] lg:leading-[1.02]" : ""
+                featured
+                  ? "lg:max-w-[14ch] lg:text-[2rem] lg:leading-[1.02]"
+                  : ""
               )}
             >
               <Link
-                href={`/editor/${project.slug}`}
+                href={`/editor/${project.id}`}
                 className="hover:text-foreground-subtle"
               >
-                {project.name}
+                {project.title}
               </Link>
             </CardTitle>
-            <StudioProjectActionsMenu project={project} onRename={onRename} />
+            {canMutate ? (
+              <StudioProjectActionsMenu
+                project={project}
+                isRenaming={isRenaming}
+                isDeleting={isDeleting}
+                onRename={onRename}
+                onDelete={onDelete}
+              />
+            ) : null}
           </div>
         </CardHeader>
 
@@ -139,7 +160,9 @@ export function StudioProjectCard({
             <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
               Main source
             </p>
-            <p className="text-sm text-foreground">{project.mainSourceMedia}</p>
+            <p className="truncate text-sm text-foreground">
+              {project.sourceLabel}
+            </p>
             <p className="text-sm text-muted-foreground">
               Workspace updated {formatShortDate(project.updatedAt)}
             </p>
@@ -152,33 +175,35 @@ export function StudioProjectCard({
 
 function StudioProjectActionsMenu({
   project,
+  isRenaming,
+  isDeleting,
   onRename,
+  onDelete,
 }: {
-  project: StudioProject
-  onRename?: (projectId: string, name: string) => void
+  project: StudioProjectCardData
+  isRenaming?: boolean
+  isDeleting?: boolean
+  onRename?: (projectId: string, title: string) => void
+  onDelete?: (project: StudioProjectCardData) => void
 }) {
   const [isRenameOpen, setIsRenameOpen] = useState(false)
-  const [nameDraft, setNameDraft] = useState(project.name)
-
-  const preventMenuAction = (event: Event) => {
-    event.preventDefault()
-  }
+  const [titleDraft, setTitleDraft] = useState(project.title)
 
   const openRenameDialog = (event: Event) => {
     event.preventDefault()
-    setNameDraft(project.name)
+    setTitleDraft(project.title)
     setIsRenameOpen(true)
   }
 
   const submitRename = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const nextTitle = titleDraft.trim()
 
-    const nextName = nameDraft.trim()
-
-    if (nextName) {
-      onRename?.(project.id, nextName)
-      setIsRenameOpen(false)
+    if (nextTitle && nextTitle !== project.title) {
+      onRename?.(project.id, nextTitle)
     }
+
+    setIsRenameOpen(false)
   }
 
   return (
@@ -190,6 +215,7 @@ function StudioProjectActionsMenu({
             size="icon-sm"
             className="shrink-0"
             aria-label="Project actions"
+            disabled={isRenaming || isDeleting}
           >
             <MoreHorizontal className="size-4" />
           </Button>
@@ -199,16 +225,11 @@ function StudioProjectActionsMenu({
             <PencilLine className="size-4" />
             Rename
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={preventMenuAction}>
-            <Download className="size-4" />
-            Download
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={preventMenuAction}>
-            <Send className="size-4" />
-            Publish
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={preventMenuAction} variant="destructive">
+          <DropdownMenuItem
+            onSelect={() => onDelete?.(project)}
+            variant="destructive"
+          >
             <Trash2 className="size-4" />
             Delete
           </DropdownMenuItem>
@@ -227,8 +248,9 @@ function StudioProjectActionsMenu({
 
             <Input
               autoFocus
-              value={nameDraft}
-              onChange={(event) => setNameDraft(event.target.value)}
+              maxLength={255}
+              value={titleDraft}
+              onChange={(event) => setTitleDraft(event.target.value)}
               placeholder="Project name"
             />
 
@@ -238,7 +260,7 @@ function StudioProjectActionsMenu({
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={!nameDraft.trim()}>
+              <Button type="submit" disabled={!titleDraft.trim()}>
                 Save
               </Button>
             </DialogFooter>
