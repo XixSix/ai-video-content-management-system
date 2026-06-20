@@ -119,6 +119,10 @@ const options: swaggerJsdoc.Options = {
         description: 'Project lifecycle and project media management endpoints'
       },
       {
+        name: 'Editor Snapshots',
+        description: 'Versioned Studio editor composition documents'
+      },
+      {
         name: 'Jobs',
         description: 'Processing job status and event stream endpoints'
       },
