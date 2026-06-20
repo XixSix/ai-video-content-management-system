@@ -1,12 +1,26 @@
 import type { JwtPayload } from 'jsonwebtoken'
-import type { Prisma, User, UserRole, UserStatus } from '../../infrastructure/db/generated/prisma/client'
+import type {
+  Prisma,
+  User,
+  UserRole,
+  UserStatus,
+  WorkspaceMemberRole
+} from '../../infrastructure/db/generated/prisma/client'
 
 export interface AuthenticatedUser {
   id: string
   email: string
   role: UserRole
   status: UserStatus
+}
+
+export interface WorkspaceAuthenticatedUser extends AuthenticatedUser {
   workspaceId: string
+}
+
+export interface WorkspaceContext {
+  id: string
+  role: WorkspaceMemberRole
 }
 
 export interface RequestMetadata {
@@ -33,7 +47,7 @@ export interface RefreshResult {
 
 export interface AuthResponseData {
   accessToken: string
-  user: AuthenticatedUser
+  user: WorkspaceAuthenticatedUser
 }
 
 export interface RegisteredUserResult {

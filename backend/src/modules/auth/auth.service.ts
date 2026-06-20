@@ -8,7 +8,8 @@ import type {
   RefreshResult,
   RefreshTokenPayload,
   RequestMetadata,
-  SessionTokenResult
+  SessionTokenResult,
+  WorkspaceContext
 } from './auth.types'
 import { createRefreshToken, signAccessToken, verifyAccessToken, verifyRefreshToken } from './auth.tokens'
 import type { LoginBody, RegisterBody } from './auth.schema'
@@ -153,19 +154,26 @@ export const getAuthenticatedUser = async (accessToken: string): Promise<Authent
     throw AuthError.unauthorized('Invalid access token')
   }
 
-  const workspaceId = await getDefaultWorkspaceId(user.id)
-
-  return toAuthenticatedUser(user, workspaceId)
+  return toAuthenticatedUser(user)
 }
 
 const getDefaultWorkspaceId = async (userId: string): Promise<string> => {
+  const membership = await getDefaultWorkspaceMembership(userId)
+
+  return membership.id
+}
+
+export const getDefaultWorkspaceMembership = async (userId: string): Promise<WorkspaceContext> => {
   const membership = await authRepo.findDefaultWorkspaceMembership(userId)
 
   if (!membership) {
     throw AuthError.forbidden('User does not belong to a workspace')
   }
 
-  return membership.workspaceId
+  return {
+    id: membership.workspaceId,
+    role: membership.role
+  }
 }
 
 const createRefreshSession = async (userId: string, metadata: RequestMetadata): Promise<SessionTokenResult> => {
