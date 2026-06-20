@@ -7,6 +7,7 @@ import type { ApiSuccess } from "@/lib/api/api.types"
 import { authenticatedApiClient } from "@/features/auth/services/authenticated-api-client"
 import type {
   CompletedUploadPart,
+  CompleteUploadInput,
   CreateUploadUrlInput,
   CreateUploadUrlResult,
   MediaApiType,
@@ -165,12 +166,12 @@ export const mediaService = {
 
   completeUpload(
     mediaId: string,
-    parts?: CompletedUploadPart[]
+    input: CompleteUploadInput = {}
   ): Promise<{ media: MediaResponseData }> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<{ media: MediaResponseData }>>(
         `/media/${mediaId}/complete-upload`,
-        parts ? { parts } : {}
+        input
       )
     )
   },
@@ -265,6 +266,7 @@ async function uploadMultipart(
 export async function uploadMediaFile({
   file,
   workspaceId,
+  metadata,
   signal,
   onProgress,
 }: MediaUploadOptions): Promise<MediaResponseData> {
@@ -284,7 +286,10 @@ export async function uploadMediaFile({
 
     if (session.mode === "SINGLE") {
       await uploadSingle(file, session, signal, onProgress)
-      const { media } = await mediaService.completeUpload(session.mediaId)
+      const { media } = await mediaService.completeUpload(
+        session.mediaId,
+        metadata
+      )
       onProgress?.(100)
       return media
     }
@@ -295,7 +300,10 @@ export async function uploadMediaFile({
       signal,
       onProgress
     )
-    const { media } = await mediaService.completeUpload(session.mediaId, parts)
+    const { media } = await mediaService.completeUpload(session.mediaId, {
+      ...metadata,
+      parts,
+    })
     onProgress?.(100)
     return media
   } catch (error) {
