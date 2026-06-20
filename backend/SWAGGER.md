@@ -62,6 +62,8 @@ http://localhost:3000/api-docs.json
 - `PUT /api/v1/projects/:projectId/source-media` - Thêm hoặc thay source media
 - `POST /api/v1/projects/:projectId/media` - Gắn media phụ vào project
 - `DELETE /api/v1/projects/:projectId/media/:projectMediaId` - Gỡ media phụ
+- `GET /api/v1/projects/:projectId/editor-snapshot` - Lấy Studio composition snapshot hiện tại
+- `PUT /api/v1/projects/:projectId/editor-snapshot` - Lưu full snapshot với optimistic version check
 
 ## Authentication trong Swagger UI
 

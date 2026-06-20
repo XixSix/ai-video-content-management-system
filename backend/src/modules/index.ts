@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { assetsRoutes } from './assets/assets.routes'
 import { authRoutes } from './auth/auth.routes'
 import { mediaChapterRoutes } from './chaptering/chaptering.routes'
+import { editorSnapshotsRoutes } from './editor-snapshots/editor-snapshots.routes'
 import { healthRouter } from './health/health.routes'
 import { jobsRoutes } from './jobs/jobs.routes'
 import { mediaRoutes } from './media/media.routes'
@@ -20,6 +21,7 @@ apiRouter.use('/media', mediaChapterRoutes)
 apiRouter.use('/media', mediaShortClipRoutes)
 apiRouter.use('/media', mediaRoutes)
 apiRouter.use('/platform-accounts', platformAccountsRoutes)
+apiRouter.use('/projects', editorSnapshotsRoutes)
 apiRouter.use('/projects', projectsRoutes)
 apiRouter.use('/publish-tasks', publishTasksRoutes)
 apiRouter.use('/transcripts', transcriptsRoutes)
