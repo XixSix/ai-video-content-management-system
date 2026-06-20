@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Check, ListPlus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { useMediaPreviewUrl } from "@/features/media-library/hooks/use-media-mutations"
 import type { StudioProjectMediaItem } from "@/features/studio-editor/studio.types"
 import {
   useStudioPlaybackState,
@@ -15,19 +16,38 @@ import { cn } from "@/lib/utils"
 import { getMediaLabel } from "../lib/media-display"
 import { MediaThumbnail } from "./media-thumbnail"
 
-export function MediaCard({ item }: { item: StudioProjectMediaItem }) {
+export function MediaCard({
+  canEdit,
+  detaching,
+  item,
+  onDetach,
+}: {
+  canEdit: boolean
+  detaching: boolean
+  item: StudioProjectMediaItem
+  onDetach: (item: StudioProjectMediaItem) => void
+}) {
   const [recentlyAdded, setRecentlyAdded] = useState(false)
+  const previewRetryRef = useRef(false)
   const { seekToTime } = useStudioPlaybackState()
-  const { addProjectMediaToTimeline, removeProjectMedia } =
-    useStudioProjectActions()
+  const { addProjectMediaToTimeline } = useStudioProjectActions()
+  const previewUrlQuery = useMediaPreviewUrl(item.id)
+  const previewUrl = previewUrlQuery.data?.url
+
+  useEffect(() => {
+    previewRetryRef.current = false
+  }, [previewUrl])
   const { selectedItem, selectedTargetId, setSelectedItemId } =
     useStudioSelectionState()
   const isSelected =
     selectedItem.id === item.id ||
     (item.linkedSelectionId ? selectedTargetId === item.linkedSelectionId : false)
   const canAddToTimeline =
-    item.type === "VIDEO" || item.type === "AUDIO" || item.type === "IMAGE"
-  const canDelete = item.origin !== "SOURCE"
+    item.origin !== "SOURCE" &&
+    Boolean(item.projectMediaId) &&
+    (item.type === "VIDEO" || item.type === "AUDIO" || item.type === "IMAGE")
+  const canDelete =
+    item.origin !== "SOURCE" && Boolean(item.projectMediaId)
 
   const handleSelect = () => {
     setSelectedItemId(item.id)
@@ -47,7 +67,16 @@ export function MediaCard({ item }: { item: StudioProjectMediaItem }) {
             : "border-border hover:border-foreground/22"
         )}
       >
-        <MediaThumbnail item={item} />
+        <MediaThumbnail
+          item={item}
+          previewUrl={previewUrl}
+          onPreviewError={() => {
+            if (!previewRetryRef.current) {
+              previewRetryRef.current = true
+              void previewUrlQuery.refetch()
+            }
+          }}
+        />
         <button
           type="button"
           aria-label={`Select ${item.name}`}
@@ -59,7 +88,7 @@ export function MediaCard({ item }: { item: StudioProjectMediaItem }) {
         </span>
 
         <div className="absolute right-1.5 top-1.5 z-20 flex gap-1 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
-          {canAddToTimeline ? (
+          {canAddToTimeline && canEdit ? (
             <Button
               type="button"
               variant="secondary"
@@ -86,13 +115,13 @@ export function MediaCard({ item }: { item: StudioProjectMediaItem }) {
             variant="secondary"
             size="icon-xs"
             aria-label={`Delete ${item.name}`}
-            disabled={!canDelete}
+            disabled={!canEdit || !canDelete || detaching}
             className="bg-background/90 shadow-sm backdrop-blur hover:bg-background disabled:opacity-45"
             onClick={(event) => {
               event.stopPropagation()
 
-              if (canDelete) {
-                removeProjectMedia(item.id)
+              if (canEdit && canDelete) {
+                onDetach(item)
               }
             }}
           >

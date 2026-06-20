@@ -7,6 +7,7 @@ import type {
   ProjectDetail,
   ProjectListQuery,
   ProjectListResponse,
+  ProjectMedia,
   UpdateProjectInput,
 } from "../studio-projects.types"
 
@@ -57,6 +58,28 @@ export const projectService = {
       authenticatedApiClient.patch<ApiSuccess<{ project: ProjectDetail }>>(
         `/projects/${projectId}`,
         input
+      )
+    )
+  },
+
+  addMedia(
+    projectId: string,
+    mediaId: string
+  ): Promise<{ projectMedia: ProjectMedia }> {
+    return unwrapApiResponse(
+      authenticatedApiClient.post<
+        ApiSuccess<{ projectMedia: ProjectMedia }>
+      >(`/projects/${projectId}/media`, { mediaId })
+    )
+  },
+
+  removeMedia(
+    projectId: string,
+    projectMediaId: string
+  ): Promise<{ message: string }> {
+    return unwrapApiResponse(
+      authenticatedApiClient.delete<ApiSuccess<{ message: string }>>(
+        `/projects/${projectId}/media/${projectMediaId}`
       )
     )
   },

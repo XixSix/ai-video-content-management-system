@@ -19,4 +19,32 @@ describe("Studio editor permissions", () => {
     )
     expect(store.getState().currentTime).toBe(12)
   })
+
+  it("removes detached media and its timeline references", () => {
+    const project = cloneProject(studioEditorProject)
+    const removableMedia = project.projectMedia.find(
+      (item) => item.origin !== "SOURCE"
+    )
+
+    expect(removableMedia).toBeDefined()
+
+    const store = createStudioEditorStore(project, true)
+    store.getState().removeProjectMedia(removableMedia!.id)
+
+    expect(
+      store.getState().project.projectMedia.some(
+        (item) => item.id === removableMedia!.id
+      )
+    ).toBe(false)
+    expect(
+      store
+        .getState()
+        .project.timelineTracks.flatMap((track) => track.segments)
+        .some(
+          (segment) =>
+            segment.selectionId === removableMedia!.id ||
+            segment.selectionId === removableMedia!.linkedSelectionId
+        )
+    ).toBe(false)
+  })
 })

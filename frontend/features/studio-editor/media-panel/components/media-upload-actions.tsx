@@ -1,7 +1,15 @@
 "use client"
 
 import { useRef, useState, type DragEvent } from "react"
-import { CloudUpload, Library, Plus, Upload } from "lucide-react"
+import {
+  AlertCircle,
+  CloudUpload,
+  Library,
+  LoaderCircle,
+  Plus,
+  RefreshCw,
+  Upload,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,11 +25,21 @@ import { cn } from "@/lib/utils"
 
 export function MediaUploadActions({
   importableItems,
+  attachingMediaId,
+  canEdit,
+  importError,
+  importLoading,
   onImportMedia,
+  onRetryImport,
   onUploadFiles,
 }: {
   importableItems: MediaLibraryItem[]
+  attachingMediaId: string | null
+  canEdit: boolean
+  importError: Error | null
+  importLoading: boolean
   onImportMedia: (item: MediaLibraryItem) => void
+  onRetryImport: () => void
   onUploadFiles: (files: File[]) => void
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -29,7 +47,7 @@ export function MediaUploadActions({
   const [isImportOpen, setIsImportOpen] = useState(false)
 
   const handleFiles = (files: FileList | null) => {
-    if (!files?.length) {
+    if (!canEdit || !files?.length) {
       return
     }
 
@@ -46,6 +64,7 @@ export function MediaUploadActions({
     <>
       <button
         type="button"
+        disabled={!canEdit}
         onClick={() => fileInputRef.current?.click()}
         onDragEnter={(event) => {
           event.preventDefault()
@@ -59,17 +78,21 @@ export function MediaUploadActions({
         onDrop={handleDrop}
         className={cn(
           "w-full rounded-lg border border-dashed border-border bg-background px-4 py-8 text-center transition",
-          isDragActive ? "border-sky-500/70 bg-sky-500/5" : "hover:border-foreground/25"
+          isDragActive ? "border-sky-500/70 bg-sky-500/5" : "hover:border-foreground/25",
+          !canEdit && "cursor-not-allowed opacity-55"
         )}
       >
         <CloudUpload className="mx-auto size-6 text-muted-foreground" />
         <p className="mt-3 text-xs font-medium text-muted-foreground">
-          Drag files here or click to upload
+          {canEdit
+            ? "Drag files here or click to upload"
+            : "Only the project creator can add media"}
         </p>
       </button>
       <input
         ref={fileInputRef}
         type="file"
+        disabled={!canEdit}
         multiple
         accept="audio/*,image/*,video/*"
         className="hidden"
@@ -84,6 +107,7 @@ export function MediaUploadActions({
         variant="outline"
         size="lg"
         className="mt-4 w-full"
+        disabled={!canEdit}
         onClick={() => setIsImportOpen(true)}
       >
         <Library className="size-4" />
@@ -99,8 +123,31 @@ export function MediaUploadActions({
             </DialogDescription>
           </DialogHeader>
           <div className="min-h-0 overflow-auto px-5 pb-5">
-            <div className="grid gap-2 py-4">
-              {importableItems.map((item) => (
+            {importLoading ? (
+              <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+                <LoaderCircle className="size-4 animate-spin" />
+                Loading Media Library…
+              </div>
+            ) : importError ? (
+              <div className="my-4 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
+                <AlertCircle className="mx-auto size-5 text-destructive" />
+                <p className="mt-2 text-sm text-foreground">
+                  Media Library could not be loaded.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={onRetryImport}
+                >
+                  <RefreshCw />
+                  Retry
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-2 py-4">
+                {importableItems.map((item) => (
                 <div
                   key={item.id}
                   className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-background p-2"
@@ -121,18 +168,23 @@ export function MediaUploadActions({
                     variant="outline"
                     size="icon-sm"
                     aria-label={`Import ${item.originalFilename}`}
+                    disabled={attachingMediaId === item.id}
                     onClick={() => {
                       onImportMedia(item)
-                      setIsImportOpen(false)
                     }}
                   >
-                    <Plus className="size-4" />
+                    {attachingMediaId === item.id ? (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    ) : (
+                      <Plus className="size-4" />
+                    )}
                   </Button>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
-            {importableItems.length === 0 ? (
+            {!importLoading && !importError && importableItems.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border bg-background px-4 py-8 text-center text-sm text-muted-foreground">
                 All library media is already in this edit.
               </div>

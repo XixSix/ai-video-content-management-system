@@ -13,7 +13,9 @@ export function MediaPreview({
   media,
   onGuideAudioElement,
   onPreviewMediaElement,
+  onPreviewError,
   pausePlayback,
+  previewUrl,
   seekToTime,
   sourceTrackMuted,
 }: {
@@ -25,16 +27,20 @@ export function MediaPreview({
   onPreviewMediaElement: (
     element: HTMLVideoElement | HTMLAudioElement | null
   ) => void
+  onPreviewError: () => void
   pausePlayback: () => void
+  previewUrl: string
   seekToTime: (timeSeconds: number) => void
   sourceTrackMuted: boolean
 }) {
+  const streamUrl = media.streamUrl || previewUrl
+
   return (
     <>
-      {media.type === "VIDEO" && media.streamUrl ? (
+      {media.type === "VIDEO" && streamUrl ? (
         <video
           ref={onPreviewMediaElement}
-          src={media.streamUrl}
+          src={streamUrl}
           poster={media.thumbnailUrl ?? undefined}
           playsInline
           muted={sourceTrackMuted}
@@ -50,9 +56,10 @@ export function MediaPreview({
               seekToTime(event.currentTarget.currentTime)
             }
           }}
+          onError={onPreviewError}
           className="absolute inset-0 size-full object-contain"
         />
-      ) : media.type === "AUDIO" && media.streamUrl ? (
+      ) : media.type === "AUDIO" && streamUrl ? (
         <>
           {media.thumbnailUrl ? (
             <Image
@@ -66,7 +73,7 @@ export function MediaPreview({
           ) : null}
           <audio
             ref={onPreviewMediaElement}
-            src={media.streamUrl}
+            src={streamUrl}
             muted={sourceTrackMuted}
             preload="metadata"
             onEnded={() => {
@@ -80,6 +87,7 @@ export function MediaPreview({
                 seekToTime(event.currentTarget.currentTime)
               }
             }}
+            onError={onPreviewError}
           />
         </>
       ) : media.thumbnailUrl ? (

@@ -157,8 +157,6 @@ export function createProjectActions(
       }))
     },
     upsertProjectMedia: (media: StudioProjectMediaItem) => {
-      recordEditorHistory(set, get)
-
       set((state) => {
         const existingMedia = state.project.projectMedia.some(
           (item) => item.id === media.id

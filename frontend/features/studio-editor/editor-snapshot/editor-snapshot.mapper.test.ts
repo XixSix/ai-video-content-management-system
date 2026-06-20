@@ -189,6 +189,10 @@ describe("editor snapshot mapper", () => {
     )
     const result = serializeEditorDocument(editorProject)
 
+    expect(editorProject.projectMedia[0].projectMediaId).toBe(
+      "00000000-0000-4000-8000-000000000006"
+    )
+    expect(editorProject.projectMedia[0].id).toBe(sourceMediaId)
     expect(result).toEqual(document)
     expect(result.layers[0].style).not.toHaveProperty("className")
     expect(result.layers[0]).not.toHaveProperty("label")

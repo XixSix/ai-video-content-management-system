@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useMediaPreviewUrl } from "@/features/media-library/hooks/use-media-mutations"
 import { getAspectRatioValue } from "@/features/studio-editor/lib/aspect-ratio"
 import { buildCaptionCues } from "@/features/studio-editor/lib/caption-cues"
 import {
@@ -40,7 +41,22 @@ export function StudioCanvas() {
   const canvasAspectRatio = getAspectRatioValue(project.media.aspectRatio)
   const { canvasAreaRef, previewSize } = usePreviewSize(canvasAspectRatio)
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
-  const hasNativeMediaPreview = Boolean(project.media.streamUrl)
+  const previewRetryRef = useRef(false)
+  const canLoadSourcePreview =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      project.media.id
+    )
+  const sourcePreviewQuery = useMediaPreviewUrl(
+    project.media.id,
+    canLoadSourcePreview && !project.media.streamUrl
+  )
+  const sourcePreviewUrl =
+    project.media.streamUrl || sourcePreviewQuery.data?.url || ""
+  const hasNativeMediaPreview = Boolean(sourcePreviewUrl)
+
+  useEffect(() => {
+    previewRetryRef.current = false
+  }, [sourcePreviewUrl])
   const guideAudioItem = useMemo(
     () =>
       project.projectMedia.find((item) => item.linkedSelectionId === "audio-bed") ??
@@ -106,7 +122,14 @@ export function StudioCanvas() {
               media={project.media}
               onGuideAudioElement={setGuideAudioElement}
               onPreviewMediaElement={setPreviewMediaElement}
+              onPreviewError={() => {
+                if (!previewRetryRef.current) {
+                  previewRetryRef.current = true
+                  void sourcePreviewQuery.refetch()
+                }
+              }}
               pausePlayback={pausePlayback}
+              previewUrl={sourcePreviewUrl}
               seekToTime={seekToTime}
               sourceTrackMuted={sourceTrackMuted}
             />

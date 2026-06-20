@@ -95,7 +95,9 @@ function getProjectMediaStatus(
   return "FAILED"
 }
 
-function toStudioProjectMedia(item: ProjectMedia): StudioProjectMediaItem {
+export function mapProjectMediaToStudioItem(
+  item: ProjectMedia
+): StudioProjectMediaItem {
   const media = item.media
   const durationLabel =
     media.duration !== null ? formatDuration(media.duration) : undefined
@@ -103,6 +105,7 @@ function toStudioProjectMedia(item: ProjectMedia): StudioProjectMediaItem {
 
   return {
     id: media.id,
+    projectMediaId: item.id,
     type: media.type,
     name: media.title ?? media.originalFilename,
     summary: `${item.role.replaceAll("_", " ").toLowerCase()} project media.`,
@@ -136,7 +139,7 @@ export function createStudioProjectFromDetail(
   const sourceId = sourceMedia?.id ?? `project-${detail.id}-source`
   const sourceName =
     sourceMedia?.title ?? sourceMedia?.originalFilename ?? "No source media"
-  const projectMedia = detail.projectMedia.map(toStudioProjectMedia)
+  const projectMedia = detail.projectMedia.map(mapProjectMediaToStudioItem)
 
   return {
     ...project,

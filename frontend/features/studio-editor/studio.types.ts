@@ -188,6 +188,7 @@ export type StudioProjectMediaOrigin = "SOURCE" | "LIBRARY" | "UPLOAD"
 
 export type StudioProjectMediaItem = {
   id: string
+  projectMediaId?: string
   type: StudioProjectMediaType
   name: string
   summary: string
