@@ -4,6 +4,7 @@ import type { MediaLibraryItem } from "@/features/media-library/media-library.ty
 import type { ProjectMedia } from "@/features/studio-hub/studio-projects.types"
 
 import {
+  assignStudioUploadPurposes,
   createProjectMediaFromResponse,
   getImportableMediaLibraryItems,
 } from "./project-media-adapter"
@@ -54,6 +55,18 @@ function createLibraryItem(id: string): MediaLibraryItem {
 }
 
 describe("project media adapter", () => {
+  it("assigns the first uploaded video or audio as source for a blank project", () => {
+    expect(
+      assignStudioUploadPurposes(
+        ["IMAGE", "VIDEO", "AUDIO", "VIDEO"],
+        false
+      )
+    ).toEqual(["PROJECT_MEDIA", "SOURCE", "PROJECT_MEDIA", "PROJECT_MEDIA"])
+    expect(
+      assignStudioUploadPurposes(["VIDEO", "AUDIO"], true)
+    ).toEqual(["PROJECT_MEDIA", "PROJECT_MEDIA"])
+  })
+
   it("keeps media and project-media identifiers separate", () => {
     const result = createProjectMediaFromResponse(projectMedia)
 

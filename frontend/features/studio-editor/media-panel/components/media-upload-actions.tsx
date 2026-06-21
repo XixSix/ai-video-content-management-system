@@ -20,8 +20,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
-import { formatDuration } from "@/features/media-library/media-library.utils"
 import { cn } from "@/lib/utils"
+
+import { getMediaImportMetadata } from "../lib/media-display"
 
 export function MediaUploadActions({
   importableItems,
@@ -101,7 +102,6 @@ export function MediaUploadActions({
           event.currentTarget.value = ""
         }}
       />
-
       <Button
         type="button"
         variant="outline"
@@ -160,7 +160,7 @@ export function MediaUploadActions({
                       {item.originalFilename}
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {item.type.toLowerCase()} - {formatDuration(item.duration)}
+                      {getMediaImportMetadata(item)}
                     </p>
                   </div>
                   <Button

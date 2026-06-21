@@ -171,15 +171,20 @@ describe("editor snapshot mapper", () => {
   })
 
   it("does not invent a source segment for a blank project", () => {
-    const result = createDefaultEditorDocument({
+    const blankProject = {
       ...project,
       sourceMediaId: null,
       sourceMedia: null,
       duration: null,
       projectMedia: [],
-    })
+    }
+    const result = createDefaultEditorDocument(blankProject)
+    const editorProject = createStudioProjectFromDetail(blankProject)
 
     expect(result.timelineTracks[2].segments).toEqual([])
+    expect(editorProject.media.durationSeconds).toBe(0)
+    expect(editorProject.media.durationLabel).toBe("0:00")
+    expect(editorProject.sourceMedia.durationLabel).toBe("0:00")
   })
 
   it("hydrates and serializes only the persisted composition contract", () => {

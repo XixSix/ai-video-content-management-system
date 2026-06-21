@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 
-import { useMediaPreviewUrl } from "@/features/media-library/hooks/use-media-mutations"
 import { getAspectRatioValue } from "@/features/studio-editor/lib/aspect-ratio"
 import { buildCaptionCues } from "@/features/studio-editor/lib/caption-cues"
 import {
@@ -13,13 +12,20 @@ import {
   useStudioToolState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
+import { getProjectTimelineDuration } from "@/features/studio-editor/timeline/lib/layout"
 import { cn } from "@/lib/utils"
 
 import { CanvasLayerList } from "./components/canvas-layer-list"
-import { MediaPreview } from "./components/media-preview"
+import {
+  CanvasAudioMedia,
+  CanvasOverlayMedia,
+  CanvasSourceMedia,
+} from "./components/composition-media"
+import { CanvasFallbackArtwork } from "./components/fallback-artwork"
 import { CanvasSelectionFrame } from "./components/selection-frame"
-import { useCanvasMediaSync } from "./hooks/use-canvas-media-sync"
+import { useCompositionClock } from "./hooks/use-composition-playback"
 import { usePreviewSize } from "./hooks/use-preview-size"
+import { resolveCompositionFrame } from "./lib/composition"
 
 export function StudioCanvas() {
   const [layerDragGuide, setLayerDragGuide] = useState<{
@@ -41,39 +47,24 @@ export function StudioCanvas() {
   const canvasAspectRatio = getAspectRatioValue(project.media.aspectRatio)
   const { canvasAreaRef, previewSize } = usePreviewSize(canvasAspectRatio)
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
-  const previewRetryRef = useRef(false)
-  const canLoadSourcePreview =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-      project.media.id
-    )
-  const sourcePreviewQuery = useMediaPreviewUrl(
-    project.media.id,
-    canLoadSourcePreview && !project.media.streamUrl
+  const timelineDurationSeconds = useMemo(
+    () => getProjectTimelineDuration(project),
+    [project]
   )
-  const sourcePreviewUrl =
-    project.media.streamUrl || sourcePreviewQuery.data?.url || ""
-  const hasNativeMediaPreview = Boolean(sourcePreviewUrl)
-
-  useEffect(() => {
-    previewRetryRef.current = false
-  }, [sourcePreviewUrl])
-  const guideAudioItem = useMemo(
-    () =>
-      project.projectMedia.find((item) => item.linkedSelectionId === "audio-bed") ??
-      null,
-    [project.projectMedia]
+  const compositionFrame = useMemo(
+    () => resolveCompositionFrame(project, currentTime),
+    [currentTime, project]
   )
   const sourceTrackMuted = mutedTrackIds.includes("SOURCE")
+  const overlayTrackMuted = mutedTrackIds.includes("OVERLAY_MEDIA")
   const audioTrackMuted = mutedTrackIds.includes("AUDIO")
-  const { setGuideAudioElement, setPreviewMediaElement } = useCanvasMediaSync({
-    audioTrackMuted,
+
+  useCompositionClock({
     currentTime,
-    durationSeconds: project.media.durationSeconds,
-    hasNativeMediaPreview,
     isPlaying,
     pausePlayback,
     seekToTime,
-    sourceTrackMuted,
+    timelineDurationSeconds,
   })
 
   const captionCues = useMemo(
@@ -115,24 +106,38 @@ export function StudioCanvas() {
               width: previewSize?.width ?? "100%",
             }}
           >
-            <MediaPreview
-              audioTrackMuted={audioTrackMuted}
-              currentTime={currentTime}
-              guideAudioItem={guideAudioItem}
-              media={project.media}
-              onGuideAudioElement={setGuideAudioElement}
-              onPreviewMediaElement={setPreviewMediaElement}
-              onPreviewError={() => {
-                if (!previewRetryRef.current) {
-                  previewRetryRef.current = true
-                  void sourcePreviewQuery.refetch()
-                }
-              }}
-              pausePlayback={pausePlayback}
-              previewUrl={sourcePreviewUrl}
-              seekToTime={seekToTime}
-              sourceTrackMuted={sourceTrackMuted}
-            />
+            <CanvasFallbackArtwork />
+
+            {compositionFrame.source ? (
+              <CanvasSourceMedia
+                isPlaying={isPlaying}
+                muted={sourceTrackMuted}
+                source={compositionFrame.source}
+                sourceDetail={project.media}
+              />
+            ) : null}
+
+            {compositionFrame.overlays.map((overlay) => (
+              <CanvasOverlayMedia
+                key={overlay.segment.id}
+                isPlaying={isPlaying}
+                muted={overlayTrackMuted}
+                onSelect={() => {
+                  setActiveTool("media")
+                  setSelectedItemId(overlay.segment.id)
+                }}
+                overlay={overlay}
+              />
+            ))}
+
+            {compositionFrame.audio.map((audio) => (
+              <CanvasAudioMedia
+                key={audio.segment.id}
+                audio={audio}
+                isPlaying={isPlaying}
+                muted={audioTrackMuted}
+              />
+            ))}
 
             <CanvasLayerList
               captionCues={captionCues}
@@ -142,6 +147,7 @@ export function StudioCanvas() {
               onMoveLayer={updateCanvasLayerPosition}
               onSelectLayer={handleSelectLayer}
               selectedTargetId={selectedTargetId}
+              visibleLayerIds={compositionFrame.visibleLayerIds}
             />
 
             {layerDragGuide ? (
@@ -156,7 +162,9 @@ export function StudioCanvas() {
             ) : null}
 
             <CanvasSelectionFrame
-              layers={project.layers}
+              layers={project.layers.filter((layer) =>
+                compositionFrame.visibleLayerIds.has(layer.id)
+              )}
               selectedItem={selectedItem}
               selectedTargetId={selectedTargetId}
             />

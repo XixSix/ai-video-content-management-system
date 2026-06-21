@@ -20,10 +20,6 @@ import type {
 function getTimelineTrackIdForMedia(
   media: StudioProjectMediaItem
 ): StudioTimelineTrackId | null {
-  if (media.origin === "SOURCE" || media.linkedSelectionId === "source-media") {
-    return "SOURCE"
-  }
-
   if (media.type === "AUDIO") {
     return "AUDIO"
   }
@@ -40,7 +36,11 @@ function getMediaTimelineSelectionId(media: StudioProjectMediaItem) {
 }
 
 function getMediaTimelineSegmentDuration(media: StudioProjectMediaItem) {
-  return Math.max(0.25, media.durationSeconds ?? 8)
+  if (media.type === "IMAGE") {
+    return 8
+  }
+
+  return Math.max(0.25, media.durationSeconds ?? 0)
 }
 
 function createMediaTimelineSegment({
@@ -55,7 +55,7 @@ function createMediaTimelineSegment({
   const segmentDurationSeconds = getMediaTimelineSegmentDuration(media)
 
   return {
-    id: `segment-${media.id}-${Date.now()}`,
+    id: `segment-${media.id}-${crypto.randomUUID()}`,
     label: media.name,
     durationSeconds: segmentDurationSeconds,
     startTime,
@@ -138,6 +138,74 @@ export function createProjectActions(
             ? project.sourceMedia.id
             : selectedItemId,
       }))
+    },
+    setProjectSource: (sourceProject: ReturnType<StudioEditorGet>["project"]) => {
+      const sourceMedia = sourceProject.projectMedia.find(
+        (item) => item.origin === "SOURCE"
+      )
+
+      if (!sourceMedia) {
+        return
+      }
+
+      recordEditorHistory(set, get)
+
+      set((state) => {
+        const projectMedia = sourceProject.projectMedia.map((item) => {
+          const existing = state.project.projectMedia.find(
+            (current) => current.id === item.id
+          )
+
+          return existing
+            ? {
+                ...item,
+                assetUrl: existing.assetUrl ?? item.assetUrl,
+                thumbnailUrl: existing.thumbnailUrl ?? item.thumbnailUrl,
+              }
+            : item
+        })
+        const sourceTrack = {
+          id: "SOURCE" as const,
+          label: "Source",
+          selectionId: sourceMedia.id,
+          segments:
+            sourceProject.media.durationSeconds > 0
+              ? [
+                  {
+                    id: `source-${sourceMedia.id}`,
+                    label: sourceMedia.name,
+                    durationSeconds: sourceProject.media.durationSeconds,
+                    startTime: 0,
+                    selectionId: sourceMedia.id,
+                    summary: sourceMedia.summary,
+                    tone: "base" as const,
+                    widthClassName: "w-[100%]",
+                  },
+                ]
+              : [],
+        }
+        const hasSourceTrack = state.project.timelineTracks.some(
+          (track) => track.id === "SOURCE"
+        )
+
+        return {
+          activeTool: "media",
+          currentTime: 0,
+          isPlaying: false,
+          project: {
+            ...state.project,
+            media: sourceProject.media,
+            projectMedia,
+            sourceMedia: sourceProject.sourceMedia,
+            timelineTracks: hasSourceTrack
+              ? state.project.timelineTracks.map((track) =>
+                  track.id === "SOURCE" ? sourceTrack : track
+                )
+              : [...state.project.timelineTracks, sourceTrack],
+          },
+          selectedItemId: sourceMedia.id,
+        }
+      })
     },
     updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => {
       if (get().project.media.aspectRatio === aspectRatio) {

@@ -13,6 +13,7 @@ export function CanvasLayerList({
   onMoveLayer,
   onSelectLayer,
   selectedTargetId,
+  visibleLayerIds,
 }: {
   captionCues: StudioCaptionCue[]
   currentTime: number
@@ -33,21 +34,29 @@ export function CanvasLayerList({
   ) => void
   onSelectLayer: (layer: StudioCanvasLayer) => void
   selectedTargetId: string
+  visibleLayerIds: Set<string>
 }) {
-  return layers.map((layer) => (
-    <CanvasLayer
-      key={layer.id}
-      activeCue={
-        layer.kind === "captions"
-          ? getActiveCaptionCue(captionCues, currentTime)
-          : null
-      }
-      currentTime={currentTime}
-      isSelected={selectedTargetId === layer.id}
-      layer={layer}
-      onLayerDragGuideChange={onLayerDragGuideChange}
-      onMoveLayer={onMoveLayer}
-      onSelect={onSelectLayer}
-    />
-  ))
+  return layers
+    .filter((layer) => visibleLayerIds.has(layer.id))
+    .sort((left, right) => {
+      if (left.kind === "captions") return 1
+      if (right.kind === "captions") return -1
+      return 0
+    })
+    .map((layer) => (
+      <CanvasLayer
+        key={layer.id}
+        activeCue={
+          layer.kind === "captions"
+            ? getActiveCaptionCue(captionCues, currentTime)
+            : null
+        }
+        currentTime={currentTime}
+        isSelected={selectedTargetId === layer.id}
+        layer={layer}
+        onLayerDragGuideChange={onLayerDragGuideChange}
+        onMoveLayer={onMoveLayer}
+        onSelect={onSelectLayer}
+      />
+    ))
 }

@@ -23,15 +23,22 @@ import type { ProjectDetail } from "@/features/studio-hub/studio-projects.types"
 import {
   useStudioEditorPermission,
   useStudioProjectActions,
+  useStudioProjectState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioProjectMediaItem } from "@/features/studio-editor/studio.types"
 import { ApiError } from "@/lib/api/api-error"
 
-import { createProjectMediaFromResponse } from "../services/project-media-adapter"
+import { createStudioProjectFromDetail } from "../../editor-snapshot/editor-snapshot.mapper"
+import {
+  assignStudioUploadPurposes,
+  createProjectMediaFromResponse,
+  type StudioMediaUploadPurpose,
+} from "../services/project-media-adapter"
 
 export type StudioMediaUploadEntry = {
   id: string
   file: File
+  purpose: StudioMediaUploadPurpose
   media: MediaResponseData | null
   progress: number
   status: "uploading" | "attaching" | "attach-error" | "failed"
@@ -46,9 +53,11 @@ export function useStudioMedia() {
   const params = useParams<{ projectId: string }>()
   const projectId = params.projectId ?? ""
   const canEdit = useStudioEditorPermission()
+  const { project } = useStudioProjectState()
   const authSession = useAuthSession()
   const queryClient = useQueryClient()
-  const { removeProjectMedia, upsertProjectMedia } = useStudioProjectActions()
+  const { removeProjectMedia, setProjectSource, upsertProjectMedia } =
+    useStudioProjectActions()
   const [uploadEntries, setUploadEntries] = useState<
     StudioMediaUploadEntry[]
   >([])
@@ -90,6 +99,43 @@ export function useStudioMedia() {
     },
     [updateProjectCache, upsertProjectMedia]
   )
+
+  const applySourceProject = useCallback(
+    (project: ProjectDetail) => {
+      queryClient.setQueryData(projectQueryKeys.detail(projectId), { project })
+      void queryClient.invalidateQueries({
+        queryKey: projectQueryKeys.lists(),
+      })
+      setProjectSource(createStudioProjectFromDetail(project))
+    },
+    [projectId, queryClient, setProjectSource]
+  )
+
+  const setSourceMedia = useCallback(
+    async (mediaId: string) => {
+      const result = await projectService.setSourceMedia(projectId, mediaId)
+      applySourceProject(result.project)
+      return result.project
+    },
+    [applySourceProject, projectId]
+  )
+
+  const sourceMutation = useMutation({
+    mutationFn: setSourceMedia,
+    onSuccess: (project) => {
+      toast.success("Source media added", {
+        description:
+          project.sourceMedia?.title ??
+          project.sourceMedia?.originalFilename ??
+          undefined,
+      })
+    },
+    onError: (error) => {
+      toast.error("Could not set source media", {
+        description: getErrorMessage(error),
+      })
+    },
+  })
 
   const reconcileProjectMedia = useCallback(
     async (mediaId: string) => {
@@ -170,7 +216,8 @@ export function useStudioMedia() {
     async (
       entryId: string,
       file: File,
-      media: MediaResponseData
+      media: MediaResponseData,
+      purpose: StudioMediaUploadEntry["purpose"]
     ) => {
       updateUploadEntry(entryId, {
         error: null,
@@ -180,6 +227,17 @@ export function useStudioMedia() {
       })
 
       try {
+        if (purpose === "SOURCE") {
+          await setSourceMedia(media.id)
+          setUploadEntries((current) =>
+            current.filter((entry) => entry.id !== entryId)
+          )
+          toast.success("Upload set as source", {
+            description: file.name,
+          })
+          return
+        }
+
         const { projectMedia } = await projectService.addMedia(
           projectId,
           media.id
@@ -221,12 +279,17 @@ export function useStudioMedia() {
       applyAttachedMedia,
       projectId,
       reconcileProjectMedia,
+      setSourceMedia,
       updateUploadEntry,
     ]
   )
 
   const startUpload = useCallback(
-    async (entryId: string, file: File) => {
+    async (
+      entryId: string,
+      file: File,
+      purpose: StudioMediaUploadEntry["purpose"]
+    ) => {
       const workspaceId = authSession.data?.workspaceId
 
       if (!workspaceId) {
@@ -262,7 +325,7 @@ export function useStudioMedia() {
         })
 
         await invalidateMediaQueries(queryClient)
-        await attachUploadedMedia(entryId, file, media)
+        await attachUploadedMedia(entryId, file, media, purpose)
       } catch (error) {
         const aborted = controller.signal.aborted
         updateUploadEntry(entryId, {
@@ -291,19 +354,15 @@ export function useStudioMedia() {
     (files: File[]) => {
       if (!canEdit) return
 
-      const accepted: StudioMediaUploadEntry[] = []
+      const acceptedFiles: Array<{
+        file: File
+        mediaType: "VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE"
+      }> = []
 
       files.forEach((file) => {
         try {
-          getMediaUploadDescriptor(file)
-          accepted.push({
-            id: `studio-upload-${crypto.randomUUID()}`,
-            file,
-            media: null,
-            progress: 0,
-            status: "uploading",
-            error: null,
-          })
+          const descriptor = getMediaUploadDescriptor(file)
+          acceptedFiles.push({ file, mediaType: descriptor.mediaType })
         } catch (error) {
           toast.error("Unsupported media file", {
             description: getErrorMessage(error),
@@ -311,24 +370,46 @@ export function useStudioMedia() {
         }
       })
 
-      if (!accepted.length) return
+      if (!acceptedFiles.length) return
+
+      const purposes = assignStudioUploadPurposes(
+        acceptedFiles.map((entry) => entry.mediaType),
+        project.projectMedia.some((item) => item.origin === "SOURCE") ||
+          uploadEntries.some((entry) => entry.purpose === "SOURCE")
+      )
+      const accepted = acceptedFiles.map(
+        ({ file }, index): StudioMediaUploadEntry => ({
+          id: `studio-upload-${crypto.randomUUID()}`,
+          file,
+          purpose: purposes[index],
+          media: null,
+          progress: 0,
+          status: "uploading",
+          error: null,
+        })
+      )
 
       setUploadEntries((current) => [...accepted, ...current])
       accepted.forEach((entry) => {
-        void startUpload(entry.id, entry.file)
+        void startUpload(entry.id, entry.file, entry.purpose)
       })
     },
-    [canEdit, startUpload]
+    [canEdit, project.projectMedia, startUpload, uploadEntries]
   )
 
   const retryUploadEntry = useCallback(
     (entry: StudioMediaUploadEntry) => {
       if (entry.media) {
-        void attachUploadedMedia(entry.id, entry.file, entry.media)
+        void attachUploadedMedia(
+          entry.id,
+          entry.file,
+          entry.media,
+          entry.purpose
+        )
         return
       }
 
-      void startUpload(entry.id, entry.file)
+      void startUpload(entry.id, entry.file, entry.purpose)
     },
     [attachUploadedMedia, startUpload]
   )
@@ -376,6 +457,10 @@ export function useStudioMedia() {
     libraryLoading: mediaListQuery.isLoading,
     refetchLibrary: mediaListQuery.refetch,
     retryUploadEntry,
+    setSourceMedia: (mediaId: string) => {
+      if (canEdit) sourceMutation.mutate(mediaId)
+    },
+    settingSourceMediaId: sourceMutation.variables ?? null,
     uploadEntries,
   }
 }

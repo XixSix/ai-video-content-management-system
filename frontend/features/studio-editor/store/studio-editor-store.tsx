@@ -51,6 +51,7 @@ const READ_ONLY_ACTIONS: Partial<StudioEditorActions> = {
   redoEditorChange: () => undefined,
   removeProjectMedia: () => undefined,
   saveTranscriptMock: () => undefined,
+  setProjectSource: () => undefined,
   setClipCandidateStatus: () => undefined,
   undoEditorChange: () => undefined,
   updateCanvasLayerPosition: () => undefined,
@@ -148,6 +149,7 @@ export function useStudioProjectActions() {
     useShallow((state) => ({
       addProjectMediaToTimeline: state.addProjectMediaToTimeline,
       removeProjectMedia: state.removeProjectMedia,
+      setProjectSource: state.setProjectSource,
       updateProjectAspectRatio: state.updateProjectAspectRatio,
       upsertProjectMedia: state.upsertProjectMedia,
     }))

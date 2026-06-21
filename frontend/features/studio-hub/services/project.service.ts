@@ -62,6 +62,18 @@ export const projectService = {
     )
   },
 
+  setSourceMedia(
+    projectId: string,
+    mediaId: string
+  ): Promise<{ project: ProjectDetail }> {
+    return unwrapApiResponse(
+      authenticatedApiClient.put<ApiSuccess<{ project: ProjectDetail }>>(
+        `/projects/${projectId}/source-media`,
+        { mediaId }
+      )
+    )
+  },
+
   addMedia(
     projectId: string,
     mediaId: string

@@ -4,6 +4,27 @@ import type { ProjectMedia } from "@/features/studio-hub/studio-projects.types"
 import { mapProjectMediaToStudioItem } from "../../editor-snapshot/editor-snapshot.mapper"
 import type { StudioProjectMediaItem } from "../../studio.types"
 
+export type StudioMediaUploadPurpose = "PROJECT_MEDIA" | "SOURCE"
+
+export function assignStudioUploadPurposes(
+  mediaTypes: Array<"VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE">,
+  hasSourceOrPendingSource: boolean
+): StudioMediaUploadPurpose[] {
+  let sourceAssigned = hasSourceOrPendingSource
+
+  return mediaTypes.map((mediaType) => {
+    if (
+      !sourceAssigned &&
+      (mediaType === "VIDEO" || mediaType === "AUDIO")
+    ) {
+      sourceAssigned = true
+      return "SOURCE"
+    }
+
+    return "PROJECT_MEDIA"
+  })
+}
+
 export function isSupportedProjectMediaUpload(file: File) {
   return (
     file.type.startsWith("video/") ||

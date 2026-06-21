@@ -120,4 +120,17 @@ describe("project service", () => {
       message: "Project media removed successfully",
     })
   })
+
+  it("sets project source media through the dedicated endpoint", async () => {
+    apiMock
+      .onPut(`/projects/${projectId}/source-media`, { mediaId })
+      .reply(200, {
+        success: true,
+        data: { project },
+      })
+
+    await expect(
+      projectService.setSourceMedia(projectId, mediaId)
+    ).resolves.toEqual({ project })
+  })
 })

@@ -1,9 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Check, ListPlus, Trash2 } from "lucide-react"
+import { Check, Clapperboard, LoaderCircle, Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useMediaPreviewUrl } from "@/features/media-library/hooks/use-media-mutations"
 import type { StudioProjectMediaItem } from "@/features/studio-editor/studio.types"
 import {
@@ -21,11 +26,15 @@ export function MediaCard({
   detaching,
   item,
   onDetach,
+  onSetSource,
+  settingSource,
 }: {
   canEdit: boolean
   detaching: boolean
   item: StudioProjectMediaItem
   onDetach: (item: StudioProjectMediaItem) => void
+  onSetSource: (item: StudioProjectMediaItem) => void
+  settingSource: boolean
 }) {
   const [recentlyAdded, setRecentlyAdded] = useState(false)
   const previewRetryRef = useRef(false)
@@ -43,11 +52,14 @@ export function MediaCard({
     selectedItem.id === item.id ||
     (item.linkedSelectionId ? selectedTargetId === item.linkedSelectionId : false)
   const canAddToTimeline =
-    item.origin !== "SOURCE" &&
     Boolean(item.projectMediaId) &&
     (item.type === "VIDEO" || item.type === "AUDIO" || item.type === "IMAGE")
   const canDelete =
     item.origin !== "SOURCE" && Boolean(item.projectMediaId)
+  const canSetAsSource =
+    item.origin !== "SOURCE" &&
+    Boolean(item.projectMediaId) &&
+    (item.type === "VIDEO" || item.type === "AUDIO")
 
   const handleSelect = () => {
     setSelectedItemId(item.id)
@@ -87,46 +99,94 @@ export function MediaCard({
           {getMediaLabel(item)}
         </span>
 
-        <div className="absolute right-1.5 top-1.5 z-20 flex gap-1 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
-          {canAddToTimeline && canEdit ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="icon-xs"
-              aria-label={`Add ${item.name} to timeline`}
-              className="bg-background/90 shadow-sm backdrop-blur hover:bg-background"
-              onClick={(event) => {
-                event.stopPropagation()
-                addProjectMediaToTimeline(item.id)
-                setRecentlyAdded(true)
-                window.setTimeout(() => setRecentlyAdded(false), 900)
-              }}
-            >
-              {recentlyAdded ? (
-                <Check className="size-3.5 text-emerald-600 dark:text-emerald-300" />
-              ) : (
-                <ListPlus className="size-3.5" />
-              )}
-            </Button>
+        <div className="absolute right-1.5 top-1.5 z-20 flex translate-y-1 overflow-hidden rounded-md border border-white/10 bg-zinc-800/90 p-0.5 text-white opacity-0 shadow-lg backdrop-blur-md transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
+          {canSetAsSource && canEdit ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Set ${item.name} as source`}
+                  disabled={settingSource}
+                  className="rounded-sm text-white hover:bg-white/15 hover:text-white"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onSetSource(item)
+                  }}
+                >
+                  {settingSource ? (
+                    <LoaderCircle className="size-3.5 animate-spin" />
+                  ) : (
+                    <Clapperboard className="size-3.5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={8}>
+                Set as source
+              </TooltipContent>
+            </Tooltip>
           ) : null}
 
-          <Button
-            type="button"
-            variant="secondary"
-            size="icon-xs"
-            aria-label={`Delete ${item.name}`}
-            disabled={!canEdit || !canDelete || detaching}
-            className="bg-background/90 shadow-sm backdrop-blur hover:bg-background disabled:opacity-45"
-            onClick={(event) => {
-              event.stopPropagation()
+          {canAddToTimeline && canEdit ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Add ${item.name} to timeline`}
+                  className="rounded-sm text-white hover:bg-white/15 hover:text-white"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    addProjectMediaToTimeline(item.id)
+                    setRecentlyAdded(true)
+                    window.setTimeout(() => setRecentlyAdded(false), 900)
+                  }}
+                >
+                  {recentlyAdded ? (
+                    <Check className="size-3.5 text-emerald-300" />
+                  ) : (
+                    <Plus className="size-3.5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={8}>
+                Add to timeline
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
 
-              if (canEdit && canDelete) {
-                onDetach(item)
-              }
-            }}
-          >
-            <Trash2 className="size-3.5" />
-          </Button>
+          {canDelete ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Remove ${item.name} from project`}
+                  disabled={!canEdit || detaching}
+                  className="rounded-sm text-white hover:bg-red-500/20 hover:text-red-200"
+                  onClick={(event) => {
+                    event.stopPropagation()
+
+                    if (canEdit) {
+                      onDetach(item)
+                    }
+                  }}
+                >
+                  {detaching ? (
+                    <LoaderCircle className="size-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-3.5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={8}>
+                Remove from project
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
         </div>
       </div>
       <button

@@ -31,6 +31,8 @@ export function StudioMediaPanel() {
     libraryLoading,
     refetchLibrary,
     retryUploadEntry,
+    setSourceMedia,
+    settingSourceMediaId,
     uploadEntries,
   } = useStudioMedia()
   const [activeFilter, setActiveFilter] = useState<MediaFilter>("ALL")
@@ -79,6 +81,8 @@ export function StudioMediaPanel() {
               detaching={detachingMediaId === item.id}
               item={item}
               onDetach={detachMedia}
+              onSetSource={(media) => setSourceMedia(media.id)}
+              settingSource={settingSourceMediaId === item.id}
             />
           ))}
         </div>

@@ -114,7 +114,7 @@ export function createInitialStudioEditorState(
     historyFuture: [],
     historyPast: [],
     isPlaying: false,
-    mutedTrackIds: [],
+    mutedTrackIds: ["OVERLAY_MEDIA"],
     project,
     savedTranscriptState: cloneSavedTranscriptState(project),
     selectedChapterId: null,

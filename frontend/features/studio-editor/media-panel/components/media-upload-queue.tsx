@@ -28,9 +28,13 @@ export function MediaUploadQueue({
           entry.status === "failed" || entry.status === "attach-error"
         const statusLabel =
           entry.status === "attaching"
-            ? "Adding to project…"
+            ? entry.purpose === "SOURCE"
+              ? "Setting project source…"
+              : "Adding to project…"
             : entry.status === "attach-error"
-              ? "Uploaded · attach failed"
+              ? entry.purpose === "SOURCE"
+                ? "Uploaded · source setup failed"
+                : "Uploaded · attach failed"
               : entry.status === "failed"
                 ? entry.error ?? "Upload failed"
                 : `${entry.progress}%`

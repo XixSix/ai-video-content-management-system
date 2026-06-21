@@ -27,6 +27,14 @@ export function StudioInspector() {
               layer.id === selectedItem.linkedSelectionId && layer.kind === "text"
           )
         : null
+  const selectedSegmentMedia =
+    selectedItem.kind === "segment"
+      ? project.projectMedia.find(
+          (media) =>
+            media.id === selectedItem.linkedSelectionId ||
+            media.linkedSelectionId === selectedItem.linkedSelectionId
+        ) ?? null
+      : null
 
   return (
     <aside className="flex h-full min-h-0 w-full flex-col overflow-hidden border-l border-border bg-background">
@@ -45,6 +53,8 @@ export function StudioInspector() {
           <CaptionInspector layer={selectedItem.layer} />
         ) : selectedItem.kind === "media" ? (
           <MediaInspector media={selectedItem.media} />
+        ) : selectedSegmentMedia ? (
+          <MediaInspector media={selectedSegmentMedia} />
         ) : (
           <DefaultInspector selectedItem={selectedItem} />
         )}

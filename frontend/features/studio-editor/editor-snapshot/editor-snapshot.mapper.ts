@@ -131,8 +131,7 @@ export function createStudioProjectFromDetail(
 ): StudioEditorProject {
   const project = cloneProject(studioEditorProject)
   const sourceMedia = detail.sourceMedia
-  const durationSeconds =
-    detail.duration ?? sourceMedia?.duration ?? project.media.durationSeconds
+  const durationSeconds = detail.duration ?? sourceMedia?.duration ?? 0
   const aspectRatio = isAspectRatio(detail.aspectRatio)
     ? detail.aspectRatio
     : project.media.aspectRatio
