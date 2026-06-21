@@ -149,6 +149,18 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Short Clips',
         description: 'Short clip generation, candidate review, and download endpoints'
+      },
+      {
+        name: 'Workspaces',
+        description: 'Workspace details and membership endpoints'
+      },
+      {
+        name: 'Workspace Invitations',
+        description: 'Workspace invitation creation and response endpoints'
+      },
+      {
+        name: 'Notifications',
+        description: 'Persistent notification inbox and realtime event stream'
       }
     ]
   },

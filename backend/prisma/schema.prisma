@@ -49,6 +49,17 @@ enum WorkspaceMemberRole {
   MEMBER
 }
 
+enum WorkspaceInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum NotificationType {
+  WORKSPACE_INVITATION
+}
+
 enum ProjectMediaRole {
   SOURCE
   OVERLAY
@@ -194,21 +205,25 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  media                Media[]
-  ownedWorkspaces      Workspace[]           @relation("WorkspaceOwner")
-  workspaceMemberships WorkspaceMember[]
-  projects             Project[]
-  processingJobs       ProcessingJob[]
-  shortClips           ShortClip[]
-  generatedAssets      GeneratedAsset[]
-  aiSuggestions        AiSuggestion[]
-  platformAccounts     PlatformAccount[]
-  platformOAuthStates  PlatformOAuthState[]
-  publishTasks         PublishTask[]
-  authSessions         AuthSession[]
-  auditLogs            AuditLog[]
-  transcriptEditDrafts TranscriptEditDraft[]
-  savedEditorSnapshots EditorSnapshot[]      @relation("EditorSnapshotSavedBy")
+  media                        Media[]
+  ownedWorkspaces              Workspace[]           @relation("WorkspaceOwner")
+  workspaceMemberships         WorkspaceMember[]
+  projects                     Project[]
+  processingJobs               ProcessingJob[]
+  shortClips                   ShortClip[]
+  generatedAssets              GeneratedAsset[]
+  aiSuggestions                AiSuggestion[]
+  platformAccounts             PlatformAccount[]
+  platformOAuthStates          PlatformOAuthState[]
+  publishTasks                 PublishTask[]
+  authSessions                 AuthSession[]
+  auditLogs                    AuditLog[]
+  transcriptEditDrafts         TranscriptEditDraft[]
+  savedEditorSnapshots         EditorSnapshot[]      @relation("EditorSnapshotSavedBy")
+  sentWorkspaceInvitations     WorkspaceInvitation[] @relation("WorkspaceInvitationInviter")
+  receivedWorkspaceInvitations WorkspaceInvitation[] @relation("WorkspaceInvitationInvitee")
+  receivedNotifications        Notification[]        @relation("NotificationRecipient")
+  actedNotifications           Notification[]        @relation("NotificationActor")
 
   @@map("users")
 }
@@ -248,9 +263,10 @@ model Workspace {
 
   owner User @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  members  WorkspaceMember[]
-  media    Media[]
-  projects Project[]
+  members     WorkspaceMember[]
+  invitations WorkspaceInvitation[]
+  media       Media[]
+  projects    Project[]
 
   @@index([ownerId])
   @@map("workspaces")
@@ -271,6 +287,54 @@ model WorkspaceMember {
   @@unique([workspaceId, userId])
   @@index([userId])
   @@map("workspace_members")
+}
+
+model WorkspaceInvitation {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  inviterId   String @map("inviter_id") @db.Uuid
+  inviteeId   String @map("invitee_id") @db.Uuid
+
+  status      WorkspaceInvitationStatus @default(PENDING)
+  expiresAt   DateTime                  @map("expires_at")
+  respondedAt DateTime?                 @map("responded_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  inviter   User      @relation("WorkspaceInvitationInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee   User      @relation("WorkspaceInvitationInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  notification Notification?
+
+  @@index([workspaceId])
+  @@index([inviteeId, status, createdAt])
+  @@index([status, expiresAt])
+  @@map("workspace_invitations")
+}
+
+model Notification {
+  id                    String  @id @default(uuid()) @db.Uuid
+  recipientId           String  @map("recipient_id") @db.Uuid
+  actorId               String? @map("actor_id") @db.Uuid
+  workspaceInvitationId String? @unique @map("workspace_invitation_id") @db.Uuid
+
+  type    NotificationType
+  title   String           @db.VarChar(255)
+  message String           @db.Text
+  data    Json?
+
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  recipient           User                 @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor               User?                @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  workspaceInvitation WorkspaceInvitation? @relation(fields: [workspaceInvitationId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, createdAt])
+  @@index([recipientId, readAt, createdAt])
+  @@map("notifications")
 }
 
 model Media {

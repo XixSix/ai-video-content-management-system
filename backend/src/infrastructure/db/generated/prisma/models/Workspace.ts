@@ -192,6 +192,7 @@ export type WorkspaceWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.WorkspaceMemberListRelationFilter
+  invitations?: Prisma.WorkspaceInvitationListRelationFilter
   media?: Prisma.MediaListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
 }
@@ -205,6 +206,7 @@ export type WorkspaceOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   members?: Prisma.WorkspaceMemberOrderByRelationAggregateInput
+  invitations?: Prisma.WorkspaceInvitationOrderByRelationAggregateInput
   media?: Prisma.MediaOrderByRelationAggregateInput
   projects?: Prisma.ProjectOrderByRelationAggregateInput
 }
@@ -221,6 +223,7 @@ export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.WorkspaceMemberListRelationFilter
+  invitations?: Prisma.WorkspaceInvitationListRelationFilter
   media?: Prisma.MediaListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
 }, "id" | "slug">
@@ -257,6 +260,7 @@ export type WorkspaceCreateInput = {
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
 }
@@ -269,6 +273,7 @@ export type WorkspaceUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
 }
@@ -281,6 +286,7 @@ export type WorkspaceUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
 }
@@ -293,6 +299,7 @@ export type WorkspaceUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
@@ -421,6 +428,20 @@ export type WorkspaceUpdateOneRequiredWithoutMembersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutMembersInput, Prisma.WorkspaceUpdateWithoutMembersInput>, Prisma.WorkspaceUncheckedUpdateWithoutMembersInput>
 }
 
+export type WorkspaceCreateNestedOneWithoutInvitationsInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutInvitationsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneRequiredWithoutInvitationsNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutInvitationsInput
+  upsert?: Prisma.WorkspaceUpsertWithoutInvitationsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutInvitationsInput, Prisma.WorkspaceUpdateWithoutInvitationsInput>, Prisma.WorkspaceUncheckedUpdateWithoutInvitationsInput>
+}
+
 export type WorkspaceCreateNestedOneWithoutMediaInput = {
   create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutMediaInput, Prisma.WorkspaceUncheckedCreateWithoutMediaInput>
   connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutMediaInput
@@ -456,6 +477,7 @@ export type WorkspaceCreateWithoutOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
 }
@@ -467,6 +489,7 @@ export type WorkspaceUncheckedCreateWithoutOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
 }
@@ -516,6 +539,7 @@ export type WorkspaceCreateWithoutMembersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
 }
@@ -527,6 +551,7 @@ export type WorkspaceUncheckedCreateWithoutMembersInput = {
   slug: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
 }
@@ -554,6 +579,7 @@ export type WorkspaceUpdateWithoutMembersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
 }
@@ -565,6 +591,71 @@ export type WorkspaceUncheckedUpdateWithoutMembersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutInvitationsInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
+  members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutInvitationsInput = {
+  id?: string
+  ownerId: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutInvitationsInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+}
+
+export type WorkspaceUpsertWithoutInvitationsInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutInvitationsInput, Prisma.WorkspaceUncheckedUpdateWithoutInvitationsInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutInvitationsInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutInvitationsInput, Prisma.WorkspaceUncheckedUpdateWithoutInvitationsInput>
+}
+
+export type WorkspaceUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
+  members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
@@ -577,6 +668,7 @@ export type WorkspaceCreateWithoutMediaInput = {
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
 }
 
@@ -588,6 +680,7 @@ export type WorkspaceUncheckedCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
@@ -615,6 +708,7 @@ export type WorkspaceUpdateWithoutMediaInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
 }
 
@@ -626,6 +720,7 @@ export type WorkspaceUncheckedUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
@@ -637,6 +732,7 @@ export type WorkspaceCreateWithoutProjectsInput = {
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
 }
 
@@ -648,6 +744,7 @@ export type WorkspaceUncheckedCreateWithoutProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
@@ -675,6 +772,7 @@ export type WorkspaceUpdateWithoutProjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
 }
 
@@ -686,6 +784,7 @@ export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
@@ -704,6 +803,7 @@ export type WorkspaceUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
 }
@@ -715,6 +815,7 @@ export type WorkspaceUncheckedUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
@@ -734,12 +835,14 @@ export type WorkspaceUncheckedUpdateManyWithoutOwnerInput = {
 
 export type WorkspaceCountOutputType = {
   members: number
+  invitations: number
   media: number
   projects: number
 }
 
 export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   members?: boolean | WorkspaceCountOutputTypeCountMembersArgs
+  invitations?: boolean | WorkspaceCountOutputTypeCountInvitationsArgs
   media?: boolean | WorkspaceCountOutputTypeCountMediaArgs
   projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
 }
@@ -759,6 +862,13 @@ export type WorkspaceCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
  */
 export type WorkspaceCountOutputTypeCountMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.WorkspaceMemberWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceInvitationWhereInput
 }
 
 /**
@@ -785,6 +895,7 @@ export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Workspace$membersArgs<ExtArgs>
+  invitations?: boolean | Prisma.Workspace$invitationsArgs<ExtArgs>
   media?: boolean | Prisma.Workspace$mediaArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
@@ -823,6 +934,7 @@ export type WorkspaceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Workspace$membersArgs<ExtArgs>
+  invitations?: boolean | Prisma.Workspace$invitationsArgs<ExtArgs>
   media?: boolean | Prisma.Workspace$mediaArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
@@ -839,6 +951,7 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
     members: Prisma.$WorkspaceMemberPayload<ExtArgs>[]
+    invitations: Prisma.$WorkspaceInvitationPayload<ExtArgs>[]
     media: Prisma.$MediaPayload<ExtArgs>[]
     projects: Prisma.$ProjectPayload<ExtArgs>[]
   }
@@ -1245,6 +1358,7 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   members<T extends Prisma.Workspace$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invitations<T extends Prisma.Workspace$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   media<T extends Prisma.Workspace$mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$mediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projects<T extends Prisma.Workspace$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1704,6 +1818,30 @@ export type Workspace$membersArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.WorkspaceMemberScalarFieldEnum | Prisma.WorkspaceMemberScalarFieldEnum[]
+}
+
+/**
+ * Workspace.invitations
+ */
+export type Workspace$invitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceInvitation
+   */
+  select?: Prisma.WorkspaceInvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceInvitation
+   */
+  omit?: Prisma.WorkspaceInvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInvitationInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceInvitationWhereInput
+  orderBy?: Prisma.WorkspaceInvitationOrderByWithRelationInput | Prisma.WorkspaceInvitationOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceInvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceInvitationScalarFieldEnum | Prisma.WorkspaceInvitationScalarFieldEnum[]
 }
 
 /**
