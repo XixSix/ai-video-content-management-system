@@ -55,6 +55,8 @@ export const ModelName = {
   AuthSession: 'AuthSession',
   Workspace: 'Workspace',
   WorkspaceMember: 'WorkspaceMember',
+  WorkspaceInvitation: 'WorkspaceInvitation',
+  Notification: 'Notification',
   Media: 'Media',
   Project: 'Project',
   ProjectMedia: 'ProjectMedia',
@@ -144,6 +146,37 @@ export const WorkspaceMemberScalarFieldEnum = {
 } as const
 
 export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
+
+
+export const WorkspaceInvitationScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  inviterId: 'inviterId',
+  inviteeId: 'inviteeId',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  respondedAt: 'respondedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceInvitationScalarFieldEnum = (typeof WorkspaceInvitationScalarFieldEnum)[keyof typeof WorkspaceInvitationScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  recipientId: 'recipientId',
+  actorId: 'actorId',
+  workspaceInvitationId: 'workspaceInvitationId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  data: 'data',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const MediaScalarFieldEnum = {

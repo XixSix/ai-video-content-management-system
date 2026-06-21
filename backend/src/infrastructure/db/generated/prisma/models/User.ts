@@ -229,6 +229,10 @@ export type UserWhereInput = {
   auditLogs?: Prisma.AuditLogListRelationFilter
   transcriptEditDrafts?: Prisma.TranscriptEditDraftListRelationFilter
   savedEditorSnapshots?: Prisma.EditorSnapshotListRelationFilter
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationListRelationFilter
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationListRelationFilter
+  receivedNotifications?: Prisma.NotificationListRelationFilter
+  actedNotifications?: Prisma.NotificationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -256,6 +260,10 @@ export type UserOrderByWithRelationInput = {
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftOrderByRelationAggregateInput
   savedEditorSnapshots?: Prisma.EditorSnapshotOrderByRelationAggregateInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationOrderByRelationAggregateInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationOrderByRelationAggregateInput
+  receivedNotifications?: Prisma.NotificationOrderByRelationAggregateInput
+  actedNotifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -286,6 +294,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   auditLogs?: Prisma.AuditLogListRelationFilter
   transcriptEditDrafts?: Prisma.TranscriptEditDraftListRelationFilter
   savedEditorSnapshots?: Prisma.EditorSnapshotListRelationFilter
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationListRelationFilter
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationListRelationFilter
+  receivedNotifications?: Prisma.NotificationListRelationFilter
+  actedNotifications?: Prisma.NotificationListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -343,6 +355,10 @@ export type UserCreateInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -370,6 +386,10 @@ export type UserUncheckedCreateInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserUpdateInput = {
@@ -397,6 +417,10 @@ export type UserUpdateInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -424,6 +448,10 @@ export type UserUncheckedUpdateInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -568,6 +596,64 @@ export type UserUpdateOneRequiredWithoutWorkspaceMembershipsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutWorkspaceMembershipsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWorkspaceMembershipsInput, Prisma.UserUpdateWithoutWorkspaceMembershipsInput>, Prisma.UserUncheckedUpdateWithoutWorkspaceMembershipsInput>
+}
+
+export type UserCreateNestedOneWithoutSentWorkspaceInvitationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutSentWorkspaceInvitationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentWorkspaceInvitationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReceivedWorkspaceInvitationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedWorkspaceInvitationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSentWorkspaceInvitationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutSentWorkspaceInvitationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentWorkspaceInvitationsInput
+  upsert?: Prisma.UserUpsertWithoutSentWorkspaceInvitationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentWorkspaceInvitationsInput, Prisma.UserUpdateWithoutSentWorkspaceInvitationsInput>, Prisma.UserUncheckedUpdateWithoutSentWorkspaceInvitationsInput>
+}
+
+export type UserUpdateOneRequiredWithoutReceivedWorkspaceInvitationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedWorkspaceInvitationsInput
+  upsert?: Prisma.UserUpsertWithoutReceivedWorkspaceInvitationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUpdateWithoutReceivedWorkspaceInvitationsInput>, Prisma.UserUncheckedUpdateWithoutReceivedWorkspaceInvitationsInput>
+}
+
+export type UserCreateNestedOneWithoutReceivedNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutActedNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActedNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReceivedNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutReceivedNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedNotificationsInput, Prisma.UserUpdateWithoutReceivedNotificationsInput>, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>
+}
+
+export type UserUpdateOneWithoutActedNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActedNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutActedNotificationsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutActedNotificationsInput, Prisma.UserUpdateWithoutActedNotificationsInput>, Prisma.UserUncheckedUpdateWithoutActedNotificationsInput>
 }
 
 export type UserCreateNestedOneWithoutMediaInput = {
@@ -766,6 +852,10 @@ export type UserCreateWithoutAuthSessionsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutAuthSessionsInput = {
@@ -792,6 +882,10 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutAuthSessionsInput = {
@@ -834,6 +928,10 @@ export type UserUpdateWithoutAuthSessionsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthSessionsInput = {
@@ -860,6 +958,10 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutOwnedWorkspacesInput = {
@@ -886,6 +988,10 @@ export type UserCreateWithoutOwnedWorkspacesInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutOwnedWorkspacesInput = {
@@ -912,6 +1018,10 @@ export type UserUncheckedCreateWithoutOwnedWorkspacesInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutOwnedWorkspacesInput = {
@@ -954,6 +1064,10 @@ export type UserUpdateWithoutOwnedWorkspacesInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
@@ -980,6 +1094,10 @@ export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutWorkspaceMembershipsInput = {
@@ -1006,6 +1124,10 @@ export type UserCreateWithoutWorkspaceMembershipsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutWorkspaceMembershipsInput = {
@@ -1032,6 +1154,10 @@ export type UserUncheckedCreateWithoutWorkspaceMembershipsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutWorkspaceMembershipsInput = {
@@ -1074,6 +1200,10 @@ export type UserUpdateWithoutWorkspaceMembershipsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkspaceMembershipsInput = {
@@ -1100,6 +1230,554 @@ export type UserUncheckedUpdateWithoutWorkspaceMembershipsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutSentWorkspaceInvitationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutSentWorkspaceInvitationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutSentWorkspaceInvitationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutSentWorkspaceInvitationsInput>
+}
+
+export type UserCreateWithoutReceivedWorkspaceInvitationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutReceivedWorkspaceInvitationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput>
+}
+
+export type UserUpsertWithoutSentWorkspaceInvitationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSentWorkspaceInvitationsInput, Prisma.UserUncheckedUpdateWithoutSentWorkspaceInvitationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutSentWorkspaceInvitationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSentWorkspaceInvitationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSentWorkspaceInvitationsInput, Prisma.UserUncheckedUpdateWithoutSentWorkspaceInvitationsInput>
+}
+
+export type UserUpdateWithoutSentWorkspaceInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSentWorkspaceInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserUpsertWithoutReceivedWorkspaceInvitationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUncheckedUpdateWithoutReceivedWorkspaceInvitationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceivedWorkspaceInvitationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceivedWorkspaceInvitationsInput, Prisma.UserUncheckedUpdateWithoutReceivedWorkspaceInvitationsInput>
+}
+
+export type UserUpdateWithoutReceivedWorkspaceInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceivedWorkspaceInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutReceivedNotificationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutReceivedNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+}
+
+export type UserCreateWithoutActedNotificationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+}
+
+export type UserUncheckedCreateWithoutActedNotificationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+}
+
+export type UserCreateOrConnectWithoutActedNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+}
+
+export type UserUpsertWithoutReceivedNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceivedNotificationsInput, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceivedNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceivedNotificationsInput, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>
+}
+
+export type UserUpdateWithoutReceivedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserUpsertWithoutActedNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutActedNotificationsInput, Prisma.UserUncheckedUpdateWithoutActedNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutActedNotificationsInput, Prisma.UserUncheckedCreateWithoutActedNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutActedNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutActedNotificationsInput, Prisma.UserUncheckedUpdateWithoutActedNotificationsInput>
+}
+
+export type UserUpdateWithoutActedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+}
+
+export type UserUncheckedUpdateWithoutActedNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutMediaInput = {
@@ -1126,6 +1804,10 @@ export type UserCreateWithoutMediaInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutMediaInput = {
@@ -1152,6 +1834,10 @@ export type UserUncheckedCreateWithoutMediaInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutMediaInput = {
@@ -1194,6 +1880,10 @@ export type UserUpdateWithoutMediaInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaInput = {
@@ -1220,6 +1910,10 @@ export type UserUncheckedUpdateWithoutMediaInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutProjectsInput = {
@@ -1246,6 +1940,10 @@ export type UserCreateWithoutProjectsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutProjectsInput = {
@@ -1272,6 +1970,10 @@ export type UserUncheckedCreateWithoutProjectsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutProjectsInput = {
@@ -1314,6 +2016,10 @@ export type UserUpdateWithoutProjectsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProjectsInput = {
@@ -1340,6 +2046,10 @@ export type UserUncheckedUpdateWithoutProjectsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutSavedEditorSnapshotsInput = {
@@ -1366,6 +2076,10 @@ export type UserCreateWithoutSavedEditorSnapshotsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutSavedEditorSnapshotsInput = {
@@ -1392,6 +2106,10 @@ export type UserUncheckedCreateWithoutSavedEditorSnapshotsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutSavedEditorSnapshotsInput = {
@@ -1434,6 +2152,10 @@ export type UserUpdateWithoutSavedEditorSnapshotsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedEditorSnapshotsInput = {
@@ -1460,6 +2182,10 @@ export type UserUncheckedUpdateWithoutSavedEditorSnapshotsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutProcessingJobsInput = {
@@ -1486,6 +2212,10 @@ export type UserCreateWithoutProcessingJobsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutProcessingJobsInput = {
@@ -1512,6 +2242,10 @@ export type UserUncheckedCreateWithoutProcessingJobsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutProcessingJobsInput = {
@@ -1554,6 +2288,10 @@ export type UserUpdateWithoutProcessingJobsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProcessingJobsInput = {
@@ -1580,6 +2318,10 @@ export type UserUncheckedUpdateWithoutProcessingJobsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutTranscriptEditDraftsInput = {
@@ -1606,6 +2348,10 @@ export type UserCreateWithoutTranscriptEditDraftsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutTranscriptEditDraftsInput = {
@@ -1632,6 +2378,10 @@ export type UserUncheckedCreateWithoutTranscriptEditDraftsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutTranscriptEditDraftsInput = {
@@ -1674,6 +2424,10 @@ export type UserUpdateWithoutTranscriptEditDraftsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTranscriptEditDraftsInput = {
@@ -1700,6 +2454,10 @@ export type UserUncheckedUpdateWithoutTranscriptEditDraftsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutShortClipsInput = {
@@ -1726,6 +2484,10 @@ export type UserCreateWithoutShortClipsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutShortClipsInput = {
@@ -1752,6 +2514,10 @@ export type UserUncheckedCreateWithoutShortClipsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutShortClipsInput = {
@@ -1794,6 +2560,10 @@ export type UserUpdateWithoutShortClipsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortClipsInput = {
@@ -1820,6 +2590,10 @@ export type UserUncheckedUpdateWithoutShortClipsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutGeneratedAssetsInput = {
@@ -1846,6 +2620,10 @@ export type UserCreateWithoutGeneratedAssetsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutGeneratedAssetsInput = {
@@ -1872,6 +2650,10 @@ export type UserUncheckedCreateWithoutGeneratedAssetsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutGeneratedAssetsInput = {
@@ -1914,6 +2696,10 @@ export type UserUpdateWithoutGeneratedAssetsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGeneratedAssetsInput = {
@@ -1940,6 +2726,10 @@ export type UserUncheckedUpdateWithoutGeneratedAssetsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutAiSuggestionsInput = {
@@ -1966,6 +2756,10 @@ export type UserCreateWithoutAiSuggestionsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutAiSuggestionsInput = {
@@ -1992,6 +2786,10 @@ export type UserUncheckedCreateWithoutAiSuggestionsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutAiSuggestionsInput = {
@@ -2034,6 +2832,10 @@ export type UserUpdateWithoutAiSuggestionsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
@@ -2060,6 +2862,10 @@ export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutPlatformAccountsInput = {
@@ -2086,6 +2892,10 @@ export type UserCreateWithoutPlatformAccountsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutPlatformAccountsInput = {
@@ -2112,6 +2922,10 @@ export type UserUncheckedCreateWithoutPlatformAccountsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutPlatformAccountsInput = {
@@ -2154,6 +2968,10 @@ export type UserUpdateWithoutPlatformAccountsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
@@ -2180,6 +2998,10 @@ export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutPlatformOAuthStatesInput = {
@@ -2206,6 +3028,10 @@ export type UserCreateWithoutPlatformOAuthStatesInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
@@ -2232,6 +3058,10 @@ export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutPlatformOAuthStatesInput = {
@@ -2274,6 +3104,10 @@ export type UserUpdateWithoutPlatformOAuthStatesInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
@@ -2300,6 +3134,10 @@ export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutPublishTasksInput = {
@@ -2326,6 +3164,10 @@ export type UserCreateWithoutPublishTasksInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutPublishTasksInput = {
@@ -2352,6 +3194,10 @@ export type UserUncheckedCreateWithoutPublishTasksInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutPublishTasksInput = {
@@ -2394,6 +3240,10 @@ export type UserUpdateWithoutPublishTasksInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPublishTasksInput = {
@@ -2420,6 +3270,10 @@ export type UserUncheckedUpdateWithoutPublishTasksInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -2446,6 +3300,10 @@ export type UserCreateWithoutAuditLogsInput = {
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -2472,6 +3330,10 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -2514,6 +3376,10 @@ export type UserUpdateWithoutAuditLogsInput = {
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -2540,6 +3406,10 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
   savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 
@@ -2563,6 +3433,10 @@ export type UserCountOutputType = {
   auditLogs: number
   transcriptEditDrafts: number
   savedEditorSnapshots: number
+  sentWorkspaceInvitations: number
+  receivedWorkspaceInvitations: number
+  receivedNotifications: number
+  actedNotifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2581,6 +3455,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
   transcriptEditDrafts?: boolean | UserCountOutputTypeCountTranscriptEditDraftsArgs
   savedEditorSnapshots?: boolean | UserCountOutputTypeCountSavedEditorSnapshotsArgs
+  sentWorkspaceInvitations?: boolean | UserCountOutputTypeCountSentWorkspaceInvitationsArgs
+  receivedWorkspaceInvitations?: boolean | UserCountOutputTypeCountReceivedWorkspaceInvitationsArgs
+  receivedNotifications?: boolean | UserCountOutputTypeCountReceivedNotificationsArgs
+  actedNotifications?: boolean | UserCountOutputTypeCountActedNotificationsArgs
 }
 
 /**
@@ -2698,6 +3576,34 @@ export type UserCountOutputTypeCountSavedEditorSnapshotsArgs<ExtArgs extends run
   where?: Prisma.EditorSnapshotWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSentWorkspaceInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceInvitationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceivedWorkspaceInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceInvitationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceivedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountActedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2724,6 +3630,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   transcriptEditDrafts?: boolean | Prisma.User$transcriptEditDraftsArgs<ExtArgs>
   savedEditorSnapshots?: boolean | Prisma.User$savedEditorSnapshotsArgs<ExtArgs>
+  sentWorkspaceInvitations?: boolean | Prisma.User$sentWorkspaceInvitationsArgs<ExtArgs>
+  receivedWorkspaceInvitations?: boolean | Prisma.User$receivedWorkspaceInvitationsArgs<ExtArgs>
+  receivedNotifications?: boolean | Prisma.User$receivedNotificationsArgs<ExtArgs>
+  actedNotifications?: boolean | Prisma.User$actedNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2780,6 +3690,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   transcriptEditDrafts?: boolean | Prisma.User$transcriptEditDraftsArgs<ExtArgs>
   savedEditorSnapshots?: boolean | Prisma.User$savedEditorSnapshotsArgs<ExtArgs>
+  sentWorkspaceInvitations?: boolean | Prisma.User$sentWorkspaceInvitationsArgs<ExtArgs>
+  receivedWorkspaceInvitations?: boolean | Prisma.User$receivedWorkspaceInvitationsArgs<ExtArgs>
+  receivedNotifications?: boolean | Prisma.User$receivedNotificationsArgs<ExtArgs>
+  actedNotifications?: boolean | Prisma.User$actedNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2803,6 +3717,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     transcriptEditDrafts: Prisma.$TranscriptEditDraftPayload<ExtArgs>[]
     savedEditorSnapshots: Prisma.$EditorSnapshotPayload<ExtArgs>[]
+    sentWorkspaceInvitations: Prisma.$WorkspaceInvitationPayload<ExtArgs>[]
+    receivedWorkspaceInvitations: Prisma.$WorkspaceInvitationPayload<ExtArgs>[]
+    receivedNotifications: Prisma.$NotificationPayload<ExtArgs>[]
+    actedNotifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3223,6 +4141,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transcriptEditDrafts<T extends Prisma.User$transcriptEditDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transcriptEditDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TranscriptEditDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedEditorSnapshots<T extends Prisma.User$savedEditorSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedEditorSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EditorSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sentWorkspaceInvitations<T extends Prisma.User$sentWorkspaceInvitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentWorkspaceInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receivedWorkspaceInvitations<T extends Prisma.User$receivedWorkspaceInvitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedWorkspaceInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receivedNotifications<T extends Prisma.User$receivedNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  actedNotifications<T extends Prisma.User$actedNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$actedNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4011,6 +4933,102 @@ export type User$savedEditorSnapshotsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.EditorSnapshotScalarFieldEnum | Prisma.EditorSnapshotScalarFieldEnum[]
+}
+
+/**
+ * User.sentWorkspaceInvitations
+ */
+export type User$sentWorkspaceInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceInvitation
+   */
+  select?: Prisma.WorkspaceInvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceInvitation
+   */
+  omit?: Prisma.WorkspaceInvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInvitationInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceInvitationWhereInput
+  orderBy?: Prisma.WorkspaceInvitationOrderByWithRelationInput | Prisma.WorkspaceInvitationOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceInvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceInvitationScalarFieldEnum | Prisma.WorkspaceInvitationScalarFieldEnum[]
+}
+
+/**
+ * User.receivedWorkspaceInvitations
+ */
+export type User$receivedWorkspaceInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceInvitation
+   */
+  select?: Prisma.WorkspaceInvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceInvitation
+   */
+  omit?: Prisma.WorkspaceInvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInvitationInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceInvitationWhereInput
+  orderBy?: Prisma.WorkspaceInvitationOrderByWithRelationInput | Prisma.WorkspaceInvitationOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceInvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceInvitationScalarFieldEnum | Prisma.WorkspaceInvitationScalarFieldEnum[]
+}
+
+/**
+ * User.receivedNotifications
+ */
+export type User$receivedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.actedNotifications
+ */
+export type User$actedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

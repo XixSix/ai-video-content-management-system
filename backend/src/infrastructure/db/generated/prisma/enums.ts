@@ -64,6 +64,23 @@ export const WorkspaceMemberRole = {
 export type WorkspaceMemberRole = (typeof WorkspaceMemberRole)[keyof typeof WorkspaceMemberRole]
 
 
+export const WorkspaceInvitationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type WorkspaceInvitationStatus = (typeof WorkspaceInvitationStatus)[keyof typeof WorkspaceInvitationStatus]
+
+
+export const NotificationType = {
+  WORKSPACE_INVITATION: 'WORKSPACE_INVITATION'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
 export const ProjectMediaRole = {
   SOURCE: 'SOURCE',
   OVERLAY: 'OVERLAY',
