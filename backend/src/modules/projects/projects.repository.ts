@@ -152,7 +152,7 @@ export const replaceSourceMedia = async (projectId: string, media: Media): Promi
     await transaction.projectMedia.deleteMany({
       where: {
         projectId,
-        role: ProjectMediaRole.SOURCE
+        OR: [{ role: ProjectMediaRole.SOURCE }, { mediaId: media.id }]
       }
     })
 

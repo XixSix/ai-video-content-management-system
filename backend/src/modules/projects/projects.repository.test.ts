@@ -124,7 +124,7 @@ describe('projects repository transactions', () => {
     expect(projectMediaDeleteManyMock).toHaveBeenCalledWith({
       where: {
         projectId,
-        role: 'SOURCE'
+        OR: [{ role: 'SOURCE' }, { mediaId }]
       }
     })
     expect(projectMediaCreateMock).toHaveBeenCalledWith({

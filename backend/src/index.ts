@@ -2,14 +2,26 @@ import { app } from './app'
 import { config } from './config/index'
 import { connectRabbitMQ, disconnectRabbitMQ } from './infrastructure/rabbitmq/client'
 import { connectRedis, disconnectRedis } from './infrastructure/redis/client'
+import {
+  connectNotificationRealtime,
+  disconnectNotificationRealtime
+} from './modules/notifications/notifications.realtime'
 
 let server: ReturnType<typeof app.listen> | undefined
+
+const disconnectRedisInfrastructure = async (): Promise<void> => {
+  try {
+    await disconnectNotificationRealtime()
+  } finally {
+    await disconnectRedis()
+  }
+}
 
 const shutdown = (signal: NodeJS.Signals): void => {
   console.log(`${signal} received. Shutting down gracefully.`)
 
   const closeInfrastructure = (): void => {
-    Promise.all([disconnectRabbitMQ(), disconnectRedis()])
+    Promise.all([disconnectRabbitMQ(), disconnectRedisInfrastructure()])
       .then(() => {
         process.exit(0)
       })
@@ -37,14 +49,15 @@ const shutdown = (signal: NodeJS.Signals): void => {
 const bootstrap = async (): Promise<void> => {
   try {
     await Promise.all([connectRabbitMQ(), connectRedis()])
-    console.log('RabbitMQ and Redis connected')
+    await connectNotificationRealtime()
+    console.log('RabbitMQ, Redis, and notification realtime connected')
 
     server = app.listen(config.app.port, (): void => {
       console.log(`Server is running on port ${config.app.port}`)
     })
   } catch (error: unknown) {
     console.error('Failed to connect infrastructure services', error)
-    await Promise.allSettled([disconnectRabbitMQ(), disconnectRedis()])
+    await Promise.allSettled([disconnectRabbitMQ(), disconnectRedisInfrastructure()])
     process.exit(1)
   }
 }
