@@ -68,6 +68,8 @@ export type StudioCaptionShadowStyle = "soft" | "hard"
 export type StudioCanvasLayer = {
   id: string
   kind: StudioLayerKind
+  mediaId?: string
+  visible?: boolean
   label: string
   className: string
   summary: string
@@ -186,6 +188,7 @@ export type StudioProjectMediaOrigin = "SOURCE" | "LIBRARY" | "UPLOAD"
 
 export type StudioProjectMediaItem = {
   id: string
+  projectMediaId?: string
   type: StudioProjectMediaType
   name: string
   summary: string

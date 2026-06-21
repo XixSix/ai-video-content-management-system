@@ -1,4 +1,3 @@
-import Image from "next/image"
 import { FileMusic, ImageIcon, Video } from "lucide-react"
 
 import type {
@@ -18,26 +17,38 @@ function MediaFileIcon({ type }: { type: StudioProjectMediaType }) {
   return <Video className="size-9 text-muted-foreground" />
 }
 
-export function MediaThumbnail({ item }: { item: StudioProjectMediaItem }) {
-  if (item.thumbnailUrl) {
-    if (item.thumbnailUrl.startsWith("blob:")) {
-      return (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.thumbnailUrl}
-          alt=""
-          className="absolute inset-0 size-full object-cover"
-        />
-      )
-    }
+export function MediaThumbnail({
+  item,
+  onPreviewError,
+  previewUrl,
+}: {
+  item: StudioProjectMediaItem
+  onPreviewError?: () => void
+  previewUrl?: string
+}) {
+  const visualUrl = previewUrl ?? item.thumbnailUrl ?? undefined
 
+  if (visualUrl && item.type === "IMAGE") {
     return (
-      <Image
-        src={item.thumbnailUrl}
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={visualUrl}
         alt=""
-        fill
-        sizes="12rem"
-        className="absolute inset-0 object-cover"
+        onError={onPreviewError}
+        className="absolute inset-0 size-full object-cover"
+      />
+    )
+  }
+
+  if (visualUrl && item.type === "VIDEO") {
+    return (
+      <video
+        src={visualUrl}
+        muted
+        playsInline
+        preload="metadata"
+        onError={onPreviewError}
+        className="absolute inset-0 size-full object-cover"
       />
     )
   }

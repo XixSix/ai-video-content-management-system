@@ -1,27 +1,28 @@
-import { mediaLibraryItems } from "@/features/media-library/media-library.data"
 import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
-import { formatFileSize } from "@/features/media-library/media-library.utils"
+import type { ProjectMedia } from "@/features/studio-hub/studio-projects.types"
 
-import { createStudioMediaItem } from "../../data/media.mock"
-import type {
-  StudioProjectMediaItem,
-  StudioProjectMediaType,
-} from "../../studio.types"
+import { mapProjectMediaToStudioItem } from "../../editor-snapshot/editor-snapshot.mapper"
+import type { StudioProjectMediaItem } from "../../studio.types"
 
-function getUploadedMediaType(file: File): StudioProjectMediaType {
-  if (file.type.startsWith("video/")) {
-    return "VIDEO"
-  }
+export type StudioMediaUploadPurpose = "PROJECT_MEDIA" | "SOURCE"
 
-  if (file.type.startsWith("audio/")) {
-    return "AUDIO"
-  }
+export function assignStudioUploadPurposes(
+  mediaTypes: Array<"VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE">,
+  hasSourceOrPendingSource: boolean
+): StudioMediaUploadPurpose[] {
+  let sourceAssigned = hasSourceOrPendingSource
 
-  if (file.type.startsWith("image/")) {
-    return "IMAGE"
-  }
+  return mediaTypes.map((mediaType) => {
+    if (
+      !sourceAssigned &&
+      (mediaType === "VIDEO" || mediaType === "AUDIO")
+    ) {
+      sourceAssigned = true
+      return "SOURCE"
+    }
 
-  return "SUBTITLE"
+    return "PROJECT_MEDIA"
+  })
 }
 
 export function isSupportedProjectMediaUpload(file: File) {
@@ -32,55 +33,23 @@ export function isSupportedProjectMediaUpload(file: File) {
   )
 }
 
-function getFormatLabel(file: File) {
-  const subtype = file.type.split("/")[1]
-  const extension = file.name.split(".").pop()
-
-  return (subtype ?? extension ?? "FILE").split(";")[0].toUpperCase()
-}
-
 export function getImportableMediaLibraryItems(
-  projectMedia: StudioProjectMediaItem[]
+  projectMedia: StudioProjectMediaItem[],
+  libraryItems: MediaLibraryItem[]
 ) {
   const importedLibraryItemIds = new Set(
     projectMedia.map((item) => item.sourceLibraryItemId ?? item.id)
   )
 
-  return mediaLibraryItems.filter(
+  return libraryItems.filter(
     (item) =>
       item.type !== "TRANSCRIPT" &&
       !importedLibraryItemIds.has(item.id)
   )
 }
 
-export function createProjectMediaFromLibraryItem(
-  item: MediaLibraryItem
+export function createProjectMediaFromResponse(
+  item: ProjectMedia
 ): StudioProjectMediaItem {
-  return createStudioMediaItem(item, {
-    summary: "Imported from Media Library for this edit.",
-    usageLabel: item.libraryGroup === "ORIGINAL" ? "Project media" : "Generated output",
-  })
-}
-
-export function createProjectMediaFromUploadFile(
-  file: File
-): StudioProjectMediaItem {
-  const type = getUploadedMediaType(file)
-  const objectUrl = URL.createObjectURL(file)
-  const sizeLabel = formatFileSize(file.size)
-
-  return {
-    id: `upload-${crypto.randomUUID()}`,
-    type,
-    name: file.name,
-    summary: "Local upload added to this editor session.",
-    origin: "UPLOAD",
-    status: "READY",
-    assetUrl: objectUrl,
-    thumbnailUrl: type === "IMAGE" ? objectUrl : null,
-    format: getFormatLabel(file),
-    metadata: sizeLabel,
-    usageLabel: "Uploaded media",
-    sizeLabel,
-  }
+  return mapProjectMediaToStudioItem(item)
 }

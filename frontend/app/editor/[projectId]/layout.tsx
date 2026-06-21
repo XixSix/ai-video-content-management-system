@@ -25,9 +25,17 @@ import {
 } from "@/features/studio-editor/timeline/studio-timeline"
 import { StudioTopbar } from "@/features/studio-editor/shell/studio-topbar"
 import { useProjectDetail } from "@/features/studio-hub/hooks/use-projects"
+import { useAuthSession } from "@/features/auth/hooks/use-auth-session"
 import { Button } from "@/components/ui/button"
 import { ApiError } from "@/lib/api/api-error"
 import { cn } from "@/lib/utils"
+import { useEditorSnapshot } from "@/features/studio-editor/editor-snapshot/editor-snapshot.queries"
+import {
+  createDefaultEditorDocument,
+  createStudioProjectFromDetail,
+  hydrateEditorDocument,
+} from "@/features/studio-editor/editor-snapshot/editor-snapshot.mapper"
+import { EditorSnapshotPersistenceProvider } from "@/features/studio-editor/editor-snapshot/editor-snapshot-persistence"
 
 const STUDIO_RAIL_WIDTH = 78
 const LEFT_PANEL_MIN_WIDTH = 300
@@ -112,13 +120,19 @@ export default function StudioLayout({
   const params = useParams<{ projectId: string }>()
   const projectId = params.projectId ?? ""
   const projectQuery = useProjectDetail(projectId)
+  const snapshotQuery = useEditorSnapshot(projectId)
+  const authSession = useAuthSession()
   const timelinePanelRef = usePanelRef()
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false)
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false)
   const project = projectQuery.data?.project
 
-  if (projectQuery.isLoading) {
+  if (
+    projectQuery.isLoading ||
+    snapshotQuery.isLoading ||
+    authSession.isLoading
+  ) {
     return (
       <div className="flex h-screen items-center justify-center bg-background text-foreground">
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -129,9 +143,21 @@ export default function StudioLayout({
     )
   }
 
-  if (projectQuery.isError || !project) {
+  if (
+    projectQuery.isError ||
+    snapshotQuery.isError ||
+    authSession.isError ||
+    !project ||
+    !snapshotQuery.data ||
+    !authSession.data
+  ) {
     const isNotFound =
-      projectQuery.error instanceof ApiError && projectQuery.error.status === 404
+      (projectQuery.error instanceof ApiError &&
+        projectQuery.error.status === 404) ||
+      (snapshotQuery.error instanceof ApiError &&
+        snapshotQuery.error.status === 404)
+    const loadError =
+      projectQuery.error ?? snapshotQuery.error ?? authSession.error
 
     return (
       <div className="flex h-screen items-center justify-center bg-background p-6 text-foreground">
@@ -145,8 +171,8 @@ export default function StudioLayout({
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {isNotFound
               ? "This project may have been deleted or is not available in your workspace."
-              : projectQuery.error instanceof Error
-                ? projectQuery.error.message
+              : loadError instanceof Error
+                ? loadError.message
                 : "Please check the API connection and try again."}
           </p>
           <div className="mt-5 flex justify-center gap-2">
@@ -154,7 +180,10 @@ export default function StudioLayout({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => void projectQuery.refetch()}
+                onClick={() => {
+                  void projectQuery.refetch()
+                  void snapshotQuery.refetch()
+                }}
               >
                 Try again
               </Button>
@@ -172,6 +201,29 @@ export default function StudioLayout({
     project.sourceMedia?.title ??
     project.sourceMedia?.originalFilename ??
     "No source media"
+  const defaultDocument = createDefaultEditorDocument(project)
+  const initialSnapshot = snapshotQuery.data.editorSnapshot
+  const initialDocument = initialSnapshot?.document ?? defaultDocument
+  const initialProject = hydrateEditorDocument(
+    createStudioProjectFromDetail(project),
+    initialDocument
+  )
+  const canEdit = project.userId === authSession.data.id
+
+  const reloadLatestSnapshot = async () => {
+    const result = await snapshotQuery.refetch()
+
+    if (result.error) {
+      throw result.error
+    }
+
+    const latestSnapshot = result.data?.editorSnapshot
+
+    return {
+      document: latestSnapshot?.document ?? createDefaultEditorDocument(project),
+      version: latestSnapshot?.version ?? 0,
+    }
+  }
 
   const syncLeftPanelCollapsed = (panelSize: PanelSize) => {
     setIsLeftPanelCollapsed(panelSize.inPixels <= SIDE_PANEL_COLLAPSED_HANDLE_WIDTH)
@@ -197,14 +249,23 @@ export default function StudioLayout({
   }
 
   return (
-    <StudioEditorStoreProvider key={projectId}>
-      <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-        <StudioTopbar
-          projectName={project.title}
-          projectStatus={project.status}
-          aspectRatio={project.aspectRatio}
-          sourceLabel={sourceLabel}
-        />
+    <StudioEditorStoreProvider
+      key={projectId}
+      initialProject={initialProject}
+      canEdit={canEdit}
+    >
+      <EditorSnapshotPersistenceProvider
+        canEdit={canEdit}
+        initialVersion={initialSnapshot?.version ?? 0}
+        projectId={projectId}
+        reloadLatest={reloadLatestSnapshot}
+      >
+        <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+          <StudioTopbar
+            projectName={project.title}
+            projectStatus={project.status}
+            sourceLabel={sourceLabel}
+          />
 
         <PanelGroup
           id="studio-editor-vertical-layout"
@@ -313,8 +374,9 @@ export default function StudioLayout({
               onToggleCollapse={handleTimelineToggle}
             />
           </Panel>
-        </PanelGroup>
-      </div>
+          </PanelGroup>
+        </div>
+      </EditorSnapshotPersistenceProvider>
     </StudioEditorStoreProvider>
   )
 }

@@ -82,7 +82,9 @@ export function AuthForm({
       if (error instanceof ApiError) {
         let hasFieldError = false
 
-        for (const detail of error.details ?? []) {
+        const details = Array.isArray(error.details) ? error.details : []
+
+        for (const detail of details) {
           if (detail.path === "email" || detail.path === "password") {
             setError(detail.path, { message: detail.message })
             hasFieldError = true

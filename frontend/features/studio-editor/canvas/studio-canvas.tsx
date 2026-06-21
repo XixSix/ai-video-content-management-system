@@ -12,13 +12,20 @@ import {
   useStudioToolState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
+import { getProjectTimelineDuration } from "@/features/studio-editor/timeline/lib/layout"
 import { cn } from "@/lib/utils"
 
 import { CanvasLayerList } from "./components/canvas-layer-list"
-import { MediaPreview } from "./components/media-preview"
+import {
+  CanvasAudioMedia,
+  CanvasOverlayMedia,
+  CanvasSourceMedia,
+} from "./components/composition-media"
+import { CanvasFallbackArtwork } from "./components/fallback-artwork"
 import { CanvasSelectionFrame } from "./components/selection-frame"
-import { useCanvasMediaSync } from "./hooks/use-canvas-media-sync"
+import { useCompositionClock } from "./hooks/use-composition-playback"
 import { usePreviewSize } from "./hooks/use-preview-size"
+import { resolveCompositionFrame } from "./lib/composition"
 
 export function StudioCanvas() {
   const [layerDragGuide, setLayerDragGuide] = useState<{
@@ -40,24 +47,24 @@ export function StudioCanvas() {
   const canvasAspectRatio = getAspectRatioValue(project.media.aspectRatio)
   const { canvasAreaRef, previewSize } = usePreviewSize(canvasAspectRatio)
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
-  const hasNativeMediaPreview = Boolean(project.media.streamUrl)
-  const guideAudioItem = useMemo(
-    () =>
-      project.projectMedia.find((item) => item.linkedSelectionId === "audio-bed") ??
-      null,
-    [project.projectMedia]
+  const timelineDurationSeconds = useMemo(
+    () => getProjectTimelineDuration(project),
+    [project]
+  )
+  const compositionFrame = useMemo(
+    () => resolveCompositionFrame(project, currentTime),
+    [currentTime, project]
   )
   const sourceTrackMuted = mutedTrackIds.includes("SOURCE")
+  const overlayTrackMuted = mutedTrackIds.includes("OVERLAY_MEDIA")
   const audioTrackMuted = mutedTrackIds.includes("AUDIO")
-  const { setGuideAudioElement, setPreviewMediaElement } = useCanvasMediaSync({
-    audioTrackMuted,
+
+  useCompositionClock({
     currentTime,
-    durationSeconds: project.media.durationSeconds,
-    hasNativeMediaPreview,
     isPlaying,
     pausePlayback,
     seekToTime,
-    sourceTrackMuted,
+    timelineDurationSeconds,
   })
 
   const captionCues = useMemo(
@@ -99,17 +106,38 @@ export function StudioCanvas() {
               width: previewSize?.width ?? "100%",
             }}
           >
-            <MediaPreview
-              audioTrackMuted={audioTrackMuted}
-              currentTime={currentTime}
-              guideAudioItem={guideAudioItem}
-              media={project.media}
-              onGuideAudioElement={setGuideAudioElement}
-              onPreviewMediaElement={setPreviewMediaElement}
-              pausePlayback={pausePlayback}
-              seekToTime={seekToTime}
-              sourceTrackMuted={sourceTrackMuted}
-            />
+            <CanvasFallbackArtwork />
+
+            {compositionFrame.source ? (
+              <CanvasSourceMedia
+                isPlaying={isPlaying}
+                muted={sourceTrackMuted}
+                source={compositionFrame.source}
+                sourceDetail={project.media}
+              />
+            ) : null}
+
+            {compositionFrame.overlays.map((overlay) => (
+              <CanvasOverlayMedia
+                key={overlay.segment.id}
+                isPlaying={isPlaying}
+                muted={overlayTrackMuted}
+                onSelect={() => {
+                  setActiveTool("media")
+                  setSelectedItemId(overlay.segment.id)
+                }}
+                overlay={overlay}
+              />
+            ))}
+
+            {compositionFrame.audio.map((audio) => (
+              <CanvasAudioMedia
+                key={audio.segment.id}
+                audio={audio}
+                isPlaying={isPlaying}
+                muted={audioTrackMuted}
+              />
+            ))}
 
             <CanvasLayerList
               captionCues={captionCues}
@@ -119,6 +147,7 @@ export function StudioCanvas() {
               onMoveLayer={updateCanvasLayerPosition}
               onSelectLayer={handleSelectLayer}
               selectedTargetId={selectedTargetId}
+              visibleLayerIds={compositionFrame.visibleLayerIds}
             />
 
             {layerDragGuide ? (
@@ -133,7 +162,9 @@ export function StudioCanvas() {
             ) : null}
 
             <CanvasSelectionFrame
-              layers={project.layers}
+              layers={project.layers.filter((layer) =>
+                compositionFrame.visibleLayerIds.has(layer.id)
+              )}
               selectedItem={selectedItem}
               selectedTargetId={selectedTargetId}
             />

@@ -69,6 +69,7 @@ export function useMediaPreviewUrl(mediaId: string | null, enabled = true) {
     queryKey: mediaQueryKeys.preview(mediaId ?? "none"),
     queryFn: () => mediaService.getPreviewUrl(mediaId!),
     enabled: Boolean(mediaId) && enabled,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 4 * 60 * 1000,
+    retry: 1,
   })
 }

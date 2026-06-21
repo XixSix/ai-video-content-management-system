@@ -4,7 +4,10 @@ import { describe, expect, it } from "vitest"
 import { invalidateMediaQueries } from "./hooks/use-media-mutations"
 import { mediaQueryKeys } from "./hooks/media-query-keys"
 import type { MediaLibraryItem } from "./media-library.types"
-import { getMediaItemsForTab } from "./media-library.utils"
+import {
+  formatDuration,
+  getMediaItemsForTab,
+} from "./media-library.utils"
 
 function createItem(
   id: string,
@@ -37,6 +40,11 @@ function createItem(
 }
 
 describe("media library data boundaries", () => {
+  it("formats fractional media durations as whole timeline seconds", () => {
+    expect(formatDuration(361.372154)).toBe("6:01")
+    expect(formatDuration(59.999)).toBe("0:59")
+  })
+
   it("keeps real tabs free of mock output data", () => {
     const real = [createItem("real", "ORIGINAL")]
     const demo = [

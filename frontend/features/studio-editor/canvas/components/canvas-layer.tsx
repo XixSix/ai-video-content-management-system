@@ -49,7 +49,10 @@ export function CanvasLayer({
 }) {
   const didDragRef = useRef(false)
 
-  if (layer.kind === "captions" && !layer.enabled) {
+  if (
+    layer.visible === false ||
+    (layer.kind === "captions" && !layer.enabled)
+  ) {
     return null
   }
 
@@ -202,9 +205,9 @@ export function CanvasLayer({
         layer.className,
         "text-left",
         layer.kind === "text"
-          ? getTextLayerClassName(layer.backgroundStyle)
+          ? cn("z-20", getTextLayerClassName(layer.backgroundStyle))
           : layer.kind === "captions"
-            ? "flex items-center justify-center"
+            ? "z-30 flex items-center justify-center"
             : null,
         isSelected
           ? "ring-2 ring-sky-300/75 ring-offset-0"

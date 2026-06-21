@@ -112,6 +112,7 @@ export type StudioEditorActions = {
     status: StudioClipCandidateStatus
   ) => void
   setSelectedItemId: (selectionId: string) => void
+  setProjectSource: (sourceProject: StudioEditorProject) => void
   togglePlayback: () => void
   toggleTrackMute: (trackId: string) => void
   undoEditorChange: () => void

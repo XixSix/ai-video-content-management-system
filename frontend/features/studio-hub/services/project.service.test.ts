@@ -7,6 +7,7 @@ import { projectService } from "./project.service"
 const apiMock = new MockAdapter(authenticatedApiClient)
 const projectId = "123e4567-e89b-12d3-a456-426614174001"
 const mediaId = "123e4567-e89b-12d3-a456-426614174002"
+const projectMediaId = "123e4567-e89b-12d3-a456-426614174003"
 const project = { id: projectId, title: "Campaign" }
 
 describe("project service", () => {
@@ -88,5 +89,48 @@ describe("project service", () => {
     await expect(projectService.remove(projectId)).resolves.toEqual({
       message: "Project deleted successfully",
     })
+  })
+
+  it("attaches and detaches project media with separate IDs", async () => {
+    const projectMedia = {
+      id: projectMediaId,
+      role: "OVERLAY",
+      media: { id: mediaId },
+    }
+
+    apiMock
+      .onPost(`/projects/${projectId}/media`, { mediaId })
+      .reply(201, {
+        success: true,
+        data: { projectMedia },
+      })
+    apiMock
+      .onDelete(`/projects/${projectId}/media/${projectMediaId}`)
+      .reply(200, {
+        success: true,
+        data: { message: "Project media removed successfully" },
+      })
+
+    await expect(projectService.addMedia(projectId, mediaId)).resolves.toEqual({
+      projectMedia,
+    })
+    await expect(
+      projectService.removeMedia(projectId, projectMediaId)
+    ).resolves.toEqual({
+      message: "Project media removed successfully",
+    })
+  })
+
+  it("sets project source media through the dedicated endpoint", async () => {
+    apiMock
+      .onPut(`/projects/${projectId}/source-media`, { mediaId })
+      .reply(200, {
+        success: true,
+        data: { project },
+      })
+
+    await expect(
+      projectService.setSourceMedia(projectId, mediaId)
+    ).resolves.toEqual({ project })
   })
 })
