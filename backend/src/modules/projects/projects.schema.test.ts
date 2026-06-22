@@ -4,10 +4,26 @@ import {
   createBlankProjectSchema,
   createProjectFromMediaSchema,
   listProjectsQuerySchema,
+  projectMediaParamsSchema,
+  projectParamsSchema,
   updateProjectSchema
 } from './projects.schema'
 
 describe('project schemas', () => {
+  it('requires workspace and project route parameters', () => {
+    const workspaceId = '00000000-0000-4000-8000-000000000001'
+    const projectId = '00000000-0000-4000-8000-000000000002'
+    const projectMediaId = '00000000-0000-4000-8000-000000000003'
+
+    expect(projectParamsSchema.parse({ workspaceId, projectId })).toEqual({ workspaceId, projectId })
+    expect(projectMediaParamsSchema.parse({ workspaceId, projectId, projectMediaId })).toEqual({
+      workspaceId,
+      projectId,
+      projectMediaId
+    })
+    expect(projectParamsSchema.safeParse({ projectId }).success).toBe(false)
+  })
+
   it('accepts only a title for blank projects and defaults list queries', () => {
     expect(
       createBlankProjectSchema.parse({

@@ -8,4 +8,8 @@ export class WorkspaceError extends AppError {
   static forbidden(message = 'You are not a member of this workspace'): WorkspaceError {
     return new WorkspaceError(message, 403, 'FORBIDDEN')
   }
+
+  static ownerRequired(message = 'Workspace owner permission is required'): WorkspaceError {
+    return new WorkspaceError(message, 403, 'WORKSPACE_OWNER_REQUIRED')
+  }
 }

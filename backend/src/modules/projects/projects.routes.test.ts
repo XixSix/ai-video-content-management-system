@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import request from 'supertest'
 import type { AuthenticatedUser } from '../auth/auth.types'
-import { AuthError } from '../auth/auth.error'
+import { WorkspaceError } from '../workspace/workspace.error'
 import type { ProjectDetailData, ProjectMediaData } from './projects.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
-const getDefaultWorkspaceMembershipMock = jest.fn()
+const getWorkspaceMembershipContextMock = jest.fn()
 const listProjectsMock = jest.fn()
 const getProjectMock = jest.fn()
 const createBlankProjectMock = jest.fn()
@@ -17,8 +17,11 @@ const addProjectMediaMock = jest.fn()
 const removeProjectMediaMock = jest.fn()
 
 jest.unstable_mockModule('../auth/auth.service', () => ({
-  getAuthenticatedUser: getAuthenticatedUserMock,
-  getDefaultWorkspaceMembership: getDefaultWorkspaceMembershipMock
+  getAuthenticatedUser: getAuthenticatedUserMock
+}))
+
+jest.unstable_mockModule('../workspace/workspace.service', () => ({
+  getWorkspaceMembershipContext: getWorkspaceMembershipContextMock
 }))
 
 jest.unstable_mockModule('./projects.service', () => ({
@@ -40,6 +43,7 @@ const workspaceId = '00000000-0000-4000-8000-000000000002'
 const projectId = '00000000-0000-4000-8000-000000000003'
 const mediaId = '00000000-0000-4000-8000-000000000004'
 const projectMediaId = '00000000-0000-4000-8000-000000000005'
+const projectsPath = `/api/v1/workspaces/${workspaceId}/projects`
 const now = new Date('2026-06-20T10:00:00.000Z')
 
 const authenticatedUser: AuthenticatedUser = {
@@ -87,7 +91,7 @@ const projectMedia: ProjectMediaData = {
 beforeEach(() => {
   jest.resetAllMocks()
   getAuthenticatedUserMock.mockResolvedValue(authenticatedUser)
-  getDefaultWorkspaceMembershipMock.mockResolvedValue({
+  getWorkspaceMembershipContextMock.mockResolvedValue({
     id: workspaceId,
     role: 'OWNER'
   })
@@ -110,15 +114,15 @@ beforeEach(() => {
 
 describe('project routes', () => {
   it.each([
-    ['GET', '/api/v1/projects'],
-    ['POST', '/api/v1/projects/blank'],
-    ['POST', '/api/v1/projects/from-media'],
-    ['GET', `/api/v1/projects/${projectId}`],
-    ['PATCH', `/api/v1/projects/${projectId}`],
-    ['DELETE', `/api/v1/projects/${projectId}`],
-    ['PUT', `/api/v1/projects/${projectId}/source-media`],
-    ['POST', `/api/v1/projects/${projectId}/media`],
-    ['DELETE', `/api/v1/projects/${projectId}/media/${projectMediaId}`]
+    ['GET', projectsPath],
+    ['POST', `${projectsPath}/blank`],
+    ['POST', `${projectsPath}/from-media`],
+    ['GET', `${projectsPath}/${projectId}`],
+    ['PATCH', `${projectsPath}/${projectId}`],
+    ['DELETE', `${projectsPath}/${projectId}`],
+    ['PUT', `${projectsPath}/${projectId}/source-media`],
+    ['POST', `${projectsPath}/${projectId}/media`],
+    ['DELETE', `${projectsPath}/${projectId}/media/${projectMediaId}`]
   ])('%s %s requires an access token', async (method, path) => {
     const requestMethod = method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete'
     const response = await request(app)[requestMethod](path).send({})
@@ -126,18 +130,30 @@ describe('project routes', () => {
     expect(response.status).toBe(401)
   })
 
-  it('requires workspace membership', async () => {
-    getDefaultWorkspaceMembershipMock.mockRejectedValue(AuthError.forbidden('No workspace'))
+  it('validates the selected workspace ID', async () => {
+    const response = await request(app)
+      .get('/api/v1/workspaces/not-a-uuid/projects')
+      .set('Authorization', 'Bearer access-token')
 
-    const response = await request(app).get('/api/v1/projects').set('Authorization', 'Bearer access-token')
+    expect(response.status).toBe(400)
+    expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    expect(getWorkspaceMembershipContextMock).not.toHaveBeenCalled()
+    expect(listProjectsMock).not.toHaveBeenCalled()
+  })
+
+  it('requires membership in the selected workspace', async () => {
+    getWorkspaceMembershipContextMock.mockRejectedValue(WorkspaceError.forbidden())
+
+    const response = await request(app).get(projectsPath).set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(403)
+    expect(getWorkspaceMembershipContextMock).toHaveBeenCalledWith(workspaceId, userId)
     expect(listProjectsMock).not.toHaveBeenCalled()
   })
 
   it('creates a blank project from its title only', async () => {
     const response = await request(app)
-      .post('/api/v1/projects/blank')
+      .post(`${projectsPath}/blank`)
       .set('Authorization', 'Bearer access-token')
       .send({ title: 'Project' })
 
@@ -150,7 +166,7 @@ describe('project routes', () => {
 
   it('rejects aspect ratio when creating a blank project', async () => {
     const response = await request(app)
-      .post('/api/v1/projects/blank')
+      .post(`${projectsPath}/blank`)
       .set('Authorization', 'Bearer access-token')
       .send({ title: 'Project', aspectRatio: '16:9' })
 
@@ -160,7 +176,7 @@ describe('project routes', () => {
 
   it('creates a project from media', async () => {
     const response = await request(app)
-      .post('/api/v1/projects/from-media')
+      .post(`${projectsPath}/from-media`)
       .set('Authorization', 'Bearer access-token')
       .send({ mediaId, title: 'Project from media' })
 
@@ -173,7 +189,7 @@ describe('project routes', () => {
 
   it('lists projects with validated pagination, filters, and sorting', async () => {
     const response = await request(app)
-      .get('/api/v1/projects')
+      .get(projectsPath)
       .query({
         page: '2',
         limit: '20',
@@ -203,7 +219,7 @@ describe('project routes', () => {
 
   it('updates only project title and status', async () => {
     const response = await request(app)
-      .patch(`/api/v1/projects/${projectId}`)
+      .patch(`${projectsPath}/${projectId}`)
       .set('Authorization', 'Bearer access-token')
       .send({
         title: 'Renamed',
@@ -217,7 +233,7 @@ describe('project routes', () => {
     })
 
     const invalidResponse = await request(app)
-      .patch(`/api/v1/projects/${projectId}`)
+      .patch(`${projectsPath}/${projectId}`)
       .set('Authorization', 'Bearer access-token')
       .send({ status: 'DELETED' })
 
@@ -229,7 +245,7 @@ describe('project routes', () => {
     ['thumbnailMediaId', { thumbnailMediaId: mediaId }]
   ])('rejects unsupported project update field %s', async (_field, body) => {
     const response = await request(app)
-      .patch(`/api/v1/projects/${projectId}`)
+      .patch(`${projectsPath}/${projectId}`)
       .set('Authorization', 'Bearer access-token')
       .send(body)
 
@@ -239,10 +255,10 @@ describe('project routes', () => {
 
   it('validates project IDs and rejects client-selected project-media roles', async () => {
     const invalidIdResponse = await request(app)
-      .get('/api/v1/projects/not-a-uuid')
+      .get(`${projectsPath}/not-a-uuid`)
       .set('Authorization', 'Bearer access-token')
     const invalidRoleResponse = await request(app)
-      .post(`/api/v1/projects/${projectId}/media`)
+      .post(`${projectsPath}/${projectId}/media`)
       .set('Authorization', 'Bearer access-token')
       .send({
         mediaId,
@@ -256,18 +272,18 @@ describe('project routes', () => {
 
   it('sets source media, adds media, removes media, and soft deletes', async () => {
     const sourceResponse = await request(app)
-      .put(`/api/v1/projects/${projectId}/source-media`)
+      .put(`${projectsPath}/${projectId}/source-media`)
       .set('Authorization', 'Bearer access-token')
       .send({ mediaId })
     const addResponse = await request(app)
-      .post(`/api/v1/projects/${projectId}/media`)
+      .post(`${projectsPath}/${projectId}/media`)
       .set('Authorization', 'Bearer access-token')
       .send({ mediaId })
     const removeResponse = await request(app)
-      .delete(`/api/v1/projects/${projectId}/media/${projectMediaId}`)
+      .delete(`${projectsPath}/${projectId}/media/${projectMediaId}`)
       .set('Authorization', 'Bearer access-token')
     const deleteResponse = await request(app)
-      .delete(`/api/v1/projects/${projectId}`)
+      .delete(`${projectsPath}/${projectId}`)
       .set('Authorization', 'Bearer access-token')
 
     expect(sourceResponse.status).toBe(200)

@@ -4,7 +4,10 @@ import type { WorkspaceMemberRecord, WorkspaceRecord, WorkspaceMembershipRecord 
 export const findMembership = async (workspaceId: string, userId: string): Promise<WorkspaceMembershipRecord | null> =>
   prisma.workspaceMember.findUnique({
     where: { workspaceId_userId: { workspaceId, userId } },
-    select: { id: true }
+    select: {
+      workspaceId: true,
+      role: true
+    }
   })
 
 export const findWorkspaceById = async (workspaceId: string): Promise<WorkspaceRecord | null> =>

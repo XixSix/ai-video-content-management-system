@@ -6,6 +6,7 @@ const invitationUpdateManyMock = jest.fn()
 const notificationCreateMock = jest.fn()
 const notificationUpdateManyMock = jest.fn()
 const workspaceMemberCreateMock = jest.fn()
+const workspaceMemberFindFirstMock = jest.fn()
 const transactionMock = jest.fn(async (callback: (transaction: unknown) => unknown) =>
   callback({
     workspaceInvitation: {
@@ -25,7 +26,10 @@ const transactionMock = jest.fn(async (callback: (transaction: unknown) => unkno
 
 jest.unstable_mockModule('../../infrastructure/db/prisma', () => ({
   prisma: {
-    $transaction: transactionMock
+    $transaction: transactionMock,
+    workspaceMember: {
+      findFirst: workspaceMemberFindFirstMock
+    }
   }
 }))
 
@@ -63,6 +67,36 @@ beforeEach(() => {
 })
 
 describe('workspace invitations repository transactions', () => {
+  it('loads invitation display context without duplicating owner authorization', async () => {
+    workspaceMemberFindFirstMock.mockResolvedValue(null)
+
+    await invitationsRepository.findWorkspaceInvitationContext(workspaceId, inviterId)
+
+    expect(workspaceMemberFindFirstMock).toHaveBeenCalledWith({
+      where: {
+        workspaceId,
+        userId: inviterId
+      },
+      select: {
+        id: true,
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            email: true,
+            fullName: true
+          }
+        }
+      }
+    })
+  })
+
   it('creates the invitation and notification atomically', async () => {
     await invitationsRepository.createInvitationWithNotification({
       workspaceId,

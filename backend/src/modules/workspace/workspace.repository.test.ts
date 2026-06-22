@@ -27,7 +27,7 @@ beforeEach(() => {
 
 describe('workspace repository', () => {
   it('finds membership by the workspace and user composite key with a minimal projection', async () => {
-    findUniqueMembershipMock.mockResolvedValue({ id: '00000000-0000-4000-8000-000000000003' })
+    findUniqueMembershipMock.mockResolvedValue({ workspaceId, role: 'MEMBER' })
 
     await workspaceRepository.findMembership(workspaceId, userId)
 
@@ -39,7 +39,8 @@ describe('workspace repository', () => {
         }
       },
       select: {
-        id: true
+        workspaceId: true,
+        role: true
       }
     })
   })

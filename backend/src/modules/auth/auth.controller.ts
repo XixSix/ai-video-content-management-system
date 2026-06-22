@@ -76,12 +76,14 @@ export const logoutAll: AppRequestHandler = async (req, res, next): Promise<void
   }
 }
 
-export const me: AppRequestHandler = (req, res, next): void => {
+export const me: AppRequestHandler = async (req, res, next): Promise<void> => {
   try {
+    const workspace = await authService.getDefaultWorkspaceMembership(req.user!.id)
+
     sendSuccess(res, {
       user: {
         ...req.user!,
-        workspaceId: req.workspace!.id
+        workspaceId: workspace.id
       }
     })
   } catch (error: unknown) {

@@ -1,13 +1,26 @@
 import * as repo from './workspace.repository'
+import type { WorkspaceContext } from '../auth/auth.types'
 import type { WorkspaceDetailData, WorkspaceMemberData } from './workspace.types'
 import { WorkspaceError } from './workspace.error'
 
-export const getWorkspaceDetails = async (workspaceId: string, requesterId: string): Promise<WorkspaceDetailData> => {
+export const getWorkspaceMembershipContext = async (
+  workspaceId: string,
+  requesterId: string
+): Promise<WorkspaceContext> => {
   const membership = await repo.findMembership(workspaceId, requesterId)
 
   if (!membership) {
     throw WorkspaceError.forbidden()
   }
+
+  return {
+    id: membership.workspaceId,
+    role: membership.role
+  }
+}
+
+export const getWorkspaceDetails = async (workspaceId: string, requesterId: string): Promise<WorkspaceDetailData> => {
+  await getWorkspaceMembershipContext(workspaceId, requesterId)
 
   const workspace = await repo.findWorkspaceById(workspaceId)
 
@@ -34,11 +47,7 @@ export const listWorkspaceMembers = async (
   workspaceId: string,
   requesterId: string
 ): Promise<WorkspaceMemberData[]> => {
-  const membership = await repo.findMembership(workspaceId, requesterId)
-
-  if (!membership) {
-    throw WorkspaceError.forbidden()
-  }
+  await getWorkspaceMembershipContext(workspaceId, requesterId)
 
   const members = await repo.findWorkspaceMembers(workspaceId)
 

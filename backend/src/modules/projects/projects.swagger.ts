@@ -43,12 +43,13 @@
 
 /**
  * @swagger
- * /projects:
+ * /workspaces/{workspaceId}/projects:
  *   get:
- *     summary: List projects in the authenticated user's default workspace
+ *     summary: List projects in the selected workspace
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: query, name: page, schema: { type: integer, default: 1 } }
  *       - { in: query, name: limit, schema: { type: integer, default: 10, maximum: 50 } }
  *       - { in: query, name: search, schema: { type: string } }
@@ -61,11 +62,13 @@
 
 /**
  * @swagger
- * /projects/blank:
+ * /workspaces/{workspaceId}/projects/blank:
  *   post:
  *     summary: Create a blank project
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *     requestBody:
  *       required: true
  *       content:
@@ -81,11 +84,13 @@
 
 /**
  * @swagger
- * /projects/from-media:
+ * /workspaces/{workspaceId}/projects/from-media:
  *   post:
  *     summary: Create a project from uploaded video or audio
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *     requestBody:
  *       required: true
  *       content:
@@ -103,12 +108,13 @@
 
 /**
  * @swagger
- * /projects/{projectId}:
+ * /workspaces/{workspaceId}/projects/{projectId}:
  *   get:
  *     summary: Get a workspace-accessible project with attached media
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     responses:
  *       200: { description: Project detail }
@@ -118,6 +124,7 @@
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     requestBody:
  *       required: true
@@ -136,6 +143,7 @@
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     responses:
  *       200: { description: Project marked DELETED }
@@ -143,12 +151,13 @@
 
 /**
  * @swagger
- * /projects/{projectId}/source-media:
+ * /workspaces/{workspaceId}/projects/{projectId}/source-media:
  *   put:
  *     summary: Add or replace the project's source media
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     requestBody:
  *       required: true
@@ -165,12 +174,13 @@
 
 /**
  * @swagger
- * /projects/{projectId}/media:
+ * /workspaces/{workspaceId}/projects/{projectId}/media:
  *   post:
  *     summary: Attach media with a role derived from its type
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     requestBody:
  *       required: true
@@ -188,12 +198,13 @@
 
 /**
  * @swagger
- * /projects/{projectId}/media/{projectMediaId}:
+ * /workspaces/{workspaceId}/projects/{projectId}/media/{projectMediaId}:
  *   delete:
  *     summary: Remove non-source media from a project
  *     tags: [Projects]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *       - { in: path, name: projectMediaId, required: true, schema: { type: string, format: uuid } }
  *     responses:

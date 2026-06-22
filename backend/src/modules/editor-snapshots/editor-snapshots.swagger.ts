@@ -60,12 +60,13 @@
 
 /**
  * @swagger
- * /projects/{projectId}/editor-snapshot:
+ * /workspaces/{workspaceId}/projects/{projectId}/editor-snapshot:
  *   get:
  *     summary: Get the latest editor composition snapshot
  *     tags: [Editor Snapshots]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     responses:
  *       200: { description: Current snapshot or null when the project has not been saved }
@@ -75,6 +76,7 @@
  *     tags: [Editor Snapshots]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - { in: path, name: projectId, required: true, schema: { type: string, format: uuid } }
  *     requestBody:
  *       required: true

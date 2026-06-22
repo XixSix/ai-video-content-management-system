@@ -23,7 +23,8 @@ export interface WorkspaceMemberData {
 }
 
 export interface WorkspaceMembershipRecord {
-  id: string
+  workspaceId: string
+  role: WorkspaceMemberRole
 }
 
 export interface WorkspaceRecord {

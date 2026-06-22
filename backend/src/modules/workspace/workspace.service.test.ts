@@ -56,13 +56,21 @@ const members: WorkspaceMemberRecord[] = [
 beforeEach(() => {
   jest.resetAllMocks()
   findMembershipMock.mockResolvedValue({
-    id: '00000000-0000-4000-8000-000000000005'
+    workspaceId,
+    role: 'MEMBER'
   })
   findWorkspaceByIdMock.mockResolvedValue(workspace)
   findWorkspaceMembersMock.mockResolvedValue(members)
 })
 
 describe('workspace service', () => {
+  it('returns the selected workspace membership context', async () => {
+    await expect(workspaceService.getWorkspaceMembershipContext(workspaceId, requesterId)).resolves.toEqual({
+      id: workspaceId,
+      role: 'MEMBER'
+    })
+  })
+
   it('returns workspace details for a member', async () => {
     await expect(workspaceService.getWorkspaceDetails(workspaceId, requesterId)).resolves.toEqual({
       id: workspaceId,

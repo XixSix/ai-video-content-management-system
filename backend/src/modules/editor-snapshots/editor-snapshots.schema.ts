@@ -155,6 +155,7 @@ export const editorDocumentSchema = z
   })
 
 export const editorSnapshotParamsSchema = z.strictObject({
+  workspaceId: z.uuid(),
   projectId: z.uuid()
 })
 

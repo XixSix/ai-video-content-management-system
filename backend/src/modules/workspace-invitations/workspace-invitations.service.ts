@@ -13,9 +13,9 @@ export const createWorkspaceInvitation = async (
   inviterId: string,
   input: CreateWorkspaceInvitationBody
 ): Promise<WorkspaceInvitationData> => {
-  const ownerContext = await invitationsRepo.findWorkspaceOwnerContext(workspaceId, inviterId)
+  const invitationContext = await invitationsRepo.findWorkspaceInvitationContext(workspaceId, inviterId)
 
-  if (!ownerContext) {
+  if (!invitationContext) {
     throw WorkspaceInvitationsError.forbidden()
   }
 
@@ -45,8 +45,8 @@ export const createWorkspaceInvitation = async (
       workspaceId,
       inviterId,
       inviteeId: invitee.id,
-      workspaceName: ownerContext.workspace.name,
-      inviterName: ownerContext.user.fullName ?? ownerContext.user.email,
+      workspaceName: invitationContext.workspace.name,
+      inviterName: invitationContext.user.fullName ?? invitationContext.user.email,
       expiresAt: new Date(now.getTime() + INVITATION_TTL_MS)
     })
 

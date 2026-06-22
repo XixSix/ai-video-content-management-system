@@ -3,11 +3,17 @@ import { ProjectStatus } from '../../infrastructure/db/generated/prisma/client'
 
 export const projectAspectRatioSchema = z.enum(['9:16', '1:1', '4:5', '16:9'])
 
+const workspaceParamsShape = {
+  workspaceId: z.uuid()
+}
+
 export const projectParamsSchema = z.strictObject({
+  ...workspaceParamsShape,
   projectId: z.uuid()
 })
 
 export const projectMediaParamsSchema = z.strictObject({
+  ...workspaceParamsShape,
   projectId: z.uuid(),
   projectMediaId: z.uuid()
 })

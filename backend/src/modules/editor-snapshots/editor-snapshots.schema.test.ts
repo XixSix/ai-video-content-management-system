@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { editorDocumentSchema, saveEditorSnapshotSchema } from './editor-snapshots.schema'
+import { editorDocumentSchema, editorSnapshotParamsSchema, saveEditorSnapshotSchema } from './editor-snapshots.schema'
 
 const mediaId = '00000000-0000-4000-8000-000000000001'
 
@@ -57,6 +57,14 @@ const createDocument = () => ({
 })
 
 describe('editor snapshot schemas', () => {
+  it('requires workspace and project route parameters', () => {
+    const workspaceId = '00000000-0000-4000-8000-000000000002'
+    const projectId = '00000000-0000-4000-8000-000000000003'
+
+    expect(editorSnapshotParamsSchema.parse({ workspaceId, projectId })).toEqual({ workspaceId, projectId })
+    expect(editorSnapshotParamsSchema.safeParse({ projectId }).success).toBe(false)
+  })
+
   it('accepts a strict version 1 composition document', () => {
     expect(
       saveEditorSnapshotSchema.parse({
