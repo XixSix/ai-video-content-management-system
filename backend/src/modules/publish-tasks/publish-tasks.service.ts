@@ -1,12 +1,9 @@
 import {
   JobStatus,
   JobType,
-  PlatformAccountStatus,
   Prisma,
   PublishStatus,
   type Media,
-  type Platform,
-  type PlatformAccount,
   type ProcessingJob,
   type PublishTask,
   type ShortClip
@@ -22,6 +19,8 @@ import type {
 } from './publish-tasks.schema'
 import { PublishTasksError } from './publish-tasks.error'
 import type { PaginatedResult, PublishTaskData, PublishTaskJobResult } from './publish-tasks.types'
+import * as platformAccountsService from '../platform-accounts/platform-accounts.service'
+import * as workspaceService from '../workspace/workspace.service'
 
 const editableStatuses: PublishStatus[] = [PublishStatus.DRAFT, PublishStatus.SCHEDULED, PublishStatus.FAILED]
 const publishableStatuses: PublishStatus[] = [PublishStatus.DRAFT, PublishStatus.FAILED]
@@ -30,8 +29,8 @@ const cancelableJobStatuses: JobStatus[] = [JobStatus.PENDING, JobStatus.QUEUED]
 const publishQueueFailureMessage = 'Failed to publish task job'
 
 export const createPublishTask = async (userId: string, body: CreatePublishTaskBody): Promise<PublishTaskData> => {
-  await ensurePublishTarget(userId, body)
-  await getUsablePlatformAccount(userId, body.platform, body.platformAccountId)
+  const workspaceId = await ensurePublishTarget(userId, body)
+  await platformAccountsService.getUsablePlatformAccount(workspaceId, body.platform, body.platformAccountId)
 
   const task = await publishTasksRepo.createPublishTask({
     userId,
@@ -101,7 +100,8 @@ export const updatePublishTask = async (
   const data: Prisma.PublishTaskUncheckedUpdateInput = {}
 
   if (Object.hasOwn(body, 'platformAccountId')) {
-    await getUsablePlatformAccount(userId, task.platform, body.platformAccountId!)
+    const workspaceId = await getPublishTaskWorkspaceId(userId, task)
+    await platformAccountsService.getUsablePlatformAccount(workspaceId, task.platform, body.platformAccountId!)
     data.platformAccountId = body.platformAccountId
   }
 
@@ -251,28 +251,31 @@ const markPublishJobFailed = async (job: ProcessingJob, publishTaskId: string): 
 const ensurePublishTarget = async (
   userId: string,
   body: Pick<CreatePublishTaskBody, 'mediaId' | 'shortClipId'>
-): Promise<void> => {
+): Promise<string> => {
   if (body.mediaId) {
-    await getOwnedPublishableMedia(userId, body.mediaId)
-    return
+    const media = await getAccessiblePublishableMedia(userId, body.mediaId)
+    return media.workspaceId
   }
 
   if (body.shortClipId) {
-    await getOwnedPublishableShortClip(userId, body.shortClipId)
+    const { media } = await getAccessiblePublishableShortClip(userId, body.shortClipId)
+    return media.workspaceId
   }
+
+  throw PublishTasksError.targetNotFound()
 }
 
 const getPublishContext = async (
   userId: string,
   task: PublishTask
 ): Promise<{ jobMediaId: string; platformAccountId: string }> => {
-  const jobMediaId = await getPublishTaskMediaId(userId, task)
+  const { mediaId: jobMediaId, workspaceId } = await getPublishTaskTargetContext(userId, task)
 
   if (!task.platformAccountId) {
     throw PublishTasksError.platformAccountNotFound()
   }
 
-  await getUsablePlatformAccount(userId, task.platform, task.platformAccountId)
+  await platformAccountsService.getUsablePlatformAccount(workspaceId, task.platform, task.platformAccountId)
 
   return {
     jobMediaId,
@@ -280,19 +283,25 @@ const getPublishContext = async (
   }
 }
 
-const getPublishTaskMediaId = async (userId: string, task: PublishTask): Promise<string> => {
+const getPublishTaskTargetContext = async (
+  userId: string,
+  task: PublishTask
+): Promise<{ mediaId: string; workspaceId: string }> => {
   if (task.mediaId) {
-    const media = await getOwnedPublishableMedia(userId, task.mediaId)
-    return media.id
+    const media = await getAccessiblePublishableMedia(userId, task.mediaId)
+    return { mediaId: media.id, workspaceId: media.workspaceId }
   }
 
   if (task.shortClipId) {
-    const shortClip = await getOwnedPublishableShortClip(userId, task.shortClipId)
-    return shortClip.mediaId
+    const { media, shortClip } = await getAccessiblePublishableShortClip(userId, task.shortClipId)
+    return { mediaId: shortClip.mediaId, workspaceId: media.workspaceId }
   }
 
   throw PublishTasksError.targetNotFound()
 }
+
+const getPublishTaskWorkspaceId = async (userId: string, task: PublishTask): Promise<string> =>
+  (await getPublishTaskTargetContext(userId, task)).workspaceId
 
 const getOwnedPublishTask = async (userId: string, publishTaskId: string): Promise<PublishTask> => {
   const task = await publishTasksRepo.findPublishTaskById(publishTaskId)
@@ -308,16 +317,14 @@ const getOwnedPublishTask = async (userId: string, publishTaskId: string): Promi
   return task
 }
 
-const getOwnedPublishableMedia = async (userId: string, mediaId: string): Promise<Media> => {
+const getAccessiblePublishableMedia = async (userId: string, mediaId: string): Promise<Media> => {
   const media = await publishTasksRepo.findMediaById(mediaId)
 
   if (!media) {
     throw PublishTasksError.targetNotFound()
   }
 
-  if (media.userId !== userId) {
-    throw PublishTasksError.targetForbidden()
-  }
+  await workspaceService.getWorkspaceMembershipContext(media.workspaceId, userId)
 
   if (media.status === 'DELETED') {
     throw PublishTasksError.invalidTargetState('Deleted media cannot be published')
@@ -326,42 +333,21 @@ const getOwnedPublishableMedia = async (userId: string, mediaId: string): Promis
   return media
 }
 
-const getOwnedPublishableShortClip = async (userId: string, shortClipId: string): Promise<ShortClip> => {
+const getAccessiblePublishableShortClip = async (
+  userId: string,
+  shortClipId: string
+): Promise<{ shortClip: ShortClip; media: Media }> => {
   const shortClip = await publishTasksRepo.findShortClipById(shortClipId)
 
   if (!shortClip) {
     throw PublishTasksError.targetNotFound()
   }
 
-  if (shortClip.userId !== userId) {
-    throw PublishTasksError.targetForbidden()
-  }
-
   if (shortClip.status === 'DELETED') {
     throw PublishTasksError.invalidTargetState('Deleted short clip cannot be published')
   }
 
-  return shortClip
-}
+  const media = await getAccessiblePublishableMedia(userId, shortClip.mediaId)
 
-const getUsablePlatformAccount = async (
-  userId: string,
-  platform: Platform,
-  platformAccountId: string
-): Promise<PlatformAccount> => {
-  const account = await publishTasksRepo.findPlatformAccountById(platformAccountId)
-
-  if (!account) {
-    throw PublishTasksError.platformAccountNotFound()
-  }
-
-  if (account.userId !== userId) {
-    throw PublishTasksError.platformAccountForbidden()
-  }
-
-  if (account.platform !== platform || account.status !== PlatformAccountStatus.CONNECTED) {
-    throw PublishTasksError.invalidPlatformAccount()
-  }
-
-  return account
+  return { shortClip, media }
 }

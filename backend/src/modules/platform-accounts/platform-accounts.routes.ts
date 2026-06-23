@@ -1,21 +1,36 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
+import { requireWorkspaceMembership, requireWorkspaceOwner } from '../../middleware/workspace.middleware'
+import { workspaceParamsSchema } from '../workspace/workspace.schema'
 import * as platformAccountsController from './platform-accounts.controller'
-import { platformOAuthCallbackQuerySchema, platformParamsSchema } from './platform-accounts.schema'
+import { platformParamsSchema, workspacePlatformParamsSchema } from './platform-accounts.schema'
 
-const router = Router()
+const callbackRouter = Router()
+const workspaceRouter = Router({ mergeParams: true })
 
-router.get(
+callbackRouter.get(
   '/:platform/callback',
-  validateRequest({ params: platformParamsSchema, query: platformOAuthCallbackQuerySchema }),
+  validateRequest({ params: platformParamsSchema }),
   platformAccountsController.callback
 )
 
-router.use(authenticate)
+workspaceRouter.use(authenticate)
+workspaceRouter.use(validateRequest({ params: workspaceParamsSchema }))
+workspaceRouter.use(requireWorkspaceMembership)
 
-router.get('/', platformAccountsController.list)
-router.post('/:platform/connect', validateRequest({ params: platformParamsSchema }), platformAccountsController.connect)
-router.delete('/:platform', validateRequest({ params: platformParamsSchema }), platformAccountsController.disconnect)
+workspaceRouter.get('/', platformAccountsController.list)
+workspaceRouter.post(
+  '/:platform/connect',
+  validateRequest({ params: workspacePlatformParamsSchema }),
+  requireWorkspaceOwner,
+  platformAccountsController.connect
+)
+workspaceRouter.delete(
+  '/:platform',
+  validateRequest({ params: workspacePlatformParamsSchema }),
+  requireWorkspaceOwner,
+  platformAccountsController.disconnect
+)
 
-export { router as platformAccountsRoutes }
+export { callbackRouter as platformAccountsCallbackRoutes, workspaceRouter as workspacePlatformAccountsRoutes }

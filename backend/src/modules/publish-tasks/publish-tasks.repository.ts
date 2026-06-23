@@ -2,7 +2,6 @@ import { prisma } from '../../infrastructure/db/prisma'
 import type {
   Media,
   Platform,
-  PlatformAccount,
   ProcessingJob,
   Prisma,
   PublishStatus,
@@ -90,10 +89,5 @@ export const findMediaById = async (id: string): Promise<Media | null> =>
 
 export const findShortClipById = async (id: string): Promise<ShortClip | null> =>
   prisma.shortClip.findUnique({
-    where: { id }
-  })
-
-export const findPlatformAccountById = async (id: string): Promise<PlatformAccount | null> =>
-  prisma.platformAccount.findUnique({
     where: { id }
   })

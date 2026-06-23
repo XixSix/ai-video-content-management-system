@@ -231,8 +231,8 @@ export type UserWhereInput = {
   shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   aiSuggestions?: Prisma.AiSuggestionListRelationFilter
-  platformAccounts?: Prisma.PlatformAccountListRelationFilter
-  platformOAuthStates?: Prisma.PlatformOAuthStateListRelationFilter
+  connectedPlatformAccounts?: Prisma.PlatformAccountListRelationFilter
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
   authSessions?: Prisma.AuthSessionListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
@@ -264,8 +264,8 @@ export type UserOrderByWithRelationInput = {
   shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
   generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
   aiSuggestions?: Prisma.AiSuggestionOrderByRelationAggregateInput
-  platformAccounts?: Prisma.PlatformAccountOrderByRelationAggregateInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateOrderByRelationAggregateInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountOrderByRelationAggregateInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateOrderByRelationAggregateInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
   authSessions?: Prisma.AuthSessionOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
@@ -300,8 +300,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
   aiSuggestions?: Prisma.AiSuggestionListRelationFilter
-  platformAccounts?: Prisma.PlatformAccountListRelationFilter
-  platformOAuthStates?: Prisma.PlatformOAuthStateListRelationFilter
+  connectedPlatformAccounts?: Prisma.PlatformAccountListRelationFilter
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
   authSessions?: Prisma.AuthSessionListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
@@ -364,8 +364,8 @@ export type UserCreateInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -396,8 +396,8 @@ export type UserUncheckedCreateInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -428,8 +428,8 @@ export type UserUpdateInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -460,8 +460,8 @@ export type UserUncheckedUpdateInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -846,32 +846,32 @@ export type UserUpdateOneRequiredWithoutAiSuggestionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAiSuggestionsInput, Prisma.UserUpdateWithoutAiSuggestionsInput>, Prisma.UserUncheckedUpdateWithoutAiSuggestionsInput>
 }
 
-export type UserCreateNestedOneWithoutPlatformAccountsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutPlatformAccountsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlatformAccountsInput
+export type UserCreateNestedOneWithoutConnectedPlatformAccountsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConnectedPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutConnectedPlatformAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConnectedPlatformAccountsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutPlatformAccountsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutPlatformAccountsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlatformAccountsInput
-  upsert?: Prisma.UserUpsertWithoutPlatformAccountsInput
+export type UserUpdateOneRequiredWithoutConnectedPlatformAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConnectedPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutConnectedPlatformAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConnectedPlatformAccountsInput
+  upsert?: Prisma.UserUpsertWithoutConnectedPlatformAccountsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPlatformAccountsInput, Prisma.UserUpdateWithoutPlatformAccountsInput>, Prisma.UserUncheckedUpdateWithoutPlatformAccountsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConnectedPlatformAccountsInput, Prisma.UserUpdateWithoutConnectedPlatformAccountsInput>, Prisma.UserUncheckedUpdateWithoutConnectedPlatformAccountsInput>
 }
 
-export type UserCreateNestedOneWithoutPlatformOAuthStatesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutPlatformOAuthStatesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlatformOAuthStatesInput
+export type UserCreateNestedOneWithoutInitiatedPlatformOAuthStatesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutInitiatedPlatformOAuthStatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInitiatedPlatformOAuthStatesInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutPlatformOAuthStatesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutPlatformOAuthStatesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlatformOAuthStatesInput
-  upsert?: Prisma.UserUpsertWithoutPlatformOAuthStatesInput
+export type UserUpdateOneRequiredWithoutInitiatedPlatformOAuthStatesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutInitiatedPlatformOAuthStatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInitiatedPlatformOAuthStatesInput
+  upsert?: Prisma.UserUpsertWithoutInitiatedPlatformOAuthStatesInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPlatformOAuthStatesInput, Prisma.UserUpdateWithoutPlatformOAuthStatesInput>, Prisma.UserUncheckedUpdateWithoutPlatformOAuthStatesInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUpdateWithoutInitiatedPlatformOAuthStatesInput>, Prisma.UserUncheckedUpdateWithoutInitiatedPlatformOAuthStatesInput>
 }
 
 export type UserCreateNestedOneWithoutPublishTasksInput = {
@@ -923,8 +923,8 @@ export type UserCreateWithoutAuthSessionsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
@@ -954,8 +954,8 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
@@ -1001,8 +1001,8 @@ export type UserUpdateWithoutAuthSessionsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
@@ -1032,8 +1032,8 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
@@ -1062,8 +1062,8 @@ export type UserCreateWithoutOwnedWorkspacesInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1093,8 +1093,8 @@ export type UserUncheckedCreateWithoutOwnedWorkspacesInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1129,8 +1129,8 @@ export type UserCreateWithoutPreferredWorkspaceInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1160,8 +1160,8 @@ export type UserUncheckedCreateWithoutPreferredWorkspaceInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1212,8 +1212,8 @@ export type UserUpdateWithoutOwnedWorkspacesInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -1243,8 +1243,8 @@ export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1306,8 +1306,8 @@ export type UserCreateWithoutWorkspaceMembershipsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1337,8 +1337,8 @@ export type UserUncheckedCreateWithoutWorkspaceMembershipsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1384,8 +1384,8 @@ export type UserUpdateWithoutWorkspaceMembershipsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -1415,8 +1415,8 @@ export type UserUncheckedUpdateWithoutWorkspaceMembershipsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1447,8 +1447,8 @@ export type UserCreateWithoutSentWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1478,8 +1478,8 @@ export type UserUncheckedCreateWithoutSentWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1514,8 +1514,8 @@ export type UserCreateWithoutReceivedWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1545,8 +1545,8 @@ export type UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1592,8 +1592,8 @@ export type UserUpdateWithoutSentWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -1623,8 +1623,8 @@ export type UserUncheckedUpdateWithoutSentWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1665,8 +1665,8 @@ export type UserUpdateWithoutReceivedWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -1696,8 +1696,8 @@ export type UserUncheckedUpdateWithoutReceivedWorkspaceInvitationsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1727,8 +1727,8 @@ export type UserCreateWithoutReceivedNotificationsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1758,8 +1758,8 @@ export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1794,8 +1794,8 @@ export type UserCreateWithoutActedNotificationsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -1825,8 +1825,8 @@ export type UserUncheckedCreateWithoutActedNotificationsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1872,8 +1872,8 @@ export type UserUpdateWithoutReceivedNotificationsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -1903,8 +1903,8 @@ export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1945,8 +1945,8 @@ export type UserUpdateWithoutActedNotificationsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -1976,8 +1976,8 @@ export type UserUncheckedUpdateWithoutActedNotificationsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2006,8 +2006,8 @@ export type UserCreateWithoutMediaInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2037,8 +2037,8 @@ export type UserUncheckedCreateWithoutMediaInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2084,8 +2084,8 @@ export type UserUpdateWithoutMediaInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2115,8 +2115,8 @@ export type UserUncheckedUpdateWithoutMediaInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2146,8 +2146,8 @@ export type UserCreateWithoutProjectsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2177,8 +2177,8 @@ export type UserUncheckedCreateWithoutProjectsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2224,8 +2224,8 @@ export type UserUpdateWithoutProjectsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2255,8 +2255,8 @@ export type UserUncheckedUpdateWithoutProjectsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2287,8 +2287,8 @@ export type UserCreateWithoutSavedEditorSnapshotsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2318,8 +2318,8 @@ export type UserUncheckedCreateWithoutSavedEditorSnapshotsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2365,8 +2365,8 @@ export type UserUpdateWithoutSavedEditorSnapshotsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2396,8 +2396,8 @@ export type UserUncheckedUpdateWithoutSavedEditorSnapshotsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2426,8 +2426,8 @@ export type UserCreateWithoutProcessingJobsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2457,8 +2457,8 @@ export type UserUncheckedCreateWithoutProcessingJobsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2504,8 +2504,8 @@ export type UserUpdateWithoutProcessingJobsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2535,8 +2535,8 @@ export type UserUncheckedUpdateWithoutProcessingJobsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2567,8 +2567,8 @@ export type UserCreateWithoutTranscriptEditDraftsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2598,8 +2598,8 @@ export type UserUncheckedCreateWithoutTranscriptEditDraftsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2645,8 +2645,8 @@ export type UserUpdateWithoutTranscriptEditDraftsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2676,8 +2676,8 @@ export type UserUncheckedUpdateWithoutTranscriptEditDraftsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2706,8 +2706,8 @@ export type UserCreateWithoutShortClipsInput = {
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2737,8 +2737,8 @@ export type UserUncheckedCreateWithoutShortClipsInput = {
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2784,8 +2784,8 @@ export type UserUpdateWithoutShortClipsInput = {
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2815,8 +2815,8 @@ export type UserUncheckedUpdateWithoutShortClipsInput = {
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2846,8 +2846,8 @@ export type UserCreateWithoutGeneratedAssetsInput = {
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -2877,8 +2877,8 @@ export type UserUncheckedCreateWithoutGeneratedAssetsInput = {
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -2924,8 +2924,8 @@ export type UserUpdateWithoutGeneratedAssetsInput = {
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -2955,8 +2955,8 @@ export type UserUncheckedUpdateWithoutGeneratedAssetsInput = {
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -2986,8 +2986,8 @@ export type UserCreateWithoutAiSuggestionsInput = {
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -3017,8 +3017,8 @@ export type UserUncheckedCreateWithoutAiSuggestionsInput = {
   processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -3064,8 +3064,8 @@ export type UserUpdateWithoutAiSuggestionsInput = {
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -3095,8 +3095,8 @@ export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
   processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -3108,7 +3108,7 @@ export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
   actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
-export type UserCreateWithoutPlatformAccountsInput = {
+export type UserCreateWithoutConnectedPlatformAccountsInput = {
   id?: string
   email: string
   passwordHash: string
@@ -3127,7 +3127,7 @@ export type UserCreateWithoutPlatformAccountsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -3139,7 +3139,7 @@ export type UserCreateWithoutPlatformAccountsInput = {
   actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
-export type UserUncheckedCreateWithoutPlatformAccountsInput = {
+export type UserUncheckedCreateWithoutConnectedPlatformAccountsInput = {
   id?: string
   email: string
   passwordHash: string
@@ -3158,7 +3158,7 @@ export type UserUncheckedCreateWithoutPlatformAccountsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -3170,23 +3170,23 @@ export type UserUncheckedCreateWithoutPlatformAccountsInput = {
   actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
-export type UserCreateOrConnectWithoutPlatformAccountsInput = {
+export type UserCreateOrConnectWithoutConnectedPlatformAccountsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutPlatformAccountsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutConnectedPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutConnectedPlatformAccountsInput>
 }
 
-export type UserUpsertWithoutPlatformAccountsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutPlatformAccountsInput, Prisma.UserUncheckedUpdateWithoutPlatformAccountsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutPlatformAccountsInput>
+export type UserUpsertWithoutConnectedPlatformAccountsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutConnectedPlatformAccountsInput, Prisma.UserUncheckedUpdateWithoutConnectedPlatformAccountsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutConnectedPlatformAccountsInput, Prisma.UserUncheckedCreateWithoutConnectedPlatformAccountsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutPlatformAccountsInput = {
+export type UserUpdateToOneWithWhereWithoutConnectedPlatformAccountsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutPlatformAccountsInput, Prisma.UserUncheckedUpdateWithoutPlatformAccountsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutConnectedPlatformAccountsInput, Prisma.UserUncheckedUpdateWithoutConnectedPlatformAccountsInput>
 }
 
-export type UserUpdateWithoutPlatformAccountsInput = {
+export type UserUpdateWithoutConnectedPlatformAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3205,7 +3205,7 @@ export type UserUpdateWithoutPlatformAccountsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -3217,7 +3217,7 @@ export type UserUpdateWithoutPlatformAccountsInput = {
   actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
-export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
+export type UserUncheckedUpdateWithoutConnectedPlatformAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3236,7 +3236,7 @@ export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -3248,7 +3248,7 @@ export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
   actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
-export type UserCreateWithoutPlatformOAuthStatesInput = {
+export type UserCreateWithoutInitiatedPlatformOAuthStatesInput = {
   id?: string
   email: string
   passwordHash: string
@@ -3267,7 +3267,7 @@ export type UserCreateWithoutPlatformOAuthStatesInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -3279,7 +3279,7 @@ export type UserCreateWithoutPlatformOAuthStatesInput = {
   actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
-export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
+export type UserUncheckedCreateWithoutInitiatedPlatformOAuthStatesInput = {
   id?: string
   email: string
   passwordHash: string
@@ -3298,7 +3298,7 @@ export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -3310,23 +3310,23 @@ export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
   actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
-export type UserCreateOrConnectWithoutPlatformOAuthStatesInput = {
+export type UserCreateOrConnectWithoutInitiatedPlatformOAuthStatesInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutPlatformOAuthStatesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutInitiatedPlatformOAuthStatesInput>
 }
 
-export type UserUpsertWithoutPlatformOAuthStatesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutPlatformOAuthStatesInput, Prisma.UserUncheckedUpdateWithoutPlatformOAuthStatesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutPlatformOAuthStatesInput>
+export type UserUpsertWithoutInitiatedPlatformOAuthStatesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUncheckedUpdateWithoutInitiatedPlatformOAuthStatesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUncheckedCreateWithoutInitiatedPlatformOAuthStatesInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutPlatformOAuthStatesInput = {
+export type UserUpdateToOneWithWhereWithoutInitiatedPlatformOAuthStatesInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutPlatformOAuthStatesInput, Prisma.UserUncheckedUpdateWithoutPlatformOAuthStatesInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutInitiatedPlatformOAuthStatesInput, Prisma.UserUncheckedUpdateWithoutInitiatedPlatformOAuthStatesInput>
 }
 
-export type UserUpdateWithoutPlatformOAuthStatesInput = {
+export type UserUpdateWithoutInitiatedPlatformOAuthStatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3345,7 +3345,7 @@ export type UserUpdateWithoutPlatformOAuthStatesInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -3357,7 +3357,7 @@ export type UserUpdateWithoutPlatformOAuthStatesInput = {
   actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
-export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
+export type UserUncheckedUpdateWithoutInitiatedPlatformOAuthStatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3376,7 +3376,7 @@ export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -3407,8 +3407,8 @@ export type UserCreateWithoutPublishTasksInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
@@ -3438,8 +3438,8 @@ export type UserUncheckedCreateWithoutPublishTasksInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
@@ -3485,8 +3485,8 @@ export type UserUpdateWithoutPublishTasksInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
@@ -3516,8 +3516,8 @@ export type UserUncheckedUpdateWithoutPublishTasksInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
@@ -3547,8 +3547,8 @@ export type UserCreateWithoutAuditLogsInput = {
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
@@ -3578,8 +3578,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
@@ -3625,8 +3625,8 @@ export type UserUpdateWithoutAuditLogsInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
@@ -3656,8 +3656,8 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
@@ -3698,8 +3698,8 @@ export type UserUpdateWithoutPreferredWorkspaceInput = {
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -3729,8 +3729,8 @@ export type UserUncheckedUpdateWithoutPreferredWorkspaceInput = {
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
   aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
-  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
-  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  connectedPlatformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput
+  initiatedPlatformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -3768,8 +3768,8 @@ export type UserCountOutputType = {
   shortClips: number
   generatedAssets: number
   aiSuggestions: number
-  platformAccounts: number
-  platformOAuthStates: number
+  connectedPlatformAccounts: number
+  initiatedPlatformOAuthStates: number
   publishTasks: number
   authSessions: number
   auditLogs: number
@@ -3790,8 +3790,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   shortClips?: boolean | UserCountOutputTypeCountShortClipsArgs
   generatedAssets?: boolean | UserCountOutputTypeCountGeneratedAssetsArgs
   aiSuggestions?: boolean | UserCountOutputTypeCountAiSuggestionsArgs
-  platformAccounts?: boolean | UserCountOutputTypeCountPlatformAccountsArgs
-  platformOAuthStates?: boolean | UserCountOutputTypeCountPlatformOAuthStatesArgs
+  connectedPlatformAccounts?: boolean | UserCountOutputTypeCountConnectedPlatformAccountsArgs
+  initiatedPlatformOAuthStates?: boolean | UserCountOutputTypeCountInitiatedPlatformOAuthStatesArgs
   publishTasks?: boolean | UserCountOutputTypeCountPublishTasksArgs
   authSessions?: boolean | UserCountOutputTypeCountAuthSessionsArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
@@ -3872,14 +3872,14 @@ export type UserCountOutputTypeCountAiSuggestionsArgs<ExtArgs extends runtime.Ty
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountPlatformAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type UserCountOutputTypeCountConnectedPlatformAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PlatformAccountWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountPlatformOAuthStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type UserCountOutputTypeCountInitiatedPlatformOAuthStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PlatformOAuthStateWhereInput
 }
 
@@ -3967,8 +3967,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   shortClips?: boolean | Prisma.User$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.User$generatedAssetsArgs<ExtArgs>
   aiSuggestions?: boolean | Prisma.User$aiSuggestionsArgs<ExtArgs>
-  platformAccounts?: boolean | Prisma.User$platformAccountsArgs<ExtArgs>
-  platformOAuthStates?: boolean | Prisma.User$platformOAuthStatesArgs<ExtArgs>
+  connectedPlatformAccounts?: boolean | Prisma.User$connectedPlatformAccountsArgs<ExtArgs>
+  initiatedPlatformOAuthStates?: boolean | Prisma.User$initiatedPlatformOAuthStatesArgs<ExtArgs>
   publishTasks?: boolean | Prisma.User$publishTasksArgs<ExtArgs>
   authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
@@ -4033,8 +4033,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   shortClips?: boolean | Prisma.User$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.User$generatedAssetsArgs<ExtArgs>
   aiSuggestions?: boolean | Prisma.User$aiSuggestionsArgs<ExtArgs>
-  platformAccounts?: boolean | Prisma.User$platformAccountsArgs<ExtArgs>
-  platformOAuthStates?: boolean | Prisma.User$platformOAuthStatesArgs<ExtArgs>
+  connectedPlatformAccounts?: boolean | Prisma.User$connectedPlatformAccountsArgs<ExtArgs>
+  initiatedPlatformOAuthStates?: boolean | Prisma.User$initiatedPlatformOAuthStatesArgs<ExtArgs>
   publishTasks?: boolean | Prisma.User$publishTasksArgs<ExtArgs>
   authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
@@ -4065,8 +4065,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
     generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
     aiSuggestions: Prisma.$AiSuggestionPayload<ExtArgs>[]
-    platformAccounts: Prisma.$PlatformAccountPayload<ExtArgs>[]
-    platformOAuthStates: Prisma.$PlatformOAuthStatePayload<ExtArgs>[]
+    connectedPlatformAccounts: Prisma.$PlatformAccountPayload<ExtArgs>[]
+    initiatedPlatformOAuthStates: Prisma.$PlatformOAuthStatePayload<ExtArgs>[]
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
     authSessions: Prisma.$AuthSessionPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
@@ -4491,8 +4491,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   shortClips<T extends Prisma.User$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   generatedAssets<T extends Prisma.User$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   aiSuggestions<T extends Prisma.User$aiSuggestionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$aiSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AiSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  platformAccounts<T extends Prisma.User$platformAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$platformAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  platformOAuthStates<T extends Prisma.User$platformOAuthStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$platformOAuthStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformOAuthStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectedPlatformAccounts<T extends Prisma.User$connectedPlatformAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$connectedPlatformAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  initiatedPlatformOAuthStates<T extends Prisma.User$initiatedPlatformOAuthStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$initiatedPlatformOAuthStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformOAuthStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   publishTasks<T extends Prisma.User$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   authSessions<T extends Prisma.User$authSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5153,9 +5153,9 @@ export type User$aiSuggestionsArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * User.platformAccounts
+ * User.connectedPlatformAccounts
  */
-export type User$platformAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$connectedPlatformAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the PlatformAccount
    */
@@ -5177,9 +5177,9 @@ export type User$platformAccountsArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * User.platformOAuthStates
+ * User.initiatedPlatformOAuthStates
  */
-export type User$platformOAuthStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$initiatedPlatformOAuthStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the PlatformOAuthState
    */

@@ -12,6 +12,31 @@ const createOAuthClient = () =>
     config.platform.youtubeRedirectUri
   )
 
+export class InvalidYouTubeRefreshTokenError extends Error {
+  constructor() {
+    super('YouTube refresh token is invalid or revoked')
+    this.name = 'InvalidYouTubeRefreshTokenError'
+  }
+}
+
+const isInvalidGrantError = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') {
+    return false
+  }
+
+  const response = 'response' in error ? error.response : undefined
+
+  if (response && typeof response === 'object' && 'data' in response) {
+    const data = response.data
+
+    if (data && typeof data === 'object' && 'error' in data && data.error === 'invalid_grant') {
+      return true
+    }
+  }
+
+  return error instanceof Error && error.message.includes('invalid_grant')
+}
+
 export const createYouTubeAuthUrl = (state: string): string => {
   const client = createOAuthClient()
 
@@ -58,6 +83,7 @@ export const getAuthenticatedYouTubeChannel = async (
   const channel = response.data.items?.[0]
   const platformUserId = channel?.id
   const accountName = channel?.snippet?.title
+  const avatarUrl = channel?.snippet?.thumbnails?.default?.url ?? null
 
   if (!platformUserId || !accountName) {
     throw new Error('Authenticated YouTube channel not found')
@@ -65,11 +91,37 @@ export const getAuthenticatedYouTubeChannel = async (
 
   return {
     accountName,
-    platformUserId
+    platformUserId,
+    avatarUrl
   }
 }
 
 export const revokeYouTubeToken = async (token: string): Promise<void> => {
   const client = createOAuthClient()
   await client.revokeToken(token)
+}
+
+export const refreshYouTubeAccessToken = async (refreshToken: string): Promise<YouTubeConnectionTokens> => {
+  const client = createOAuthClient()
+  client.setCredentials({ refresh_token: refreshToken })
+
+  try {
+    const { credentials } = await client.refreshAccessToken()
+
+    if (!credentials.access_token) {
+      throw new Error('Google OAuth refresh response did not include an access token')
+    }
+
+    return {
+      accessToken: credentials.access_token,
+      refreshToken: credentials.refresh_token ?? refreshToken,
+      expiresAt: typeof credentials.expiry_date === 'number' ? new Date(credentials.expiry_date) : null
+    }
+  } catch (error: unknown) {
+    if (isInvalidGrantError(error)) {
+      throw new InvalidYouTubeRefreshTokenError()
+    }
+
+    throw error
+  }
 }

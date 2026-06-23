@@ -8,15 +8,21 @@ import type {
 } from './platform-accounts.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
-const listPlatformAccountsMock = jest.fn<(userId: string) => Promise<PlatformAccountData[]>>()
+const getWorkspaceMembershipContextMock =
+  jest.fn<(workspaceId: string, userId: string) => Promise<{ id: string; role: 'OWNER' | 'MEMBER' }>>()
+const listPlatformAccountsMock = jest.fn<(workspaceId: string) => Promise<PlatformAccountData[]>>()
 const createPlatformConnectionMock =
-  jest.fn<(userId: string, platform: string) => Promise<CreatePlatformConnectionResult>>()
+  jest.fn<(workspaceId: string, userId: string, platform: string) => Promise<CreatePlatformConnectionResult>>()
 const handlePlatformCallbackMock = jest.fn<(input: unknown) => Promise<HandlePlatformCallbackResult>>()
 const buildCallbackFailureRedirectUrlMock = jest.fn<(platform: string, code: string) => string>()
-const disconnectPlatformAccountMock = jest.fn<(userId: string, platform: string) => Promise<void>>()
+const disconnectPlatformAccountMock = jest.fn<(workspaceId: string, platform: string) => Promise<void>>()
 
 jest.unstable_mockModule('../auth/auth.service', () => ({
   getAuthenticatedUser: getAuthenticatedUserMock
+}))
+
+jest.unstable_mockModule('../workspace/workspace.service', () => ({
+  getWorkspaceMembershipContext: getWorkspaceMembershipContextMock
 }))
 
 jest.unstable_mockModule('./platform-accounts.service', () => ({
@@ -30,7 +36,9 @@ jest.unstable_mockModule('./platform-accounts.service', () => ({
 const { app } = await import('../../app')
 
 const userId = '00000000-0000-4000-8000-000000000001'
+const workspaceId = '00000000-0000-4000-8000-000000000010'
 const now = new Date('2026-06-08T15:30:00.000Z')
+const platformAccountsPath = `/api/v1/workspaces/${workspaceId}/platform-accounts`
 
 const authenticatedUser: AuthenticatedUser = {
   id: userId,
@@ -41,9 +49,11 @@ const authenticatedUser: AuthenticatedUser = {
 
 const createAccount = (): PlatformAccountData => ({
   id: '00000000-0000-4000-8000-000000000002',
+  workspaceId,
   platform: 'YOUTUBE',
   accountName: 'VidPilot Channel',
   platformUserId: 'UC1234567890',
+  avatarUrl: 'https://yt3.ggpht.com/default-avatar',
   status: 'CONNECTED',
   expiresAt: now,
   createdAt: now,
@@ -53,6 +63,7 @@ const createAccount = (): PlatformAccountData => ({
 describe('platform account routes', () => {
   beforeEach(() => {
     getAuthenticatedUserMock.mockReset()
+    getWorkspaceMembershipContextMock.mockReset()
     listPlatformAccountsMock.mockReset()
     createPlatformConnectionMock.mockReset()
     handlePlatformCallbackMock.mockReset()
@@ -60,6 +71,7 @@ describe('platform account routes', () => {
     disconnectPlatformAccountMock.mockReset()
 
     getAuthenticatedUserMock.mockResolvedValue(authenticatedUser)
+    getWorkspaceMembershipContextMock.mockResolvedValue({ id: workspaceId, role: 'OWNER' })
     listPlatformAccountsMock.mockResolvedValue([createAccount()])
     createPlatformConnectionMock.mockResolvedValue({
       authUrl: 'https://accounts.google.com/o/oauth2/v2/auth?state=test-state'
@@ -74,10 +86,10 @@ describe('platform account routes', () => {
   })
 
   it.each([
-    ['GET', '/api/v1/platform-accounts'],
-    ['POST', '/api/v1/platform-accounts/YOUTUBE/connect'],
-    ['POST', '/api/v1/platform-accounts/FACEBOOK/connect'],
-    ['DELETE', '/api/v1/platform-accounts/YOUTUBE']
+    ['GET', platformAccountsPath],
+    ['POST', `${platformAccountsPath}/YOUTUBE/connect`],
+    ['POST', `${platformAccountsPath}/FACEBOOK/connect`],
+    ['DELETE', `${platformAccountsPath}/YOUTUBE`]
   ])('%s %s requires an access token', async (method, path) => {
     const response = await request(app)[method.toLowerCase() as 'get' | 'post' | 'delete'](path).send({})
 
@@ -92,7 +104,9 @@ describe('platform account routes', () => {
   })
 
   it('lists connected platform accounts', async () => {
-    const response = await request(app).get('/api/v1/platform-accounts').set('Authorization', 'Bearer access-token')
+    getWorkspaceMembershipContextMock.mockResolvedValueOnce({ id: workspaceId, role: 'MEMBER' })
+
+    const response = await request(app).get(platformAccountsPath).set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
@@ -108,12 +122,12 @@ describe('platform account routes', () => {
         ]
       }
     })
-    expect(listPlatformAccountsMock).toHaveBeenCalledWith(userId)
+    expect(listPlatformAccountsMock).toHaveBeenCalledWith(workspaceId)
   })
 
   it('creates a YouTube connection URL', async () => {
     const response = await request(app)
-      .post('/api/v1/platform-accounts/YOUTUBE/connect')
+      .post(`${platformAccountsPath}/YOUTUBE/connect`)
       .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(200)
@@ -123,7 +137,7 @@ describe('platform account routes', () => {
         authUrl: 'https://accounts.google.com/o/oauth2/v2/auth?state=test-state'
       }
     })
-    expect(createPlatformConnectionMock).toHaveBeenCalledWith(userId, 'YOUTUBE')
+    expect(createPlatformConnectionMock).toHaveBeenCalledWith(workspaceId, userId, 'YOUTUBE')
   })
 
   it('creates a Facebook connection URL', async () => {
@@ -132,7 +146,7 @@ describe('platform account routes', () => {
     })
 
     const response = await request(app)
-      .post('/api/v1/platform-accounts/FACEBOOK/connect')
+      .post(`${platformAccountsPath}/FACEBOOK/connect`)
       .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(200)
@@ -142,13 +156,15 @@ describe('platform account routes', () => {
         authUrl: 'https://www.facebook.com/v25.0/dialog/oauth?state=test-state'
       }
     })
-    expect(createPlatformConnectionMock).toHaveBeenCalledWith(userId, 'FACEBOOK')
+    expect(createPlatformConnectionMock).toHaveBeenCalledWith(workspaceId, userId, 'FACEBOOK')
   })
 
   it('redirects a public OAuth callback on success', async () => {
     const response = await request(app).get('/api/v1/platform-accounts/YOUTUBE/callback').query({
       code: 'oauth-code',
-      state: 'oauth-state'
+      state: 'oauth-state',
+      scope: 'youtube.upload youtube.readonly',
+      authuser: '0'
     })
 
     expect(response.status).toBe(302)
@@ -183,7 +199,7 @@ describe('platform account routes', () => {
 
   it('returns validation errors for unsupported platforms', async () => {
     const response = await request(app)
-      .post('/api/v1/platform-accounts/facebook/connect')
+      .post(`${platformAccountsPath}/facebook/connect`)
       .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(400)
@@ -198,7 +214,7 @@ describe('platform account routes', () => {
 
   it('disconnects a platform account', async () => {
     const response = await request(app)
-      .delete('/api/v1/platform-accounts/YOUTUBE')
+      .delete(`${platformAccountsPath}/YOUTUBE`)
       .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(200)
@@ -208,6 +224,34 @@ describe('platform account routes', () => {
         message: 'Platform account disconnected successfully'
       }
     })
-    expect(disconnectPlatformAccountMock).toHaveBeenCalledWith(userId, 'YOUTUBE')
+    expect(disconnectPlatformAccountMock).toHaveBeenCalledWith(workspaceId, 'YOUTUBE')
+  })
+
+  it.each([
+    ['POST', `${platformAccountsPath}/YOUTUBE/connect`],
+    ['DELETE', `${platformAccountsPath}/YOUTUBE`]
+  ])('%s %s requires workspace owner permission', async (method, path) => {
+    getWorkspaceMembershipContextMock.mockResolvedValueOnce({ id: workspaceId, role: 'MEMBER' })
+
+    const requester = request(app)
+    const response = await requester[method.toLowerCase() as 'post' | 'delete'](path).set(
+      'Authorization',
+      'Bearer access-token'
+    )
+
+    expect(response.status).toBe(403)
+    expect(response.body.error.code).toBe('WORKSPACE_OWNER_REQUIRED')
+  })
+
+  it('redirects malformed callback queries instead of returning JSON validation errors', async () => {
+    const response = await request(app)
+      .get('/api/v1/platform-accounts/YOUTUBE/callback')
+      .query({
+        code: ['one', 'two'],
+        state: 'oauth-state'
+      })
+
+    expect(response.status).toBe(302)
+    expect(buildCallbackFailureRedirectUrlMock).toHaveBeenCalledWith('YOUTUBE', 'PLATFORM_OAUTH_CALLBACK_INVALID')
   })
 })

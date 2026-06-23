@@ -26,20 +26,30 @@ const findPublishTaskByIdMock = jest.fn<(id: string) => Promise<PublishTask | nu
 const updatePublishTaskMock = jest.fn<(id: string, data: unknown) => Promise<PublishTask>>()
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
 const findShortClipByIdMock = jest.fn<(id: string) => Promise<ShortClip | null>>()
-const findPlatformAccountByIdMock = jest.fn<(id: string) => Promise<PlatformAccount | null>>()
+const getUsablePlatformAccountMock =
+  jest.fn<(workspaceId: string, platform: string, id: string) => Promise<PlatformAccount>>()
+const getWorkspaceMembershipContextMock =
+  jest.fn<(workspaceId: string, userId: string) => Promise<{ id: string; role: 'OWNER' | 'MEMBER' }>>()
 const publishPublishTaskJobMock = jest.fn<(message: unknown, eta?: string) => Promise<void>>()
 
 jest.unstable_mockModule('./publish-tasks.repository', () => ({
   createProcessingJob: createProcessingJobMock,
   createPublishTask: createPublishTaskMock,
   findMediaById: findMediaByIdMock,
-  findPlatformAccountById: findPlatformAccountByIdMock,
   findProcessingJobById: findProcessingJobByIdMock,
   findPublishTaskById: findPublishTaskByIdMock,
   findPublishTasksByUserId: findPublishTasksByUserIdMock,
   findShortClipById: findShortClipByIdMock,
   updateProcessingJob: updateProcessingJobMock,
   updatePublishTask: updatePublishTaskMock
+}))
+
+jest.unstable_mockModule('../platform-accounts/platform-accounts.service', () => ({
+  getUsablePlatformAccount: getUsablePlatformAccountMock
+}))
+
+jest.unstable_mockModule('../workspace/workspace.service', () => ({
+  getWorkspaceMembershipContext: getWorkspaceMembershipContextMock
 }))
 
 jest.unstable_mockModule('./publish-tasks.queue', () => ({
@@ -53,6 +63,8 @@ const otherUserId = '00000000-0000-4000-8000-000000000099'
 const publishTaskId = '00000000-0000-4000-8000-000000000002'
 const jobId = '00000000-0000-4000-8000-000000000007'
 const mediaId = '00000000-0000-4000-8000-000000000003'
+const workspaceId = '00000000-0000-4000-8000-000000000008'
+const otherWorkspaceId = '00000000-0000-4000-8000-000000000009'
 const shortClipId = '00000000-0000-4000-8000-000000000004'
 const platformAccountId = '00000000-0000-4000-8000-000000000005'
 const replacementPlatformAccountId = '00000000-0000-4000-8000-000000000006'
@@ -61,6 +73,7 @@ const scheduledAt = new Date('2026-06-10T10:00:00.000Z')
 
 const createMedia = (overrides: Partial<Media> = {}): Media => ({
   id: mediaId,
+  workspaceId,
   userId,
   type: 'VIDEO',
   title: 'Video test',
@@ -111,7 +124,8 @@ const createShortClip = (overrides: Partial<ShortClip> = {}): ShortClip => ({
 
 const createPlatformAccount = (overrides: Partial<PlatformAccount> = {}): PlatformAccount => ({
   id: platformAccountId,
-  userId,
+  workspaceId,
+  connectedByUserId: userId,
   platform: 'FACEBOOK',
   accountName: 'VidPilot Page',
   platformUserId: '123456789',
@@ -180,13 +194,15 @@ describe('publish task service', () => {
     updatePublishTaskMock.mockReset()
     findMediaByIdMock.mockReset()
     findShortClipByIdMock.mockReset()
-    findPlatformAccountByIdMock.mockReset()
+    getUsablePlatformAccountMock.mockReset()
+    getWorkspaceMembershipContextMock.mockReset()
     publishPublishTaskJobMock.mockReset()
+    getUsablePlatformAccountMock.mockResolvedValue(createPlatformAccount())
+    getWorkspaceMembershipContextMock.mockResolvedValue({ id: workspaceId, role: 'MEMBER' })
   })
 
   it('creates a media publish task with a required connected platform account', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
     createPublishTaskMock.mockResolvedValue(createPublishTask({ scheduledAt }))
 
     const result = await publishTasksService.createPublishTask(userId, {
@@ -200,7 +216,7 @@ describe('publish task service', () => {
     })
 
     expect(findMediaByIdMock).toHaveBeenCalledWith(mediaId)
-    expect(findPlatformAccountByIdMock).toHaveBeenCalledWith(platformAccountId)
+    expect(getUsablePlatformAccountMock).toHaveBeenCalledWith(workspaceId, 'FACEBOOK', platformAccountId)
     expect(createPublishTaskMock).toHaveBeenCalledWith(
       expect.objectContaining({
         userId,
@@ -222,7 +238,7 @@ describe('publish task service', () => {
 
   it('creates a short clip publish task with a required connected platform account', async () => {
     findShortClipByIdMock.mockResolvedValue(createShortClip())
-    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
+    findMediaByIdMock.mockResolvedValue(createMedia())
     createPublishTaskMock.mockResolvedValue(createPublishTask({ mediaId: null, shortClipId }))
 
     const result = await publishTasksService.createPublishTask(userId, {
@@ -246,7 +262,7 @@ describe('publish task service', () => {
     })
   })
 
-  it('rejects missing, forbidden, and deleted media targets', async () => {
+  it('rejects missing, inaccessible, and deleted media targets', async () => {
     findMediaByIdMock.mockResolvedValueOnce(null)
     await expect(
       publishTasksService.createPublishTask(userId, { mediaId, platform: 'FACEBOOK', platformAccountId })
@@ -255,12 +271,16 @@ describe('publish task service', () => {
       code: 'PUBLISH_TARGET_NOT_FOUND'
     })
 
-    findMediaByIdMock.mockResolvedValueOnce(createMedia({ userId: otherUserId }))
+    findMediaByIdMock.mockResolvedValueOnce(createMedia({ workspaceId: otherWorkspaceId }))
+    getWorkspaceMembershipContextMock.mockRejectedValueOnce({
+      statusCode: 403,
+      code: 'WORKSPACE_FORBIDDEN'
+    })
     await expect(
       publishTasksService.createPublishTask(userId, { mediaId, platform: 'FACEBOOK', platformAccountId })
     ).rejects.toMatchObject({
       statusCode: 403,
-      code: 'FORBIDDEN'
+      code: 'WORKSPACE_FORBIDDEN'
     })
 
     findMediaByIdMock.mockResolvedValueOnce(createMedia({ status: 'DELETED' }))
@@ -272,7 +292,7 @@ describe('publish task service', () => {
     })
   })
 
-  it('rejects missing, forbidden, and deleted short clip targets', async () => {
+  it('rejects missing, inaccessible, and deleted short clip targets', async () => {
     findShortClipByIdMock.mockResolvedValueOnce(null)
     await expect(
       publishTasksService.createPublishTask(userId, { shortClipId, platform: 'FACEBOOK', platformAccountId })
@@ -281,12 +301,17 @@ describe('publish task service', () => {
       code: 'PUBLISH_TARGET_NOT_FOUND'
     })
 
-    findShortClipByIdMock.mockResolvedValueOnce(createShortClip({ userId: otherUserId }))
+    findShortClipByIdMock.mockResolvedValueOnce(createShortClip())
+    findMediaByIdMock.mockResolvedValueOnce(createMedia({ workspaceId: otherWorkspaceId }))
+    getWorkspaceMembershipContextMock.mockRejectedValueOnce({
+      statusCode: 403,
+      code: 'WORKSPACE_FORBIDDEN'
+    })
     await expect(
       publishTasksService.createPublishTask(userId, { shortClipId, platform: 'FACEBOOK', platformAccountId })
     ).rejects.toMatchObject({
       statusCode: 403,
-      code: 'FORBIDDEN'
+      code: 'WORKSPACE_FORBIDDEN'
     })
 
     findShortClipByIdMock.mockResolvedValueOnce(createShortClip({ status: 'DELETED' }))
@@ -298,10 +323,13 @@ describe('publish task service', () => {
     })
   })
 
-  it('rejects missing, forbidden, wrong-platform, and disconnected platform accounts', async () => {
+  it('propagates unusable shared platform account errors', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
 
-    findPlatformAccountByIdMock.mockResolvedValueOnce(null)
+    getUsablePlatformAccountMock.mockRejectedValueOnce({
+      statusCode: 404,
+      code: 'PLATFORM_ACCOUNT_NOT_FOUND'
+    })
     await expect(
       publishTasksService.createPublishTask(userId, { mediaId, platform: 'FACEBOOK', platformAccountId })
     ).rejects.toMatchObject({
@@ -309,7 +337,10 @@ describe('publish task service', () => {
       code: 'PLATFORM_ACCOUNT_NOT_FOUND'
     })
 
-    findPlatformAccountByIdMock.mockResolvedValueOnce(createPlatformAccount({ userId: otherUserId }))
+    getUsablePlatformAccountMock.mockRejectedValueOnce({
+      statusCode: 403,
+      code: 'FORBIDDEN'
+    })
     await expect(
       publishTasksService.createPublishTask(userId, { mediaId, platform: 'FACEBOOK', platformAccountId })
     ).rejects.toMatchObject({
@@ -317,15 +348,10 @@ describe('publish task service', () => {
       code: 'FORBIDDEN'
     })
 
-    findPlatformAccountByIdMock.mockResolvedValueOnce(createPlatformAccount({ platform: 'YOUTUBE' }))
-    await expect(
-      publishTasksService.createPublishTask(userId, { mediaId, platform: 'FACEBOOK', platformAccountId })
-    ).rejects.toMatchObject({
+    getUsablePlatformAccountMock.mockRejectedValueOnce({
       statusCode: 409,
       code: 'PLATFORM_ACCOUNT_INVALID_STATE'
     })
-
-    findPlatformAccountByIdMock.mockResolvedValueOnce(createPlatformAccount({ status: 'REVOKED' }))
     await expect(
       publishTasksService.createPublishTask(userId, { mediaId, platform: 'FACEBOOK', platformAccountId })
     ).rejects.toMatchObject({
@@ -399,7 +425,8 @@ describe('publish task service', () => {
 
   it('updates editable publish task metadata and validates changed platform account', async () => {
     findPublishTaskByIdMock.mockResolvedValue(createPublishTask({ status: 'FAILED' }))
-    findPlatformAccountByIdMock.mockResolvedValue(
+    findMediaByIdMock.mockResolvedValue(createMedia())
+    getUsablePlatformAccountMock.mockResolvedValue(
       createPlatformAccount({ id: replacementPlatformAccountId, platform: 'FACEBOOK' })
     )
     updatePublishTaskMock.mockResolvedValue(
@@ -420,7 +447,7 @@ describe('publish task service', () => {
       scheduledAt: null
     })
 
-    expect(findPlatformAccountByIdMock).toHaveBeenCalledWith(replacementPlatformAccountId)
+    expect(getUsablePlatformAccountMock).toHaveBeenCalledWith(workspaceId, 'FACEBOOK', replacementPlatformAccountId)
     expect(updatePublishTaskMock).toHaveBeenCalledWith(publishTaskId, {
       platformAccountId: replacementPlatformAccountId,
       title: 'Updated title',
@@ -454,7 +481,6 @@ describe('publish task service', () => {
   it('publishes a draft media publish task by creating a job and enqueueing it', async () => {
     findPublishTaskByIdMock.mockResolvedValue(createPublishTask())
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     updatePublishTaskMock.mockResolvedValue(createPublishTask({ jobId, status: 'PUBLISHING' }))
     publishPublishTaskJobMock.mockResolvedValue()
@@ -510,7 +536,7 @@ describe('publish task service', () => {
 
     findPublishTaskByIdMock.mockResolvedValue(createPublishTask({ mediaId: null, shortClipId, status: 'FAILED' }))
     findShortClipByIdMock.mockResolvedValue(createShortClip())
-    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
+    findMediaByIdMock.mockResolvedValue(createMedia())
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     updatePublishTaskMock.mockResolvedValue(
       createPublishTask({ mediaId: null, shortClipId, jobId, status: 'SCHEDULED', scheduledAt: futureScheduledAt })
@@ -633,7 +659,10 @@ describe('publish task service', () => {
 
     findPublishTaskByIdMock.mockResolvedValueOnce(createPublishTask())
     findMediaByIdMock.mockResolvedValueOnce(createMedia())
-    findPlatformAccountByIdMock.mockResolvedValueOnce(createPlatformAccount({ status: 'REVOKED' }))
+    getUsablePlatformAccountMock.mockRejectedValueOnce({
+      statusCode: 409,
+      code: 'PLATFORM_ACCOUNT_INVALID_STATE'
+    })
 
     await expect(publishTasksService.publishPublishTask(userId, publishTaskId)).rejects.toMatchObject({
       statusCode: 409,
@@ -646,7 +675,6 @@ describe('publish task service', () => {
   it('marks the publish job and task failed when queue publish fails', async () => {
     findPublishTaskByIdMock.mockResolvedValue(createPublishTask())
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findPlatformAccountByIdMock.mockResolvedValue(createPlatformAccount())
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     updatePublishTaskMock.mockResolvedValueOnce(createPublishTask({ jobId, status: 'PUBLISHING' }))
     updatePublishTaskMock.mockResolvedValueOnce(createPublishTask({ jobId, status: 'FAILED' }))

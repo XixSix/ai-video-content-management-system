@@ -26,6 +26,11 @@ interface FacebookAccountsResponse extends FacebookErrorResponse {
     id?: string
     name?: string
     tasks?: string[]
+    picture?: {
+      data?: {
+        url?: string
+      }
+    }
   }>
 }
 
@@ -92,7 +97,7 @@ export const exchangeFacebookCode = async (code: string): Promise<FacebookConnec
 
 export const getAuthenticatedFacebookPage = async (tokens: FacebookConnectionTokens): Promise<FacebookPageProfile> => {
   const url = createGraphUrl('/me/accounts')
-  url.searchParams.set('fields', 'id,name,access_token,tasks')
+  url.searchParams.set('fields', 'id,name,access_token,tasks,picture')
   url.searchParams.set('access_token', tokens.accessToken)
 
   const response = await readFacebookJson<FacebookAccountsResponse>(await fetch(url))
@@ -108,6 +113,7 @@ export const getAuthenticatedFacebookPage = async (tokens: FacebookConnectionTok
   return {
     accountName: page.name,
     platformUserId: page.id,
+    avatarUrl: page.picture?.data?.url ?? null,
     pageAccessToken: page.access_token
   }
 }

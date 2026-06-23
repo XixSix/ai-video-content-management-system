@@ -26,7 +26,8 @@ export type AggregatePlatformOAuthState = {
 
 export type PlatformOAuthStateMinAggregateOutputType = {
   id: string | null
-  userId: string | null
+  workspaceId: string | null
+  initiatedByUserId: string | null
   platform: $Enums.Platform | null
   stateHash: string | null
   expiresAt: Date | null
@@ -36,7 +37,8 @@ export type PlatformOAuthStateMinAggregateOutputType = {
 
 export type PlatformOAuthStateMaxAggregateOutputType = {
   id: string | null
-  userId: string | null
+  workspaceId: string | null
+  initiatedByUserId: string | null
   platform: $Enums.Platform | null
   stateHash: string | null
   expiresAt: Date | null
@@ -46,7 +48,8 @@ export type PlatformOAuthStateMaxAggregateOutputType = {
 
 export type PlatformOAuthStateCountAggregateOutputType = {
   id: number
-  userId: number
+  workspaceId: number
+  initiatedByUserId: number
   platform: number
   stateHash: number
   expiresAt: number
@@ -58,7 +61,8 @@ export type PlatformOAuthStateCountAggregateOutputType = {
 
 export type PlatformOAuthStateMinAggregateInputType = {
   id?: true
-  userId?: true
+  workspaceId?: true
+  initiatedByUserId?: true
   platform?: true
   stateHash?: true
   expiresAt?: true
@@ -68,7 +72,8 @@ export type PlatformOAuthStateMinAggregateInputType = {
 
 export type PlatformOAuthStateMaxAggregateInputType = {
   id?: true
-  userId?: true
+  workspaceId?: true
+  initiatedByUserId?: true
   platform?: true
   stateHash?: true
   expiresAt?: true
@@ -78,7 +83,8 @@ export type PlatformOAuthStateMaxAggregateInputType = {
 
 export type PlatformOAuthStateCountAggregateInputType = {
   id?: true
-  userId?: true
+  workspaceId?: true
+  initiatedByUserId?: true
   platform?: true
   stateHash?: true
   expiresAt?: true
@@ -161,7 +167,8 @@ export type PlatformOAuthStateGroupByArgs<ExtArgs extends runtime.Types.Extensio
 
 export type PlatformOAuthStateGroupByOutputType = {
   id: string
-  userId: string
+  workspaceId: string
+  initiatedByUserId: string
   platform: $Enums.Platform
   stateHash: string
   expiresAt: Date
@@ -192,24 +199,28 @@ export type PlatformOAuthStateWhereInput = {
   OR?: Prisma.PlatformOAuthStateWhereInput[]
   NOT?: Prisma.PlatformOAuthStateWhereInput | Prisma.PlatformOAuthStateWhereInput[]
   id?: Prisma.UuidFilter<"PlatformOAuthState"> | string
-  userId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
+  workspaceId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
+  initiatedByUserId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
   platform?: Prisma.EnumPlatformFilter<"PlatformOAuthState"> | $Enums.Platform
   stateHash?: Prisma.StringFilter<"PlatformOAuthState"> | string
   expiresAt?: Prisma.DateTimeFilter<"PlatformOAuthState"> | Date | string
   consumedAt?: Prisma.DateTimeNullableFilter<"PlatformOAuthState"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PlatformOAuthState"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
+  initiatedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type PlatformOAuthStateOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  initiatedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   stateHash?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   consumedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
+  workspace?: Prisma.WorkspaceOrderByWithRelationInput
+  initiatedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type PlatformOAuthStateWhereUniqueInput = Prisma.AtLeast<{
@@ -218,17 +229,20 @@ export type PlatformOAuthStateWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PlatformOAuthStateWhereInput | Prisma.PlatformOAuthStateWhereInput[]
   OR?: Prisma.PlatformOAuthStateWhereInput[]
   NOT?: Prisma.PlatformOAuthStateWhereInput | Prisma.PlatformOAuthStateWhereInput[]
-  userId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
+  workspaceId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
+  initiatedByUserId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
   platform?: Prisma.EnumPlatformFilter<"PlatformOAuthState"> | $Enums.Platform
   expiresAt?: Prisma.DateTimeFilter<"PlatformOAuthState"> | Date | string
   consumedAt?: Prisma.DateTimeNullableFilter<"PlatformOAuthState"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PlatformOAuthState"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
+  initiatedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "stateHash">
 
 export type PlatformOAuthStateOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  initiatedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   stateHash?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
@@ -244,7 +258,8 @@ export type PlatformOAuthStateScalarWhereWithAggregatesInput = {
   OR?: Prisma.PlatformOAuthStateScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PlatformOAuthStateScalarWhereWithAggregatesInput | Prisma.PlatformOAuthStateScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"PlatformOAuthState"> | string
-  userId?: Prisma.UuidWithAggregatesFilter<"PlatformOAuthState"> | string
+  workspaceId?: Prisma.UuidWithAggregatesFilter<"PlatformOAuthState"> | string
+  initiatedByUserId?: Prisma.UuidWithAggregatesFilter<"PlatformOAuthState"> | string
   platform?: Prisma.EnumPlatformWithAggregatesFilter<"PlatformOAuthState"> | $Enums.Platform
   stateHash?: Prisma.StringWithAggregatesFilter<"PlatformOAuthState"> | string
   expiresAt?: Prisma.DateTimeWithAggregatesFilter<"PlatformOAuthState"> | Date | string
@@ -259,12 +274,14 @@ export type PlatformOAuthStateCreateInput = {
   expiresAt: Date | string
   consumedAt?: Date | string | null
   createdAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPlatformOAuthStatesInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutPlatformOAuthStatesInput
+  initiatedBy: Prisma.UserCreateNestedOneWithoutInitiatedPlatformOAuthStatesInput
 }
 
 export type PlatformOAuthStateUncheckedCreateInput = {
   id?: string
-  userId: string
+  workspaceId: string
+  initiatedByUserId: string
   platform: $Enums.Platform
   stateHash: string
   expiresAt: Date | string
@@ -279,12 +296,14 @@ export type PlatformOAuthStateUpdateInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPlatformOAuthStatesNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutPlatformOAuthStatesNestedInput
+  initiatedBy?: Prisma.UserUpdateOneRequiredWithoutInitiatedPlatformOAuthStatesNestedInput
 }
 
 export type PlatformOAuthStateUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   stateHash?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -294,7 +313,8 @@ export type PlatformOAuthStateUncheckedUpdateInput = {
 
 export type PlatformOAuthStateCreateManyInput = {
   id?: string
-  userId: string
+  workspaceId: string
+  initiatedByUserId: string
   platform: $Enums.Platform
   stateHash: string
   expiresAt: Date | string
@@ -313,7 +333,8 @@ export type PlatformOAuthStateUpdateManyMutationInput = {
 
 export type PlatformOAuthStateUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   stateHash?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -333,7 +354,8 @@ export type PlatformOAuthStateOrderByRelationAggregateInput = {
 
 export type PlatformOAuthStateCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  initiatedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   stateHash?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
@@ -343,7 +365,8 @@ export type PlatformOAuthStateCountOrderByAggregateInput = {
 
 export type PlatformOAuthStateMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  initiatedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   stateHash?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
@@ -353,7 +376,8 @@ export type PlatformOAuthStateMaxOrderByAggregateInput = {
 
 export type PlatformOAuthStateMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  initiatedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   stateHash?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
@@ -361,50 +385,103 @@ export type PlatformOAuthStateMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
 }
 
-export type PlatformOAuthStateCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput> | Prisma.PlatformOAuthStateCreateWithoutUserInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.PlatformOAuthStateCreateManyUserInputEnvelope
+export type PlatformOAuthStateCreateNestedManyWithoutInitiatedByInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput> | Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyInitiatedByInputEnvelope
   connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
 }
 
-export type PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput> | Prisma.PlatformOAuthStateCreateWithoutUserInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.PlatformOAuthStateCreateManyUserInputEnvelope
+export type PlatformOAuthStateUncheckedCreateNestedManyWithoutInitiatedByInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput> | Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyInitiatedByInputEnvelope
   connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
 }
 
-export type PlatformOAuthStateUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput> | Prisma.PlatformOAuthStateCreateWithoutUserInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutUserInput | Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.PlatformOAuthStateCreateManyUserInputEnvelope
+export type PlatformOAuthStateUpdateManyWithoutInitiatedByNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput> | Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput[]
+  upsert?: Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutInitiatedByInput | Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutInitiatedByInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyInitiatedByInputEnvelope
   set?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
   disconnect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
   delete?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
   connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
-  update?: Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutUserInput | Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutUserInput | Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutInitiatedByInput | Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutInitiatedByInput[]
+  updateMany?: Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutInitiatedByInput | Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutInitiatedByInput[]
   deleteMany?: Prisma.PlatformOAuthStateScalarWhereInput | Prisma.PlatformOAuthStateScalarWhereInput[]
 }
 
-export type PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput> | Prisma.PlatformOAuthStateCreateWithoutUserInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutUserInput | Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.PlatformOAuthStateCreateManyUserInputEnvelope
+export type PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput> | Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput[]
+  upsert?: Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutInitiatedByInput | Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutInitiatedByInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyInitiatedByInputEnvelope
   set?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
   disconnect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
   delete?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
   connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
-  update?: Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutUserInput | Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutUserInput | Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutInitiatedByInput | Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutInitiatedByInput[]
+  updateMany?: Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutInitiatedByInput | Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutInitiatedByInput[]
   deleteMany?: Prisma.PlatformOAuthStateScalarWhereInput | Prisma.PlatformOAuthStateScalarWhereInput[]
 }
 
-export type PlatformOAuthStateCreateWithoutUserInput = {
+export type PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+}
+
+export type PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+}
+
+export type PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyWorkspaceInputEnvelope
+  set?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  disconnect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  delete?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  update?: Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutWorkspaceInput | Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.PlatformOAuthStateScalarWhereInput | Prisma.PlatformOAuthStateScalarWhereInput[]
+}
+
+export type PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput[] | Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformOAuthStateUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformOAuthStateCreateManyWorkspaceInputEnvelope
+  set?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  disconnect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  delete?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  connect?: Prisma.PlatformOAuthStateWhereUniqueInput | Prisma.PlatformOAuthStateWhereUniqueInput[]
+  update?: Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformOAuthStateUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutWorkspaceInput | Prisma.PlatformOAuthStateUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.PlatformOAuthStateScalarWhereInput | Prisma.PlatformOAuthStateScalarWhereInput[]
+}
+
+export type PlatformOAuthStateCreateWithoutInitiatedByInput = {
   id?: string
+  platform: $Enums.Platform
+  stateHash: string
+  expiresAt: Date | string
+  consumedAt?: Date | string | null
+  createdAt?: Date | string
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutPlatformOAuthStatesInput
+}
+
+export type PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput = {
+  id?: string
+  workspaceId: string
   platform: $Enums.Platform
   stateHash: string
   expiresAt: Date | string
@@ -412,39 +489,30 @@ export type PlatformOAuthStateCreateWithoutUserInput = {
   createdAt?: Date | string
 }
 
-export type PlatformOAuthStateUncheckedCreateWithoutUserInput = {
-  id?: string
-  platform: $Enums.Platform
-  stateHash: string
-  expiresAt: Date | string
-  consumedAt?: Date | string | null
-  createdAt?: Date | string
-}
-
-export type PlatformOAuthStateCreateOrConnectWithoutUserInput = {
+export type PlatformOAuthStateCreateOrConnectWithoutInitiatedByInput = {
   where: Prisma.PlatformOAuthStateWhereUniqueInput
-  create: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput>
 }
 
-export type PlatformOAuthStateCreateManyUserInputEnvelope = {
-  data: Prisma.PlatformOAuthStateCreateManyUserInput | Prisma.PlatformOAuthStateCreateManyUserInput[]
+export type PlatformOAuthStateCreateManyInitiatedByInputEnvelope = {
+  data: Prisma.PlatformOAuthStateCreateManyInitiatedByInput | Prisma.PlatformOAuthStateCreateManyInitiatedByInput[]
   skipDuplicates?: boolean
 }
 
-export type PlatformOAuthStateUpsertWithWhereUniqueWithoutUserInput = {
+export type PlatformOAuthStateUpsertWithWhereUniqueWithoutInitiatedByInput = {
   where: Prisma.PlatformOAuthStateWhereUniqueInput
-  update: Prisma.XOR<Prisma.PlatformOAuthStateUpdateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutUserInput>
+  update: Prisma.XOR<Prisma.PlatformOAuthStateUpdateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedUpdateWithoutInitiatedByInput>
+  create: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutInitiatedByInput>
 }
 
-export type PlatformOAuthStateUpdateWithWhereUniqueWithoutUserInput = {
+export type PlatformOAuthStateUpdateWithWhereUniqueWithoutInitiatedByInput = {
   where: Prisma.PlatformOAuthStateWhereUniqueInput
-  data: Prisma.XOR<Prisma.PlatformOAuthStateUpdateWithoutUserInput, Prisma.PlatformOAuthStateUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.PlatformOAuthStateUpdateWithoutInitiatedByInput, Prisma.PlatformOAuthStateUncheckedUpdateWithoutInitiatedByInput>
 }
 
-export type PlatformOAuthStateUpdateManyWithWhereWithoutUserInput = {
+export type PlatformOAuthStateUpdateManyWithWhereWithoutInitiatedByInput = {
   where: Prisma.PlatformOAuthStateScalarWhereInput
-  data: Prisma.XOR<Prisma.PlatformOAuthStateUpdateManyMutationInput, Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserInput>
+  data: Prisma.XOR<Prisma.PlatformOAuthStateUpdateManyMutationInput, Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByInput>
 }
 
 export type PlatformOAuthStateScalarWhereInput = {
@@ -452,7 +520,8 @@ export type PlatformOAuthStateScalarWhereInput = {
   OR?: Prisma.PlatformOAuthStateScalarWhereInput[]
   NOT?: Prisma.PlatformOAuthStateScalarWhereInput | Prisma.PlatformOAuthStateScalarWhereInput[]
   id?: Prisma.UuidFilter<"PlatformOAuthState"> | string
-  userId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
+  workspaceId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
+  initiatedByUserId?: Prisma.UuidFilter<"PlatformOAuthState"> | string
   platform?: Prisma.EnumPlatformFilter<"PlatformOAuthState"> | $Enums.Platform
   stateHash?: Prisma.StringFilter<"PlatformOAuthState"> | string
   expiresAt?: Prisma.DateTimeFilter<"PlatformOAuthState"> | Date | string
@@ -460,8 +529,19 @@ export type PlatformOAuthStateScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PlatformOAuthState"> | Date | string
 }
 
-export type PlatformOAuthStateCreateManyUserInput = {
+export type PlatformOAuthStateCreateWithoutWorkspaceInput = {
   id?: string
+  platform: $Enums.Platform
+  stateHash: string
+  expiresAt: Date | string
+  consumedAt?: Date | string | null
+  createdAt?: Date | string
+  initiatedBy: Prisma.UserCreateNestedOneWithoutInitiatedPlatformOAuthStatesInput
+}
+
+export type PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput = {
+  id?: string
+  initiatedByUserId: string
   platform: $Enums.Platform
   stateHash: string
   expiresAt: Date | string
@@ -469,8 +549,55 @@ export type PlatformOAuthStateCreateManyUserInput = {
   createdAt?: Date | string
 }
 
-export type PlatformOAuthStateUpdateWithoutUserInput = {
+export type PlatformOAuthStateCreateOrConnectWithoutWorkspaceInput = {
+  where: Prisma.PlatformOAuthStateWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type PlatformOAuthStateCreateManyWorkspaceInputEnvelope = {
+  data: Prisma.PlatformOAuthStateCreateManyWorkspaceInput | Prisma.PlatformOAuthStateCreateManyWorkspaceInput[]
+  skipDuplicates?: boolean
+}
+
+export type PlatformOAuthStateUpsertWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.PlatformOAuthStateWhereUniqueInput
+  update: Prisma.XOR<Prisma.PlatformOAuthStateUpdateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedUpdateWithoutWorkspaceInput>
+  create: Prisma.XOR<Prisma.PlatformOAuthStateCreateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type PlatformOAuthStateUpdateWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.PlatformOAuthStateWhereUniqueInput
+  data: Prisma.XOR<Prisma.PlatformOAuthStateUpdateWithoutWorkspaceInput, Prisma.PlatformOAuthStateUncheckedUpdateWithoutWorkspaceInput>
+}
+
+export type PlatformOAuthStateUpdateManyWithWhereWithoutWorkspaceInput = {
+  where: Prisma.PlatformOAuthStateScalarWhereInput
+  data: Prisma.XOR<Prisma.PlatformOAuthStateUpdateManyMutationInput, Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceInput>
+}
+
+export type PlatformOAuthStateCreateManyInitiatedByInput = {
+  id?: string
+  workspaceId: string
+  platform: $Enums.Platform
+  stateHash: string
+  expiresAt: Date | string
+  consumedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type PlatformOAuthStateUpdateWithoutInitiatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  stateHash?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutPlatformOAuthStatesNestedInput
+}
+
+export type PlatformOAuthStateUncheckedUpdateWithoutInitiatedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   stateHash?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -478,8 +605,9 @@ export type PlatformOAuthStateUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type PlatformOAuthStateUncheckedUpdateWithoutUserInput = {
+export type PlatformOAuthStateUncheckedUpdateManyWithoutInitiatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   stateHash?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -487,8 +615,39 @@ export type PlatformOAuthStateUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type PlatformOAuthStateUncheckedUpdateManyWithoutUserInput = {
+export type PlatformOAuthStateCreateManyWorkspaceInput = {
+  id?: string
+  initiatedByUserId: string
+  platform: $Enums.Platform
+  stateHash: string
+  expiresAt: Date | string
+  consumedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type PlatformOAuthStateUpdateWithoutWorkspaceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  stateHash?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  initiatedBy?: Prisma.UserUpdateOneRequiredWithoutInitiatedPlatformOAuthStatesNestedInput
+}
+
+export type PlatformOAuthStateUncheckedUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  stateHash?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   stateHash?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -500,40 +659,47 @@ export type PlatformOAuthStateUncheckedUpdateManyWithoutUserInput = {
 
 export type PlatformOAuthStateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  initiatedByUserId?: boolean
   platform?: boolean
   stateHash?: boolean
   expiresAt?: boolean
   consumedAt?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  initiatedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformOAuthState"]>
 
 export type PlatformOAuthStateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  initiatedByUserId?: boolean
   platform?: boolean
   stateHash?: boolean
   expiresAt?: boolean
   consumedAt?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  initiatedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformOAuthState"]>
 
 export type PlatformOAuthStateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  initiatedByUserId?: boolean
   platform?: boolean
   stateHash?: boolean
   expiresAt?: boolean
   consumedAt?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  initiatedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformOAuthState"]>
 
 export type PlatformOAuthStateSelectScalar = {
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  initiatedByUserId?: boolean
   platform?: boolean
   stateHash?: boolean
   expiresAt?: boolean
@@ -541,25 +707,30 @@ export type PlatformOAuthStateSelectScalar = {
   createdAt?: boolean
 }
 
-export type PlatformOAuthStateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "platform" | "stateHash" | "expiresAt" | "consumedAt" | "createdAt", ExtArgs["result"]["platformOAuthState"]>
+export type PlatformOAuthStateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workspaceId" | "initiatedByUserId" | "platform" | "stateHash" | "expiresAt" | "consumedAt" | "createdAt", ExtArgs["result"]["platformOAuthState"]>
 export type PlatformOAuthStateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  initiatedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type PlatformOAuthStateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  initiatedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type PlatformOAuthStateIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  initiatedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $PlatformOAuthStatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformOAuthState"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
+    workspace: Prisma.$WorkspacePayload<ExtArgs>
+    initiatedBy: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    userId: string
+    workspaceId: string
+    initiatedByUserId: string
     platform: $Enums.Platform
     stateHash: string
     expiresAt: Date
@@ -959,7 +1130,8 @@ readonly fields: PlatformOAuthStateFieldRefs;
  */
 export interface Prisma__PlatformOAuthStateClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  workspace<T extends Prisma.WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkspaceDefaultArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  initiatedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -990,7 +1162,8 @@ export interface Prisma__PlatformOAuthStateClient<T, Null = never, ExtArgs exten
  */
 export interface PlatformOAuthStateFieldRefs {
   readonly id: Prisma.FieldRef<"PlatformOAuthState", 'String'>
-  readonly userId: Prisma.FieldRef<"PlatformOAuthState", 'String'>
+  readonly workspaceId: Prisma.FieldRef<"PlatformOAuthState", 'String'>
+  readonly initiatedByUserId: Prisma.FieldRef<"PlatformOAuthState", 'String'>
   readonly platform: Prisma.FieldRef<"PlatformOAuthState", 'Platform'>
   readonly stateHash: Prisma.FieldRef<"PlatformOAuthState", 'String'>
   readonly expiresAt: Prisma.FieldRef<"PlatformOAuthState", 'DateTime'>

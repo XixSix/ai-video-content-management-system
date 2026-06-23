@@ -6,13 +6,20 @@ export type SocialPlatform =
   | "linkedin"
   | "x"
 
-export type ConnectedAccount = {
+export type BackendPlatform = "YOUTUBE" | "FACEBOOK"
+export type PlatformAccountStatus = "CONNECTED" | "EXPIRED" | "REVOKED"
+
+export type PlatformAccountData = {
   id: string
-  platform: SocialPlatform
-  displayName: string
-  profileUrl: string | null
+  workspaceId: string
+  platform: BackendPlatform
+  accountName: string | null
+  platformUserId: string | null
   avatarUrl: string | null
-  connectedAt: string
+  status: PlatformAccountStatus
+  expiresAt: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export type PlatformInfo = {
@@ -22,6 +29,8 @@ export type PlatformInfo = {
   color: string
   badgeLabel?: string
   mockAccountName: string
+  backendSupported: boolean
+  backendId?: BackendPlatform
 }
 
 export type PlatformFilterValue = "all" | SocialPlatform

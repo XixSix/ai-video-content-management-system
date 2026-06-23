@@ -40,4 +40,22 @@ export class PlatformAccountsError extends AppError {
   static accountFetchFailed(message = 'Failed to load the authenticated platform account'): PlatformAccountsError {
     return new PlatformAccountsError(message, 502, 'PLATFORM_OAUTH_ACCOUNT_FETCH_FAILED')
   }
+
+  static accountNotFound(message = 'Platform account not found'): PlatformAccountsError {
+    return new PlatformAccountsError(message, 404, 'PLATFORM_ACCOUNT_NOT_FOUND')
+  }
+
+  static accountForbidden(
+    message = 'Platform account does not belong to the current workspace'
+  ): PlatformAccountsError {
+    return new PlatformAccountsError(message, 403, 'FORBIDDEN')
+  }
+
+  static invalidAccount(message = 'Platform account cannot be used'): PlatformAccountsError {
+    return new PlatformAccountsError(message, 409, 'PLATFORM_ACCOUNT_INVALID_STATE')
+  }
+
+  static providerUnavailable(message = 'Platform credential service is unavailable'): PlatformAccountsError {
+    return new PlatformAccountsError(message, 502, 'PLATFORM_CREDENTIAL_PROVIDER_UNAVAILABLE')
+  }
 }

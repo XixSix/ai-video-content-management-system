@@ -113,7 +113,7 @@ const envSchema = z.object({
     .int()
     .positive()
     .default(10 * 60 * 1000),
-  FRONTEND_OAUTH_REDIRECT_URL: z.url().default('http://localhost:5173/settings/integrations')
+  FRONTEND_OAUTH_REDIRECT_URL: z.url().default('http://localhost:5173/social-accounts/callback')
 })
 
 const parsedEnv = envSchema.safeParse(process.env)

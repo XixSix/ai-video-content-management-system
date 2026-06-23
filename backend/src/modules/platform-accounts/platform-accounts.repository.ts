@@ -10,6 +10,22 @@ import type { CreatePlatformOAuthStateInput, UpsertConnectedPlatformAccountInput
 export const createPlatformOAuthState = async (data: CreatePlatformOAuthStateInput): Promise<PlatformOAuthState> =>
   prisma.platformOAuthState.create({ data })
 
+export const deleteStalePlatformOAuthStates = async (
+  workspaceId: string,
+  platform: Platform,
+  now: Date
+): Promise<number> => {
+  const result = await prisma.platformOAuthState.deleteMany({
+    where: {
+      workspaceId,
+      platform,
+      OR: [{ consumedAt: { not: null } }, { expiresAt: { lte: now } }]
+    }
+  })
+
+  return result.count
+}
+
 export const findPlatformOAuthStateByHashAndPlatform = async (
   stateHash: string,
   platform: Platform
@@ -21,16 +37,38 @@ export const findPlatformOAuthStateByHashAndPlatform = async (
     }
   })
 
-export const consumePlatformOAuthState = async (id: string, consumedAt: Date): Promise<PlatformOAuthState> =>
-  prisma.platformOAuthState.update({
-    where: { id },
+export const claimPlatformOAuthState = async (id: string, consumedAt: Date): Promise<boolean> => {
+  const result = await prisma.platformOAuthState.updateMany({
+    where: {
+      id,
+      consumedAt: null,
+      expiresAt: { gt: consumedAt }
+    },
     data: { consumedAt }
   })
 
-export const findPlatformAccountsByUserId = async (userId: string): Promise<PlatformAccount[]> =>
+  return result.count === 1
+}
+
+export const expireElapsedPlatformAccounts = async (workspaceId: string, now: Date): Promise<number> => {
+  const result = await prisma.platformAccount.updateMany({
+    where: {
+      workspaceId,
+      status: PlatformAccountStatus.CONNECTED,
+      expiresAt: { lte: now }
+    },
+    data: {
+      status: PlatformAccountStatus.EXPIRED
+    }
+  })
+
+  return result.count
+}
+
+export const findPlatformAccountsByWorkspaceId = async (workspaceId: string): Promise<PlatformAccount[]> =>
   prisma.platformAccount.findMany({
     where: {
-      userId,
+      workspaceId,
       status: {
         not: PlatformAccountStatus.REVOKED
       }
@@ -40,17 +78,22 @@ export const findPlatformAccountsByUserId = async (userId: string): Promise<Plat
     }
   })
 
-export const findPlatformAccountByUserIdAndPlatform = async (
-  userId: string,
+export const findPlatformAccountByWorkspaceIdAndPlatform = async (
+  workspaceId: string,
   platform: Platform
 ): Promise<PlatformAccount | null> =>
   prisma.platformAccount.findUnique({
     where: {
-      userId_platform: {
-        userId,
+      workspaceId_platform: {
+        workspaceId,
         platform
       }
     }
+  })
+
+export const findPlatformAccountById = async (id: string): Promise<PlatformAccount | null> =>
+  prisma.platformAccount.findUnique({
+    where: { id }
   })
 
 export const upsertConnectedPlatformAccount = async (
@@ -58,16 +101,18 @@ export const upsertConnectedPlatformAccount = async (
 ): Promise<PlatformAccount> =>
   prisma.platformAccount.upsert({
     where: {
-      userId_platform: {
-        userId: data.userId,
+      workspaceId_platform: {
+        workspaceId: data.workspaceId,
         platform: data.platform
       }
     },
     create: {
-      userId: data.userId,
+      workspaceId: data.workspaceId,
+      connectedByUserId: data.connectedByUserId,
       platform: data.platform,
       accountName: data.accountName,
       platformUserId: data.platformUserId,
+      avatarUrl: data.avatarUrl,
       accessTokenEncrypted: data.accessTokenEncrypted,
       refreshTokenEncrypted: data.refreshTokenEncrypted,
       tokenLast4: data.tokenLast4,
@@ -75,13 +120,40 @@ export const upsertConnectedPlatformAccount = async (
       status: PlatformAccountStatus.CONNECTED
     },
     update: {
+      connectedByUserId: data.connectedByUserId,
       accountName: data.accountName,
       platformUserId: data.platformUserId,
+      avatarUrl: data.avatarUrl,
       accessTokenEncrypted: data.accessTokenEncrypted,
       refreshTokenEncrypted: data.refreshTokenEncrypted,
       tokenLast4: data.tokenLast4,
       expiresAt: data.expiresAt,
       status: PlatformAccountStatus.CONNECTED
+    }
+  })
+
+export const updatePlatformAccountCredentials = async (
+  id: string,
+  data: {
+    accessTokenEncrypted: string
+    refreshTokenEncrypted: string | null
+    tokenLast4: string | null
+    expiresAt: Date | null
+  }
+): Promise<PlatformAccount> =>
+  prisma.platformAccount.update({
+    where: { id },
+    data: {
+      ...data,
+      status: PlatformAccountStatus.CONNECTED
+    }
+  })
+
+export const expirePlatformAccount = async (id: string): Promise<PlatformAccount> =>
+  prisma.platformAccount.update({
+    where: { id },
+    data: {
+      status: PlatformAccountStatus.EXPIRED
     }
   })
 

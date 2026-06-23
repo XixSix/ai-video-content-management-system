@@ -8,9 +8,11 @@ import type { PlatformOAuthCallbackQuery, PlatformRoute } from './platform-accou
 
 export interface PlatformAccountData {
   id: string
+  workspaceId: string
   platform: Platform
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   status: PlatformAccountStatus
   expiresAt: Date | null
   createdAt: Date
@@ -39,6 +41,7 @@ export interface YouTubeConnectionTokens {
 export interface YouTubeChannelProfile {
   accountName: string
   platformUserId: string
+  avatarUrl: string | null
 }
 
 export interface FacebookConnectionTokens {
@@ -50,21 +53,25 @@ export interface FacebookConnectionTokens {
 export interface FacebookPageProfile {
   accountName: string
   platformUserId: string
+  avatarUrl: string | null
   pageAccessToken: string
 }
 
 export interface CreatePlatformOAuthStateInput {
-  userId: string
+  workspaceId: string
+  initiatedByUserId: string
   platform: Platform
   stateHash: string
   expiresAt: Date
 }
 
 export interface UpsertConnectedPlatformAccountInput {
-  userId: string
+  workspaceId: string
+  connectedByUserId: string
   platform: Platform
   accountName: string
   platformUserId: string
+  avatarUrl: string | null
   accessTokenEncrypted: string
   refreshTokenEncrypted: string | null
   tokenLast4: string | null

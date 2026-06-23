@@ -8,6 +8,9 @@
  *         id:
  *           type: string
  *           format: uuid
+ *         workspaceId:
+ *           type: string
+ *           format: uuid
  *         platform:
  *           type: string
  *           enum: [YOUTUBE, FACEBOOK]
@@ -43,13 +46,20 @@
 
 /**
  * @swagger
- * /platform-accounts:
+ * /workspaces/{workspaceId}/platform-accounts:
  *   get:
- *     summary: List connected platform accounts
- *     description: List non-revoked external platform accounts connected by the authenticated user.
+ *     summary: List workspace platform accounts
+ *     description: List non-revoked external platform accounts available to members of the selected workspace.
  *     tags: [Platform Accounts]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: workspaceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Platform accounts retrieved successfully
@@ -78,14 +88,20 @@
 
 /**
  * @swagger
- * /platform-accounts/{platform}/connect:
+ * /workspaces/{workspaceId}/platform-accounts/{platform}/connect:
  *   post:
- *     summary: Create platform OAuth connection URL
- *     description: Create an OAuth authorization URL for the selected platform. Open the returned URL in the browser to continue the platform connection flow.
+ *     summary: Create workspace platform OAuth connection URL
+ *     description: Workspace owners can create an OAuth authorization URL for a shared platform connection.
  *     tags: [Platform Accounts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: workspaceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: platform
  *         required: true
@@ -117,6 +133,8 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Workspace owner permission required
  */
 
 /**
@@ -124,7 +142,7 @@
  * /platform-accounts/{platform}/callback:
  *   get:
  *     summary: Handle platform OAuth callback
- *     description: Public OAuth callback endpoint used by external platforms. On success or failure it redirects the browser back to the configured frontend integrations page.
+ *     description: Public OAuth callback endpoint used by external platforms. On success or failure it redirects the browser back to the configured frontend settings page.
  *     tags: [Platform Accounts]
  *     parameters:
  *       - in: path
@@ -151,19 +169,25 @@
  *           type: string
  *     responses:
  *       302:
- *         description: Redirect to the frontend integrations page with connection result query params
+ *         description: Redirect to the frontend settings page with connection result query params
  */
 
 /**
  * @swagger
- * /platform-accounts/{platform}:
+ * /workspaces/{workspaceId}/platform-accounts/{platform}:
  *   delete:
- *     summary: Disconnect platform account
- *     description: Revoke and locally disconnect the selected platform account for the authenticated user.
+ *     summary: Disconnect workspace platform account
+ *     description: Workspace owners can revoke and locally disconnect a shared platform account.
  *     tags: [Platform Accounts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: workspaceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: platform
  *         required: true
@@ -199,4 +223,6 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Workspace owner permission required
  */

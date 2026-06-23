@@ -26,10 +26,12 @@ export type AggregatePlatformAccount = {
 
 export type PlatformAccountMinAggregateOutputType = {
   id: string | null
-  userId: string | null
+  workspaceId: string | null
+  connectedByUserId: string | null
   platform: $Enums.Platform | null
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   tokenLast4: string | null
@@ -41,10 +43,12 @@ export type PlatformAccountMinAggregateOutputType = {
 
 export type PlatformAccountMaxAggregateOutputType = {
   id: string | null
-  userId: string | null
+  workspaceId: string | null
+  connectedByUserId: string | null
   platform: $Enums.Platform | null
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   tokenLast4: string | null
@@ -56,10 +60,12 @@ export type PlatformAccountMaxAggregateOutputType = {
 
 export type PlatformAccountCountAggregateOutputType = {
   id: number
-  userId: number
+  workspaceId: number
+  connectedByUserId: number
   platform: number
   accountName: number
   platformUserId: number
+  avatarUrl: number
   accessTokenEncrypted: number
   refreshTokenEncrypted: number
   tokenLast4: number
@@ -73,10 +79,12 @@ export type PlatformAccountCountAggregateOutputType = {
 
 export type PlatformAccountMinAggregateInputType = {
   id?: true
-  userId?: true
+  workspaceId?: true
+  connectedByUserId?: true
   platform?: true
   accountName?: true
   platformUserId?: true
+  avatarUrl?: true
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   tokenLast4?: true
@@ -88,10 +96,12 @@ export type PlatformAccountMinAggregateInputType = {
 
 export type PlatformAccountMaxAggregateInputType = {
   id?: true
-  userId?: true
+  workspaceId?: true
+  connectedByUserId?: true
   platform?: true
   accountName?: true
   platformUserId?: true
+  avatarUrl?: true
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   tokenLast4?: true
@@ -103,10 +113,12 @@ export type PlatformAccountMaxAggregateInputType = {
 
 export type PlatformAccountCountAggregateInputType = {
   id?: true
-  userId?: true
+  workspaceId?: true
+  connectedByUserId?: true
   platform?: true
   accountName?: true
   platformUserId?: true
+  avatarUrl?: true
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   tokenLast4?: true
@@ -191,10 +203,12 @@ export type PlatformAccountGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 
 export type PlatformAccountGroupByOutputType = {
   id: string
-  userId: string
+  workspaceId: string
+  connectedByUserId: string
   platform: $Enums.Platform
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   tokenLast4: string | null
@@ -227,10 +241,12 @@ export type PlatformAccountWhereInput = {
   OR?: Prisma.PlatformAccountWhereInput[]
   NOT?: Prisma.PlatformAccountWhereInput | Prisma.PlatformAccountWhereInput[]
   id?: Prisma.UuidFilter<"PlatformAccount"> | string
-  userId?: Prisma.UuidFilter<"PlatformAccount"> | string
+  workspaceId?: Prisma.UuidFilter<"PlatformAccount"> | string
+  connectedByUserId?: Prisma.UuidFilter<"PlatformAccount"> | string
   platform?: Prisma.EnumPlatformFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
@@ -238,16 +254,19 @@ export type PlatformAccountWhereInput = {
   status?: Prisma.EnumPlatformAccountStatusFilter<"PlatformAccount"> | $Enums.PlatformAccountStatus
   createdAt?: Prisma.DateTimeFilter<"PlatformAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlatformAccount"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
+  connectedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }
 
 export type PlatformAccountOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  connectedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrderInput | Prisma.SortOrder
   platformUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   tokenLast4?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -255,20 +274,23 @@ export type PlatformAccountOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
+  workspace?: Prisma.WorkspaceOrderByWithRelationInput
+  connectedBy?: Prisma.UserOrderByWithRelationInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
 }
 
 export type PlatformAccountWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_platform?: Prisma.PlatformAccountUserIdPlatformCompoundUniqueInput
+  workspaceId_platform?: Prisma.PlatformAccountWorkspaceIdPlatformCompoundUniqueInput
   AND?: Prisma.PlatformAccountWhereInput | Prisma.PlatformAccountWhereInput[]
   OR?: Prisma.PlatformAccountWhereInput[]
   NOT?: Prisma.PlatformAccountWhereInput | Prisma.PlatformAccountWhereInput[]
-  userId?: Prisma.UuidFilter<"PlatformAccount"> | string
+  workspaceId?: Prisma.UuidFilter<"PlatformAccount"> | string
+  connectedByUserId?: Prisma.UuidFilter<"PlatformAccount"> | string
   platform?: Prisma.EnumPlatformFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
@@ -276,16 +298,19 @@ export type PlatformAccountWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumPlatformAccountStatusFilter<"PlatformAccount"> | $Enums.PlatformAccountStatus
   createdAt?: Prisma.DateTimeFilter<"PlatformAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlatformAccount"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
+  connectedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   publishTasks?: Prisma.PublishTaskListRelationFilter
-}, "id" | "userId_platform">
+}, "id" | "workspaceId_platform">
 
 export type PlatformAccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  connectedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrderInput | Prisma.SortOrder
   platformUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   tokenLast4?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -303,10 +328,12 @@ export type PlatformAccountScalarWhereWithAggregatesInput = {
   OR?: Prisma.PlatformAccountScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PlatformAccountScalarWhereWithAggregatesInput | Prisma.PlatformAccountScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"PlatformAccount"> | string
-  userId?: Prisma.UuidWithAggregatesFilter<"PlatformAccount"> | string
+  workspaceId?: Prisma.UuidWithAggregatesFilter<"PlatformAccount"> | string
+  connectedByUserId?: Prisma.UuidWithAggregatesFilter<"PlatformAccount"> | string
   platform?: Prisma.EnumPlatformWithAggregatesFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
@@ -321,6 +348,7 @@ export type PlatformAccountCreateInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -328,16 +356,19 @@ export type PlatformAccountCreateInput = {
   status?: $Enums.PlatformAccountStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPlatformAccountsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutPlatformAccountsInput
+  connectedBy: Prisma.UserCreateNestedOneWithoutConnectedPlatformAccountsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutPlatformAccountInput
 }
 
 export type PlatformAccountUncheckedCreateInput = {
   id?: string
-  userId: string
+  workspaceId: string
+  connectedByUserId: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -353,6 +384,7 @@ export type PlatformAccountUpdateInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -360,16 +392,19 @@ export type PlatformAccountUpdateInput = {
   status?: Prisma.EnumPlatformAccountStatusFieldUpdateOperationsInput | $Enums.PlatformAccountStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPlatformAccountsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutPlatformAccountsNestedInput
+  connectedBy?: Prisma.UserUpdateOneRequiredWithoutConnectedPlatformAccountsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutPlatformAccountNestedInput
 }
 
 export type PlatformAccountUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  connectedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -382,10 +417,12 @@ export type PlatformAccountUncheckedUpdateInput = {
 
 export type PlatformAccountCreateManyInput = {
   id?: string
-  userId: string
+  workspaceId: string
+  connectedByUserId: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -400,6 +437,7 @@ export type PlatformAccountUpdateManyMutationInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -411,10 +449,12 @@ export type PlatformAccountUpdateManyMutationInput = {
 
 export type PlatformAccountUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  connectedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -434,17 +474,19 @@ export type PlatformAccountOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type PlatformAccountUserIdPlatformCompoundUniqueInput = {
-  userId: string
+export type PlatformAccountWorkspaceIdPlatformCompoundUniqueInput = {
+  workspaceId: string
   platform: $Enums.Platform
 }
 
 export type PlatformAccountCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  connectedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   platformUserId?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   tokenLast4?: Prisma.SortOrder
@@ -456,10 +498,12 @@ export type PlatformAccountCountOrderByAggregateInput = {
 
 export type PlatformAccountMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  connectedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   platformUserId?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   tokenLast4?: Prisma.SortOrder
@@ -471,10 +515,12 @@ export type PlatformAccountMaxOrderByAggregateInput = {
 
 export type PlatformAccountMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
+  connectedByUserId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   platformUserId?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   tokenLast4?: Prisma.SortOrder
@@ -489,45 +535,87 @@ export type PlatformAccountNullableScalarRelationFilter = {
   isNot?: Prisma.PlatformAccountWhereInput | null
 }
 
-export type PlatformAccountCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutUserInput, Prisma.PlatformAccountUncheckedCreateWithoutUserInput> | Prisma.PlatformAccountCreateWithoutUserInput[] | Prisma.PlatformAccountUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutUserInput | Prisma.PlatformAccountCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.PlatformAccountCreateManyUserInputEnvelope
+export type PlatformAccountCreateNestedManyWithoutConnectedByInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput> | Prisma.PlatformAccountCreateWithoutConnectedByInput[] | Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput | Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput[]
+  createMany?: Prisma.PlatformAccountCreateManyConnectedByInputEnvelope
   connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
 }
 
-export type PlatformAccountUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutUserInput, Prisma.PlatformAccountUncheckedCreateWithoutUserInput> | Prisma.PlatformAccountCreateWithoutUserInput[] | Prisma.PlatformAccountUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutUserInput | Prisma.PlatformAccountCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.PlatformAccountCreateManyUserInputEnvelope
+export type PlatformAccountUncheckedCreateNestedManyWithoutConnectedByInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput> | Prisma.PlatformAccountCreateWithoutConnectedByInput[] | Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput | Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput[]
+  createMany?: Prisma.PlatformAccountCreateManyConnectedByInputEnvelope
   connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
 }
 
-export type PlatformAccountUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutUserInput, Prisma.PlatformAccountUncheckedCreateWithoutUserInput> | Prisma.PlatformAccountCreateWithoutUserInput[] | Prisma.PlatformAccountUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutUserInput | Prisma.PlatformAccountCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.PlatformAccountUpsertWithWhereUniqueWithoutUserInput | Prisma.PlatformAccountUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.PlatformAccountCreateManyUserInputEnvelope
+export type PlatformAccountUpdateManyWithoutConnectedByNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput> | Prisma.PlatformAccountCreateWithoutConnectedByInput[] | Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput | Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput[]
+  upsert?: Prisma.PlatformAccountUpsertWithWhereUniqueWithoutConnectedByInput | Prisma.PlatformAccountUpsertWithWhereUniqueWithoutConnectedByInput[]
+  createMany?: Prisma.PlatformAccountCreateManyConnectedByInputEnvelope
   set?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
   disconnect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
   delete?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
   connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
-  update?: Prisma.PlatformAccountUpdateWithWhereUniqueWithoutUserInput | Prisma.PlatformAccountUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.PlatformAccountUpdateManyWithWhereWithoutUserInput | Prisma.PlatformAccountUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.PlatformAccountUpdateWithWhereUniqueWithoutConnectedByInput | Prisma.PlatformAccountUpdateWithWhereUniqueWithoutConnectedByInput[]
+  updateMany?: Prisma.PlatformAccountUpdateManyWithWhereWithoutConnectedByInput | Prisma.PlatformAccountUpdateManyWithWhereWithoutConnectedByInput[]
   deleteMany?: Prisma.PlatformAccountScalarWhereInput | Prisma.PlatformAccountScalarWhereInput[]
 }
 
-export type PlatformAccountUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutUserInput, Prisma.PlatformAccountUncheckedCreateWithoutUserInput> | Prisma.PlatformAccountCreateWithoutUserInput[] | Prisma.PlatformAccountUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutUserInput | Prisma.PlatformAccountCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.PlatformAccountUpsertWithWhereUniqueWithoutUserInput | Prisma.PlatformAccountUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.PlatformAccountCreateManyUserInputEnvelope
+export type PlatformAccountUncheckedUpdateManyWithoutConnectedByNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput> | Prisma.PlatformAccountCreateWithoutConnectedByInput[] | Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput | Prisma.PlatformAccountCreateOrConnectWithoutConnectedByInput[]
+  upsert?: Prisma.PlatformAccountUpsertWithWhereUniqueWithoutConnectedByInput | Prisma.PlatformAccountUpsertWithWhereUniqueWithoutConnectedByInput[]
+  createMany?: Prisma.PlatformAccountCreateManyConnectedByInputEnvelope
   set?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
   disconnect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
   delete?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
   connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
-  update?: Prisma.PlatformAccountUpdateWithWhereUniqueWithoutUserInput | Prisma.PlatformAccountUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.PlatformAccountUpdateManyWithWhereWithoutUserInput | Prisma.PlatformAccountUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.PlatformAccountUpdateWithWhereUniqueWithoutConnectedByInput | Prisma.PlatformAccountUpdateWithWhereUniqueWithoutConnectedByInput[]
+  updateMany?: Prisma.PlatformAccountUpdateManyWithWhereWithoutConnectedByInput | Prisma.PlatformAccountUpdateManyWithWhereWithoutConnectedByInput[]
+  deleteMany?: Prisma.PlatformAccountScalarWhereInput | Prisma.PlatformAccountScalarWhereInput[]
+}
+
+export type PlatformAccountCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformAccountCreateWithoutWorkspaceInput[] | Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformAccountCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+}
+
+export type PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformAccountCreateWithoutWorkspaceInput[] | Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformAccountCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+}
+
+export type PlatformAccountUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformAccountCreateWithoutWorkspaceInput[] | Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.PlatformAccountUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformAccountUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformAccountCreateManyWorkspaceInputEnvelope
+  set?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  disconnect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  delete?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  update?: Prisma.PlatformAccountUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformAccountUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.PlatformAccountUpdateManyWithWhereWithoutWorkspaceInput | Prisma.PlatformAccountUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.PlatformAccountScalarWhereInput | Prisma.PlatformAccountScalarWhereInput[]
+}
+
+export type PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformAccountCreateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput> | Prisma.PlatformAccountCreateWithoutWorkspaceInput[] | Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput | Prisma.PlatformAccountCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.PlatformAccountUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformAccountUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.PlatformAccountCreateManyWorkspaceInputEnvelope
+  set?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  disconnect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  delete?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  connect?: Prisma.PlatformAccountWhereUniqueInput | Prisma.PlatformAccountWhereUniqueInput[]
+  update?: Prisma.PlatformAccountUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.PlatformAccountUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.PlatformAccountUpdateManyWithWhereWithoutWorkspaceInput | Prisma.PlatformAccountUpdateManyWithWhereWithoutWorkspaceInput[]
   deleteMany?: Prisma.PlatformAccountScalarWhereInput | Prisma.PlatformAccountScalarWhereInput[]
 }
 
@@ -555,11 +643,12 @@ export type PlatformAccountUpdateOneWithoutPublishTasksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlatformAccountUpdateToOneWithWhereWithoutPublishTasksInput, Prisma.PlatformAccountUpdateWithoutPublishTasksInput>, Prisma.PlatformAccountUncheckedUpdateWithoutPublishTasksInput>
 }
 
-export type PlatformAccountCreateWithoutUserInput = {
+export type PlatformAccountCreateWithoutConnectedByInput = {
   id?: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -567,14 +656,17 @@ export type PlatformAccountCreateWithoutUserInput = {
   status?: $Enums.PlatformAccountStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutPlatformAccountsInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutPlatformAccountInput
 }
 
-export type PlatformAccountUncheckedCreateWithoutUserInput = {
+export type PlatformAccountUncheckedCreateWithoutConnectedByInput = {
   id?: string
+  workspaceId: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -585,30 +677,30 @@ export type PlatformAccountUncheckedCreateWithoutUserInput = {
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutPlatformAccountInput
 }
 
-export type PlatformAccountCreateOrConnectWithoutUserInput = {
+export type PlatformAccountCreateOrConnectWithoutConnectedByInput = {
   where: Prisma.PlatformAccountWhereUniqueInput
-  create: Prisma.XOR<Prisma.PlatformAccountCreateWithoutUserInput, Prisma.PlatformAccountUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.PlatformAccountCreateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput>
 }
 
-export type PlatformAccountCreateManyUserInputEnvelope = {
-  data: Prisma.PlatformAccountCreateManyUserInput | Prisma.PlatformAccountCreateManyUserInput[]
+export type PlatformAccountCreateManyConnectedByInputEnvelope = {
+  data: Prisma.PlatformAccountCreateManyConnectedByInput | Prisma.PlatformAccountCreateManyConnectedByInput[]
   skipDuplicates?: boolean
 }
 
-export type PlatformAccountUpsertWithWhereUniqueWithoutUserInput = {
+export type PlatformAccountUpsertWithWhereUniqueWithoutConnectedByInput = {
   where: Prisma.PlatformAccountWhereUniqueInput
-  update: Prisma.XOR<Prisma.PlatformAccountUpdateWithoutUserInput, Prisma.PlatformAccountUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.PlatformAccountCreateWithoutUserInput, Prisma.PlatformAccountUncheckedCreateWithoutUserInput>
+  update: Prisma.XOR<Prisma.PlatformAccountUpdateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedUpdateWithoutConnectedByInput>
+  create: Prisma.XOR<Prisma.PlatformAccountCreateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedCreateWithoutConnectedByInput>
 }
 
-export type PlatformAccountUpdateWithWhereUniqueWithoutUserInput = {
+export type PlatformAccountUpdateWithWhereUniqueWithoutConnectedByInput = {
   where: Prisma.PlatformAccountWhereUniqueInput
-  data: Prisma.XOR<Prisma.PlatformAccountUpdateWithoutUserInput, Prisma.PlatformAccountUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.PlatformAccountUpdateWithoutConnectedByInput, Prisma.PlatformAccountUncheckedUpdateWithoutConnectedByInput>
 }
 
-export type PlatformAccountUpdateManyWithWhereWithoutUserInput = {
+export type PlatformAccountUpdateManyWithWhereWithoutConnectedByInput = {
   where: Prisma.PlatformAccountScalarWhereInput
-  data: Prisma.XOR<Prisma.PlatformAccountUpdateManyMutationInput, Prisma.PlatformAccountUncheckedUpdateManyWithoutUserInput>
+  data: Prisma.XOR<Prisma.PlatformAccountUpdateManyMutationInput, Prisma.PlatformAccountUncheckedUpdateManyWithoutConnectedByInput>
 }
 
 export type PlatformAccountScalarWhereInput = {
@@ -616,10 +708,12 @@ export type PlatformAccountScalarWhereInput = {
   OR?: Prisma.PlatformAccountScalarWhereInput[]
   NOT?: Prisma.PlatformAccountScalarWhereInput | Prisma.PlatformAccountScalarWhereInput[]
   id?: Prisma.UuidFilter<"PlatformAccount"> | string
-  userId?: Prisma.UuidFilter<"PlatformAccount"> | string
+  workspaceId?: Prisma.UuidFilter<"PlatformAccount"> | string
+  connectedByUserId?: Prisma.UuidFilter<"PlatformAccount"> | string
   platform?: Prisma.EnumPlatformFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
@@ -629,11 +723,12 @@ export type PlatformAccountScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PlatformAccount"> | Date | string
 }
 
-export type PlatformAccountCreateWithoutPublishTasksInput = {
+export type PlatformAccountCreateWithoutWorkspaceInput = {
   id?: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -641,15 +736,78 @@ export type PlatformAccountCreateWithoutPublishTasksInput = {
   status?: $Enums.PlatformAccountStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPlatformAccountsInput
+  connectedBy: Prisma.UserCreateNestedOneWithoutConnectedPlatformAccountsInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutPlatformAccountInput
+}
+
+export type PlatformAccountUncheckedCreateWithoutWorkspaceInput = {
+  id?: string
+  connectedByUserId: string
+  platform: $Enums.Platform
+  accountName?: string | null
+  platformUserId?: string | null
+  avatarUrl?: string | null
+  accessTokenEncrypted?: string | null
+  refreshTokenEncrypted?: string | null
+  tokenLast4?: string | null
+  expiresAt?: Date | string | null
+  status?: $Enums.PlatformAccountStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutPlatformAccountInput
+}
+
+export type PlatformAccountCreateOrConnectWithoutWorkspaceInput = {
+  where: Prisma.PlatformAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlatformAccountCreateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type PlatformAccountCreateManyWorkspaceInputEnvelope = {
+  data: Prisma.PlatformAccountCreateManyWorkspaceInput | Prisma.PlatformAccountCreateManyWorkspaceInput[]
+  skipDuplicates?: boolean
+}
+
+export type PlatformAccountUpsertWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.PlatformAccountWhereUniqueInput
+  update: Prisma.XOR<Prisma.PlatformAccountUpdateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedUpdateWithoutWorkspaceInput>
+  create: Prisma.XOR<Prisma.PlatformAccountCreateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type PlatformAccountUpdateWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.PlatformAccountWhereUniqueInput
+  data: Prisma.XOR<Prisma.PlatformAccountUpdateWithoutWorkspaceInput, Prisma.PlatformAccountUncheckedUpdateWithoutWorkspaceInput>
+}
+
+export type PlatformAccountUpdateManyWithWhereWithoutWorkspaceInput = {
+  where: Prisma.PlatformAccountScalarWhereInput
+  data: Prisma.XOR<Prisma.PlatformAccountUpdateManyMutationInput, Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceInput>
+}
+
+export type PlatformAccountCreateWithoutPublishTasksInput = {
+  id?: string
+  platform: $Enums.Platform
+  accountName?: string | null
+  platformUserId?: string | null
+  avatarUrl?: string | null
+  accessTokenEncrypted?: string | null
+  refreshTokenEncrypted?: string | null
+  tokenLast4?: string | null
+  expiresAt?: Date | string | null
+  status?: $Enums.PlatformAccountStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutPlatformAccountsInput
+  connectedBy: Prisma.UserCreateNestedOneWithoutConnectedPlatformAccountsInput
 }
 
 export type PlatformAccountUncheckedCreateWithoutPublishTasksInput = {
   id?: string
-  userId: string
+  workspaceId: string
+  connectedByUserId: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -680,6 +838,7 @@ export type PlatformAccountUpdateWithoutPublishTasksInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -687,15 +846,18 @@ export type PlatformAccountUpdateWithoutPublishTasksInput = {
   status?: Prisma.EnumPlatformAccountStatusFieldUpdateOperationsInput | $Enums.PlatformAccountStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPlatformAccountsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutPlatformAccountsNestedInput
+  connectedBy?: Prisma.UserUpdateOneRequiredWithoutConnectedPlatformAccountsNestedInput
 }
 
 export type PlatformAccountUncheckedUpdateWithoutPublishTasksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  connectedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -705,11 +867,13 @@ export type PlatformAccountUncheckedUpdateWithoutPublishTasksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type PlatformAccountCreateManyUserInput = {
+export type PlatformAccountCreateManyConnectedByInput = {
   id?: string
+  workspaceId: string
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -719,11 +883,12 @@ export type PlatformAccountCreateManyUserInput = {
   updatedAt?: Date | string
 }
 
-export type PlatformAccountUpdateWithoutUserInput = {
+export type PlatformAccountUpdateWithoutConnectedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -731,14 +896,17 @@ export type PlatformAccountUpdateWithoutUserInput = {
   status?: Prisma.EnumPlatformAccountStatusFieldUpdateOperationsInput | $Enums.PlatformAccountStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutPlatformAccountsNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutPlatformAccountNestedInput
 }
 
-export type PlatformAccountUncheckedUpdateWithoutUserInput = {
+export type PlatformAccountUncheckedUpdateWithoutConnectedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -749,11 +917,79 @@ export type PlatformAccountUncheckedUpdateWithoutUserInput = {
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutPlatformAccountNestedInput
 }
 
-export type PlatformAccountUncheckedUpdateManyWithoutUserInput = {
+export type PlatformAccountUncheckedUpdateManyWithoutConnectedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumPlatformAccountStatusFieldUpdateOperationsInput | $Enums.PlatformAccountStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PlatformAccountCreateManyWorkspaceInput = {
+  id?: string
+  connectedByUserId: string
+  platform: $Enums.Platform
+  accountName?: string | null
+  platformUserId?: string | null
+  avatarUrl?: string | null
+  accessTokenEncrypted?: string | null
+  refreshTokenEncrypted?: string | null
+  tokenLast4?: string | null
+  expiresAt?: Date | string | null
+  status?: $Enums.PlatformAccountStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PlatformAccountUpdateWithoutWorkspaceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumPlatformAccountStatusFieldUpdateOperationsInput | $Enums.PlatformAccountStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  connectedBy?: Prisma.UserUpdateOneRequiredWithoutConnectedPlatformAccountsNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutPlatformAccountNestedInput
+}
+
+export type PlatformAccountUncheckedUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  connectedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumPlatformAccountStatusFieldUpdateOperationsInput | $Enums.PlatformAccountStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutPlatformAccountNestedInput
+}
+
+export type PlatformAccountUncheckedUpdateManyWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  connectedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -796,10 +1032,12 @@ export type PlatformAccountCountOutputTypeCountPublishTasksArgs<ExtArgs extends 
 
 export type PlatformAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  connectedByUserId?: boolean
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -807,17 +1045,20 @@ export type PlatformAccountSelect<ExtArgs extends runtime.Types.Extensions.Inter
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   publishTasks?: boolean | Prisma.PlatformAccount$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.PlatformAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformAccount"]>
 
 export type PlatformAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  connectedByUserId?: boolean
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -825,15 +1066,18 @@ export type PlatformAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformAccount"]>
 
 export type PlatformAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  connectedByUserId?: boolean
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -841,15 +1085,18 @@ export type PlatformAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformAccount"]>
 
 export type PlatformAccountSelectScalar = {
   id?: boolean
-  userId?: boolean
+  workspaceId?: boolean
+  connectedByUserId?: boolean
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -859,31 +1106,37 @@ export type PlatformAccountSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlatformAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "platform" | "accountName" | "platformUserId" | "accessTokenEncrypted" | "refreshTokenEncrypted" | "tokenLast4" | "expiresAt" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["platformAccount"]>
+export type PlatformAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workspaceId" | "connectedByUserId" | "platform" | "accountName" | "platformUserId" | "avatarUrl" | "accessTokenEncrypted" | "refreshTokenEncrypted" | "tokenLast4" | "expiresAt" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["platformAccount"]>
 export type PlatformAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   publishTasks?: boolean | Prisma.PlatformAccount$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.PlatformAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlatformAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type PlatformAccountIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
+  connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $PlatformAccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformAccount"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
+    workspace: Prisma.$WorkspacePayload<ExtArgs>
+    connectedBy: Prisma.$UserPayload<ExtArgs>
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    userId: string
+    workspaceId: string
+    connectedByUserId: string
     platform: $Enums.Platform
     accountName: string | null
     platformUserId: string | null
+    avatarUrl: string | null
     accessTokenEncrypted: string | null
     refreshTokenEncrypted: string | null
     tokenLast4: string | null
@@ -1285,7 +1538,8 @@ readonly fields: PlatformAccountFieldRefs;
  */
 export interface Prisma__PlatformAccountClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  workspace<T extends Prisma.WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkspaceDefaultArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  connectedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   publishTasks<T extends Prisma.PlatformAccount$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlatformAccount$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1317,10 +1571,12 @@ export interface Prisma__PlatformAccountClient<T, Null = never, ExtArgs extends 
  */
 export interface PlatformAccountFieldRefs {
   readonly id: Prisma.FieldRef<"PlatformAccount", 'String'>
-  readonly userId: Prisma.FieldRef<"PlatformAccount", 'String'>
+  readonly workspaceId: Prisma.FieldRef<"PlatformAccount", 'String'>
+  readonly connectedByUserId: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly platform: Prisma.FieldRef<"PlatformAccount", 'Platform'>
   readonly accountName: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly platformUserId: Prisma.FieldRef<"PlatformAccount", 'String'>
+  readonly avatarUrl: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly accessTokenEncrypted: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly refreshTokenEncrypted: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly tokenLast4: Prisma.FieldRef<"PlatformAccount", 'String'>
