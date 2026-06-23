@@ -23,6 +23,7 @@ dependencies = [
 transcript_worker = "app.cli:transcript_worker"
 chaptering_worker = "app.cli:chaptering_worker"
 media_previews_worker = "app.cli:media_previews_worker"
+render_exports_worker = "app.cli:render_exports_worker"
 
 [build-system]
 requires = ["hatchling"]

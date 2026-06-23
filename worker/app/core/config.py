@@ -42,6 +42,14 @@ class _CeleryAppSettings:
         default="media_preview_task",
         alias="MEDIA_PREVIEW_TASK_NAME",
     )
+    render_exports_queue_name: str = Field(
+        default="render_exports_queue",
+        alias="RENDER_EXPORTS_QUEUE_NAME",
+    )
+    render_export_task_name: str = Field(
+        default="render_export_task",
+        alias="RENDER_EXPORT_TASK_NAME",
+    )
     worker_concurrency: PositiveInt = Field(default=1, alias="WORKER_CONCURRENCY")
     worker_prefetch_multiplier: PositiveInt = Field(
         default=1,
@@ -85,6 +93,18 @@ class _StorageSettings:
     storage_dir: Path = Field(
         default=WORKER_DIR / "app" / "storage",
         alias="STORAGE_DIR",
+    )
+
+
+class _RendererSettings:
+    renderer_dir: Path = Field(
+        default=WORKER_DIR.parent / "renderer",
+        alias="RENDERER_DIR",
+    )
+    renderer_npm_binary: str = Field(default="npm", alias="RENDERER_NPM_BINARY")
+    renderer_timeout_seconds: PositiveInt = Field(
+        default=3600,
+        alias="RENDERER_TIMEOUT_SECONDS",
     )
 
 
@@ -144,6 +164,7 @@ class Settings(
     _FfmpegSettings,
     _AiServiceGrpcSettings,
     _LoggingSettings,
+    _RendererSettings,
     _StorageSettings,
     BaseSettings,
 ):

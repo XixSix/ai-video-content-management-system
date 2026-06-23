@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -10,10 +11,16 @@ from app.core.config import settings
 
 def _to_sqlalchemy_database_url(database_url: str) -> str:
     """Convert Prisma-style PostgreSQL URLs to SQLAlchemy psycopg URLs."""
-    if database_url.startswith("postgresql://"):
-        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    parsed_url = urlsplit(database_url)
+    query = urlencode(
+        [(key, value) for key, value in parse_qsl(parsed_url.query) if key != "schema"]
+    )
+    normalized_url = urlunsplit(parsed_url._replace(query=query))
 
-    return database_url
+    if normalized_url.startswith("postgresql://"):
+        return normalized_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+    return normalized_url
 
 
 engine: Engine = create_engine(

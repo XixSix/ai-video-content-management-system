@@ -44,3 +44,9 @@ def media_previews_worker() -> None:
     """Start the media previews Celery worker."""
     configure_logging(settings.log_level)
     _run_worker(settings.media_previews_queue_name, log_level=settings.log_level)
+
+
+def render_exports_worker() -> None:
+    """Start the render exports Celery worker."""
+    configure_logging(settings.log_level)
+    _run_worker(settings.render_exports_queue_name, log_level=settings.log_level)

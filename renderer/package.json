@@ -1,0 +1,38 @@
+{
+  "name": "renderer",
+  "version": "1.0.0",
+  "description": "VidPilot Remotion export renderer",
+  "repository": {},
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@remotion/bundler": "4.0.482",
+    "@remotion/captions": "4.0.482",
+    "@remotion/cli": "4.0.482",
+    "@remotion/media": "4.0.482",
+    "@remotion/renderer": "4.0.482",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.482",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.482",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "render:document": "tsx src/cli.ts",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}
