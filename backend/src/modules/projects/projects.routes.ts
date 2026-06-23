@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
 import { requireWorkspaceMembership } from '../../middleware/workspace.middleware'
+import { workspaceParamsSchema } from '../workspace/workspace.schema'
 import * as projectsController from './projects.controller'
 import {
   addProjectMediaSchema,
@@ -14,9 +15,11 @@ import {
   updateProjectSchema
 } from './projects.schema'
 
-const router = Router()
+const router = Router({ mergeParams: true })
 
-router.use(authenticate, requireWorkspaceMembership)
+router.use(authenticate)
+router.use(validateRequest({ params: workspaceParamsSchema }))
+router.use(requireWorkspaceMembership)
 
 router.get('/', validateRequest({ query: listProjectsQuerySchema }), projectsController.list)
 router.post('/blank', validateRequest({ body: createBlankProjectSchema }), projectsController.createBlank)

@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
+import { requireWorkspaceMembership, requireWorkspaceOwner } from '../../middleware/workspace.middleware'
 import * as invitationsController from './workspace-invitations.controller'
 import {
   createWorkspaceInvitationSchema,
@@ -14,10 +15,10 @@ const actionRouter = Router()
 createRouter.use(authenticate)
 createRouter.post(
   '/:workspaceId/invitations',
-  validateRequest({
-    params: workspaceInvitationCreateParamsSchema,
-    body: createWorkspaceInvitationSchema
-  }),
+  validateRequest({ params: workspaceInvitationCreateParamsSchema }),
+  requireWorkspaceMembership,
+  requireWorkspaceOwner,
+  validateRequest({ body: createWorkspaceInvitationSchema }),
   invitationsController.create
 )
 

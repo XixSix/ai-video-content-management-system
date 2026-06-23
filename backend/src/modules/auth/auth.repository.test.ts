@@ -2,13 +2,15 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 
 const findUniqueMock = jest.fn()
 const createUserMock = jest.fn()
+const updateUserMock = jest.fn()
 const createWorkspaceMock = jest.fn()
 const createSessionMock = jest.fn()
 const transactionMock = jest.fn(async (callback: (transaction: unknown) => unknown) =>
   callback({
     user: {
       findUnique: findUniqueMock,
-      create: createUserMock
+      create: createUserMock,
+      update: updateUserMock
     },
     workspace: {
       create: createWorkspaceMock
@@ -33,6 +35,7 @@ const user = {
   passwordHash: 'hashed-password',
   fullName: null,
   avatarUrl: null,
+  preferredWorkspaceId: '123e4567-e89b-12d3-a456-426614174002',
   role: 'USER',
   status: 'ACTIVE',
   createdAt: new Date(),
@@ -57,6 +60,7 @@ beforeEach(() => {
   createWorkspaceMock.mockResolvedValue({
     id: '123e4567-e89b-12d3-a456-426614174002'
   })
+  updateUserMock.mockResolvedValue(user)
   createSessionMock.mockResolvedValue({
     id: '123e4567-e89b-12d3-a456-426614174003'
   })
@@ -83,6 +87,12 @@ describe('auth repository registration transaction', () => {
         }
       }
     })
+    expect(updateUserMock).toHaveBeenCalledWith({
+      where: { id: user.id },
+      data: {
+        preferredWorkspaceId: '123e4567-e89b-12d3-a456-426614174002'
+      }
+    })
     expect(createSessionMock).toHaveBeenCalledWith({
       data: {
         userId: user.id,
@@ -97,6 +107,7 @@ describe('auth repository registration transaction', () => {
     await expect(authRepository.registerUserWithWorkspaceAndSession(input)).resolves.toBeNull()
     expect(createUserMock).not.toHaveBeenCalled()
     expect(createWorkspaceMock).not.toHaveBeenCalled()
+    expect(updateUserMock).not.toHaveBeenCalled()
     expect(createSessionMock).not.toHaveBeenCalled()
   })
 

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import type { NotificationRecord } from '../notifications/notifications.types'
-import type { WorkspaceInvitationRecord, WorkspaceOwnerContext } from './workspace-invitations.types'
+import type { WorkspaceInvitationContext, WorkspaceInvitationRecord } from './workspace-invitations.types'
 
-const findWorkspaceOwnerContextMock = jest.fn()
+const findWorkspaceInvitationContextMock = jest.fn()
 const findUserByEmailMock = jest.fn()
 const findMembershipMock = jest.fn()
 const expirePendingInvitationMock = jest.fn()
@@ -17,7 +17,7 @@ const publishCreatedNotificationMock = jest.fn()
 const publishUpdatedNotificationMock = jest.fn()
 
 jest.unstable_mockModule('./workspace-invitations.repository', () => ({
-  findWorkspaceOwnerContext: findWorkspaceOwnerContextMock,
+  findWorkspaceInvitationContext: findWorkspaceInvitationContextMock,
   findUserByEmail: findUserByEmailMock,
   findMembership: findMembershipMock,
   expirePendingInvitation: expirePendingInvitationMock,
@@ -45,9 +45,8 @@ const notificationId = '00000000-0000-4000-8000-000000000005'
 const createdAt = new Date('2026-06-21T10:00:00.000Z')
 const expiresAt = new Date('2026-06-28T10:00:00.000Z')
 
-const ownerContext: WorkspaceOwnerContext = {
+const invitationContext: WorkspaceInvitationContext = {
   id: '00000000-0000-4000-8000-000000000006',
-  role: 'OWNER',
   workspace: {
     id: workspaceId,
     name: 'Creator Workspace',
@@ -71,12 +70,12 @@ const notification = {
   data: null,
   readAt: null,
   createdAt,
-  actor: ownerContext.user,
+  actor: invitationContext.user,
   workspaceInvitation: {
     id: invitationId,
     status: 'PENDING',
     expiresAt,
-    workspace: ownerContext.workspace
+    workspace: invitationContext.workspace
   }
 } satisfies NotificationRecord
 
@@ -90,8 +89,8 @@ const invitation = {
   respondedAt: null,
   createdAt,
   updatedAt: createdAt,
-  workspace: ownerContext.workspace,
-  inviter: ownerContext.user,
+  workspace: invitationContext.workspace,
+  inviter: invitationContext.user,
   invitee: {
     id: inviteeId,
     email: 'invitee@example.com',
@@ -102,7 +101,7 @@ const invitation = {
 
 beforeEach(() => {
   jest.resetAllMocks()
-  findWorkspaceOwnerContextMock.mockResolvedValue(ownerContext)
+  findWorkspaceInvitationContextMock.mockResolvedValue(invitationContext)
   findUserByEmailMock.mockResolvedValue({
     id: inviteeId,
     email: 'invitee@example.com',
@@ -146,8 +145,8 @@ describe('workspace invitations service', () => {
     expect(result.status).toBe('PENDING')
   })
 
-  it('rejects non-owners before resolving the invitee', async () => {
-    findWorkspaceOwnerContextMock.mockResolvedValue(null)
+  it('rejects when invitation context disappears before resolving the invitee', async () => {
+    findWorkspaceInvitationContextMock.mockResolvedValue(null)
 
     await expect(
       invitationsService.createWorkspaceInvitation(workspaceId, ownerId, {

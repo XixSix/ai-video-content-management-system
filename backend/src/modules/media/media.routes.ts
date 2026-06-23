@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
+import { requireWorkspaceMembership } from '../../middleware/workspace.middleware'
+import { workspaceParamsSchema } from '../workspace/workspace.schema'
 import * as mediaController from './media.controller'
 import {
   completeUploadSchema,
@@ -10,9 +12,11 @@ import {
   updateMediaSchema
 } from './media.schema'
 
-const router = Router()
+const router = Router({ mergeParams: true })
 
 router.use(authenticate)
+router.use(validateRequest({ params: workspaceParamsSchema }))
+router.use(requireWorkspaceMembership)
 
 router.get('/', validateRequest({ query: listMediaQuerySchema }), mediaController.list)
 router.post('/upload-url', validateRequest({ body: createUploadUrlSchema }), mediaController.createUploadUrl)

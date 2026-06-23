@@ -2323,6 +2323,7 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   fullName: 'fullName',
   avatarUrl: 'avatarUrl',
+  preferredWorkspaceId: 'preferredWorkspaceId',
   role: 'role',
   status: 'status',
   createdAt: 'createdAt',

@@ -30,6 +30,7 @@ export type UserMinAggregateOutputType = {
   passwordHash: string | null
   fullName: string | null
   avatarUrl: string | null
+  preferredWorkspaceId: string | null
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   createdAt: Date | null
@@ -42,6 +43,7 @@ export type UserMaxAggregateOutputType = {
   passwordHash: string | null
   fullName: string | null
   avatarUrl: string | null
+  preferredWorkspaceId: string | null
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   createdAt: Date | null
@@ -54,6 +56,7 @@ export type UserCountAggregateOutputType = {
   passwordHash: number
   fullName: number
   avatarUrl: number
+  preferredWorkspaceId: number
   role: number
   status: number
   createdAt: number
@@ -68,6 +71,7 @@ export type UserMinAggregateInputType = {
   passwordHash?: true
   fullName?: true
   avatarUrl?: true
+  preferredWorkspaceId?: true
   role?: true
   status?: true
   createdAt?: true
@@ -80,6 +84,7 @@ export type UserMaxAggregateInputType = {
   passwordHash?: true
   fullName?: true
   avatarUrl?: true
+  preferredWorkspaceId?: true
   role?: true
   status?: true
   createdAt?: true
@@ -92,6 +97,7 @@ export type UserCountAggregateInputType = {
   passwordHash?: true
   fullName?: true
   avatarUrl?: true
+  preferredWorkspaceId?: true
   role?: true
   status?: true
   createdAt?: true
@@ -177,6 +183,7 @@ export type UserGroupByOutputType = {
   passwordHash: string
   fullName: string | null
   avatarUrl: string | null
+  preferredWorkspaceId: string | null
   role: $Enums.UserRole
   status: $Enums.UserStatus
   createdAt: Date
@@ -210,12 +217,14 @@ export type UserWhereInput = {
   passwordHash?: Prisma.StringFilter<"User"> | string
   fullName?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  preferredWorkspaceId?: Prisma.UuidNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   media?: Prisma.MediaListRelationFilter
   ownedWorkspaces?: Prisma.WorkspaceListRelationFilter
+  preferredWorkspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   workspaceMemberships?: Prisma.WorkspaceMemberListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
   processingJobs?: Prisma.ProcessingJobListRelationFilter
@@ -241,12 +250,14 @@ export type UserOrderByWithRelationInput = {
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredWorkspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   media?: Prisma.MediaOrderByRelationAggregateInput
   ownedWorkspaces?: Prisma.WorkspaceOrderByRelationAggregateInput
+  preferredWorkspace?: Prisma.WorkspaceOrderByWithRelationInput
   workspaceMemberships?: Prisma.WorkspaceMemberOrderByRelationAggregateInput
   projects?: Prisma.ProjectOrderByRelationAggregateInput
   processingJobs?: Prisma.ProcessingJobOrderByRelationAggregateInput
@@ -275,12 +286,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   passwordHash?: Prisma.StringFilter<"User"> | string
   fullName?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  preferredWorkspaceId?: Prisma.UuidNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   media?: Prisma.MediaListRelationFilter
   ownedWorkspaces?: Prisma.WorkspaceListRelationFilter
+  preferredWorkspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   workspaceMemberships?: Prisma.WorkspaceMemberListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
   processingJobs?: Prisma.ProcessingJobListRelationFilter
@@ -306,6 +319,7 @@ export type UserOrderByWithAggregationInput = {
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredWorkspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -324,6 +338,7 @@ export type UserScalarWhereWithAggregatesInput = {
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   fullName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  preferredWorkspaceId?: Prisma.UuidNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -342,6 +357,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -367,6 +383,7 @@ export type UserUncheckedCreateInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -404,6 +421,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -429,6 +447,7 @@ export type UserUncheckedUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -460,6 +479,7 @@ export type UserCreateManyInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -484,6 +504,7 @@ export type UserUncheckedUpdateManyInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -496,6 +517,7 @@ export type UserCountOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  preferredWorkspaceId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -508,6 +530,7 @@ export type UserMaxOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  preferredWorkspaceId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -520,6 +543,7 @@ export type UserMinOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  preferredWorkspaceId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -529,6 +553,16 @@ export type UserMinOrderByAggregateInput = {
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -576,12 +610,54 @@ export type UserCreateNestedOneWithoutOwnedWorkspacesInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedManyWithoutPreferredWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput> | Prisma.UserCreateWithoutPreferredWorkspaceInput[] | Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput | Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput[]
+  createMany?: Prisma.UserCreateManyPreferredWorkspaceInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutPreferredWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput> | Prisma.UserCreateWithoutPreferredWorkspaceInput[] | Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput | Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput[]
+  createMany?: Prisma.UserCreateManyPreferredWorkspaceInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
 export type UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedWorkspacesInput, Prisma.UserUncheckedCreateWithoutOwnedWorkspacesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedWorkspacesInput
   upsert?: Prisma.UserUpsertWithoutOwnedWorkspacesInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOwnedWorkspacesInput, Prisma.UserUpdateWithoutOwnedWorkspacesInput>, Prisma.UserUncheckedUpdateWithoutOwnedWorkspacesInput>
+}
+
+export type UserUpdateManyWithoutPreferredWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput> | Prisma.UserCreateWithoutPreferredWorkspaceInput[] | Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput | Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutPreferredWorkspaceInput | Prisma.UserUpsertWithWhereUniqueWithoutPreferredWorkspaceInput[]
+  createMany?: Prisma.UserCreateManyPreferredWorkspaceInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutPreferredWorkspaceInput | Prisma.UserUpdateWithWhereUniqueWithoutPreferredWorkspaceInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutPreferredWorkspaceInput | Prisma.UserUpdateManyWithWhereWithoutPreferredWorkspaceInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutPreferredWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput> | Prisma.UserCreateWithoutPreferredWorkspaceInput[] | Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput | Prisma.UserCreateOrConnectWithoutPreferredWorkspaceInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutPreferredWorkspaceInput | Prisma.UserUpsertWithWhereUniqueWithoutPreferredWorkspaceInput[]
+  createMany?: Prisma.UserCreateManyPreferredWorkspaceInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutPreferredWorkspaceInput | Prisma.UserUpdateWithWhereUniqueWithoutPreferredWorkspaceInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutPreferredWorkspaceInput | Prisma.UserUpdateManyWithWhereWithoutPreferredWorkspaceInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
 export type UserCreateNestedOneWithoutWorkspaceMembershipsInput = {
@@ -840,6 +916,7 @@ export type UserCreateWithoutAuthSessionsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -864,6 +941,7 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -916,6 +994,7 @@ export type UserUpdateWithoutAuthSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -940,6 +1019,7 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -975,6 +1055,7 @@ export type UserCreateWithoutOwnedWorkspacesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -1000,6 +1081,7 @@ export type UserUncheckedCreateWithoutOwnedWorkspacesInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1029,6 +1111,78 @@ export type UserCreateOrConnectWithoutOwnedWorkspacesInput = {
   create: Prisma.XOR<Prisma.UserCreateWithoutOwnedWorkspacesInput, Prisma.UserUncheckedCreateWithoutOwnedWorkspacesInput>
 }
 
+export type UserCreateWithoutPreferredWorkspaceInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutPreferredWorkspaceInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutUserInput
+  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutUserInput
+  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutUserInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutUserInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutUserInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutUserInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutUserInput
+  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedCreateNestedManyWithoutUserInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedCreateNestedManyWithoutSavedByInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviterInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  actedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutPreferredWorkspaceInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput>
+}
+
+export type UserCreateManyPreferredWorkspaceInputEnvelope = {
+  data: Prisma.UserCreateManyPreferredWorkspaceInput | Prisma.UserCreateManyPreferredWorkspaceInput[]
+  skipDuplicates?: boolean
+}
+
 export type UserUpsertWithoutOwnedWorkspacesInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutOwnedWorkspacesInput, Prisma.UserUncheckedUpdateWithoutOwnedWorkspacesInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutOwnedWorkspacesInput, Prisma.UserUncheckedCreateWithoutOwnedWorkspacesInput>
@@ -1051,6 +1205,7 @@ export type UserUpdateWithoutOwnedWorkspacesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -1076,6 +1231,7 @@ export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1100,6 +1256,38 @@ export type UserUncheckedUpdateWithoutOwnedWorkspacesInput = {
   actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
+export type UserUpsertWithWhereUniqueWithoutPreferredWorkspaceInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedUpdateWithoutPreferredWorkspaceInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedCreateWithoutPreferredWorkspaceInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutPreferredWorkspaceInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPreferredWorkspaceInput, Prisma.UserUncheckedUpdateWithoutPreferredWorkspaceInput>
+}
+
+export type UserUpdateManyWithWhereWithoutPreferredWorkspaceInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutPreferredWorkspaceInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.UuidFilter<"User"> | string
+  email?: Prisma.StringFilter<"User"> | string
+  passwordHash?: Prisma.StringFilter<"User"> | string
+  fullName?: Prisma.StringNullableFilter<"User"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  preferredWorkspaceId?: Prisma.UuidNullableFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+}
+
 export type UserCreateWithoutWorkspaceMembershipsInput = {
   id?: string
   email: string
@@ -1112,6 +1300,7 @@ export type UserCreateWithoutWorkspaceMembershipsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
@@ -1136,6 +1325,7 @@ export type UserUncheckedCreateWithoutWorkspaceMembershipsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1188,6 +1378,7 @@ export type UserUpdateWithoutWorkspaceMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
@@ -1212,6 +1403,7 @@ export type UserUncheckedUpdateWithoutWorkspaceMembershipsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1248,6 +1440,7 @@ export type UserCreateWithoutSentWorkspaceInvitationsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -1272,6 +1465,7 @@ export type UserUncheckedCreateWithoutSentWorkspaceInvitationsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1313,6 +1507,7 @@ export type UserCreateWithoutReceivedWorkspaceInvitationsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -1337,6 +1532,7 @@ export type UserUncheckedCreateWithoutReceivedWorkspaceInvitationsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1389,6 +1585,7 @@ export type UserUpdateWithoutSentWorkspaceInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -1413,6 +1610,7 @@ export type UserUncheckedUpdateWithoutSentWorkspaceInvitationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1460,6 +1658,7 @@ export type UserUpdateWithoutReceivedWorkspaceInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -1484,6 +1683,7 @@ export type UserUncheckedUpdateWithoutReceivedWorkspaceInvitationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1520,6 +1720,7 @@ export type UserCreateWithoutReceivedNotificationsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -1544,6 +1745,7 @@ export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1585,6 +1787,7 @@ export type UserCreateWithoutActedNotificationsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -1609,6 +1812,7 @@ export type UserUncheckedCreateWithoutActedNotificationsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1661,6 +1865,7 @@ export type UserUpdateWithoutReceivedNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -1685,6 +1890,7 @@ export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1732,6 +1938,7 @@ export type UserUpdateWithoutActedNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -1756,6 +1963,7 @@ export type UserUncheckedUpdateWithoutActedNotificationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1791,6 +1999,7 @@ export type UserCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -1816,6 +2025,7 @@ export type UserUncheckedCreateWithoutMediaInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1867,6 +2077,7 @@ export type UserUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -1892,6 +2103,7 @@ export type UserUncheckedUpdateWithoutMediaInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1928,6 +2140,7 @@ export type UserCreateWithoutProjectsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
@@ -1952,6 +2165,7 @@ export type UserUncheckedCreateWithoutProjectsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2004,6 +2218,7 @@ export type UserUpdateWithoutProjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
@@ -2028,6 +2243,7 @@ export type UserUncheckedUpdateWithoutProjectsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2064,6 +2280,7 @@ export type UserCreateWithoutSavedEditorSnapshotsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -2088,6 +2305,7 @@ export type UserUncheckedCreateWithoutSavedEditorSnapshotsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2140,6 +2358,7 @@ export type UserUpdateWithoutSavedEditorSnapshotsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -2164,6 +2383,7 @@ export type UserUncheckedUpdateWithoutSavedEditorSnapshotsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2200,6 +2420,7 @@ export type UserCreateWithoutProcessingJobsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutUserInput
@@ -2224,6 +2445,7 @@ export type UserUncheckedCreateWithoutProcessingJobsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2276,6 +2498,7 @@ export type UserUpdateWithoutProcessingJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
@@ -2300,6 +2523,7 @@ export type UserUncheckedUpdateWithoutProcessingJobsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2336,6 +2560,7 @@ export type UserCreateWithoutTranscriptEditDraftsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -2360,6 +2585,7 @@ export type UserUncheckedCreateWithoutTranscriptEditDraftsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2412,6 +2638,7 @@ export type UserUpdateWithoutTranscriptEditDraftsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -2436,6 +2663,7 @@ export type UserUncheckedUpdateWithoutTranscriptEditDraftsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2472,6 +2700,7 @@ export type UserCreateWithoutShortClipsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -2496,6 +2725,7 @@ export type UserUncheckedCreateWithoutShortClipsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2548,6 +2778,7 @@ export type UserUpdateWithoutShortClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -2572,6 +2803,7 @@ export type UserUncheckedUpdateWithoutShortClipsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2608,6 +2840,7 @@ export type UserCreateWithoutGeneratedAssetsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -2632,6 +2865,7 @@ export type UserUncheckedCreateWithoutGeneratedAssetsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2684,6 +2918,7 @@ export type UserUpdateWithoutGeneratedAssetsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -2708,6 +2943,7 @@ export type UserUncheckedUpdateWithoutGeneratedAssetsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2744,6 +2980,7 @@ export type UserCreateWithoutAiSuggestionsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -2768,6 +3005,7 @@ export type UserUncheckedCreateWithoutAiSuggestionsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2820,6 +3058,7 @@ export type UserUpdateWithoutAiSuggestionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -2844,6 +3083,7 @@ export type UserUncheckedUpdateWithoutAiSuggestionsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2880,6 +3120,7 @@ export type UserCreateWithoutPlatformAccountsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -2904,6 +3145,7 @@ export type UserUncheckedCreateWithoutPlatformAccountsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -2956,6 +3198,7 @@ export type UserUpdateWithoutPlatformAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -2980,6 +3223,7 @@ export type UserUncheckedUpdateWithoutPlatformAccountsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3016,6 +3260,7 @@ export type UserCreateWithoutPlatformOAuthStatesInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -3040,6 +3285,7 @@ export type UserUncheckedCreateWithoutPlatformOAuthStatesInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -3092,6 +3338,7 @@ export type UserUpdateWithoutPlatformOAuthStatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -3116,6 +3363,7 @@ export type UserUncheckedUpdateWithoutPlatformOAuthStatesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3152,6 +3400,7 @@ export type UserCreateWithoutPublishTasksInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -3176,6 +3425,7 @@ export type UserUncheckedCreateWithoutPublishTasksInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -3228,6 +3478,7 @@ export type UserUpdateWithoutPublishTasksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -3252,6 +3503,7 @@ export type UserUncheckedUpdateWithoutPublishTasksInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3288,6 +3540,7 @@ export type UserCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedManyWithoutUserInput
   ownedWorkspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  preferredWorkspace?: Prisma.WorkspaceCreateNestedOneWithoutPreferredByUsersInput
   workspaceMemberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projects?: Prisma.ProjectCreateNestedManyWithoutUserInput
   processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutUserInput
@@ -3312,6 +3565,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   passwordHash: string
   fullName?: string | null
   avatarUrl?: string | null
+  preferredWorkspaceId?: string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -3364,6 +3618,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateManyWithoutUserNestedInput
   ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  preferredWorkspace?: Prisma.WorkspaceUpdateOneWithoutPreferredByUsersNestedInput
   workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
   processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
@@ -3388,6 +3643,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3410,6 +3666,92 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
   receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateManyPreferredWorkspaceInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserUpdateWithoutPreferredWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPreferredWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  ownedWorkspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  workspaceMemberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutUserNestedInput
+  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutUserNestedInput
+  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutUserNestedInput
+  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutUserNestedInput
+  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutUserNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutUserNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutUserNestedInput
+  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  transcriptEditDrafts?: Prisma.TranscriptEditDraftUncheckedUpdateManyWithoutUserNestedInput
+  savedEditorSnapshots?: Prisma.EditorSnapshotUncheckedUpdateManyWithoutSavedByNestedInput
+  sentWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  receivedWorkspaceInvitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  actedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutPreferredWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -3611,12 +3953,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   passwordHash?: boolean
   fullName?: boolean
   avatarUrl?: boolean
+  preferredWorkspaceId?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   media?: boolean | Prisma.User$mediaArgs<ExtArgs>
   ownedWorkspaces?: boolean | Prisma.User$ownedWorkspacesArgs<ExtArgs>
+  preferredWorkspace?: boolean | Prisma.User$preferredWorkspaceArgs<ExtArgs>
   workspaceMemberships?: boolean | Prisma.User$workspaceMembershipsArgs<ExtArgs>
   projects?: boolean | Prisma.User$projectsArgs<ExtArgs>
   processingJobs?: boolean | Prisma.User$processingJobsArgs<ExtArgs>
@@ -3643,10 +3987,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   fullName?: boolean
   avatarUrl?: boolean
+  preferredWorkspaceId?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  preferredWorkspace?: boolean | Prisma.User$preferredWorkspaceArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3655,10 +4001,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   fullName?: boolean
   avatarUrl?: boolean
+  preferredWorkspaceId?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  preferredWorkspace?: boolean | Prisma.User$preferredWorkspaceArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -3667,16 +4015,18 @@ export type UserSelectScalar = {
   passwordHash?: boolean
   fullName?: boolean
   avatarUrl?: boolean
+  preferredWorkspaceId?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "avatarUrl" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "avatarUrl" | "preferredWorkspaceId" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.User$mediaArgs<ExtArgs>
   ownedWorkspaces?: boolean | Prisma.User$ownedWorkspacesArgs<ExtArgs>
+  preferredWorkspace?: boolean | Prisma.User$preferredWorkspaceArgs<ExtArgs>
   workspaceMemberships?: boolean | Prisma.User$workspaceMembershipsArgs<ExtArgs>
   projects?: boolean | Prisma.User$projectsArgs<ExtArgs>
   processingJobs?: boolean | Prisma.User$processingJobsArgs<ExtArgs>
@@ -3696,14 +4046,19 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   actedNotifications?: boolean | Prisma.User$actedNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  preferredWorkspace?: boolean | Prisma.User$preferredWorkspaceArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  preferredWorkspace?: boolean | Prisma.User$preferredWorkspaceArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
     media: Prisma.$MediaPayload<ExtArgs>[]
     ownedWorkspaces: Prisma.$WorkspacePayload<ExtArgs>[]
+    preferredWorkspace: Prisma.$WorkspacePayload<ExtArgs> | null
     workspaceMemberships: Prisma.$WorkspaceMemberPayload<ExtArgs>[]
     projects: Prisma.$ProjectPayload<ExtArgs>[]
     processingJobs: Prisma.$ProcessingJobPayload<ExtArgs>[]
@@ -3728,6 +4083,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passwordHash: string
     fullName: string | null
     avatarUrl: string | null
+    preferredWorkspaceId: string | null
     role: $Enums.UserRole
     status: $Enums.UserStatus
     createdAt: Date
@@ -4128,6 +4484,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   media<T extends Prisma.User$mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$mediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ownedWorkspaces<T extends Prisma.User$ownedWorkspacesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedWorkspacesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preferredWorkspace<T extends Prisma.User$preferredWorkspaceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferredWorkspaceArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   workspaceMemberships<T extends Prisma.User$workspaceMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workspaceMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projects<T extends Prisma.User$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   processingJobs<T extends Prisma.User$processingJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$processingJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4179,6 +4536,7 @@ export interface UserFieldRefs {
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly fullName: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
+  readonly preferredWorkspaceId: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
@@ -4437,6 +4795,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -4507,6 +4869,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -4621,6 +4987,25 @@ export type User$ownedWorkspacesArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.WorkspaceScalarFieldEnum | Prisma.WorkspaceScalarFieldEnum[]
+}
+
+/**
+ * User.preferredWorkspace
+ */
+export type User$preferredWorkspaceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Workspace
+   */
+  select?: Prisma.WorkspaceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Workspace
+   */
+  omit?: Prisma.WorkspaceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceWhereInput
 }
 
 /**

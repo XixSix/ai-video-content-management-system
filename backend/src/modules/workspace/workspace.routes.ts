@@ -8,6 +8,12 @@ const router = Router()
 
 router.use(authenticate)
 
+router.get('/', workspaceController.list)
+router.put(
+  '/:workspaceId/preferred',
+  validateRequest({ params: workspaceParamsSchema }),
+  workspaceController.setPreferred
+)
 router.get('/:workspaceId', validateRequest({ params: workspaceParamsSchema }), workspaceController.getDetails)
 router.get('/:workspaceId/members', validateRequest({ params: workspaceParamsSchema }), workspaceController.listMembers)
 

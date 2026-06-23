@@ -1,4 +1,4 @@
-import type { WorkspaceInvitationStatus, WorkspaceMemberRole } from '../../infrastructure/db/generated/prisma/client'
+import type { WorkspaceInvitationStatus } from '../../infrastructure/db/generated/prisma/client'
 import type { NotificationRecord } from '../notifications/notifications.types'
 
 export interface InvitationUserData {
@@ -25,9 +25,8 @@ export interface WorkspaceInvitationData {
   invitee: InvitationUserData
 }
 
-export interface WorkspaceOwnerContext {
+export interface WorkspaceInvitationContext {
   id: string
-  role: WorkspaceMemberRole
   workspace: InvitationWorkspaceData
   user: InvitationUserData
 }

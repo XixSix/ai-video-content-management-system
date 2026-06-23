@@ -1,10 +1,16 @@
 import { describe, expect, it } from '@jest/globals'
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from './media.constants'
-import { completeUploadSchema, createUploadUrlSchema } from './media.schema'
+import { completeUploadSchema, createUploadUrlSchema, mediaParamsSchema } from './media.schema'
 
 const workspaceId = '00000000-0000-4000-8000-000000000001'
+const mediaId = '00000000-0000-4000-8000-000000000002'
 
 describe('media upload schema', () => {
+  it('requires workspace and media route parameters', () => {
+    expect(mediaParamsSchema.parse({ workspaceId, mediaId })).toEqual({ workspaceId, mediaId })
+    expect(mediaParamsSchema.safeParse({ mediaId }).success).toBe(false)
+  })
+
   it.each([
     ['VIDEO', 'recording.mp4', 'video/mp4'],
     ['VIDEO', 'recording.webm', 'video/webm'],
@@ -22,7 +28,6 @@ describe('media upload schema', () => {
     ['SUBTITLE', 'captions.vtt', 'application/octet-stream']
   ])('accepts %s upload %s with %s', (mediaType, originalFilename, mimeType) => {
     const result = createUploadUrlSchema.safeParse({
-      workspaceId,
       mediaType,
       originalFilename,
       mimeType,
@@ -34,7 +39,6 @@ describe('media upload schema', () => {
 
   it('rejects DOCUMENT uploads', () => {
     const result = createUploadUrlSchema.safeParse({
-      workspaceId,
       mediaType: 'DOCUMENT',
       originalFilename: 'notes.pdf',
       mimeType: 'application/pdf',
@@ -44,9 +48,20 @@ describe('media upload schema', () => {
     expect(result.success).toBe(false)
   })
 
+  it('rejects workspaceId in the upload body', () => {
+    expect(
+      createUploadUrlSchema.safeParse({
+        workspaceId,
+        mediaType: 'VIDEO',
+        originalFilename: 'recording.mp4',
+        mimeType: 'video/mp4',
+        fileSizeBytes: 1024
+      }).success
+    ).toBe(false)
+  })
+
   it('rejects a subtitle MIME that does not match its extension', () => {
     const result = createUploadUrlSchema.safeParse({
-      workspaceId,
       mediaType: 'SUBTITLE',
       originalFilename: 'captions.vtt',
       mimeType: 'application/x-subrip',
@@ -58,7 +73,6 @@ describe('media upload schema', () => {
 
   it('accepts the configured maximum upload size', () => {
     const result = createUploadUrlSchema.safeParse({
-      workspaceId,
       mediaType: 'VIDEO',
       originalFilename: 'recording.mp4',
       mimeType: 'video/mp4',
@@ -70,7 +84,6 @@ describe('media upload schema', () => {
 
   it('rejects file sizes above the configured maximum', () => {
     const result = createUploadUrlSchema.safeParse({
-      workspaceId,
       mediaType: 'VIDEO',
       originalFilename: 'recording.mp4',
       mimeType: 'video/mp4',

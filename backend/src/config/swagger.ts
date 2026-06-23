@@ -99,6 +99,18 @@ const options: swaggerJsdoc.Options = {
             }
           }
         }
+      },
+      parameters: {
+        WorkspaceIdPath: {
+          in: 'path',
+          name: 'workspaceId',
+          required: true,
+          description: 'Selected workspace ID. The authenticated user must be a member of this workspace.',
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          }
+        }
       }
     },
     tags: [

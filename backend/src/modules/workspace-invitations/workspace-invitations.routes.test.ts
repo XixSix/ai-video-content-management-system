@@ -5,12 +5,17 @@ import { WorkspaceInvitationsError } from './workspace-invitations.error'
 import type { WorkspaceInvitationData } from './workspace-invitations.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
+const getWorkspaceMembershipContextMock = jest.fn()
 const createWorkspaceInvitationMock = jest.fn()
 const acceptWorkspaceInvitationMock = jest.fn()
 const declineWorkspaceInvitationMock = jest.fn()
 
 jest.unstable_mockModule('../auth/auth.service', () => ({
   getAuthenticatedUser: getAuthenticatedUserMock
+}))
+
+jest.unstable_mockModule('../workspace/workspace.service', () => ({
+  getWorkspaceMembershipContext: getWorkspaceMembershipContextMock
 }))
 
 jest.unstable_mockModule('./workspace-invitations.service', () => ({
@@ -61,6 +66,10 @@ const invitation: WorkspaceInvitationData = {
 beforeEach(() => {
   jest.resetAllMocks()
   getAuthenticatedUserMock.mockResolvedValue(user)
+  getWorkspaceMembershipContextMock.mockResolvedValue({
+    id: workspaceId,
+    role: 'OWNER'
+  })
   createWorkspaceInvitationMock.mockResolvedValue(invitation)
   acceptWorkspaceInvitationMock.mockResolvedValue({ ...invitation, status: 'ACCEPTED' })
   declineWorkspaceInvitationMock.mockResolvedValue({ ...invitation, status: 'DECLINED' })
@@ -83,6 +92,7 @@ describe('workspace invitation routes', () => {
       .send({ email: '  INVITEE@EXAMPLE.COM ' })
 
     expect(response.status).toBe(201)
+    expect(getWorkspaceMembershipContextMock).toHaveBeenCalledWith(workspaceId, userId)
     expect(createWorkspaceInvitationMock).toHaveBeenCalledWith(workspaceId, userId, {
       email: 'invitee@example.com'
     })
@@ -91,6 +101,22 @@ describe('workspace invitation routes', () => {
       status: 'PENDING',
       expiresAt: expiresAt.toISOString()
     })
+  })
+
+  it('requires workspace owner permission when creating an invitation', async () => {
+    getWorkspaceMembershipContextMock.mockResolvedValue({
+      id: workspaceId,
+      role: 'MEMBER'
+    })
+
+    const response = await request(app)
+      .post(`/api/v1/workspaces/${workspaceId}/invitations`)
+      .set('Authorization', 'Bearer access-token')
+      .send({ email: 'invitee@example.com' })
+
+    expect(response.status).toBe(403)
+    expect(response.body.error.code).toBe('WORKSPACE_OWNER_REQUIRED')
+    expect(createWorkspaceInvitationMock).not.toHaveBeenCalled()
   })
 
   it.each([
@@ -118,6 +144,7 @@ describe('workspace invitation routes', () => {
 
     expect(invalidId.status).toBe(400)
     expect(invalidEmail.status).toBe(400)
+    expect(getWorkspaceMembershipContextMock).toHaveBeenCalledTimes(1)
     expect(createWorkspaceInvitationMock).not.toHaveBeenCalled()
   })
 

@@ -11,8 +11,8 @@ import type {
   CreateWorkspaceInvitationResult,
   InvitationUserData,
   RespondToInvitationResult,
-  WorkspaceInvitationRecord,
-  WorkspaceOwnerContext
+  WorkspaceInvitationContext,
+  WorkspaceInvitationRecord
 } from './workspace-invitations.types'
 
 const invitationInclude = {
@@ -97,19 +97,17 @@ export interface CreateInvitationInput {
   expiresAt: Date
 }
 
-export const findWorkspaceOwnerContext = async (
+export const findWorkspaceInvitationContext = async (
   workspaceId: string,
   userId: string
-): Promise<WorkspaceOwnerContext | null> =>
+): Promise<WorkspaceInvitationContext | null> =>
   prisma.workspaceMember.findFirst({
     where: {
       workspaceId,
-      userId,
-      role: WorkspaceMemberRole.OWNER
+      userId
     },
     select: {
       id: true,
-      role: true,
       workspace: {
         select: {
           id: true,

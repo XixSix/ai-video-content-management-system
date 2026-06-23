@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import request from 'supertest'
 import type { AuthenticatedUser } from '../auth/auth.types'
 import { WorkspaceError } from './workspace.error'
-import type { WorkspaceDetailData, WorkspaceMemberData } from './workspace.types'
+import type { WorkspaceDetailData, WorkspaceListData, WorkspaceMemberData } from './workspace.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
+const listUserWorkspacesMock = jest.fn<(userId: string) => Promise<WorkspaceListData>>()
+const setPreferredWorkspaceMock = jest.fn<(workspaceId: string, userId: string) => Promise<string>>()
 const getWorkspaceDetailsMock = jest.fn<(workspaceId: string, requesterId: string) => Promise<WorkspaceDetailData>>()
 const listWorkspaceMembersMock = jest.fn<(workspaceId: string, requesterId: string) => Promise<WorkspaceMemberData[]>>()
 
@@ -13,6 +15,8 @@ jest.unstable_mockModule('../auth/auth.service', () => ({
 }))
 
 jest.unstable_mockModule('./workspace.service', () => ({
+  listUserWorkspaces: listUserWorkspacesMock,
+  setPreferredWorkspace: setPreferredWorkspaceMock,
   getWorkspaceDetails: getWorkspaceDetailsMock,
   listWorkspaceMembers: listWorkspaceMembersMock
 }))
@@ -56,25 +60,69 @@ const members: WorkspaceMemberData[] = [
 beforeEach(() => {
   jest.resetAllMocks()
   getAuthenticatedUserMock.mockResolvedValue(authenticatedUser)
+  listUserWorkspacesMock.mockResolvedValue({
+    items: [
+      {
+        id: workspaceId,
+        name: workspace.name,
+        slug: workspace.slug,
+        role: 'MEMBER',
+        createdAt
+      }
+    ],
+    preferredWorkspaceId: workspaceId
+  })
+  setPreferredWorkspaceMock.mockResolvedValue(workspaceId)
   getWorkspaceDetailsMock.mockResolvedValue(workspace)
   listWorkspaceMembersMock.mockResolvedValue(members)
 })
 
 describe('workspace routes', () => {
-  it.each([`/api/v1/workspaces/${workspaceId}`, `/api/v1/workspaces/${workspaceId}/members`])(
-    'requires an access token for GET %s',
-    async (path) => {
-      const response = await request(app).get(path)
+  it.each([
+    ['get', '/api/v1/workspaces'],
+    ['get', `/api/v1/workspaces/${workspaceId}`],
+    ['get', `/api/v1/workspaces/${workspaceId}/members`],
+    ['put', `/api/v1/workspaces/${workspaceId}/preferred`]
+  ] as const)('requires an access token for %s %s', async (method, path) => {
+    const response = await request(app)[method](path)
 
-      expect(response.status).toBe(401)
-      expect(response.body).toMatchObject({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED'
+    expect(response.status).toBe(401)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'UNAUTHORIZED'
+      }
+    })
+  })
+
+  it('lists memberships and the preferred workspace', async () => {
+    const response = await request(app).get('/api/v1/workspaces').set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body.data).toEqual({
+      items: [
+        {
+          id: workspaceId,
+          name: workspace.name,
+          slug: workspace.slug,
+          role: 'MEMBER',
+          createdAt: createdAt.toISOString()
         }
-      })
-    }
-  )
+      ],
+      preferredWorkspaceId: workspaceId
+    })
+    expect(listUserWorkspacesMock).toHaveBeenCalledWith(userId)
+  })
+
+  it('sets the preferred workspace', async () => {
+    const response = await request(app)
+      .put(`/api/v1/workspaces/${workspaceId}/preferred`)
+      .set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body.data).toEqual({ preferredWorkspaceId: workspaceId })
+    expect(setPreferredWorkspaceMock).toHaveBeenCalledWith(workspaceId, userId)
+  })
 
   it('returns workspace details with the consistent response envelope', async () => {
     const response = await request(app)
@@ -114,23 +162,25 @@ describe('workspace routes', () => {
     expect(listWorkspaceMembersMock).toHaveBeenCalledWith(workspaceId, userId)
   })
 
-  it.each(['/api/v1/workspaces/not-a-uuid', '/api/v1/workspaces/not-a-uuid/members'])(
-    'validates workspace IDs before calling the service for GET %s',
-    async (path) => {
-      const response = await request(app).get(path).set('Authorization', 'Bearer access-token')
+  it.each([
+    ['get', '/api/v1/workspaces/not-a-uuid'],
+    ['get', '/api/v1/workspaces/not-a-uuid/members'],
+    ['put', '/api/v1/workspaces/not-a-uuid/preferred']
+  ] as const)('validates workspace IDs before calling the service for GET %s', async (method, path) => {
+    const response = await request(app)[method](path).set('Authorization', 'Bearer access-token')
 
-      expect(response.status).toBe(400)
-      expect(response.body).toMatchObject({
-        success: false,
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Validation failed'
-        }
-      })
-      expect(getWorkspaceDetailsMock).not.toHaveBeenCalled()
-      expect(listWorkspaceMembersMock).not.toHaveBeenCalled()
-    }
-  )
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed'
+      }
+    })
+    expect(getWorkspaceDetailsMock).not.toHaveBeenCalled()
+    expect(listWorkspaceMembersMock).not.toHaveBeenCalled()
+    expect(setPreferredWorkspaceMock).not.toHaveBeenCalled()
+  })
 
   it.each([
     ['details', `/api/v1/workspaces/${workspaceId}`, getWorkspaceDetailsMock],
