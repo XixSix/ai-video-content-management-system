@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Check, ChevronDown, LayoutGrid, Plus } from "lucide-react"
+import { Check, ChevronDown, LayoutGrid, Plus, Loader2 } from "lucide-react"
 
+import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,91 +19,58 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  connectedAccountsSeed,
   platformFilterOptions,
   platformInfoList,
 } from "../social-accounts.data"
 import { useSocialAccountsStore } from "../social-accounts.store"
+import {
+  useConnectPlatform,
+  useDisconnectPlatform,
+  usePlatformAccounts,
+} from "../hooks/use-platform-accounts"
 import type {
-  ConnectedAccount,
+  BackendPlatform,
   PlatformFilterValue,
-  SocialPlatform,
 } from "../social-accounts.types"
 import { AddPlatformCard } from "./add-platform-card"
 import { ConnectedAccountRow } from "./connected-account-row"
 import { PlatformIcon } from "./platform-icon"
 
-function buildProfileUrl(platform: SocialPlatform, displayName: string) {
-  const slug = displayName.toLowerCase().replace(/\s+/g, "")
-
-  switch (platform) {
-    case "youtube":
-      return `https://youtube.com/@${slug}`
-    case "tiktok":
-      return `https://tiktok.com/@${slug}`
-    case "instagram":
-      return `https://instagram.com/${slug}`
-    case "linkedin":
-      return `https://linkedin.com/in/${slug}`
-    case "facebook":
-      return `https://facebook.com/${slug}`
-    case "x":
-      return `https://x.com/${slug}`
-    default:
-      return null
-  }
-}
-
 export function SocialAccountsManager() {
+  const { selectedWorkspaceId, selectedWorkspace } = useWorkspace()
+  const isOwner = selectedWorkspace?.role === "OWNER"
+
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [filterValue, setFilterValue] = useState<PlatformFilterValue>("all")
-  const [accounts, setAccounts] = useState<ConnectedAccount[]>(
-    connectedAccountsSeed
-  )
+  
   const isOpen = useSocialAccountsStore((state) => state.isManagerOpen)
   const setManagerOpen = useSocialAccountsStore((state) => state.setManagerOpen)
+
+  const { data: accountsData, isLoading: isAccountsLoading } = usePlatformAccounts(
+    selectedWorkspaceId ?? "",
+    isOpen
+  )
+  const connectMutation = useConnectPlatform(selectedWorkspaceId ?? "")
+  const disconnectMutation = useDisconnectPlatform(selectedWorkspaceId ?? "")
+
+  const accounts = accountsData?.accounts ?? []
 
   const selectedFilterLabel =
     platformFilterOptions.find((option) => option.value === filterValue)?.label ??
     "All platforms"
 
-  const filteredAccounts = accounts.filter((account) =>
-    filterValue === "all" ? true : account.platform === filterValue
-  )
+  const filteredAccounts = accounts.filter((account) => {
+    if (filterValue === "all") return true
+    const platformInfo = platformInfoList.find((p) => p.id === filterValue)
+    return platformInfo?.backendId === account.platform
+  })
 
-  const handleRemoveAccount = (id: string) => {
-    setAccounts((currentAccounts) =>
-      currentAccounts.filter((account) => account.id !== id)
-    )
+  const handleRemoveAccount = (backendId: BackendPlatform) => {
+    disconnectMutation.mutate(backendId)
   }
 
-  const handleConnectPlatform = (platform: SocialPlatform) => {
-    const selectedPlatform = platformInfoList.find((item) => item.id === platform)
-
-    if (!selectedPlatform) {
-      return
-    }
-
-    const alreadyConnected = accounts.some((account) => account.platform === platform)
-
-    if (alreadyConnected) {
-      setIsPickerOpen(false)
-      return
-    }
-
-    setAccounts((currentAccounts) => [
-      {
-        id: `sa-${Date.now()}`,
-        platform,
-        displayName: selectedPlatform.mockAccountName,
-        profileUrl: buildProfileUrl(platform, selectedPlatform.mockAccountName),
-        avatarUrl: null,
-        connectedAt: new Date().toISOString(),
-      },
-      ...currentAccounts,
-    ])
-    setFilterValue("all")
-    setIsPickerOpen(false)
+  const handleConnectPlatform = (backendId: BackendPlatform) => {
+    connectMutation.mutate(backendId)
   }
 
   return (
@@ -169,12 +137,21 @@ export function SocialAccountsManager() {
 
           <div className="overflow-hidden rounded-xl border border-border/70 bg-background/40">
             <div className="min-h-[26rem]">
-              {filteredAccounts.length > 0 ? (
+              {isAccountsLoading ? (
+                <div className="flex min-h-[26rem] items-center justify-center">
+                  <Loader2 className="size-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : filteredAccounts.length > 0 ? (
                 filteredAccounts.map((account) => (
                   <ConnectedAccountRow
                     key={account.id}
                     account={account}
                     onRemove={handleRemoveAccount}
+                    isRemoving={
+                      disconnectMutation.isPending &&
+                      disconnectMutation.variables === account.platform
+                    }
+                    disabled={!isOwner}
                   />
                 ))
               ) : (
@@ -202,6 +179,7 @@ export function SocialAccountsManager() {
               variant="secondary"
               size="lg"
               className="rounded-xl px-4"
+              disabled={!isOwner}
               onClick={() => setIsPickerOpen(true)}
             >
               <Plus className="size-4" />
@@ -236,15 +214,22 @@ export function SocialAccountsManager() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 {platformInfoList.map((platform) => {
-                  const isConnected = accounts.some(
-                    (account) => account.platform === platform.id
-                  )
+                  const isConnected = platform.backendId
+                    ? accounts.some(
+                        (account) => account.platform === platform.backendId && account.status === "CONNECTED"
+                      )
+                    : false
+
+                  const isConnecting =
+                    connectMutation.isPending &&
+                    connectMutation.variables === platform.backendId
 
                   return (
                     <AddPlatformCard
                       key={platform.id}
                       platform={platform}
                       disabled={isConnected}
+                      isConnecting={isConnecting}
                       onConnect={handleConnectPlatform}
                     />
                   )
