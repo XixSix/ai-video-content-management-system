@@ -146,6 +146,24 @@ describe("Studio editor permissions", () => {
     expect(store.getState().currentTime).toBe(12)
   })
 
+  it("toggles playback without resetting the current timeline position", () => {
+    const store = createStudioEditorStore(
+      cloneProject(studioEditorProject),
+      true
+    )
+
+    store.getState().seekToTime(12)
+    store.getState().togglePlayback()
+
+    expect(store.getState().isPlaying).toBe(true)
+    expect(store.getState().currentTime).toBe(12)
+
+    store.getState().togglePlayback()
+
+    expect(store.getState().isPlaying).toBe(false)
+    expect(store.getState().currentTime).toBe(12)
+  })
+
   it("removes detached media and its timeline references", () => {
     const project = cloneProject(studioEditorProject)
     const removableMedia = project.projectMedia.find(

@@ -21,6 +21,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import type { MediaPreviewSpriteSheet } from "@/features/media-library/lib/media-previews"
 import type {
   StudioProjectMediaItem,
   StudioTimelineSegment as StudioTimelineSegmentType,
@@ -72,9 +73,12 @@ export function TimelineSegment({
   onResizeStart,
   onSegmentClick,
   projectMediaThumbnailUrl,
+  segmentPreviewSprites,
+  segmentPixelWidth,
   segment,
   segmentMedia,
   segmentStyle,
+  sourcePreviewSprites,
   sourceAudioPeaks,
   track,
 }: {
@@ -117,9 +121,12 @@ export function TimelineSegment({
     segment: StudioTimelineSegmentType
   ) => void
   projectMediaThumbnailUrl: string | null
+  segmentPreviewSprites?: MediaPreviewSpriteSheet[]
+  segmentPixelWidth: number
   segment: StudioTimelineSegmentType
   segmentMedia: StudioProjectMediaItem | null
   segmentStyle: CSSProperties | undefined
+  sourcePreviewSprites?: MediaPreviewSpriteSheet[]
   sourceAudioPeaks: number[] | null
   track: StudioTimelineTrack
 }) {
@@ -190,12 +197,14 @@ export function TimelineSegment({
           {track.id === "SOURCE" ? (
             <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
               <TimelineThumbnailStrip
+                frameHeight={40}
+                spriteSheets={sourcePreviewSprites}
+                stripWidth={segmentPixelWidth}
                 thumbnailUrl={segmentMedia?.thumbnailUrl ?? projectMediaThumbnailUrl}
               />
-              <div className="absolute inset-x-0 bottom-0 h-[38%] bg-blue-500/18">
+              <div className="absolute inset-x-0 bottom-0 h-[38%] border-t border-blue-500/15 bg-blue-100/75 dark:bg-blue-950/55">
                 <TimelineWaveform
-                  barCount={160}
-                  className="bg-blue-500/38 dark:bg-blue-200/35"
+                  className="bg-blue-500/55 dark:bg-blue-200/45"
                   peaks={sourceAudioPeaks}
                   seed={19}
                 />
@@ -207,8 +216,7 @@ export function TimelineSegment({
             track.id === "AUDIO" ? (
               <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-cyan-500/12">
                 <TimelineWaveform
-                  barCount={140}
-                  className="bg-cyan-600/45 dark:bg-cyan-100/40"
+                  className="bg-cyan-600/55 dark:bg-cyan-100/45"
                   peaks={guideAudioPeaks}
                   seed={23}
                 />
@@ -216,7 +224,13 @@ export function TimelineSegment({
             ) : isOverlayMedia ? (
               <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-amber-500/10">
                 {segmentMedia.type === "VIDEO" ? (
-                  <TimelineThumbnailStrip thumbnailUrl={overlayThumbnailUrl} />
+                  <TimelineThumbnailStrip
+                    className="h-full"
+                    frameHeight={32}
+                    spriteSheets={segmentPreviewSprites}
+                    stripWidth={segmentPixelWidth}
+                    thumbnailUrl={overlayThumbnailUrl}
+                  />
                 ) : overlayThumbnailUrl ? (
                   <div
                     className="absolute inset-0 bg-cover bg-center"

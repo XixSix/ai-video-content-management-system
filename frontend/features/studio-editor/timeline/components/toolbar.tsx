@@ -56,6 +56,7 @@ export function TimelineToolbar({
     >
       <div className="relative z-10 flex items-center gap-2">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
@@ -65,6 +66,7 @@ export function TimelineToolbar({
           {isCollapsed ? "Show timeline" : "Hide timeline"}
         </Button>
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           aria-label="Split track"
@@ -77,6 +79,7 @@ export function TimelineToolbar({
 
       <div className="absolute left-1/2 top-1/2 z-10 h-8 w-72 -translate-x-1/2 -translate-y-1/2">
         <Button
+          type="button"
           variant="ghost"
           size="icon-sm"
           aria-label="Rewind"
@@ -89,6 +92,7 @@ export function TimelineToolbar({
           <SkipBack className="size-4" />
         </Button>
         <Button
+          type="button"
           variant="ghost"
           size="icon-sm"
           aria-label={isPlaying ? "Pause" : "Play"}
@@ -106,6 +110,7 @@ export function TimelineToolbar({
           )}
         </Button>
         <Button
+          type="button"
           variant="ghost"
           size="icon-sm"
           aria-label="Forward"
@@ -128,6 +133,7 @@ export function TimelineToolbar({
 
       <div className="relative z-10 ml-auto flex items-center gap-2" aria-label="Timeline zoom">
         <Button
+          type="button"
           variant="ghost"
           size="icon-sm"
           aria-label="Zoom out"
@@ -154,6 +160,7 @@ export function TimelineToolbar({
           />
         </div>
         <Button
+          type="button"
           variant="ghost"
           size="icon-sm"
           aria-label="Zoom in"

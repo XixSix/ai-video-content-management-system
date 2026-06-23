@@ -26,9 +26,10 @@ export function MediaThumbnail({
   onPreviewError?: () => void
   previewUrl?: string
 }) {
-  const visualUrl = previewUrl ?? item.thumbnailUrl ?? undefined
+  const thumbnailUrl = item.thumbnailUrl ?? undefined
+  const visualUrl = thumbnailUrl ?? previewUrl ?? undefined
 
-  if (visualUrl && item.type === "IMAGE") {
+  if (visualUrl && (item.type === "IMAGE" || (item.type === "VIDEO" && thumbnailUrl))) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img

@@ -29,6 +29,7 @@ import {
 } from "@/features/media-library/media-library.utils"
 import { longToShortCandidatesBySourceId } from "@/features/long-to-short/long-to-short.data"
 import { useMediaList } from "@/features/media-library/hooks/use-media-list"
+import { useMediaDetail } from "@/features/media-library/hooks/use-media-detail"
 import {
   useDeleteMedia,
   useMediaPreviewUrl,
@@ -372,6 +373,14 @@ function MediaLibraryPageContent() {
     previewItem && !previewItem.isDemo ? previewItem.id : null,
     previewItem?.status === "UPLOADED"
   )
+  const previewDetailQuery = useMediaDetail(
+    workspaceId,
+    previewItem && !previewItem.isDemo ? previewItem.id : null,
+    {
+      enabled: previewItem?.status === "UPLOADED",
+      pollUntilReady: true,
+    }
+  )
   const resolvedPreviewItem =
     previewItem && !previewItem.isDemo && previewUrlQuery.data?.url
       ? { ...previewItem, assetUrl: previewUrlQuery.data.url }
@@ -670,6 +679,7 @@ function MediaLibraryPageContent() {
           }
         }}
         onPreviousItem={openPreviousPreviewItem}
+        previewDetail={previewDetailQuery.data?.media ?? null}
         previewError={
           previewItem && !previewItem.isDemo && previewUrlQuery.isError
             ? previewUrlQuery.error instanceof Error

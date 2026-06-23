@@ -50,7 +50,10 @@ def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | Non
 
 
 def mark_job_queued_from_pending(
-    session: Session, job_id: str
+    session: Session,
+    job_id: str,
+    *,
+    current_step: str = "Queued",
 ) -> ProcessingJobRow | None:
     """Atomically move a pending job to queued and return the claimed job row."""
     now = datetime.now(UTC)
@@ -93,7 +96,7 @@ def mark_job_queued_from_pending(
                 "job_id": job_id,
                 "queued_status": JobStatus.QUEUED.value,
                 "progress": 0,
-                "current_step": "Queued for transcription",
+                "current_step": current_step,
                 "pending_status": JobStatus.PENDING.value,
                 "now": now,
             },

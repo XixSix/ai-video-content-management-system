@@ -2,6 +2,7 @@ import type {
   MediaListItemResponseData,
   MediaLibraryItem,
 } from "./media-library.types"
+import { getMediaListThumbnailUrl } from "./lib/media-previews"
 
 export function mapMediaResponseToLibraryItem(
   media: MediaListItemResponseData
@@ -11,7 +12,7 @@ export function mapMediaResponseToLibraryItem(
     title: media.title ?? media.originalFilename,
     originalFilename: media.originalFilename,
     assetUrl: null,
-    thumbnailUrl: media.thumbnail?.url ?? null,
+    thumbnailUrl: getMediaListThumbnailUrl(media),
     duration: media.duration,
     fileSizeBytes: Number(media.fileSizeBytes ?? 0),
     mimeType: media.mimeType ?? "application/octet-stream",

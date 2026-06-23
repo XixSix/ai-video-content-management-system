@@ -1,5 +1,4 @@
 import type {
-  ConnectedAccount,
   PlatformFilterValue,
   PlatformInfo,
 } from "./social-accounts.types"
@@ -69,4 +68,3 @@ export const platformFilterOptions: {
   { label: "YouTube", value: "youtube" },
   { label: "Facebook Page", value: "facebook" },
 ]
-

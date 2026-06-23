@@ -5,10 +5,23 @@ from pathlib import Path
 from typing import Any
 
 from app.core.config import settings
+from app.schemas.media_preview.probe import MediaProbe
 from app.schemas.transcript.audio import AudioMetadata, AudioSanityResult
 
 
 class FFmpegServiceError(Exception):
+    pass
+
+
+class FFmpegBinaryNotFoundError(FFmpegServiceError):
+    pass
+
+
+class FFmpegTimeoutError(FFmpegServiceError):
+    pass
+
+
+class FFmpegCommandError(FFmpegServiceError):
     pass
 
 
@@ -58,6 +71,191 @@ class FFmpegService:
 
         self._run(command)
 
+        return output_path
+
+    def probe_media(self, media_path: Path) -> MediaProbe:
+        """Read duration and stream availability for media preview processing."""
+        command = [
+            self.ffprobe_binary,
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration:stream=codec_type,width,height,duration",
+            "-of",
+            "json",
+            str(media_path),
+        ]
+        result = self._run(command)
+
+        try:
+            payload = json.loads(result.stdout or "{}")
+        except json.JSONDecodeError as error:
+            raise FFmpegCommandError("Invalid ffprobe JSON output") from error
+
+        streams = payload.get("streams")
+
+        if not isinstance(streams, list) or not streams:
+            raise FFmpegCommandError("No media streams found")
+
+        video_stream = next(
+            (
+                stream
+                for stream in streams
+                if isinstance(stream, dict) and stream.get("codec_type") == "video"
+            ),
+            None,
+        )
+        audio_stream = next(
+            (
+                stream
+                for stream in streams
+                if isinstance(stream, dict) and stream.get("codec_type") == "audio"
+            ),
+            None,
+        )
+        format_payload = payload.get("format")
+        format_duration = (
+            _to_float(format_payload.get("duration"))
+            if isinstance(format_payload, dict)
+            else None
+        )
+        stream_durations = [
+            duration
+            for stream in streams
+            if isinstance(stream, dict)
+            for duration in [_to_float(stream.get("duration"))]
+            if duration is not None
+        ]
+        duration_seconds = format_duration or (
+            max(stream_durations) if stream_durations else None
+        )
+
+        if duration_seconds is None or duration_seconds <= 0:
+            raise FFmpegCommandError("Media duration is missing or invalid")
+
+        return MediaProbe(
+            duration_seconds=duration_seconds,
+            has_video=video_stream is not None,
+            has_audio=audio_stream is not None,
+            width=_to_int(video_stream.get("width")) if video_stream else None,
+            height=_to_int(video_stream.get("height")) if video_stream else None,
+        )
+
+    def extract_frame(
+        self,
+        media_path: Path,
+        output_path: Path,
+        *,
+        timestamp_seconds: float,
+        max_width: int | None = None,
+        width: int | None = None,
+        height: int | None = None,
+    ) -> Path:
+        """Extract one JPEG frame, optionally resized for thumbnail or sprite use."""
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        command = [
+            self.ffmpeg_binary,
+            "-y",
+            "-ss",
+            f"{max(0.0, timestamp_seconds):.6f}",
+            "-i",
+            str(media_path),
+            "-frames:v",
+            "1",
+        ]
+
+        if width is not None and height is not None:
+            command.extend(
+                [
+                    "-vf",
+                    (
+                        f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+                        f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:black"
+                    ),
+                ]
+            )
+        elif max_width is not None:
+            command.extend(["-vf", f"scale=min({max_width}\\,iw):-2"])
+
+        command.extend(["-q:v", "2", str(output_path)])
+        self._run(command)
+        _validate_non_empty_output(output_path)
+        return output_path
+
+    def extract_frames(
+        self,
+        media_path: Path,
+        output_pattern: Path,
+        *,
+        frames_per_second: float,
+        frame_count: int,
+        width: int,
+        height: int,
+    ) -> list[Path]:
+        """Extract evenly spaced, letterboxed JPEG frames in one FFmpeg process."""
+        output_pattern.parent.mkdir(parents=True, exist_ok=True)
+        filter_value = (
+            f"fps={frames_per_second:.12f},"
+            f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:black"
+        )
+        command = [
+            self.ffmpeg_binary,
+            "-y",
+            "-i",
+            str(media_path),
+            "-vf",
+            filter_value,
+            "-frames:v",
+            str(frame_count),
+            "-q:v",
+            "3",
+            str(output_pattern),
+        ]
+        self._run(command)
+        frames = sorted(output_pattern.parent.glob("frame-*.jpg"))
+
+        if len(frames) != frame_count:
+            raise FFmpegCommandError(
+                f"Expected {frame_count} sprite frames, generated {len(frames)}"
+            )
+
+        for frame in frames:
+            _validate_non_empty_output(frame)
+
+        return frames
+
+    def extract_pcm_wav(
+        self,
+        media_path: Path,
+        output_path: Path,
+        *,
+        sample_rate: int,
+        duration_seconds: float | None = None,
+    ) -> Path:
+        """Extract mono signed 16-bit PCM WAV for waveform peak calculation."""
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        command = [
+            self.ffmpeg_binary,
+            "-y",
+            "-i",
+            str(media_path),
+            "-vn",
+            "-ac",
+            "1",
+            "-ar",
+            str(sample_rate),
+            "-c:a",
+            "pcm_s16le",
+        ]
+
+        if duration_seconds is not None:
+            command.extend(["-t", f"{duration_seconds:.6f}"])
+
+        command.append(str(output_path))
+        self._run(command)
+        _validate_non_empty_output(output_path)
         return output_path
 
     def probe_audio(self, audio_path: Path) -> AudioMetadata:
@@ -148,16 +346,16 @@ class FFmpegService:
                 timeout=self.timeout_seconds,
             )
         except FileNotFoundError as error:
-            raise FFmpegServiceError(
+            raise FFmpegBinaryNotFoundError(
                 f"FFmpeg binary not found: {command[0]}"
             ) from error
         except subprocess.TimeoutExpired as error:
-            raise FFmpegServiceError(
+            raise FFmpegTimeoutError(
                 f"Command timed out: {_command_name(command)}"
             ) from error
         except subprocess.CalledProcessError as error:
             message = error.stderr.strip() or error.stdout.strip() or str(error)
-            raise FFmpegServiceError(
+            raise FFmpegCommandError(
                 f"Command failed: {_command_name(command)}: {message}"
             ) from error
 
@@ -181,14 +379,20 @@ def _to_int(value: Any) -> int | None:
     if value is None:
         return None
 
-    return int(value)
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _to_float(value: Any) -> float | None:
     if value is None:
         return None
 
-    return float(value)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def parse_silence_ratio(stderr: str, duration_seconds: float) -> float:
@@ -244,6 +448,11 @@ def validate_audio_sanity(
 
 def _command_name(command: list[str]) -> str:
     return Path(command[0]).name if command else "unknown"
+
+
+def _validate_non_empty_output(output_path: Path) -> None:
+    if not output_path.exists() or output_path.stat().st_size == 0:
+        raise FFmpegCommandError(f"FFmpeg output is missing or empty: {output_path}")
 
 
 ffmpeg_service = FFmpegService()

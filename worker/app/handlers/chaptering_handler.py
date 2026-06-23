@@ -42,7 +42,11 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
         return _skipped_result(message, job.status)
 
     with get_db_session() as session:
-        queued_job = jobs_repository.mark_job_queued_from_pending(session, job_id)
+        queued_job = jobs_repository.mark_job_queued_from_pending(
+            session,
+            job_id,
+            current_step="Queued for chapter generation",
+        )
 
     if not queued_job:
         # Another worker may have claimed the job between validation and update.

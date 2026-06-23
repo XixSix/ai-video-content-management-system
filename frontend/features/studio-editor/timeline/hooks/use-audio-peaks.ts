@@ -2,78 +2,57 @@
 
 import { useEffect, useState } from "react"
 
+import {
+  normalizeWaveformPeaks,
+  parseWaveformPeaksPayload,
+} from "@/features/media-library/lib/media-previews"
+
 export function buildFallbackPeaks(barCount: number, seed: number) {
   return Array.from({ length: barCount }).map(
     (_, barIndex) => (18 + ((barIndex * seed + (barIndex % 7) * 11) % 76)) / 100
   )
 }
 
-function buildAudioPeaks(audioBuffer: AudioBuffer, barCount: number) {
-  const channelData = audioBuffer.getChannelData(0)
-  const samplesPerBar = Math.max(1, Math.floor(channelData.length / barCount))
-  const peaks = Array.from({ length: barCount }).map((_, barIndex) => {
-    const startIndex = barIndex * samplesPerBar
-    const endIndex = Math.min(channelData.length, startIndex + samplesPerBar)
-    let peak = 0
-
-    for (let sampleIndex = startIndex; sampleIndex < endIndex; sampleIndex += 1) {
-      peak = Math.max(peak, Math.abs(channelData[sampleIndex] ?? 0))
-    }
-
-    return peak
-  })
-  const maxPeak = Math.max(...peaks, 0.01)
-
-  return peaks.map((peak) => Math.max(0.08, peak / maxPeak))
-}
-
-export function useAudioPeaks(
-  sourceUrl: string | null | undefined,
-  barCount: number
-) {
+export function useAudioPeaks(waveformUrl: string | null | undefined) {
   const [peaksState, setPeaksState] = useState<{
     peaks: number[]
-    sourceUrl: string
+    requestKey: string
   } | null>(null)
+  const requestKey = waveformUrl ?? ""
 
   useEffect(() => {
-    if (!sourceUrl) {
+    if (!waveformUrl) {
       return
     }
 
-    let isCancelled = false
-    let isClosed = false
-    const AudioContextConstructor =
-      window.AudioContext ??
-      (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext
-
-    if (!AudioContextConstructor) {
-      return
-    }
-
-    const audioContext = new AudioContextConstructor()
+    const abortController = new AbortController()
 
     const loadPeaks = async () => {
       try {
-        const response = await fetch(sourceUrl)
-        const audioData = await response.arrayBuffer()
-        const audioBuffer = await audioContext.decodeAudioData(audioData)
+        const response = await fetch(waveformUrl, {
+          signal: abortController.signal,
+        })
 
-        if (!isCancelled) {
-          setPeaksState({
-            peaks: buildAudioPeaks(audioBuffer, barCount),
-            sourceUrl,
-          })
+        if (!response.ok) {
+          throw new Error("Unable to load waveform peaks")
         }
-      } catch {
-        if (!isCancelled) {
+
+        const payload = parseWaveformPeaksPayload(await response.json())
+
+        if (!payload) {
+          throw new Error("Waveform peaks payload is invalid")
+        }
+
+        setPeaksState({
+          peaks: normalizeWaveformPeaks(payload),
+          requestKey: waveformUrl,
+        })
+      } catch (error) {
+        if (
+          !abortController.signal.aborted &&
+          !(error instanceof DOMException && error.name === "AbortError")
+        ) {
           setPeaksState(null)
-        }
-      } finally {
-        if (!isClosed) {
-          isClosed = true
-          void audioContext.close()
         }
       }
     }
@@ -81,15 +60,11 @@ export function useAudioPeaks(
     void loadPeaks()
 
     return () => {
-      isCancelled = true
-      if (!isClosed) {
-        isClosed = true
-        void audioContext.close()
-      }
+      abortController.abort()
     }
-  }, [barCount, sourceUrl])
+  }, [waveformUrl])
 
-  if (!peaksState || peaksState.sourceUrl !== sourceUrl) {
+  if (!peaksState || peaksState.requestKey !== requestKey) {
     return null
   }
 
