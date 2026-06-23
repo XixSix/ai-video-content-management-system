@@ -20,6 +20,7 @@ describe("mapMediaResponseToLibraryItem", () => {
       status: "UPLOADING",
       createdAt: "2026-06-19T10:00:00.000Z",
       updatedAt: "2026-06-19T10:00:00.000Z",
+      thumbnail: null,
     })
 
     expect(item).toMatchObject({
@@ -29,5 +30,38 @@ describe("mapMediaResponseToLibraryItem", () => {
       hasSubtitles: true,
       uploadInterrupted: true,
     })
+  })
+
+  it("maps generated thumbnail URLs into library cards", () => {
+    const item = mapMediaResponseToLibraryItem({
+      id: "123e4567-e89b-12d3-a456-426614174001",
+      workspaceId: "123e4567-e89b-12d3-a456-426614174000",
+      type: "VIDEO",
+      title: "Launch",
+      description: null,
+      originalFilename: "launch.mp4",
+      duration: 120,
+      fileSizeBytes: "2048",
+      mimeType: "video/mp4",
+      width: 1920,
+      height: 1080,
+      metadata: null,
+      status: "UPLOADED",
+      createdAt: "2026-06-19T10:00:00.000Z",
+      updatedAt: "2026-06-19T10:00:00.000Z",
+      thumbnail: {
+        id: "123e4567-e89b-12d3-a456-426614174002",
+        url: "https://storage.example.com/thumbnail.jpg",
+        assetType: "THUMBNAIL",
+        mimeType: "image/jpeg",
+        fileSizeBytes: "1024",
+        metadata: null,
+        expiresInSeconds: 900,
+      },
+    })
+
+    expect(item.thumbnailUrl).toBe(
+      "https://storage.example.com/thumbnail.jpg"
+    )
   })
 })

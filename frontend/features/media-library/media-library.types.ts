@@ -76,6 +76,28 @@ export type MediaResponseData = {
   updatedAt: string
 }
 
+export type MediaPreviewAssetData = {
+  id: string
+  url: string
+  assetType: "THUMBNAIL" | "THUMBNAIL_SPRITE" | "WAVEFORM_PEAKS"
+  mimeType: string | null
+  fileSizeBytes: string | null
+  metadata: Record<string, unknown> | null
+  expiresInSeconds: number
+}
+
+export type MediaListItemResponseData = MediaResponseData & {
+  thumbnail: MediaPreviewAssetData | null
+}
+
+export type MediaDetailResponseData = MediaResponseData & {
+  previews: {
+    thumbnail: MediaPreviewAssetData | null
+    thumbnailSprites: MediaPreviewAssetData[]
+    waveformPeaks: MediaPreviewAssetData | null
+  }
+}
+
 export type MediaListMeta = {
   total: number
   page: number
@@ -84,7 +106,7 @@ export type MediaListMeta = {
 }
 
 export type MediaListResponseData = {
-  items: MediaResponseData[]
+  items: MediaListItemResponseData[]
   meta: MediaListMeta
 }
 

@@ -11,6 +11,7 @@ import type {
   CreateUploadUrlInput,
   CreateUploadUrlResult,
   MediaApiType,
+  MediaDetailResponseData,
   MediaListQuery,
   MediaListResponseData,
   MediaResponseData,
@@ -114,9 +115,9 @@ export const mediaService = {
   get(
     workspaceId: string,
     mediaId: string
-  ): Promise<{ media: MediaResponseData }> {
+  ): Promise<{ media: MediaDetailResponseData }> {
     return unwrapApiResponse(
-      authenticatedApiClient.get<ApiSuccess<{ media: MediaResponseData }>>(
+      authenticatedApiClient.get<ApiSuccess<{ media: MediaDetailResponseData }>>(
         `/workspaces/${workspaceId}/media/${mediaId}`
       )
     )
