@@ -81,7 +81,7 @@ export type MediaResponseData = {
   updatedAt: string
 }
 
-export type MediaPreviewAssetResponseData = {
+export type MediaPreviewAssetData = {
   id: string
   url: string
   assetType: MediaPreviewAssetType
@@ -92,13 +92,13 @@ export type MediaPreviewAssetResponseData = {
 }
 
 export type MediaListItemResponseData = MediaResponseData & {
-  thumbnail: MediaPreviewAssetResponseData | null
+  thumbnail: MediaPreviewAssetData | null
 }
 
 export type MediaPreviewAssetsResponseData = {
-  thumbnail: MediaPreviewAssetResponseData | null
-  thumbnailSprites: MediaPreviewAssetResponseData[]
-  waveformPeaks: MediaPreviewAssetResponseData | null
+  thumbnail: MediaPreviewAssetData | null
+  thumbnailSprites: MediaPreviewAssetData[]
+  waveformPeaks: MediaPreviewAssetData | null
 }
 
 export type MediaDetailResponseData = MediaResponseData & {

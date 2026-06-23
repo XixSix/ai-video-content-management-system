@@ -29,6 +29,11 @@ const media = {
   updatedAt: now,
 }
 
+const mediaListItem = {
+  ...media,
+  thumbnail: null,
+}
+
 describe("media service", () => {
   beforeEach(() => {
     apiMock.reset()
@@ -55,7 +60,7 @@ describe("media service", () => {
         {
           success: true,
           data: {
-            items: [media],
+            items: [mediaListItem],
             meta: {
               total: 1,
               page: 1,
@@ -76,7 +81,7 @@ describe("media service", () => {
         sortOrder: "desc",
       })
     ).resolves.toMatchObject({
-      items: [media],
+      items: [mediaListItem],
       meta: { total: 1 },
     })
   })
@@ -96,6 +101,48 @@ describe("media service", () => {
     })
     await expect(mediaService.getDownloadUrl(workspaceId, mediaId)).resolves.toMatchObject({
       url: "https://storage.example.com/download",
+    })
+  })
+
+  it("returns generated preview assets with media details", async () => {
+    apiMock.onGet(`/workspaces/${workspaceId}/media/${mediaId}`).reply(200, {
+      success: true,
+      data: {
+        media: {
+          ...media,
+          previews: {
+            thumbnail: null,
+            thumbnailSprites: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174002",
+                url: "https://storage.example.com/sprite-000.jpg",
+                assetType: "THUMBNAIL_SPRITE",
+                mimeType: "image/jpeg",
+                fileSizeBytes: "4096",
+                metadata: { sheetIndex: 0 },
+                expiresInSeconds: 900,
+              },
+            ],
+            waveformPeaks: {
+              id: "123e4567-e89b-12d3-a456-426614174003",
+              url: "https://storage.example.com/waveform.json",
+              assetType: "WAVEFORM_PEAKS",
+              mimeType: "application/json",
+              fileSizeBytes: "1024",
+              metadata: { encoding: "uint8", scale: 255 },
+              expiresInSeconds: 900,
+            },
+          },
+        },
+      },
+    })
+
+    const result = await mediaService.get(workspaceId, mediaId)
+
+    expect(result.media.previews.thumbnailSprites).toHaveLength(1)
+    expect(result.media.previews.waveformPeaks?.metadata).toMatchObject({
+      encoding: "uint8",
+      scale: 255,
     })
   })
 
