@@ -71,7 +71,7 @@ describe('jobs service', () => {
       createProcessingJob({
         jobType: 'GENERATE_THUMBNAIL',
         status: 'PENDING',
-        queueName: 'media_derivatives_queue',
+        queueName: 'media_previews_queue',
         taskName: 'generate_thumbnail'
       })
     )

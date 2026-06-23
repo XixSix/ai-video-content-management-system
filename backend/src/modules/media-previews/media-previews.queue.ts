@@ -3,13 +3,13 @@ import {
   GENERATE_THUMBNAIL_SPRITE_TASK_NAME,
   GENERATE_THUMBNAIL_TASK_NAME,
   GENERATE_WAVEFORM_PEAK_TASK_NAME,
-  MEDIA_DERIVATIVES_CELERY_TASK_NAME,
-  MEDIA_DERIVATIVES_QUEUE_NAME,
-  type MediaDerivativeJobMessage,
-  type MediaDerivativeTaskName
-} from './media-derivatives.types'
+  MEDIA_PREVIEWS_CELERY_TASK_NAME,
+  MEDIA_PREVIEWS_QUEUE_NAME,
+  type MediaPreviewJobMessage,
+  type MediaPreviewTaskName
+} from './media-previews.types'
 
-const getTaskName = (jobType: MediaDerivativeJobMessage['jobType']): MediaDerivativeTaskName => {
+const getTaskName = (jobType: MediaPreviewJobMessage['jobType']): MediaPreviewTaskName => {
   switch (jobType) {
     case 'GENERATE_THUMBNAIL':
       return GENERATE_THUMBNAIL_TASK_NAME
@@ -20,12 +20,10 @@ const getTaskName = (jobType: MediaDerivativeJobMessage['jobType']): MediaDeriva
   }
 }
 
-export const publishMediaDerivativeJob = async (
-  message: Omit<MediaDerivativeJobMessage, 'taskName'>
-): Promise<void> => {
+export const publishMediaPreviewJob = async (message: Omit<MediaPreviewJobMessage, 'taskName'>): Promise<void> => {
   await rabbitPublisher.publishCeleryTaskToQueue({
-    queueName: MEDIA_DERIVATIVES_QUEUE_NAME,
-    taskName: MEDIA_DERIVATIVES_CELERY_TASK_NAME,
+    queueName: MEDIA_PREVIEWS_QUEUE_NAME,
+    taskName: MEDIA_PREVIEWS_CELERY_TASK_NAME,
     taskId: message.jobId,
     kwargs: {
       ...message,

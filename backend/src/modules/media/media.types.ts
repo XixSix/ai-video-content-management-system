@@ -62,7 +62,7 @@ export interface MediaListItemResponseData extends MediaResponseData {
 
 export interface MediaPreviewAssetsResponseData {
   thumbnail: MediaPreviewAssetResponseData | null
-  thumbnailSprite: MediaPreviewAssetResponseData | null
+  thumbnailSprites: MediaPreviewAssetResponseData[]
   waveformPeaks: MediaPreviewAssetResponseData | null
 }
 

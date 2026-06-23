@@ -1,7 +1,7 @@
 import { config } from '../../config'
 import { MediaStatus, type GeneratedAsset, type Media } from '../../infrastructure/db/generated/prisma/client'
 import * as storageService from '../../infrastructure/s3/uploader'
-import * as mediaDerivativesService from '../media-derivatives/media-derivatives.service'
+import * as mediaPreviewsService from '../media-previews/media-previews.service'
 import { MediaError } from './media.error'
 import * as mediaRepo from './media.repository'
 import type { ListMediaQuery, UpdateMediaBody } from './media.schema'
@@ -123,11 +123,26 @@ export const getMedia = async (workspaceId: string, mediaId: string): Promise<Me
       latestAssets.set(asset.assetType, asset)
     }
   }
+
+  const latestSprite = latestAssets.get('THUMBNAIL_SPRITE')
+  const thumbnailSprites = latestSprite
+    ? media.generatedAssets
+        .filter(
+          (asset) =>
+            asset.assetType === 'THUMBNAIL_SPRITE' &&
+            (latestSprite.jobId ? asset.jobId === latestSprite.jobId : asset.id === latestSprite.id)
+        )
+        .sort((left, right) => {
+          const leftIndex = getSheetIndex(left)
+          const rightIndex = getSheetIndex(right)
+
+          return leftIndex - rightIndex
+        })
+    : []
+
   const previews: MediaPreviewAssetsResponseData = {
     thumbnail: latestAssets.get('THUMBNAIL') ? await toPreviewAssetResponse(latestAssets.get('THUMBNAIL')!) : null,
-    thumbnailSprite: latestAssets.get('THUMBNAIL_SPRITE')
-      ? await toPreviewAssetResponse(latestAssets.get('THUMBNAIL_SPRITE')!)
-      : null,
+    thumbnailSprites: await Promise.all(thumbnailSprites.map(toPreviewAssetResponse)),
     waveformPeaks: latestAssets.get('WAVEFORM_PEAKS')
       ? await toPreviewAssetResponse(latestAssets.get('WAVEFORM_PEAKS')!)
       : null
@@ -137,6 +152,16 @@ export const getMedia = async (workspaceId: string, mediaId: string): Promise<Me
     ...toMediaResponseData(media),
     previews
   }
+}
+
+const getSheetIndex = (asset: GeneratedAsset): number => {
+  if (!asset.metadata || Array.isArray(asset.metadata) || typeof asset.metadata !== 'object') {
+    return Number.MAX_SAFE_INTEGER
+  }
+
+  const sheetIndex = asset.metadata.sheetIndex
+
+  return typeof sheetIndex === 'number' ? sheetIndex : Number.MAX_SAFE_INTEGER
 }
 
 export const updateMedia = async (
@@ -329,8 +354,8 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
     await rejectInvalidUploadedObject(media, 'Uploaded object content type does not match mimeType')
   }
 
-  const derivativeJobDrafts = mediaDerivativesService.createDerivativeJobDrafts(media)
-  const { media: completedMedia, jobs: createdDerivativeJobs } = await mediaRepo.completeUploadAndCreateJobs({
+  const previewJobDrafts = mediaPreviewsService.createPreviewJobDrafts(media)
+  const { media: completedMedia, jobs: createdPreviewJobs } = await mediaRepo.completeUploadAndCreateJobs({
     id: media.id,
     userId: input.userId,
     mediaData: {
@@ -342,15 +367,15 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
       ...(input.height !== undefined ? { height: input.height } : {}),
       status: MediaStatus.UPLOADED
     },
-    jobs: derivativeJobDrafts.map((draft) => draft.data)
+    jobs: previewJobDrafts.map((draft) => draft.data)
   })
 
   if (completedMedia) {
-    if (createdDerivativeJobs.length > 0) {
-      await mediaDerivativesService.publishDerivativeJobs(
+    if (createdPreviewJobs.length > 0) {
+      await mediaPreviewsService.publishPreviewJobs(
         completedMedia,
-        createdDerivativeJobs.map((job, index) => ({
-          kind: derivativeJobDrafts[index].kind,
+        createdPreviewJobs.map((job, index) => ({
+          kind: previewJobDrafts[index].kind,
           job
         }))
       )

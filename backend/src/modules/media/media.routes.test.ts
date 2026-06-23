@@ -125,7 +125,7 @@ describe('media routes', () => {
       updatedAt: now,
       previews: {
         thumbnail: null,
-        thumbnailSprite: null,
+        thumbnailSprites: [],
         waveformPeaks: null
       }
     })
@@ -230,15 +230,17 @@ describe('media routes', () => {
       updatedAt: now,
       previews: {
         thumbnail: null,
-        thumbnailSprite: {
-          id: '00000000-0000-4000-8000-000000000005',
-          url: 'https://storage.example.com/generated/sprite.jpg',
-          assetType: 'THUMBNAIL_SPRITE',
-          mimeType: 'image/jpeg',
-          fileSizeBytes: '4096',
-          metadata: null,
-          expiresInSeconds: 900
-        },
+        thumbnailSprites: [
+          {
+            id: '00000000-0000-4000-8000-000000000005',
+            url: 'https://storage.example.com/generated/sprite.jpg',
+            assetType: 'THUMBNAIL_SPRITE',
+            mimeType: 'image/jpeg',
+            fileSizeBytes: '4096',
+            metadata: { sheetIndex: 0 },
+            expiresInSeconds: 900
+          }
+        ],
         waveformPeaks: {
           id: '00000000-0000-4000-8000-000000000006',
           url: 'https://storage.example.com/generated/waveform.json',
@@ -256,9 +258,7 @@ describe('media routes', () => {
     expect(response.status).toBe(200)
     expect(response.body.data.media.previews).toMatchObject({
       thumbnail: null,
-      thumbnailSprite: {
-        assetType: 'THUMBNAIL_SPRITE'
-      },
+      thumbnailSprites: [{ assetType: 'THUMBNAIL_SPRITE' }],
       waveformPeaks: {
         assetType: 'WAVEFORM_PEAKS'
       }

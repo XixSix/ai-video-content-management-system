@@ -2,17 +2,17 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import type { Media, ProcessingJob } from '../../infrastructure/db/generated/prisma/client'
 
 const updateProcessingJobMock = jest.fn<(id: string, data: unknown) => Promise<ProcessingJob>>()
-const publishMediaDerivativeJobMock = jest.fn<(message: unknown) => Promise<void>>()
+const publishMediaPreviewJobMock = jest.fn<(message: unknown) => Promise<void>>()
 
-jest.unstable_mockModule('./media-derivatives.repository', () => ({
+jest.unstable_mockModule('./media-previews.repository', () => ({
   updateProcessingJob: updateProcessingJobMock
 }))
 
-jest.unstable_mockModule('./media-derivatives.queue', () => ({
-  publishMediaDerivativeJob: publishMediaDerivativeJobMock
+jest.unstable_mockModule('./media-previews.queue', () => ({
+  publishMediaPreviewJob: publishMediaPreviewJobMock
 }))
 
-const mediaDerivativesService = await import('./media-derivatives.service')
+const mediaPreviewsService = await import('./media-previews.service')
 
 const now = new Date('2026-06-23T06:00:00.000Z')
 const workspaceId = '00000000-0000-4000-8000-000000000001'
@@ -54,7 +54,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   progress: 0,
   currentStep: null,
   errorMessage: null,
-  queueName: 'media_derivatives_queue',
+  queueName: 'media_previews_queue',
   taskName: 'generate_thumbnail',
   externalTaskId: null,
   attemptCount: 0,
@@ -67,17 +67,17 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   ...overrides
 })
 
-describe('media derivatives service', () => {
+describe('media previews service', () => {
   beforeEach(() => {
     updateProcessingJobMock.mockReset()
-    publishMediaDerivativeJobMock.mockReset()
+    publishMediaPreviewJobMock.mockReset()
 
     updateProcessingJobMock.mockImplementation(async (id, data) => createProcessingJob({ id, ...(data as object) }))
-    publishMediaDerivativeJobMock.mockResolvedValue()
+    publishMediaPreviewJobMock.mockResolvedValue()
   })
 
-  it('creates video derivative drafts for thumbnail, sprite, and waveform', () => {
-    const drafts = mediaDerivativesService.createDerivativeJobDrafts(createMedia({ type: 'VIDEO' }))
+  it('creates video preview drafts for thumbnail, sprite, and waveform', () => {
+    const drafts = mediaPreviewsService.createPreviewJobDrafts(createMedia({ type: 'VIDEO' }))
 
     expect(drafts).toHaveLength(3)
     expect(drafts.map((draft) => draft.kind)).toEqual(['thumbnail', 'thumbnailSprite', 'waveformPeak'])
@@ -88,10 +88,8 @@ describe('media derivatives service', () => {
     ])
   })
 
-  it('creates only waveform derivative drafts for audio uploads', () => {
-    const drafts = mediaDerivativesService.createDerivativeJobDrafts(
-      createMedia({ type: 'AUDIO', mimeType: 'audio/mpeg' })
-    )
+  it('creates only waveform preview drafts for audio uploads', () => {
+    const drafts = mediaPreviewsService.createPreviewJobDrafts(createMedia({ type: 'AUDIO', mimeType: 'audio/mpeg' }))
 
     expect(drafts).toHaveLength(1)
     expect(drafts[0]).toMatchObject({
@@ -102,10 +100,8 @@ describe('media derivatives service', () => {
     })
   })
 
-  it('creates no derivative drafts for image uploads', () => {
-    const drafts = mediaDerivativesService.createDerivativeJobDrafts(
-      createMedia({ type: 'IMAGE', mimeType: 'image/png' })
-    )
+  it('creates no preview drafts for image uploads', () => {
+    const drafts = mediaPreviewsService.createPreviewJobDrafts(createMedia({ type: 'IMAGE', mimeType: 'image/png' }))
 
     expect(drafts).toEqual([])
   })
@@ -127,17 +123,17 @@ describe('media derivatives service', () => {
       }
     ]
 
-    publishMediaDerivativeJobMock.mockResolvedValueOnce().mockRejectedValueOnce(new Error('RabbitMQ unavailable'))
+    publishMediaPreviewJobMock.mockResolvedValueOnce().mockRejectedValueOnce(new Error('RabbitMQ unavailable'))
 
-    await mediaDerivativesService.publishDerivativeJobs(media, jobs)
+    await mediaPreviewsService.publishPreviewJobs(media, jobs)
 
-    expect(publishMediaDerivativeJobMock).toHaveBeenCalledTimes(2)
+    expect(publishMediaPreviewJobMock).toHaveBeenCalledTimes(2)
     expect(updateProcessingJobMock).toHaveBeenCalledTimes(1)
     expect(updateProcessingJobMock).toHaveBeenCalledWith(
       'job-waveform',
       expect.objectContaining({
         status: 'FAILED',
-        errorMessage: expect.stringContaining('Failed to publish waveformPeak derivative job')
+        errorMessage: expect.stringContaining('Failed to publish waveformPeak preview job')
       })
     )
   })

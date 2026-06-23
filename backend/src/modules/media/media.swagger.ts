@@ -89,16 +89,16 @@
  *               nullable: true
  *     MediaPreviewAssets:
  *       type: object
- *       required: [thumbnail, thumbnailSprite, waveformPeaks]
+ *       required: [thumbnail, thumbnailSprites, waveformPeaks]
  *       properties:
  *         thumbnail:
  *           allOf:
  *             - $ref: '#/components/schemas/MediaPreviewAsset'
  *           nullable: true
- *         thumbnailSprite:
- *           allOf:
- *             - $ref: '#/components/schemas/MediaPreviewAsset'
- *           nullable: true
+ *         thumbnailSprites:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/MediaPreviewAsset'
  *         waveformPeaks:
  *           allOf:
  *             - $ref: '#/components/schemas/MediaPreviewAsset'

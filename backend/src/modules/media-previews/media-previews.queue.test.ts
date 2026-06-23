@@ -6,9 +6,9 @@ jest.unstable_mockModule('../../infrastructure/rabbitmq/publisher', () => ({
   publishCeleryTaskToQueue: publishCeleryTaskToQueueMock
 }))
 
-const { publishMediaDerivativeJob } = await import('./media-derivatives.queue')
+const { publishMediaPreviewJob } = await import('./media-previews.queue')
 
-describe('media derivatives queue', () => {
+describe('media previews queue', () => {
   beforeEach(() => {
     publishCeleryTaskToQueueMock.mockReset()
     publishCeleryTaskToQueueMock.mockResolvedValue()
@@ -19,7 +19,7 @@ describe('media derivatives queue', () => {
     ['GENERATE_THUMBNAIL_SPRITE', 'generate_thumbnail_sprite'],
     ['GENERATE_WAVEFORM_PEAK', 'generate_waveform_peak']
   ] as const)('publishes %s with task name %s', async (jobType, taskName) => {
-    await publishMediaDerivativeJob({
+    await publishMediaPreviewJob({
       jobId: 'job-1',
       jobType,
       mediaId: 'media-1',
@@ -32,8 +32,8 @@ describe('media derivatives queue', () => {
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
-      queueName: 'media_derivatives_queue',
-      taskName: 'media_derivative_task',
+      queueName: 'media_previews_queue',
+      taskName: 'media_preview_task',
       taskId: 'job-1',
       kwargs: {
         jobId: 'job-1',

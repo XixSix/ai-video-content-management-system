@@ -1,20 +1,20 @@
 import { AssetType, JobStatus, JobType, MediaType, type Media } from '../../infrastructure/db/generated/prisma/client'
-import * as mediaDerivativesQueue from './media-derivatives.queue'
-import * as mediaDerivativesRepo from './media-derivatives.repository'
+import * as mediaPreviewsQueue from './media-previews.queue'
+import * as mediaPreviewsRepo from './media-previews.repository'
 import type {
-  DerivativeJobDraft,
-  DerivativeJobRecord,
-  MediaDerivativeDefinition,
-  MediaDerivativeJobMessage
-} from './media-derivatives.types'
+  MediaPreviewDefinition,
+  MediaPreviewJobMessage,
+  PreviewJobDraft,
+  PreviewJobRecord
+} from './media-previews.types'
 import {
   GENERATE_THUMBNAIL_SPRITE_TASK_NAME,
   GENERATE_THUMBNAIL_TASK_NAME,
   GENERATE_WAVEFORM_PEAK_TASK_NAME,
-  MEDIA_DERIVATIVES_QUEUE_NAME
-} from './media-derivatives.types'
+  MEDIA_PREVIEWS_QUEUE_NAME
+} from './media-previews.types'
 
-const MEDIA_DERIVATIVE_DEFINITIONS: readonly MediaDerivativeDefinition[] = [
+const MEDIA_PREVIEW_DEFINITIONS: readonly MediaPreviewDefinition[] = [
   {
     kind: 'thumbnail',
     jobType: JobType.GENERATE_THUMBNAIL,
@@ -38,14 +38,14 @@ const MEDIA_DERIVATIVE_DEFINITIONS: readonly MediaDerivativeDefinition[] = [
   }
 ] as const
 
-const DERIVATIVE_DEFINITION_BY_JOB_TYPE: ReadonlyMap<JobType, MediaDerivativeDefinition> = new Map(
-  MEDIA_DERIVATIVE_DEFINITIONS.map((definition) => [definition.jobType, definition] as const)
+const PREVIEW_DEFINITION_BY_JOB_TYPE: ReadonlyMap<JobType, MediaPreviewDefinition> = new Map(
+  MEDIA_PREVIEW_DEFINITIONS.map((definition) => [definition.jobType, definition] as const)
 )
-export const getEligibleDerivativeDefinitions = (mediaType: MediaType): MediaDerivativeDefinition[] =>
-  MEDIA_DERIVATIVE_DEFINITIONS.filter((definition) => definition.supportedMediaTypes.includes(mediaType))
+export const getEligiblePreviewDefinitions = (mediaType: MediaType): MediaPreviewDefinition[] =>
+  MEDIA_PREVIEW_DEFINITIONS.filter((definition) => definition.supportedMediaTypes.includes(mediaType))
 
-export const createDerivativeJobDrafts = (media: Media): DerivativeJobDraft[] =>
-  getEligibleDerivativeDefinitions(media.type).map((definition) => ({
+export const createPreviewJobDrafts = (media: Media): PreviewJobDraft[] =>
+  getEligiblePreviewDefinitions(media.type).map((definition) => ({
     kind: definition.kind,
     data: {
       mediaId: media.id,
@@ -53,7 +53,7 @@ export const createDerivativeJobDrafts = (media: Media): DerivativeJobDraft[] =>
       jobType: definition.jobType,
       status: JobStatus.PENDING,
       progress: 0,
-      queueName: MEDIA_DERIVATIVES_QUEUE_NAME,
+      queueName: MEDIA_PREVIEWS_QUEUE_NAME,
       taskName: definition.taskName,
       input: {
         mediaId: media.id,
@@ -63,21 +63,21 @@ export const createDerivativeJobDrafts = (media: Media): DerivativeJobDraft[] =>
         s3Key: media.s3Key,
         mediaType: media.type,
         mimeType: media.mimeType,
-        derivativeKind: definition.kind
+        previewKind: definition.kind
       }
     }
   }))
 
-export const publishDerivativeJobs = async (media: Media, jobs: DerivativeJobRecord[]): Promise<void> => {
+export const publishPreviewJobs = async (media: Media, jobs: PreviewJobRecord[]): Promise<void> => {
   const publishResults = await Promise.allSettled(
     jobs.map(async ({ job }) => {
-      const definition = DERIVATIVE_DEFINITION_BY_JOB_TYPE.get(job.jobType)
+      const definition = PREVIEW_DEFINITION_BY_JOB_TYPE.get(job.jobType)
 
       if (!definition) {
-        throw new Error(`Unsupported media derivative job type: ${job.jobType}`)
+        throw new Error(`Unsupported media preview job type: ${job.jobType}`)
       }
 
-      const message: Omit<MediaDerivativeJobMessage, 'taskName'> = {
+      const message: Omit<MediaPreviewJobMessage, 'taskName'> = {
         jobId: job.id,
         jobType: definition.jobType,
         mediaId: media.id,
@@ -89,7 +89,7 @@ export const publishDerivativeJobs = async (media: Media, jobs: DerivativeJobRec
         mimeType: media.mimeType
       }
 
-      await mediaDerivativesQueue.publishMediaDerivativeJob(message)
+      await mediaPreviewsQueue.publishMediaPreviewJob(message)
     })
   )
 
@@ -102,10 +102,10 @@ export const publishDerivativeJobs = async (media: Media, jobs: DerivativeJobRec
       const failedJob = jobs[index]
       const reason = result.reason instanceof Error ? result.reason.message : 'Unknown queue publish error'
 
-      await mediaDerivativesRepo.updateProcessingJob(failedJob.job.id, {
+      await mediaPreviewsRepo.updateProcessingJob(failedJob.job.id, {
         status: JobStatus.FAILED,
         progress: 0,
-        errorMessage: `Failed to publish ${failedJob.kind} derivative job: ${reason}`,
+        errorMessage: `Failed to publish ${failedJob.kind} preview job: ${reason}`,
         completedAt: new Date()
       })
     })

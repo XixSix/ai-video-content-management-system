@@ -6,33 +6,33 @@ import type {
   ProcessingJob
 } from '../../infrastructure/db/generated/prisma/client'
 
-export const MEDIA_DERIVATIVES_QUEUE_NAME = 'media_derivatives_queue'
-export const MEDIA_DERIVATIVES_CELERY_TASK_NAME = 'media_derivative_task'
+export const MEDIA_PREVIEWS_QUEUE_NAME = 'media_previews_queue'
+export const MEDIA_PREVIEWS_CELERY_TASK_NAME = 'media_preview_task'
 export const GENERATE_THUMBNAIL_TASK_NAME = 'generate_thumbnail'
 export const GENERATE_THUMBNAIL_SPRITE_TASK_NAME = 'generate_thumbnail_sprite'
 export const GENERATE_WAVEFORM_PEAK_TASK_NAME = 'generate_waveform_peak'
 
-export type MediaDerivativeKind = 'thumbnail' | 'thumbnailSprite' | 'waveformPeak'
-export type MediaDerivativeTaskName =
+export type MediaPreviewKind = 'thumbnail' | 'thumbnailSprite' | 'waveformPeak'
+export type MediaPreviewTaskName =
   | typeof GENERATE_THUMBNAIL_TASK_NAME
   | typeof GENERATE_THUMBNAIL_SPRITE_TASK_NAME
   | typeof GENERATE_WAVEFORM_PEAK_TASK_NAME
-export type MediaDerivativeJobType = Extract<
+export type MediaPreviewJobType = Extract<
   JobType,
   'GENERATE_THUMBNAIL' | 'GENERATE_THUMBNAIL_SPRITE' | 'GENERATE_WAVEFORM_PEAK'
 >
 
-export interface MediaDerivativeDefinition {
-  kind: MediaDerivativeKind
-  jobType: MediaDerivativeJobType
+export interface MediaPreviewDefinition {
+  kind: MediaPreviewKind
+  jobType: MediaPreviewJobType
   assetType: AssetType
-  taskName: MediaDerivativeTaskName
+  taskName: MediaPreviewTaskName
   supportedMediaTypes: readonly MediaType[]
 }
 
-export interface MediaDerivativeJobMessage {
+export interface MediaPreviewJobMessage {
   jobId: string
-  jobType: MediaDerivativeJobType
+  jobType: MediaPreviewJobType
   mediaId: string
   workspaceId: string
   userId: string
@@ -40,15 +40,15 @@ export interface MediaDerivativeJobMessage {
   s3Key: string
   mediaType: MediaType
   mimeType: string | null
-  taskName: MediaDerivativeTaskName
+  taskName: MediaPreviewTaskName
 }
 
-export interface DerivativeJobDraft {
-  kind: MediaDerivativeKind
+export interface PreviewJobDraft {
+  kind: MediaPreviewKind
   data: Prisma.ProcessingJobUncheckedCreateInput
 }
 
-export interface DerivativeJobRecord {
-  kind: MediaDerivativeKind
+export interface PreviewJobRecord {
+  kind: MediaPreviewKind
   job: ProcessingJob
 }
