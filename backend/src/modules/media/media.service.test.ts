@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { config } from '../../config'
-import type { Media } from '../../infrastructure/db/generated/prisma/client'
+import type { GeneratedAsset, Media } from '../../infrastructure/db/generated/prisma/client'
 import { MediaError } from './media.error'
 
 const createMediaMock = jest.fn<(data: unknown) => Promise<Media>>()
 const findMediaByWorkspaceIdMock = jest.fn()
 const findMediaByIdInWorkspaceMock = jest.fn<(id: string, workspaceId: string) => Promise<Media | null>>()
+const findMediaWithPreviewAssetsByIdInWorkspaceMock = jest.fn()
 const updateMediaMock = jest.fn<(id: string, data: unknown) => Promise<Media>>()
 const updateUploadingMediaMock = jest.fn<(id: string, userId: string, data: unknown) => Promise<Media | null>>()
+const completeUploadAndCreateJobsMock = jest.fn()
 const createPresignedPutUrlMock = jest.fn<(bucket: string, key: string, mimeType: string) => Promise<string>>()
+const createPresignedGetUrlMock = jest.fn<(bucket: string, key: string) => Promise<string>>()
 const createPresignedPreviewUrlMock = jest.fn<(bucket: string, key: string) => Promise<string>>()
 const createPresignedDownloadUrlMock = jest.fn<(bucket: string, key: string, filename: string) => Promise<string>>()
 const createMultipartUploadMock = jest.fn<(bucket: string, key: string, mimeType: string) => Promise<string>>()
@@ -27,11 +30,15 @@ const abortMultipartUploadMock = jest.fn<(bucket: string, key: string, uploadId:
 const deleteObjectMock = jest.fn<(bucket: string, key: string) => Promise<void>>()
 const headObjectMock =
   jest.fn<(bucket: string, key: string) => Promise<{ contentLength?: number; contentType?: string; etag?: string }>>()
+const createPreviewJobDraftsMock = jest.fn()
+const publishPreviewJobsMock = jest.fn<(media: Media, jobs: unknown[]) => Promise<void>>()
 
 jest.unstable_mockModule('./media.repository', () => ({
   createMedia: createMediaMock,
+  completeUploadAndCreateJobs: completeUploadAndCreateJobsMock,
   findMediaByWorkspaceId: findMediaByWorkspaceIdMock,
   findMediaByIdInWorkspace: findMediaByIdInWorkspaceMock,
+  findMediaWithPreviewAssetsByIdInWorkspace: findMediaWithPreviewAssetsByIdInWorkspaceMock,
   updateMedia: updateMediaMock,
   updateUploadingMedia: updateUploadingMediaMock
 }))
@@ -42,12 +49,18 @@ jest.unstable_mockModule('../../infrastructure/s3/uploader', () => ({
   abortMultipartUpload: abortMultipartUploadMock,
   completeMultipartUpload: completeMultipartUploadMock,
   createMultipartUpload: createMultipartUploadMock,
+  createPresignedGetUrl: createPresignedGetUrlMock,
   createPresignedPreviewUrl: createPresignedPreviewUrlMock,
   createPresignedDownloadUrl: createPresignedDownloadUrlMock,
   createPresignedPutUrl: createPresignedPutUrlMock,
   createPresignedUploadPartUrls: createPresignedUploadPartUrlsMock,
   deleteObject: deleteObjectMock,
   headObject: headObjectMock
+}))
+
+jest.unstable_mockModule('../media-previews/media-previews.service', () => ({
+  createPreviewJobDrafts: createPreviewJobDraftsMock,
+  publishPreviewJobs: publishPreviewJobsMock
 }))
 
 const mediaService = await import('./media.service')
@@ -83,14 +96,39 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
   ...overrides
 })
 
+const createThumbnail = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset => ({
+  id: '00000000-0000-4000-8000-000000000005',
+  userId,
+  mediaId,
+  projectId: null,
+  transcriptId: null,
+  chapterId: null,
+  shortClipId: null,
+  jobId: null,
+  assetType: 'THUMBNAIL',
+  transcriptVersion: null,
+  s3Bucket: 'vidpilot-media',
+  s3Key: 'generated/thumbnail.jpg',
+  s3Region: 'us-east-1',
+  s3Etag: '"thumbnail-etag"',
+  mimeType: 'image/jpeg',
+  fileSizeBytes: BigInt(2048),
+  metadata: { width: 320, height: 180 },
+  createdAt: now,
+  ...overrides
+})
+
 describe('media upload service', () => {
   beforeEach(() => {
     createMediaMock.mockReset()
     findMediaByWorkspaceIdMock.mockReset()
     findMediaByIdInWorkspaceMock.mockReset()
+    findMediaWithPreviewAssetsByIdInWorkspaceMock.mockReset()
     updateMediaMock.mockReset()
     updateUploadingMediaMock.mockReset()
+    completeUploadAndCreateJobsMock.mockReset()
     createPresignedPutUrlMock.mockReset()
+    createPresignedGetUrlMock.mockReset()
     createPresignedPreviewUrlMock.mockReset()
     createPresignedDownloadUrlMock.mockReset()
     createMultipartUploadMock.mockReset()
@@ -99,13 +137,24 @@ describe('media upload service', () => {
     abortMultipartUploadMock.mockReset()
     deleteObjectMock.mockReset()
     headObjectMock.mockReset()
+    createPreviewJobDraftsMock.mockReset()
+    publishPreviewJobsMock.mockReset()
 
     createMediaMock.mockResolvedValue(createMedia())
-    findMediaByWorkspaceIdMock.mockResolvedValue([[createMedia({ status: 'UPLOADED' })], 1])
+    findMediaByWorkspaceIdMock.mockResolvedValue([[{ ...createMedia({ status: 'UPLOADED' }), generatedAssets: [] }], 1])
     findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ status: 'UPLOADED' }))
+    findMediaWithPreviewAssetsByIdInWorkspaceMock.mockResolvedValue({
+      ...createMedia({ status: 'UPLOADED' }),
+      generatedAssets: []
+    })
     updateMediaMock.mockImplementation(async (_id, data) => createMedia(data as Partial<Media>))
     updateUploadingMediaMock.mockImplementation(async (_id, _userId, data) => createMedia(data as Partial<Media>))
+    completeUploadAndCreateJobsMock.mockImplementation(async ({ mediaData }) => ({
+      media: createMedia(mediaData as Partial<Media>),
+      jobs: []
+    }))
     createPresignedPutUrlMock.mockResolvedValue('https://storage.example.com/upload')
+    createPresignedGetUrlMock.mockResolvedValue('https://storage.example.com/generated/thumbnail.jpg')
     createPresignedPreviewUrlMock.mockResolvedValue('https://storage.example.com/preview')
     createPresignedDownloadUrlMock.mockResolvedValue('https://storage.example.com/download')
     createMultipartUploadMock.mockResolvedValue('multipart-upload-id')
@@ -118,6 +167,8 @@ describe('media upload service', () => {
       contentType: 'video/mp4',
       etag: '"etag"'
     })
+    createPreviewJobDraftsMock.mockReturnValue([])
+    publishPreviewJobsMock.mockResolvedValue()
   })
 
   it('lists all non-deleted media in the selected workspace', async () => {
@@ -136,15 +187,107 @@ describe('media upload service', () => {
     expect(findMediaByWorkspaceIdMock).toHaveBeenCalledWith(workspaceId, 0, 10, undefined, 'createdAt', 'desc')
   })
 
+  it('includes the latest generated thumbnail in media list items', async () => {
+    findMediaByWorkspaceIdMock.mockResolvedValue([
+      [
+        {
+          ...createMedia({ status: 'UPLOADED' }),
+          generatedAssets: [createThumbnail()]
+        }
+      ],
+      1
+    ])
+
+    const result = await mediaService.listMedia(workspaceId, {
+      page: 1,
+      limit: 10,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    })
+
+    expect(result.items[0].thumbnail).toEqual({
+      id: '00000000-0000-4000-8000-000000000005',
+      url: 'https://storage.example.com/generated/thumbnail.jpg',
+      assetType: 'THUMBNAIL',
+      mimeType: 'image/jpeg',
+      fileSizeBytes: '2048',
+      metadata: { width: 320, height: 180 },
+      expiresInSeconds: 900
+    })
+    expect(createPresignedGetUrlMock).toHaveBeenCalledWith('vidpilot-media', 'generated/thumbnail.jpg')
+  })
+
   it('lets a workspace member read media uploaded by another member', async () => {
     const sharedMedia = createMedia({
       userId: otherUserId,
       status: 'UPLOADED'
     })
-    findMediaByIdInWorkspaceMock.mockResolvedValue(sharedMedia)
+    findMediaWithPreviewAssetsByIdInWorkspaceMock.mockResolvedValue({
+      ...sharedMedia,
+      generatedAssets: []
+    })
 
-    await expect(mediaService.getMedia(workspaceId, mediaId)).resolves.toEqual(sharedMedia)
-    expect(findMediaByIdInWorkspaceMock).toHaveBeenCalledWith(mediaId, workspaceId)
+    await expect(mediaService.getMedia(workspaceId, mediaId)).resolves.toMatchObject({
+      id: mediaId,
+      workspaceId,
+      previews: {
+        thumbnail: null,
+        thumbnailSprites: [],
+        waveformPeaks: null
+      }
+    })
+    expect(findMediaWithPreviewAssetsByIdInWorkspaceMock).toHaveBeenCalledWith(mediaId, workspaceId)
+  })
+
+  it('returns latest preview assets with media details for Studio', async () => {
+    findMediaWithPreviewAssetsByIdInWorkspaceMock.mockResolvedValue({
+      ...createMedia({ status: 'UPLOADED' }),
+      generatedAssets: [
+        createThumbnail(),
+        createThumbnail({
+          id: '00000000-0000-4000-8000-000000000006',
+          assetType: 'THUMBNAIL_SPRITE',
+          jobId: '00000000-0000-4000-8000-000000000008',
+          s3Key: 'generated/sprite-001.jpg',
+          metadata: { sheetIndex: 1 }
+        }),
+        createThumbnail({
+          id: '00000000-0000-4000-8000-000000000009',
+          assetType: 'THUMBNAIL_SPRITE',
+          jobId: '00000000-0000-4000-8000-000000000008',
+          s3Key: 'generated/sprite-000.jpg',
+          metadata: { sheetIndex: 0 }
+        }),
+        createThumbnail({
+          id: '00000000-0000-4000-8000-000000000010',
+          assetType: 'THUMBNAIL_SPRITE',
+          jobId: '00000000-0000-4000-8000-000000000011',
+          s3Key: 'generated/old-sprite.jpg',
+          metadata: { sheetIndex: 0 }
+        }),
+        createThumbnail({
+          id: '00000000-0000-4000-8000-000000000007',
+          assetType: 'WAVEFORM_PEAKS',
+          s3Key: 'generated/waveform.json',
+          mimeType: 'application/json'
+        })
+      ]
+    })
+    createPresignedGetUrlMock
+      .mockResolvedValueOnce('https://storage.example.com/generated/thumbnail.jpg')
+      .mockResolvedValueOnce('https://storage.example.com/generated/sprite-000.jpg')
+      .mockResolvedValueOnce('https://storage.example.com/generated/sprite-001.jpg')
+      .mockResolvedValueOnce('https://storage.example.com/generated/waveform.json')
+
+    const result = await mediaService.getMedia(workspaceId, mediaId)
+
+    expect(result.previews.thumbnail?.assetType).toBe('THUMBNAIL')
+    expect(result.previews.thumbnailSprites.map((asset) => asset.metadata)).toEqual([
+      { sheetIndex: 0 },
+      { sheetIndex: 1 }
+    ])
+    expect(result.previews.thumbnailSprites).toHaveLength(2)
+    expect(result.previews.waveformPeaks?.mimeType).toBe('application/json')
   })
 
   it('lets a workspace member create a download URL for shared media', async () => {
@@ -198,7 +341,7 @@ describe('media upload service', () => {
   })
 
   it('hides media from users outside its workspace', async () => {
-    findMediaByIdInWorkspaceMock.mockResolvedValue(null)
+    findMediaWithPreviewAssetsByIdInWorkspaceMock.mockResolvedValue(null)
 
     await expect(mediaService.getMedia(workspaceId, mediaId)).rejects.toMatchObject({
       statusCode: 404,
@@ -349,7 +492,10 @@ describe('media upload service', () => {
     const uploadingMedia = createMedia({ title: null })
     const uploadedMedia = createMedia({ title: 'upload.mp4', status: 'UPLOADED', s3Etag: '"etag"' })
     findMediaByIdInWorkspaceMock.mockResolvedValue(uploadingMedia)
-    updateUploadingMediaMock.mockResolvedValue(uploadedMedia)
+    completeUploadAndCreateJobsMock.mockResolvedValue({
+      media: uploadedMedia,
+      jobs: []
+    })
 
     const result = await mediaService.completeUpload({
       userId,
@@ -360,14 +506,19 @@ describe('media upload service', () => {
       height: 1080
     })
 
-    expect(updateUploadingMediaMock).toHaveBeenCalledWith(mediaId, userId, {
-      s3Etag: '"etag"',
-      uploadId: null,
-      title: 'upload.mp4',
-      duration: 120.5,
-      width: 1920,
-      height: 1080,
-      status: 'UPLOADED'
+    expect(completeUploadAndCreateJobsMock).toHaveBeenCalledWith({
+      id: mediaId,
+      userId,
+      mediaData: {
+        s3Etag: '"etag"',
+        uploadId: null,
+        title: 'upload.mp4',
+        duration: 120.5,
+        width: 1920,
+        height: 1080,
+        status: 'UPLOADED'
+      },
+      jobs: []
     })
     expect(result).toEqual({ media: uploadedMedia })
     expect(findMediaByIdInWorkspaceMock).toHaveBeenCalledTimes(1)
@@ -403,7 +554,10 @@ describe('media upload service', () => {
       fileSizeBytes: BigInt(10 * 1024 * 1024)
     })
     findMediaByIdInWorkspaceMock.mockResolvedValue(multipartMedia)
-    updateUploadingMediaMock.mockResolvedValue(uploadedMedia)
+    completeUploadAndCreateJobsMock.mockResolvedValue({
+      media: uploadedMedia,
+      jobs: []
+    })
     completeMultipartUploadMock.mockRejectedValue(MediaError.multipartUploadNotFound())
     headObjectMock.mockResolvedValue({
       contentLength: 10 * 1024 * 1024,
@@ -442,12 +596,71 @@ describe('media upload service', () => {
     findMediaByIdInWorkspaceMock
       .mockResolvedValueOnce(createMedia())
       .mockResolvedValueOnce(createMedia({ status: 'DELETED' }))
-    updateUploadingMediaMock.mockResolvedValue(null)
+    completeUploadAndCreateJobsMock.mockResolvedValue({
+      media: null,
+      jobs: []
+    })
 
     await expect(mediaService.completeUpload({ workspaceId, userId, mediaId })).rejects.toMatchObject({
       code: 'INVALID_MEDIA_STATE'
     })
     expect(deleteObjectMock).toHaveBeenCalled()
+  })
+
+  it('creates and publishes preview jobs for eligible media when upload completes', async () => {
+    const uploadingMedia = createMedia({ type: 'VIDEO' })
+    const uploadedMedia = createMedia({ status: 'UPLOADED', s3Etag: '"etag"' })
+    const createdJob = {
+      id: 'job-1',
+      mediaId,
+      userId,
+      projectId: null,
+      jobType: 'GENERATE_THUMBNAIL',
+      status: 'PENDING',
+      progress: 0,
+      currentStep: null,
+      errorMessage: null,
+      queueName: 'media_previews_queue',
+      taskName: 'generate_thumbnail',
+      externalTaskId: null,
+      attemptCount: 0,
+      input: null,
+      output: null,
+      createdAt: now,
+      updatedAt: now,
+      startedAt: null,
+      completedAt: null
+    }
+
+    findMediaByIdInWorkspaceMock.mockResolvedValue(uploadingMedia)
+    createPreviewJobDraftsMock.mockReturnValue([
+      {
+        kind: 'thumbnail',
+        data: {
+          mediaId,
+          userId,
+          jobType: 'GENERATE_THUMBNAIL'
+        }
+      }
+    ])
+    completeUploadAndCreateJobsMock.mockResolvedValue({
+      media: uploadedMedia,
+      jobs: [createdJob]
+    })
+
+    await mediaService.completeUpload({
+      userId,
+      workspaceId,
+      mediaId
+    })
+
+    expect(createPreviewJobDraftsMock).toHaveBeenCalledWith(uploadingMedia)
+    expect(publishPreviewJobsMock).toHaveBeenCalledWith(uploadedMedia, [
+      {
+        kind: 'thumbnail',
+        job: createdJob
+      }
+    ])
   })
 
   it('aborts a multipart upload and clears its upload id', async () => {

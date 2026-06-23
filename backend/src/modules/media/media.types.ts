@@ -46,6 +46,30 @@ export interface MediaResponseData {
   updatedAt: Date
 }
 
+export interface MediaPreviewAssetResponseData {
+  id: string
+  url: string
+  assetType: 'THUMBNAIL' | 'THUMBNAIL_SPRITE' | 'WAVEFORM_PEAKS'
+  mimeType: string | null
+  fileSizeBytes: string | null
+  metadata: Prisma.JsonValue | null
+  expiresInSeconds: number
+}
+
+export interface MediaListItemResponseData extends MediaResponseData {
+  thumbnail: MediaPreviewAssetResponseData | null
+}
+
+export interface MediaPreviewAssetsResponseData {
+  thumbnail: MediaPreviewAssetResponseData | null
+  thumbnailSprites: MediaPreviewAssetResponseData[]
+  waveformPeaks: MediaPreviewAssetResponseData | null
+}
+
+export interface MediaDetailResponseData extends MediaResponseData {
+  previews: MediaPreviewAssetsResponseData
+}
+
 export interface CompleteUploadResult {
   media: Media
 }

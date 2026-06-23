@@ -3,12 +3,20 @@ import request from 'supertest'
 import type { AuthenticatedUser } from '../auth/auth.types'
 import { WorkspaceError } from '../workspace/workspace.error'
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
-import type { CreateUploadUrlResult } from './media.types'
+import type {
+  CreateUploadUrlResult,
+  MediaDetailResponseData,
+  MediaListItemResponseData,
+  PaginatedResult
+} from './media.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
 const getWorkspaceMembershipContextMock = jest.fn()
 const createUploadUrlMock = jest.fn<(input: unknown) => Promise<CreateUploadUrlResult>>()
 const completeUploadMock = jest.fn<(input: unknown) => Promise<{ media: Media }>>()
+const listMediaMock =
+  jest.fn<(workspaceId: string, query: unknown) => Promise<PaginatedResult<MediaListItemResponseData>>>()
+const getMediaMock = jest.fn<(workspaceId: string, mediaId: string) => Promise<MediaDetailResponseData>>()
 const abortUploadMock =
   jest.fn<(workspaceId: string, userId: string, mediaId: string) => Promise<{ message: string }>>()
 
@@ -23,7 +31,9 @@ jest.unstable_mockModule('../workspace/workspace.service', () => ({
 jest.unstable_mockModule('./media.service', () => ({
   abortUpload: abortUploadMock,
   completeUpload: completeUploadMock,
-  createUploadUrl: createUploadUrlMock
+  createUploadUrl: createUploadUrlMock,
+  getMedia: getMediaMock,
+  listMedia: listMediaMock
 }))
 
 const { app } = await import('../../app')
@@ -71,6 +81,8 @@ describe('media routes', () => {
     getWorkspaceMembershipContextMock.mockReset()
     createUploadUrlMock.mockReset()
     completeUploadMock.mockReset()
+    listMediaMock.mockReset()
+    getMediaMock.mockReset()
     abortUploadMock.mockReset()
 
     getAuthenticatedUserMock.mockResolvedValue(authenticatedUser)
@@ -88,6 +100,35 @@ describe('media routes', () => {
       expiresInSeconds: 900
     })
     completeUploadMock.mockResolvedValue({ media })
+    listMediaMock.mockResolvedValue({
+      items: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 0
+    })
+    getMediaMock.mockResolvedValue({
+      id: mediaId,
+      workspaceId,
+      type: 'VIDEO',
+      title: 'Upload',
+      description: null,
+      originalFilename: 'upload.mp4',
+      duration: null,
+      fileSizeBytes: '1024',
+      mimeType: 'video/mp4',
+      width: null,
+      height: null,
+      metadata: null,
+      status: 'UPLOADED',
+      createdAt: now,
+      updatedAt: now,
+      previews: {
+        thumbnail: null,
+        thumbnailSprites: [],
+        waveformPeaks: null
+      }
+    })
     abortUploadMock.mockResolvedValue({
       message: 'Media upload aborted successfully'
     })
@@ -112,6 +153,114 @@ describe('media routes', () => {
       error: {
         code: 'UNAUTHORIZED',
         message: 'Missing access token'
+      }
+    })
+  })
+
+  it('returns media list items with generated thumbnails', async () => {
+    listMediaMock.mockResolvedValue({
+      items: [
+        {
+          id: mediaId,
+          workspaceId,
+          type: 'VIDEO',
+          title: 'Upload',
+          description: null,
+          originalFilename: 'upload.mp4',
+          duration: 120,
+          fileSizeBytes: '1024',
+          mimeType: 'video/mp4',
+          width: 1920,
+          height: 1080,
+          metadata: null,
+          status: 'UPLOADED',
+          createdAt: now,
+          updatedAt: now,
+          thumbnail: {
+            id: '00000000-0000-4000-8000-000000000004',
+            url: 'https://storage.example.com/generated/thumbnail.jpg',
+            assetType: 'THUMBNAIL',
+            mimeType: 'image/jpeg',
+            fileSizeBytes: '2048',
+            metadata: { width: 320, height: 180 },
+            expiresInSeconds: 900
+          }
+        }
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1
+    })
+
+    const response = await request(app).get(mediaPath).set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body.data.items[0]).toMatchObject({
+      id: mediaId,
+      thumbnail: {
+        id: '00000000-0000-4000-8000-000000000004',
+        url: 'https://storage.example.com/generated/thumbnail.jpg'
+      }
+    })
+    expect(listMediaMock).toHaveBeenCalledWith(workspaceId, {
+      page: 1,
+      limit: 10,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    })
+  })
+
+  it('returns preview assets with media details for Studio', async () => {
+    getMediaMock.mockResolvedValue({
+      id: mediaId,
+      workspaceId,
+      type: 'VIDEO',
+      title: 'Upload',
+      description: null,
+      originalFilename: 'upload.mp4',
+      duration: 120,
+      fileSizeBytes: '1024',
+      mimeType: 'video/mp4',
+      width: 1920,
+      height: 1080,
+      metadata: null,
+      status: 'UPLOADED',
+      createdAt: now,
+      updatedAt: now,
+      previews: {
+        thumbnail: null,
+        thumbnailSprites: [
+          {
+            id: '00000000-0000-4000-8000-000000000005',
+            url: 'https://storage.example.com/generated/sprite.jpg',
+            assetType: 'THUMBNAIL_SPRITE',
+            mimeType: 'image/jpeg',
+            fileSizeBytes: '4096',
+            metadata: { sheetIndex: 0 },
+            expiresInSeconds: 900
+          }
+        ],
+        waveformPeaks: {
+          id: '00000000-0000-4000-8000-000000000006',
+          url: 'https://storage.example.com/generated/waveform.json',
+          assetType: 'WAVEFORM_PEAKS',
+          mimeType: 'application/json',
+          fileSizeBytes: '1024',
+          metadata: null,
+          expiresInSeconds: 900
+        }
+      }
+    })
+
+    const response = await request(app).get(`${mediaPath}/${mediaId}`).set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body.data.media.previews).toMatchObject({
+      thumbnail: null,
+      thumbnailSprites: [{ assetType: 'THUMBNAIL_SPRITE' }],
+      waveformPeaks: {
+        assetType: 'WAVEFORM_PEAKS'
       }
     })
   })
