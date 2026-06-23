@@ -66,6 +66,23 @@ describe('jobs service', () => {
     expect(job).not.toHaveProperty('input')
   })
 
+  it('returns media preview job types without special-case mapping', async () => {
+    findJobByIdAndUserIdMock.mockResolvedValue(
+      createProcessingJob({
+        jobType: 'GENERATE_THUMBNAIL',
+        status: 'PENDING',
+        queueName: 'media_derivatives_queue',
+        taskName: 'generate_thumbnail'
+      })
+    )
+
+    await expect(jobsService.getJob(userId, jobId)).resolves.toMatchObject({
+      id: jobId,
+      jobType: 'GENERATE_THUMBNAIL',
+      status: 'PENDING'
+    })
+  })
+
   it('throws JOB_NOT_FOUND when the job is missing or belongs to another user', async () => {
     findJobByIdAndUserIdMock.mockResolvedValue(null)
 

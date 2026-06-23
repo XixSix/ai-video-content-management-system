@@ -52,6 +52,65 @@
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *     MediaPreviewAsset:
+ *       type: object
+ *       required: [id, url, assetType, expiresInSeconds]
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         url:
+ *           type: string
+ *           format: uri
+ *         assetType:
+ *           type: string
+ *           enum: [THUMBNAIL, THUMBNAIL_SPRITE, WAVEFORM_PEAKS]
+ *         mimeType:
+ *           type: string
+ *           nullable: true
+ *         fileSizeBytes:
+ *           type: string
+ *           nullable: true
+ *         metadata:
+ *           type: object
+ *           nullable: true
+ *           additionalProperties: true
+ *         expiresInSeconds:
+ *           type: integer
+ *     MediaListItem:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Media'
+ *         - type: object
+ *           required: [thumbnail]
+ *           properties:
+ *             thumbnail:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/MediaPreviewAsset'
+ *               nullable: true
+ *     MediaPreviewAssets:
+ *       type: object
+ *       required: [thumbnail, thumbnailSprite, waveformPeaks]
+ *       properties:
+ *         thumbnail:
+ *           allOf:
+ *             - $ref: '#/components/schemas/MediaPreviewAsset'
+ *           nullable: true
+ *         thumbnailSprite:
+ *           allOf:
+ *             - $ref: '#/components/schemas/MediaPreviewAsset'
+ *           nullable: true
+ *         waveformPeaks:
+ *           allOf:
+ *             - $ref: '#/components/schemas/MediaPreviewAsset'
+ *           nullable: true
+ *     MediaDetail:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Media'
+ *         - type: object
+ *           required: [previews]
+ *           properties:
+ *             previews:
+ *               $ref: '#/components/schemas/MediaPreviewAssets'
  *     UploadPart:
  *       type: object
  *       required: [partNumber, url]
@@ -302,6 +361,22 @@
  *     responses:
  *       200:
  *         description: Paginated media list.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/MediaListItem'
+ *                     meta:
+ *                       type: object
  */
 
 /**
@@ -324,6 +399,18 @@
  *     responses:
  *       200:
  *         description: Media details.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     media:
+ *                       $ref: '#/components/schemas/MediaDetail'
  *   patch:
  *     summary: Update owned media metadata
  *     tags: [Media]

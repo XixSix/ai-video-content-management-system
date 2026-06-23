@@ -14,6 +14,8 @@ import type {
   CompleteUploadResponseData,
   CreateUploadUrlResult,
   CreateDownloadUrlResult,
+  MediaDetailResponseData,
+  MediaListItemResponseData,
   MediaResponseData,
   PaginatedResult
 } from './media.types'
@@ -29,8 +31,8 @@ export const list: ParamsQueryRequestHandler<WorkspaceParams, ListMediaQuery> = 
     const query = req.query as ListMediaQuery
     const result = await mediaService.listMedia(req.params.workspaceId, query)
 
-    sendSuccess<{ items: MediaResponseData[]; meta: Omit<PaginatedResult<never>, 'items'> }>(res, {
-      items: result.items.map(toMediaResponseData),
+    sendSuccess<{ items: MediaListItemResponseData[]; meta: Omit<PaginatedResult<never>, 'items'> }>(res, {
+      items: result.items,
       meta: {
         total: result.total,
         page: result.page,
@@ -45,11 +47,9 @@ export const list: ParamsQueryRequestHandler<WorkspaceParams, ListMediaQuery> = 
 
 export const get: ParamsRequestHandler<MediaParams> = async (req, res, next): Promise<void> => {
   try {
-    const media = await mediaService.getMedia(req.params.workspaceId, req.params.mediaId)
+    const media: MediaDetailResponseData = await mediaService.getMedia(req.params.workspaceId, req.params.mediaId)
 
-    sendSuccess<{ media: MediaResponseData }>(res, {
-      media: toMediaResponseData(media)
-    })
+    sendSuccess<{ media: MediaDetailResponseData }>(res, { media })
   } catch (error: unknown) {
     next(error)
   }

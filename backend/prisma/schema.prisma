@@ -75,12 +75,12 @@ enum JobType {
   GENERATE_SHORT_CLIPS
   GENERATE_AI_SUGGESTIONS
   GENERATE_SUGGESTIONS
-  RENDER_EXPORT
+  EXPORT_RENDER
   BURN_SUBTITLE
   PUBLISH
-  MEDIA_TRANSCODE
-  THUMBNAIL_GENERATION
-  WAVEFORM_PEAK_GENERATION
+  GENERATE_THUMBNAIL
+  GENERATE_THUMBNAIL_SPRITE
+  GENERATE_WAVEFORM_PEAK
 }
 
 enum JobStatus {
@@ -144,6 +144,7 @@ enum ShortClipStatus {
 
 enum AssetType {
   THUMBNAIL
+  THUMBNAIL_SPRITE
   SUBTITLE_SRT
   SUBTITLE_VTT
   BURNED_SUBTITLE_VIDEO
@@ -867,6 +868,7 @@ model GeneratedAsset {
   @@index([shortClipId])
   @@index([jobId])
   @@index([assetType])
+  @@index([mediaId, assetType, createdAt])
   @@map("generated_assets")
 }
 

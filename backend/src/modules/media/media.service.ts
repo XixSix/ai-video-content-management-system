@@ -1,6 +1,7 @@
 import { config } from '../../config'
-import { MediaStatus, type Media } from '../../infrastructure/db/generated/prisma/client'
+import { MediaStatus, type GeneratedAsset, type Media } from '../../infrastructure/db/generated/prisma/client'
 import * as storageService from '../../infrastructure/s3/uploader'
+import * as mediaDerivativesService from '../media-derivatives/media-derivatives.service'
 import { MediaError } from './media.error'
 import * as mediaRepo from './media.repository'
 import type { ListMediaQuery, UpdateMediaBody } from './media.schema'
@@ -12,6 +13,10 @@ import type {
   CreateDownloadUrlResult,
   CreateMediaUploadInput,
   CreateUploadUrlResult,
+  MediaDetailResponseData,
+  MediaListItemResponseData,
+  MediaPreviewAssetResponseData,
+  MediaPreviewAssetsResponseData,
   PaginatedResult
 } from './media.types'
 import {
@@ -19,10 +24,14 @@ import {
   ensureSupportedFileSize,
   getMultipartPartCount,
   getUploadMode,
-  getValidCompletedParts
+  getValidCompletedParts,
+  toMediaResponseData
 } from './media.util'
 
-export const listMedia = async (workspaceId: string, query: ListMediaQuery): Promise<PaginatedResult<Media>> => {
+export const listMedia = async (
+  workspaceId: string,
+  query: ListMediaQuery
+): Promise<PaginatedResult<MediaListItemResponseData>> => {
   const page: number = query.page
   const limit: number = query.limit
   const skip: number = (page - 1) * limit
@@ -36,8 +45,29 @@ export const listMedia = async (workspaceId: string, query: ListMediaQuery): Pro
     query.sortOrder
   )
 
+  const responseItems = await Promise.all(
+    items.map(async (media): Promise<MediaListItemResponseData> => {
+      const thumbnailAsset = media.generatedAssets[0]
+
+      return {
+        ...toMediaResponseData(media),
+        thumbnail: thumbnailAsset
+          ? {
+              id: thumbnailAsset.id,
+              url: await storageService.createPresignedGetUrl(thumbnailAsset.s3Bucket, thumbnailAsset.s3Key),
+              assetType: 'THUMBNAIL',
+              mimeType: thumbnailAsset.mimeType,
+              fileSizeBytes: thumbnailAsset.fileSizeBytes?.toString() ?? null,
+              metadata: thumbnailAsset.metadata,
+              expiresInSeconds: storageService.PRESIGNED_DOWNLOAD_EXPIRES_SECONDS
+            }
+          : null
+      }
+    })
+  )
+
   return {
-    items,
+    items: responseItems,
     total,
     page,
     limit,
@@ -69,8 +99,45 @@ const getWorkspaceMedia = async (workspaceId: string, mediaId: string): Promise<
   return media
 }
 
-export const getMedia = async (workspaceId: string, mediaId: string): Promise<Media> =>
-  getWorkspaceMedia(workspaceId, mediaId)
+const toPreviewAssetResponse = async (asset: GeneratedAsset): Promise<MediaPreviewAssetResponseData> => ({
+  id: asset.id,
+  url: await storageService.createPresignedGetUrl(asset.s3Bucket, asset.s3Key),
+  assetType: asset.assetType as MediaPreviewAssetResponseData['assetType'],
+  mimeType: asset.mimeType,
+  fileSizeBytes: asset.fileSizeBytes?.toString() ?? null,
+  metadata: asset.metadata,
+  expiresInSeconds: storageService.PRESIGNED_DOWNLOAD_EXPIRES_SECONDS
+})
+
+export const getMedia = async (workspaceId: string, mediaId: string): Promise<MediaDetailResponseData> => {
+  const media = await mediaRepo.findMediaWithPreviewAssetsByIdInWorkspace(mediaId, workspaceId)
+
+  if (!media || media.status === MediaStatus.DELETED) {
+    throw MediaError.notFound()
+  }
+
+  const latestAssets = new Map<GeneratedAsset['assetType'], GeneratedAsset>()
+
+  for (const asset of media.generatedAssets) {
+    if (!latestAssets.has(asset.assetType)) {
+      latestAssets.set(asset.assetType, asset)
+    }
+  }
+  const previews: MediaPreviewAssetsResponseData = {
+    thumbnail: latestAssets.get('THUMBNAIL') ? await toPreviewAssetResponse(latestAssets.get('THUMBNAIL')!) : null,
+    thumbnailSprite: latestAssets.get('THUMBNAIL_SPRITE')
+      ? await toPreviewAssetResponse(latestAssets.get('THUMBNAIL_SPRITE')!)
+      : null,
+    waveformPeaks: latestAssets.get('WAVEFORM_PEAKS')
+      ? await toPreviewAssetResponse(latestAssets.get('WAVEFORM_PEAKS')!)
+      : null
+  }
+
+  return {
+    ...toMediaResponseData(media),
+    previews
+  }
+}
 
 export const updateMedia = async (
   workspaceId: string,
@@ -262,17 +329,33 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
     await rejectInvalidUploadedObject(media, 'Uploaded object content type does not match mimeType')
   }
 
-  const completedMedia = await mediaRepo.updateUploadingMedia(media.id, input.userId, {
-    s3Etag: objectMetadata.etag,
-    uploadId: null,
-    title: media.title ?? media.originalFilename,
-    ...(input.duration !== undefined ? { duration: input.duration } : {}),
-    ...(input.width !== undefined ? { width: input.width } : {}),
-    ...(input.height !== undefined ? { height: input.height } : {}),
-    status: MediaStatus.UPLOADED
+  const derivativeJobDrafts = mediaDerivativesService.createDerivativeJobDrafts(media)
+  const { media: completedMedia, jobs: createdDerivativeJobs } = await mediaRepo.completeUploadAndCreateJobs({
+    id: media.id,
+    userId: input.userId,
+    mediaData: {
+      s3Etag: objectMetadata.etag,
+      uploadId: null,
+      title: media.title ?? media.originalFilename,
+      ...(input.duration !== undefined ? { duration: input.duration } : {}),
+      ...(input.width !== undefined ? { width: input.width } : {}),
+      ...(input.height !== undefined ? { height: input.height } : {}),
+      status: MediaStatus.UPLOADED
+    },
+    jobs: derivativeJobDrafts.map((draft) => draft.data)
   })
 
   if (completedMedia) {
+    if (createdDerivativeJobs.length > 0) {
+      await mediaDerivativesService.publishDerivativeJobs(
+        completedMedia,
+        createdDerivativeJobs.map((job, index) => ({
+          kind: derivativeJobDrafts[index].kind,
+          job
+        }))
+      )
+    }
+
     return { media: completedMedia }
   }
 
