@@ -13,6 +13,7 @@ import {
 } from './platform-accounts/platform-accounts.routes'
 import { projectsRoutes } from './projects/projects.routes'
 import { publishTasksRoutes } from './publish-tasks/publish-tasks.routes'
+import { renderExportsRoutes } from './render-exports/render-exports.routes'
 import { clipCandidatesRoutes, mediaShortClipRoutes, shortClipsRoutes } from './short-clips/short-clips.routes'
 import { mediaTranscriptRoutes, transcriptsRoutes } from './transcripts/transcripts.routes'
 import { workspaceRoutes } from './workspace/workspace.routes'
@@ -32,6 +33,7 @@ apiRouter.use('/platform-accounts', platformAccountsCallbackRoutes)
 apiRouter.use('/workspaces/:workspaceId/platform-accounts', workspacePlatformAccountsRoutes)
 apiRouter.use('/workspaces/:workspaceId/media', mediaRoutes)
 apiRouter.use('/workspaces/:workspaceId/projects', editorSnapshotsRoutes)
+apiRouter.use('/workspaces/:workspaceId/projects', renderExportsRoutes)
 apiRouter.use('/workspaces/:workspaceId/projects', projectsRoutes)
 apiRouter.use('/publish-tasks', publishTasksRoutes)
 apiRouter.use('/transcripts', transcriptsRoutes)
