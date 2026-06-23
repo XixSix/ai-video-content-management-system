@@ -44,6 +44,7 @@ class ProcessingJobRow(BaseModel):
     id: UUID
     media_id: UUID = Field(alias="mediaId")
     user_id: UUID = Field(alias="userId")
+    project_id: UUID | None = Field(default=None, alias="projectId")
     job_type: JobType = Field(alias="jobType")
     status: JobStatus
     progress: int | None
