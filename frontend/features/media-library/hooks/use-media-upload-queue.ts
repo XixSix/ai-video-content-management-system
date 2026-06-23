@@ -15,6 +15,7 @@ import { mediaQueryKeys } from "./media-query-keys"
 type UploadQueueEntry = {
   file: File
   item: MediaLibraryItem
+  workspaceId: string
 }
 
 function getLocalUploadItem(file: File, id: string): MediaLibraryItem {
@@ -109,7 +110,7 @@ export function useMediaUploadQueue(workspaceId: string | undefined) {
           current.filter((entry) => entry.item.id !== entryId)
         )
         await queryClient.invalidateQueries({
-          queryKey: mediaQueryKeys.lists(),
+          queryKey: mediaQueryKeys.lists(workspaceId),
         })
         toast.success("Upload complete", { description: file.name })
       } catch (error) {
@@ -148,6 +149,7 @@ export function useMediaUploadQueue(workspaceId: string | undefined) {
           acceptedEntries.push({
             file,
             item: getLocalUploadItem(file, entryId),
+            workspaceId: workspaceId ?? "",
           })
         } catch (error) {
           rejected.push({
@@ -167,7 +169,7 @@ export function useMediaUploadQueue(workspaceId: string | undefined) {
 
       return rejected
     },
-    [startUpload]
+    [startUpload, workspaceId]
   )
 
   const retryUpload = useCallback(
@@ -200,8 +202,15 @@ export function useMediaUploadQueue(workspaceId: string | undefined) {
     []
   )
 
+  useEffect(() => {
+    controllersRef.current.forEach((controller) => controller.abort())
+    controllersRef.current.clear()
+  }, [workspaceId])
+
   return {
-    items: entries.map((entry) => entry.item),
+    items: entries
+      .filter((entry) => entry.workspaceId === workspaceId)
+      .map((entry) => entry.item),
     addFiles,
     retryUpload,
     cancelUpload,

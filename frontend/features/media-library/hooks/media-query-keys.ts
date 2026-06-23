@@ -2,11 +2,14 @@ import type { MediaListQuery } from "../media-library.types"
 
 export const mediaQueryKeys = {
   all: ["media"] as const,
-  lists: () => [...mediaQueryKeys.all, "list"] as const,
-  list: (query: MediaListQuery) =>
-    [...mediaQueryKeys.lists(), query] as const,
-  detail: (mediaId: string) =>
-    [...mediaQueryKeys.all, "detail", mediaId] as const,
-  preview: (mediaId: string) =>
-    [...mediaQueryKeys.all, "preview", mediaId] as const,
+  workspace: (workspaceId: string) =>
+    [...mediaQueryKeys.all, workspaceId] as const,
+  lists: (workspaceId: string) =>
+    [...mediaQueryKeys.workspace(workspaceId), "list"] as const,
+  list: (workspaceId: string, query: MediaListQuery) =>
+    [...mediaQueryKeys.lists(workspaceId), query] as const,
+  detail: (workspaceId: string, mediaId: string) =>
+    [...mediaQueryKeys.workspace(workspaceId), "detail", mediaId] as const,
+  preview: (workspaceId: string, mediaId: string) =>
+    [...mediaQueryKeys.workspace(workspaceId), "preview", mediaId] as const,
 }

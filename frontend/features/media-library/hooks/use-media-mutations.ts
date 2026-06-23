@@ -11,11 +11,16 @@ import type { MediaListResponseData } from "../media-library.types"
 import { mediaService } from "../services/media.service"
 import { mediaQueryKeys } from "./media-query-keys"
 
-export async function invalidateMediaQueries(queryClient: QueryClient) {
-  await queryClient.invalidateQueries({ queryKey: mediaQueryKeys.lists() })
+export async function invalidateMediaQueries(
+  queryClient: QueryClient,
+  workspaceId: string
+) {
+  await queryClient.invalidateQueries({
+    queryKey: mediaQueryKeys.lists(workspaceId),
+  })
 }
 
-export function useRenameMedia() {
+export function useRenameMedia(workspaceId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -25,11 +30,13 @@ export function useRenameMedia() {
     }: {
       mediaId: string
       title: string
-    }) => mediaService.update(mediaId, { title }),
+    }) => mediaService.update(workspaceId, mediaId, { title }),
     onMutate: async ({ mediaId, title }) => {
-      await queryClient.cancelQueries({ queryKey: mediaQueryKeys.lists() })
+      await queryClient.cancelQueries({
+        queryKey: mediaQueryKeys.lists(workspaceId),
+      })
       const snapshots = queryClient.getQueriesData<MediaListResponseData>({
-        queryKey: mediaQueryKeys.lists(),
+        queryKey: mediaQueryKeys.lists(workspaceId),
       })
 
       snapshots.forEach(([queryKey, data]) => {
@@ -51,24 +58,28 @@ export function useRenameMedia() {
         queryClient.setQueryData(queryKey, data)
       })
     },
-    onSettled: () => invalidateMediaQueries(queryClient),
+    onSettled: () => invalidateMediaQueries(queryClient, workspaceId),
   })
 }
 
-export function useDeleteMedia() {
+export function useDeleteMedia(workspaceId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (mediaId: string) => mediaService.remove(mediaId),
-    onSuccess: () => invalidateMediaQueries(queryClient),
+    mutationFn: (mediaId: string) => mediaService.remove(workspaceId, mediaId),
+    onSuccess: () => invalidateMediaQueries(queryClient, workspaceId),
   })
 }
 
-export function useMediaPreviewUrl(mediaId: string | null, enabled = true) {
+export function useMediaPreviewUrl(
+  workspaceId: string,
+  mediaId: string | null,
+  enabled = true
+) {
   return useQuery({
-    queryKey: mediaQueryKeys.preview(mediaId ?? "none"),
-    queryFn: () => mediaService.getPreviewUrl(mediaId!),
-    enabled: Boolean(mediaId) && enabled,
+    queryKey: mediaQueryKeys.preview(workspaceId, mediaId ?? "none"),
+    queryFn: () => mediaService.getPreviewUrl(workspaceId, mediaId!),
+    enabled: Boolean(workspaceId) && Boolean(mediaId) && enabled,
     staleTime: 4 * 60 * 1000,
     retry: 1,
   })

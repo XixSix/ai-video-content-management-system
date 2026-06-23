@@ -97,7 +97,6 @@ export type MediaListQuery = {
 }
 
 export type CreateUploadUrlInput = {
-  workspaceId: string
   mediaType: MediaApiType
   originalFilename: string
   mimeType: string

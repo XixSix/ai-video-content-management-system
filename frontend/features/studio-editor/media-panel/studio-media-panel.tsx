@@ -14,8 +14,10 @@ import { MediaUploadQueue } from "./components/media-upload-queue"
 import { useStudioMedia } from "./hooks/use-studio-media"
 import type { MediaFilter } from "./lib/media-display"
 import { getImportableMediaLibraryItems } from "./services/project-media-adapter"
+import { useEditorRouteParams } from "../hooks/use-editor-route-params"
 
 export function StudioMediaPanel() {
+  const { workspaceId } = useEditorRouteParams()
   const { project } = useStudioProjectState()
   const {
     addFiles,
@@ -80,6 +82,7 @@ export function StudioMediaPanel() {
               canEdit={canEdit}
               detaching={detachingMediaId === item.id}
               item={item}
+              workspaceId={workspaceId}
               onDetach={detachMedia}
               onSetSource={(media) => setSourceMedia(media.id)}
               settingSource={settingSourceMediaId === item.id}

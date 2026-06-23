@@ -24,6 +24,7 @@ export type ProjectCreateMode = "blank" | "from-media"
 
 type ProjectCreateDialogProps = {
   open: boolean
+  workspaceId: string
   initialMode: ProjectCreateMode
   isSubmitting: boolean
   onOpenChange: (open: boolean) => void
@@ -36,6 +37,7 @@ type ProjectCreateDialogProps = {
 
 export function ProjectCreateDialog({
   open,
+  workspaceId,
   initialMode,
   isSubmitting,
   onOpenChange,
@@ -46,7 +48,7 @@ export function ProjectCreateDialog({
   const [selectedMedia, setSelectedMedia] = useState<MediaLibraryItem | null>(
     null
   )
-  const mediaQuery = useMediaList({
+  const mediaQuery = useMediaList(workspaceId, {
     page: 1,
     limit: 50,
     status: "UPLOADED",

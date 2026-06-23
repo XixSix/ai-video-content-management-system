@@ -41,7 +41,7 @@ describe("media service", () => {
   })
 
   it("passes list pagination, status, and sort parameters to the media API", async () => {
-    apiMock.onGet("/media").reply((config) => {
+    apiMock.onGet(`/workspaces/${workspaceId}/media`).reply((config) => {
       expect(config.params).toEqual({
         page: 1,
         limit: 50,
@@ -68,7 +68,7 @@ describe("media service", () => {
     })
 
     await expect(
-      mediaService.list({
+      mediaService.list(workspaceId, {
         page: 1,
         limit: 50,
         status: "UPLOADED",
@@ -82,19 +82,19 @@ describe("media service", () => {
   })
 
   it("uses separate preview and attachment download endpoints", async () => {
-    apiMock.onGet(`/media/${mediaId}/preview-url`).reply(200, {
+    apiMock.onGet(`/workspaces/${workspaceId}/media/${mediaId}/preview-url`).reply(200, {
       success: true,
       data: { url: "https://storage.example.com/preview", expiresInSeconds: 900 },
     })
-    apiMock.onGet(`/media/${mediaId}/download-url`).reply(200, {
+    apiMock.onGet(`/workspaces/${workspaceId}/media/${mediaId}/download-url`).reply(200, {
       success: true,
       data: { url: "https://storage.example.com/download", expiresInSeconds: 900 },
     })
 
-    await expect(mediaService.getPreviewUrl(mediaId)).resolves.toMatchObject({
+    await expect(mediaService.getPreviewUrl(workspaceId, mediaId)).resolves.toMatchObject({
       url: "https://storage.example.com/preview",
     })
-    await expect(mediaService.getDownloadUrl(mediaId)).resolves.toMatchObject({
+    await expect(mediaService.getDownloadUrl(workspaceId, mediaId)).resolves.toMatchObject({
       url: "https://storage.example.com/download",
     })
   })
@@ -105,7 +105,7 @@ describe("media service", () => {
     })
     const progress: number[] = []
 
-    apiMock.onPost("/media/upload-url").reply(201, {
+    apiMock.onPost(`/workspaces/${workspaceId}/media/upload-url`).reply(201, {
       success: true,
       data: {
         mode: "SINGLE",
@@ -116,7 +116,7 @@ describe("media service", () => {
       },
     })
     storageMock.onPut("https://storage.example.com/single").reply(200)
-    apiMock.onPost(`/media/${mediaId}/complete-upload`).reply(200, {
+    apiMock.onPost(`/workspaces/${workspaceId}/media/${mediaId}/complete-upload`).reply(200, {
       success: true,
       data: { media },
     })
@@ -130,7 +130,6 @@ describe("media service", () => {
     ).resolves.toEqual(media)
 
     expect(JSON.parse(apiMock.history.post[0].data)).toEqual({
-      workspaceId,
       mediaType: "VIDEO",
       originalFilename: "upload.mp4",
       mimeType: "video/mp4",
@@ -144,7 +143,7 @@ describe("media service", () => {
       type: "video/mp4",
     })
 
-    apiMock.onPost("/media/upload-url").reply(201, {
+    apiMock.onPost(`/workspaces/${workspaceId}/media/upload-url`).reply(201, {
       success: true,
       data: {
         mode: "MULTIPART",
@@ -167,7 +166,7 @@ describe("media service", () => {
     storageMock
       .onPut("https://storage.example.com/part-3")
       .reply(200, undefined, { ETag: '"etag-3"' })
-    apiMock.onPost(`/media/${mediaId}/complete-upload`).reply((config) => {
+    apiMock.onPost(`/workspaces/${workspaceId}/media/${mediaId}/complete-upload`).reply((config) => {
       expect(JSON.parse(config.data)).toEqual({
         duration: 120.5,
         width: 1920,
@@ -200,7 +199,7 @@ describe("media service", () => {
       type: "video/mp4",
     })
 
-    apiMock.onPost("/media/upload-url").reply(201, {
+    apiMock.onPost(`/workspaces/${workspaceId}/media/upload-url`).reply(201, {
       success: true,
       data: {
         mode: "SINGLE",
@@ -211,7 +210,7 @@ describe("media service", () => {
       },
     })
     storageMock.onPut("https://storage.example.com/failure").reply(500)
-    apiMock.onPost(`/media/${mediaId}/abort-upload`).reply(200, {
+    apiMock.onPost(`/workspaces/${workspaceId}/media/${mediaId}/abort-upload`).reply(200, {
       success: true,
       data: { message: "Media upload aborted successfully" },
     })

@@ -26,8 +26,10 @@ import { CanvasSelectionFrame } from "./components/selection-frame"
 import { useCompositionClock } from "./hooks/use-composition-playback"
 import { usePreviewSize } from "./hooks/use-preview-size"
 import { resolveCompositionFrame } from "./lib/composition"
+import { useEditorRouteParams } from "../hooks/use-editor-route-params"
 
 export function StudioCanvas() {
+  const { workspaceId } = useEditorRouteParams()
   const [layerDragGuide, setLayerDragGuide] = useState<{
     horizontal: boolean
     vertical: boolean
@@ -114,6 +116,7 @@ export function StudioCanvas() {
                 muted={sourceTrackMuted}
                 source={compositionFrame.source}
                 sourceDetail={project.media}
+                workspaceId={workspaceId}
               />
             ) : null}
 
@@ -127,6 +130,7 @@ export function StudioCanvas() {
                   setSelectedItemId(overlay.segment.id)
                 }}
                 overlay={overlay}
+                workspaceId={workspaceId}
               />
             ))}
 
@@ -136,6 +140,7 @@ export function StudioCanvas() {
                 audio={audio}
                 isPlaying={isPlaying}
                 muted={audioTrackMuted}
+                workspaceId={workspaceId}
               />
             ))}
 

@@ -5,6 +5,7 @@ import { authenticatedApiClient } from "@/features/auth/services/authenticated-a
 import { projectService } from "./project.service"
 
 const apiMock = new MockAdapter(authenticatedApiClient)
+const workspaceId = "123e4567-e89b-12d3-a456-426614174000"
 const projectId = "123e4567-e89b-12d3-a456-426614174001"
 const mediaId = "123e4567-e89b-12d3-a456-426614174002"
 const projectMediaId = "123e4567-e89b-12d3-a456-426614174003"
@@ -15,7 +16,7 @@ describe("project service", () => {
   afterAll(() => apiMock.restore())
 
   it("passes server-side list filters, sort, and pagination", async () => {
-    apiMock.onGet("/projects").reply((config) => {
+    apiMock.onGet(`/workspaces/${workspaceId}/projects`).reply((config) => {
       expect(config.params).toEqual({
         page: 2,
         limit: 9,
@@ -38,7 +39,7 @@ describe("project service", () => {
     })
 
     await expect(
-      projectService.list({
+      projectService.list(workspaceId, {
         page: 2,
         limit: 9,
         search: "launch",
@@ -50,43 +51,43 @@ describe("project service", () => {
   })
 
   it("uses the detail and split creation endpoints", async () => {
-    apiMock.onGet(`/projects/${projectId}`).reply(200, {
+    apiMock.onGet(`/workspaces/${workspaceId}/projects/${projectId}`).reply(200, {
       success: true,
       data: { project },
     })
-    apiMock.onPost("/projects/blank", { title: "Blank" }).reply(201, {
+    apiMock.onPost(`/workspaces/${workspaceId}/projects/blank`, { title: "Blank" }).reply(201, {
       success: true,
       data: { project },
     })
     apiMock
-      .onPost("/projects/from-media", { mediaId, title: "From media" })
+      .onPost(`/workspaces/${workspaceId}/projects/from-media`, { mediaId, title: "From media" })
       .reply(201, {
         success: true,
         data: { project },
       })
 
-    await expect(projectService.get(projectId)).resolves.toEqual({ project })
+    await expect(projectService.get(workspaceId, projectId)).resolves.toEqual({ project })
     await expect(
-      projectService.createBlank({ title: "Blank" })
+      projectService.createBlank(workspaceId, { title: "Blank" })
     ).resolves.toEqual({ project })
     await expect(
-      projectService.createFromMedia({ mediaId, title: "From media" })
+      projectService.createFromMedia(workspaceId, { mediaId, title: "From media" })
     ).resolves.toEqual({ project })
   })
 
   it("uses patch for rename and delete for soft deletion", async () => {
     apiMock
-      .onPatch(`/projects/${projectId}`, { title: "Renamed" })
+      .onPatch(`/workspaces/${workspaceId}/projects/${projectId}`, { title: "Renamed" })
       .reply(200, { success: true, data: { project } })
-    apiMock.onDelete(`/projects/${projectId}`).reply(200, {
+    apiMock.onDelete(`/workspaces/${workspaceId}/projects/${projectId}`).reply(200, {
       success: true,
       data: { message: "Project deleted successfully" },
     })
 
     await expect(
-      projectService.update(projectId, { title: "Renamed" })
+      projectService.update(workspaceId, projectId, { title: "Renamed" })
     ).resolves.toEqual({ project })
-    await expect(projectService.remove(projectId)).resolves.toEqual({
+    await expect(projectService.remove(workspaceId, projectId)).resolves.toEqual({
       message: "Project deleted successfully",
     })
   })
@@ -99,23 +100,23 @@ describe("project service", () => {
     }
 
     apiMock
-      .onPost(`/projects/${projectId}/media`, { mediaId })
+      .onPost(`/workspaces/${workspaceId}/projects/${projectId}/media`, { mediaId })
       .reply(201, {
         success: true,
         data: { projectMedia },
       })
     apiMock
-      .onDelete(`/projects/${projectId}/media/${projectMediaId}`)
+      .onDelete(`/workspaces/${workspaceId}/projects/${projectId}/media/${projectMediaId}`)
       .reply(200, {
         success: true,
         data: { message: "Project media removed successfully" },
       })
 
-    await expect(projectService.addMedia(projectId, mediaId)).resolves.toEqual({
+    await expect(projectService.addMedia(workspaceId, projectId, mediaId)).resolves.toEqual({
       projectMedia,
     })
     await expect(
-      projectService.removeMedia(projectId, projectMediaId)
+      projectService.removeMedia(workspaceId, projectId, projectMediaId)
     ).resolves.toEqual({
       message: "Project media removed successfully",
     })
@@ -123,14 +124,14 @@ describe("project service", () => {
 
   it("sets project source media through the dedicated endpoint", async () => {
     apiMock
-      .onPut(`/projects/${projectId}/source-media`, { mediaId })
+      .onPut(`/workspaces/${workspaceId}/projects/${projectId}/source-media`, { mediaId })
       .reply(200, {
         success: true,
         data: { project },
       })
 
     await expect(
-      projectService.setSourceMedia(projectId, mediaId)
+      projectService.setSourceMedia(workspaceId, projectId, mediaId)
     ).resolves.toEqual({ project })
   })
 })

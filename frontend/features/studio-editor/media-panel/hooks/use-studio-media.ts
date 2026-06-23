@@ -2,10 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useParams } from "next/navigation"
 import { toast } from "sonner"
 
-import { useAuthSession } from "@/features/auth/hooks/use-auth-session"
 import { useMediaList } from "@/features/media-library/hooks/use-media-list"
 import { invalidateMediaQueries } from "@/features/media-library/hooks/use-media-mutations"
 import { readMediaFileMetadata } from "@/features/media-library/lib/read-media-file-metadata"
@@ -27,6 +25,7 @@ import {
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioProjectMediaItem } from "@/features/studio-editor/studio.types"
 import { ApiError } from "@/lib/api/api-error"
+import { useEditorRouteParams } from "@/features/studio-editor/hooks/use-editor-route-params"
 
 import { createStudioProjectFromDetail } from "../../editor-snapshot/editor-snapshot.mapper"
 import {
@@ -50,11 +49,9 @@ function getErrorMessage(error: unknown) {
 }
 
 export function useStudioMedia() {
-  const params = useParams<{ projectId: string }>()
-  const projectId = params.projectId ?? ""
+  const { projectId, workspaceId } = useEditorRouteParams()
   const canEdit = useStudioEditorPermission()
   const { project } = useStudioProjectState()
-  const authSession = useAuthSession()
   const queryClient = useQueryClient()
   const { removeProjectMedia, setProjectSource, upsertProjectMedia } =
     useStudioProjectActions()
@@ -62,7 +59,7 @@ export function useStudioMedia() {
     StudioMediaUploadEntry[]
   >([])
   const controllersRef = useRef(new Map<string, AbortController>())
-  const mediaListQuery = useMediaList({
+  const mediaListQuery = useMediaList(workspaceId, {
     page: 1,
     limit: 50,
     status: "UPLOADED",
@@ -73,7 +70,7 @@ export function useStudioMedia() {
   const updateProjectCache = useCallback(
     (updater: (project: ProjectDetail) => ProjectDetail) => {
       queryClient.setQueryData<{ project: ProjectDetail }>(
-        projectQueryKeys.detail(projectId),
+        projectQueryKeys.detail(workspaceId, projectId),
         (current) =>
           current
             ? {
@@ -82,7 +79,7 @@ export function useStudioMedia() {
             : current
       )
     },
-    [projectId, queryClient]
+    [projectId, queryClient, workspaceId]
   )
 
   const applyAttachedMedia = useCallback(
@@ -102,22 +99,29 @@ export function useStudioMedia() {
 
   const applySourceProject = useCallback(
     (project: ProjectDetail) => {
-      queryClient.setQueryData(projectQueryKeys.detail(projectId), { project })
+      queryClient.setQueryData(
+        projectQueryKeys.detail(workspaceId, projectId),
+        { project }
+      )
       void queryClient.invalidateQueries({
-        queryKey: projectQueryKeys.lists(),
+        queryKey: projectQueryKeys.lists(workspaceId),
       })
       setProjectSource(createStudioProjectFromDetail(project))
     },
-    [projectId, queryClient, setProjectSource]
+    [projectId, queryClient, setProjectSource, workspaceId]
   )
 
   const setSourceMedia = useCallback(
     async (mediaId: string) => {
-      const result = await projectService.setSourceMedia(projectId, mediaId)
+      const result = await projectService.setSourceMedia(
+        workspaceId,
+        projectId,
+        mediaId
+      )
       applySourceProject(result.project)
       return result.project
     },
-    [applySourceProject, projectId]
+    [applySourceProject, projectId, workspaceId]
   )
 
   const sourceMutation = useMutation({
@@ -139,8 +143,11 @@ export function useStudioMedia() {
 
   const reconcileProjectMedia = useCallback(
     async (mediaId: string) => {
-      const result = await projectService.get(projectId)
-      queryClient.setQueryData(projectQueryKeys.detail(projectId), result)
+      const result = await projectService.get(workspaceId, projectId)
+      queryClient.setQueryData(
+        projectQueryKeys.detail(workspaceId, projectId),
+        result
+      )
       const attached = result.project.projectMedia.find(
         (item) => item.media.id === mediaId
       )
@@ -151,11 +158,12 @@ export function useStudioMedia() {
 
       return attached
     },
-    [projectId, queryClient, upsertProjectMedia]
+    [projectId, queryClient, upsertProjectMedia, workspaceId]
   )
 
   const attachMutation = useMutation({
-    mutationFn: (mediaId: string) => projectService.addMedia(projectId, mediaId),
+    mutationFn: (mediaId: string) =>
+      projectService.addMedia(workspaceId, projectId, mediaId),
     onSuccess: ({ projectMedia }) => {
       applyAttachedMedia(projectMedia)
       toast.success("Media added to project")
@@ -183,7 +191,10 @@ export function useStudioMedia() {
     }: {
       mediaId: string
       projectMediaId: string
-    }) => projectService.removeMedia(projectId, projectMediaId).then(() => mediaId),
+    }) =>
+      projectService
+        .removeMedia(workspaceId, projectId, projectMediaId)
+        .then(() => mediaId),
     onSuccess: (mediaId, { projectMediaId }) => {
       removeProjectMedia(mediaId)
       updateProjectCache((project) => ({
@@ -239,6 +250,7 @@ export function useStudioMedia() {
         }
 
         const { projectMedia } = await projectService.addMedia(
+          workspaceId,
           projectId,
           media.id
         )
@@ -281,6 +293,7 @@ export function useStudioMedia() {
       reconcileProjectMedia,
       setSourceMedia,
       updateUploadEntry,
+      workspaceId,
     ]
   )
 
@@ -290,8 +303,6 @@ export function useStudioMedia() {
       file: File,
       purpose: StudioMediaUploadEntry["purpose"]
     ) => {
-      const workspaceId = authSession.data?.workspaceId
-
       if (!workspaceId) {
         updateUploadEntry(entryId, {
           error: "No workspace is available for this account.",
@@ -324,7 +335,7 @@ export function useStudioMedia() {
             updateUploadEntry(entryId, { progress }),
         })
 
-        await invalidateMediaQueries(queryClient)
+        await invalidateMediaQueries(queryClient, workspaceId)
         await attachUploadedMedia(entryId, file, media, purpose)
       } catch (error) {
         const aborted = controller.signal.aborted
@@ -344,9 +355,9 @@ export function useStudioMedia() {
     },
     [
       attachUploadedMedia,
-      authSession.data?.workspaceId,
       queryClient,
       updateUploadEntry,
+      workspaceId,
     ]
   )
 

@@ -33,6 +33,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { formatShortDate } from "@/features/home/home.utils"
 import type { StudioProjectCardData } from "@/features/studio-hub/studio-projects.types"
+import { getEditorHref } from "@/features/studio-hub/studio-projects.utils"
 import { cn } from "@/lib/utils"
 
 type StudioProjectCardProps = {
@@ -84,7 +85,7 @@ export function StudioProjectCard({
       )}
     >
       <Link
-        href={`/editor/${project.id}`}
+        href={getEditorHref(project.workspaceId, project.id)}
         className={cn(
           "block border-b border-border/60",
           featured ? "lg:border-b-0 lg:border-r" : ""
@@ -135,7 +136,7 @@ export function StudioProjectCard({
               )}
             >
               <Link
-                href={`/editor/${project.id}`}
+                href={getEditorHref(project.workspaceId, project.id)}
                 className="hover:text-foreground-subtle"
               >
                 {project.title}

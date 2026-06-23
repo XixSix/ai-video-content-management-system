@@ -5,9 +5,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { MediaLibraryCard } from "@/features/media-library/components/media-library-card"
 import { MediaLibraryLoading } from "@/features/media-library/components/media-library-loading"
 import { useMediaList } from "@/features/media-library/hooks/use-media-list"
+import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 
 export function RecentMediaSection() {
-  const mediaQuery = useMediaList({
+  const { selectedWorkspaceId } = useWorkspace()
+  const mediaQuery = useMediaList(selectedWorkspaceId ?? "", {
     page: 1,
     limit: 4,
     sortBy: "createdAt",

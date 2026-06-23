@@ -13,10 +13,13 @@ function parseSnapshotResponse(data: EditorSnapshotResponse) {
 }
 
 export const editorSnapshotService = {
-  async get(projectId: string): Promise<EditorSnapshotResponse> {
+  async get(
+    workspaceId: string,
+    projectId: string
+  ): Promise<EditorSnapshotResponse> {
     const data = await unwrapApiResponse(
       authenticatedApiClient.get<ApiSuccess<EditorSnapshotResponse>>(
-        `/projects/${projectId}/editor-snapshot`
+        `/workspaces/${workspaceId}/projects/${projectId}/editor-snapshot`
       )
     )
 
@@ -24,12 +27,13 @@ export const editorSnapshotService = {
   },
 
   async save(
+    workspaceId: string,
     projectId: string,
     input: SaveEditorSnapshotInput
   ): Promise<EditorSnapshotResponse> {
     const data = await unwrapApiResponse(
       authenticatedApiClient.put<ApiSuccess<EditorSnapshotResponse>>(
-        `/projects/${projectId}/editor-snapshot`,
+        `/workspaces/${workspaceId}/projects/${projectId}/editor-snapshot`,
         input
       )
     )

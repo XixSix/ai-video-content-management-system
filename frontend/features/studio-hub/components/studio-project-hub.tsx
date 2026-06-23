@@ -38,6 +38,8 @@ import type {
   StudioProjectCardData,
   StudioProjectSortKey,
 } from "@/features/studio-hub/studio-projects.types"
+import { getEditorHref } from "@/features/studio-hub/studio-projects.utils"
+import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 
 const PROJECT_PAGE_SIZE = 9
 
@@ -66,6 +68,8 @@ function ProjectGridLoading() {
 export function StudioProjectHub() {
   const router = useRouter()
   const authSession = useAuthSession()
+  const { selectedWorkspaceId } = useWorkspace()
+  const workspaceId = selectedWorkspaceId ?? ""
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | "ALL">("ALL")
   const [sortKey, setSortKey] = useState<StudioProjectSortKey>("recent")
@@ -78,22 +82,22 @@ export function StudioProjectHub() {
     useState<StudioProjectCardData | null>(null)
   const deferredSearch = useDeferredValue(searchQuery.trim())
   const sort = getProjectSort(sortKey)
-  const listQuery = useProjectList({
+  const listQuery = useProjectList(workspaceId, {
     page: currentPage,
     limit: PROJECT_PAGE_SIZE,
     search: deferredSearch || undefined,
     status: statusFilter === "ALL" ? undefined : statusFilter,
     ...sort,
   })
-  const featuredQuery = useProjectList({
+  const featuredQuery = useProjectList(workspaceId, {
     page: 1,
     limit: 1,
     sortBy: "updatedAt",
     sortOrder: "desc",
   })
-  const createMutation = useCreateProject()
-  const renameMutation = useRenameProject()
-  const deleteMutation = useDeleteProject()
+  const createMutation = useCreateProject(workspaceId)
+  const renameMutation = useRenameProject(workspaceId)
+  const deleteMutation = useDeleteProject(workspaceId)
   const projects = (listQuery.data?.items ?? []).map(mapProjectToCard)
   const featuredProject = featuredQuery.data?.items[0]
     ? mapProjectToCard(featuredQuery.data.items[0])
@@ -120,7 +124,7 @@ export function StudioProjectHub() {
         onSuccess: ({ project }) => {
           setCreateDialog((current) => ({ ...current, open: false }))
           toast.success("Project created", { description: project.title })
-          router.push(`/editor/${project.id}`)
+          router.push(getEditorHref(workspaceId, project.id))
         },
         onError: (error) =>
           toast.error("Unable to create project", {
@@ -304,6 +308,7 @@ export function StudioProjectHub() {
       {createDialog.open ? (
         <ProjectCreateDialog
           open
+          workspaceId={workspaceId}
           initialMode={createDialog.mode}
           isSubmitting={createMutation.isPending}
           onOpenChange={(open) =>
