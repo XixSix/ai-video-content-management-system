@@ -1,5 +1,10 @@
 import { prisma } from '../../infrastructure/db/prisma'
-import type { WorkspaceMemberRecord, WorkspaceRecord, WorkspaceMembershipRecord } from './workspace.types'
+import type {
+  UserWorkspaceMembershipRecord,
+  WorkspaceMemberRecord,
+  WorkspaceRecord,
+  WorkspaceMembershipRecord
+} from './workspace.types'
 
 export const findMembership = async (workspaceId: string, userId: string): Promise<WorkspaceMembershipRecord | null> =>
   prisma.workspaceMember.findUnique({
@@ -44,3 +49,37 @@ export const findWorkspaceMembers = async (workspaceId: string): Promise<Workspa
     },
     orderBy: { createdAt: 'asc' }
   })
+
+export const findUserWorkspaceMemberships = async (userId: string): Promise<UserWorkspaceMembershipRecord[]> =>
+  prisma.workspaceMember.findMany({
+    where: { userId },
+    select: {
+      role: true,
+      createdAt: true,
+      workspace: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          createdAt: true
+        }
+      }
+    },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
+  })
+
+export const findUserPreferredWorkspaceId = async (userId: string): Promise<string | null> => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { preferredWorkspaceId: true }
+  })
+
+  return user?.preferredWorkspaceId ?? null
+}
+
+export const updateUserPreferredWorkspace = async (userId: string, workspaceId: string): Promise<void> => {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { preferredWorkspaceId: workspaceId }
+  })
+}

@@ -1,12 +1,11 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { config } from '../../config'
-import type { Media, WorkspaceMember } from '../../infrastructure/db/generated/prisma/client'
+import type { Media } from '../../infrastructure/db/generated/prisma/client'
 import { MediaError } from './media.error'
 
-const findWorkspaceMembershipMock = jest.fn<(workspaceId: string, userId: string) => Promise<WorkspaceMember | null>>()
 const createMediaMock = jest.fn<(data: unknown) => Promise<Media>>()
-const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
-const findWorkspaceAccessibleMediaByIdMock = jest.fn<(id: string, userId: string) => Promise<Media | null>>()
+const findMediaByWorkspaceIdMock = jest.fn()
+const findMediaByIdInWorkspaceMock = jest.fn<(id: string, workspaceId: string) => Promise<Media | null>>()
 const updateMediaMock = jest.fn<(id: string, data: unknown) => Promise<Media>>()
 const updateUploadingMediaMock = jest.fn<(id: string, userId: string, data: unknown) => Promise<Media | null>>()
 const createPresignedPutUrlMock = jest.fn<(bucket: string, key: string, mimeType: string) => Promise<string>>()
@@ -31,9 +30,8 @@ const headObjectMock =
 
 jest.unstable_mockModule('./media.repository', () => ({
   createMedia: createMediaMock,
-  findMediaById: findMediaByIdMock,
-  findWorkspaceAccessibleMediaById: findWorkspaceAccessibleMediaByIdMock,
-  findWorkspaceMembership: findWorkspaceMembershipMock,
+  findMediaByWorkspaceId: findMediaByWorkspaceIdMock,
+  findMediaByIdInWorkspace: findMediaByIdInWorkspaceMock,
   updateMedia: updateMediaMock,
   updateUploadingMedia: updateUploadingMediaMock
 }))
@@ -59,14 +57,6 @@ const otherUserId = '00000000-0000-4000-8000-000000000002'
 const workspaceId = '00000000-0000-4000-8000-000000000003'
 const mediaId = '00000000-0000-4000-8000-000000000004'
 const now = new Date('2026-06-19T10:00:00.000Z')
-
-const createMembership = (): WorkspaceMember => ({
-  id: '00000000-0000-4000-8000-000000000005',
-  workspaceId,
-  userId,
-  role: 'MEMBER',
-  createdAt: now
-})
 
 const createMedia = (overrides: Partial<Media> = {}): Media => ({
   id: mediaId,
@@ -95,10 +85,9 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
 
 describe('media upload service', () => {
   beforeEach(() => {
-    findWorkspaceMembershipMock.mockReset()
     createMediaMock.mockReset()
-    findMediaByIdMock.mockReset()
-    findWorkspaceAccessibleMediaByIdMock.mockReset()
+    findMediaByWorkspaceIdMock.mockReset()
+    findMediaByIdInWorkspaceMock.mockReset()
     updateMediaMock.mockReset()
     updateUploadingMediaMock.mockReset()
     createPresignedPutUrlMock.mockReset()
@@ -111,9 +100,9 @@ describe('media upload service', () => {
     deleteObjectMock.mockReset()
     headObjectMock.mockReset()
 
-    findWorkspaceMembershipMock.mockResolvedValue(createMembership())
     createMediaMock.mockResolvedValue(createMedia())
-    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(createMedia({ status: 'UPLOADED' }))
+    findMediaByWorkspaceIdMock.mockResolvedValue([[createMedia({ status: 'UPLOADED' })], 1])
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ status: 'UPLOADED' }))
     updateMediaMock.mockImplementation(async (_id, data) => createMedia(data as Partial<Media>))
     updateUploadingMediaMock.mockImplementation(async (_id, _userId, data) => createMedia(data as Partial<Media>))
     createPresignedPutUrlMock.mockResolvedValue('https://storage.example.com/upload')
@@ -131,23 +120,20 @@ describe('media upload service', () => {
     })
   })
 
-  it('rejects uploads from users outside the workspace', async () => {
-    findWorkspaceMembershipMock.mockResolvedValue(null)
-
+  it('lists all non-deleted media in the selected workspace', async () => {
     await expect(
-      mediaService.createUploadUrl({
-        workspaceId,
-        userId,
-        mediaType: 'VIDEO',
-        originalFilename: 'upload.mp4',
-        mimeType: 'video/mp4',
-        fileSizeBytes: 1024
+      mediaService.listMedia(workspaceId, {
+        page: 1,
+        limit: 10,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
       })
-    ).rejects.toMatchObject({
-      statusCode: 403,
-      code: 'FORBIDDEN'
+    ).resolves.toMatchObject({
+      total: 1,
+      page: 1,
+      limit: 10
     })
-    expect(createMediaMock).not.toHaveBeenCalled()
+    expect(findMediaByWorkspaceIdMock).toHaveBeenCalledWith(workspaceId, 0, 10, undefined, 'createdAt', 'desc')
   })
 
   it('lets a workspace member read media uploaded by another member', async () => {
@@ -155,22 +141,21 @@ describe('media upload service', () => {
       userId: otherUserId,
       status: 'UPLOADED'
     })
-    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(sharedMedia)
+    findMediaByIdInWorkspaceMock.mockResolvedValue(sharedMedia)
 
-    await expect(mediaService.getMedia(userId, mediaId)).resolves.toEqual(sharedMedia)
-    expect(findWorkspaceAccessibleMediaByIdMock).toHaveBeenCalledWith(mediaId, userId)
-    expect(findMediaByIdMock).not.toHaveBeenCalled()
+    await expect(mediaService.getMedia(workspaceId, mediaId)).resolves.toEqual(sharedMedia)
+    expect(findMediaByIdInWorkspaceMock).toHaveBeenCalledWith(mediaId, workspaceId)
   })
 
   it('lets a workspace member create a download URL for shared media', async () => {
-    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(
+    findMediaByIdInWorkspaceMock.mockResolvedValue(
       createMedia({
         userId: otherUserId,
         status: 'UPLOADED'
       })
     )
 
-    await expect(mediaService.createDownloadUrl(userId, mediaId)).resolves.toEqual({
+    await expect(mediaService.createDownloadUrl(workspaceId, mediaId)).resolves.toEqual({
       url: 'https://storage.example.com/download',
       expiresInSeconds: 900
     })
@@ -182,27 +167,27 @@ describe('media upload service', () => {
   })
 
   it('falls back to the original filename when downloading legacy media without a title', async () => {
-    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(
+    findMediaByIdInWorkspaceMock.mockResolvedValue(
       createMedia({
         title: null,
         status: 'UPLOADED'
       })
     )
 
-    await mediaService.createDownloadUrl(userId, mediaId)
+    await mediaService.createDownloadUrl(workspaceId, mediaId)
 
     expect(createPresignedDownloadUrlMock).toHaveBeenCalledWith('vidpilot-media', expect.any(String), 'upload.mp4')
   })
 
   it('lets a workspace member create an inline preview URL for shared media', async () => {
-    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(
+    findMediaByIdInWorkspaceMock.mockResolvedValue(
       createMedia({
         userId: otherUserId,
         status: 'UPLOADED'
       })
     )
 
-    await expect(mediaService.createPreviewUrl(userId, mediaId)).resolves.toEqual({
+    await expect(mediaService.createPreviewUrl(workspaceId, mediaId)).resolves.toEqual({
       url: 'https://storage.example.com/preview',
       expiresInSeconds: 900
     })
@@ -213,18 +198,18 @@ describe('media upload service', () => {
   })
 
   it('hides media from users outside its workspace', async () => {
-    findWorkspaceAccessibleMediaByIdMock.mockResolvedValue(null)
+    findMediaByIdInWorkspaceMock.mockResolvedValue(null)
 
-    await expect(mediaService.getMedia(userId, mediaId)).rejects.toMatchObject({
+    await expect(mediaService.getMedia(workspaceId, mediaId)).rejects.toMatchObject({
       statusCode: 404,
       code: 'MEDIA_NOT_FOUND'
     })
   })
 
   it('still restricts metadata updates to the uploader', async () => {
-    findMediaByIdMock.mockResolvedValue(createMedia({ userId: otherUserId, status: 'UPLOADED' }))
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ userId: otherUserId, status: 'UPLOADED' }))
 
-    await expect(mediaService.updateMedia(userId, mediaId, { title: 'Renamed' })).rejects.toMatchObject({
+    await expect(mediaService.updateMedia(workspaceId, userId, mediaId, { title: 'Renamed' })).rejects.toMatchObject({
       statusCode: 403,
       code: 'FORBIDDEN'
     })
@@ -363,11 +348,12 @@ describe('media upload service', () => {
   it('completes a single upload and returns the persisted media', async () => {
     const uploadingMedia = createMedia({ title: null })
     const uploadedMedia = createMedia({ title: 'upload.mp4', status: 'UPLOADED', s3Etag: '"etag"' })
-    findMediaByIdMock.mockResolvedValue(uploadingMedia)
+    findMediaByIdInWorkspaceMock.mockResolvedValue(uploadingMedia)
     updateUploadingMediaMock.mockResolvedValue(uploadedMedia)
 
     const result = await mediaService.completeUpload({
       userId,
+      workspaceId,
       mediaId,
       duration: 120.5,
       width: 1920,
@@ -384,21 +370,23 @@ describe('media upload service', () => {
       status: 'UPLOADED'
     })
     expect(result).toEqual({ media: uploadedMedia })
-    expect(findMediaByIdMock).toHaveBeenCalledTimes(1)
+    expect(findMediaByIdInWorkspaceMock).toHaveBeenCalledTimes(1)
   })
 
   it('returns an already uploaded media idempotently', async () => {
     const uploadedMedia = createMedia({ status: 'UPLOADED' })
-    findMediaByIdMock.mockResolvedValue(uploadedMedia)
+    findMediaByIdInWorkspaceMock.mockResolvedValue(uploadedMedia)
 
-    await expect(mediaService.completeUpload({ userId, mediaId })).resolves.toEqual({ media: uploadedMedia })
+    await expect(mediaService.completeUpload({ workspaceId, userId, mediaId })).resolves.toEqual({
+      media: uploadedMedia
+    })
     expect(headObjectMock).not.toHaveBeenCalled()
   })
 
   it('rejects completion by another user', async () => {
-    findMediaByIdMock.mockResolvedValue(createMedia({ userId: otherUserId }))
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ userId: otherUserId }))
 
-    await expect(mediaService.completeUpload({ userId, mediaId })).rejects.toMatchObject({
+    await expect(mediaService.completeUpload({ workspaceId, userId, mediaId })).rejects.toMatchObject({
       statusCode: 403,
       code: 'FORBIDDEN'
     })
@@ -414,7 +402,7 @@ describe('media upload service', () => {
       status: 'UPLOADED',
       fileSizeBytes: BigInt(10 * 1024 * 1024)
     })
-    findMediaByIdMock.mockResolvedValue(multipartMedia)
+    findMediaByIdInWorkspaceMock.mockResolvedValue(multipartMedia)
     updateUploadingMediaMock.mockResolvedValue(uploadedMedia)
     completeMultipartUploadMock.mockRejectedValue(MediaError.multipartUploadNotFound())
     headObjectMock.mockResolvedValue({
@@ -425,6 +413,7 @@ describe('media upload service', () => {
 
     const result = await mediaService.completeUpload({
       userId,
+      workspaceId,
       mediaId,
       parts: [{ partNumber: 1, etag: '"part-etag"' }]
     })
@@ -433,13 +422,13 @@ describe('media upload service', () => {
   })
 
   it('deletes an invalid object and marks media failed', async () => {
-    findMediaByIdMock.mockResolvedValue(createMedia())
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia())
     headObjectMock.mockResolvedValue({
       contentLength: 2048,
       contentType: 'video/mp4'
     })
 
-    await expect(mediaService.completeUpload({ userId, mediaId })).rejects.toMatchObject({
+    await expect(mediaService.completeUpload({ workspaceId, userId, mediaId })).rejects.toMatchObject({
       code: 'INVALID_MEDIA_UPLOAD'
     })
     expect(deleteObjectMock).toHaveBeenCalled()
@@ -450,10 +439,12 @@ describe('media upload service', () => {
   })
 
   it('cleans an object when abort wins the completion race', async () => {
-    findMediaByIdMock.mockResolvedValueOnce(createMedia()).mockResolvedValueOnce(createMedia({ status: 'DELETED' }))
+    findMediaByIdInWorkspaceMock
+      .mockResolvedValueOnce(createMedia())
+      .mockResolvedValueOnce(createMedia({ status: 'DELETED' }))
     updateUploadingMediaMock.mockResolvedValue(null)
 
-    await expect(mediaService.completeUpload({ userId, mediaId })).rejects.toMatchObject({
+    await expect(mediaService.completeUpload({ workspaceId, userId, mediaId })).rejects.toMatchObject({
       code: 'INVALID_MEDIA_STATE'
     })
     expect(deleteObjectMock).toHaveBeenCalled()
@@ -464,10 +455,10 @@ describe('media upload service', () => {
       status: 'DELETED',
       uploadId: 'multipart-upload-id'
     })
-    findMediaByIdMock.mockResolvedValue(createMedia({ uploadId: 'multipart-upload-id' }))
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ uploadId: 'multipart-upload-id' }))
     updateUploadingMediaMock.mockResolvedValue(deletedMedia)
 
-    await expect(mediaService.abortUpload(userId, mediaId)).resolves.toEqual({
+    await expect(mediaService.abortUpload(workspaceId, userId, mediaId)).resolves.toEqual({
       message: 'Media upload aborted successfully'
     })
     expect(updateUploadingMediaMock).toHaveBeenCalledWith(mediaId, userId, {
@@ -481,9 +472,9 @@ describe('media upload service', () => {
   })
 
   it('retries cleanup for an already deleted media', async () => {
-    findMediaByIdMock.mockResolvedValue(createMedia({ status: 'DELETED', uploadId: 'multipart-upload-id' }))
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ status: 'DELETED', uploadId: 'multipart-upload-id' }))
 
-    await expect(mediaService.abortUpload(userId, mediaId)).resolves.toMatchObject({
+    await expect(mediaService.abortUpload(workspaceId, userId, mediaId)).resolves.toMatchObject({
       message: 'Media upload aborted successfully'
     })
     expect(abortMultipartUploadMock).toHaveBeenCalled()
@@ -491,9 +482,9 @@ describe('media upload service', () => {
   })
 
   it('rejects aborting an uploaded media', async () => {
-    findMediaByIdMock.mockResolvedValue(createMedia({ status: 'UPLOADED' }))
+    findMediaByIdInWorkspaceMock.mockResolvedValue(createMedia({ status: 'UPLOADED' }))
 
-    await expect(mediaService.abortUpload(userId, mediaId)).rejects.toMatchObject({
+    await expect(mediaService.abortUpload(workspaceId, userId, mediaId)).rejects.toMatchObject({
       statusCode: 409,
       code: 'INVALID_MEDIA_STATE'
     })

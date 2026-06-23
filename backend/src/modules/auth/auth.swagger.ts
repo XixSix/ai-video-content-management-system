@@ -21,7 +21,7 @@
  *         workspaceId:
  *           type: string
  *           format: uuid
- *           description: Default workspace used by the current MVP client.
+ *           description: Preferred workspace, repaired to the oldest valid membership when necessary.
  *     AuthResponse:
  *       type: object
  *       properties:

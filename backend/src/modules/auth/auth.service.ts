@@ -164,11 +164,22 @@ const getDefaultWorkspaceId = async (userId: string): Promise<string> => {
 }
 
 export const getDefaultWorkspaceMembership = async (userId: string): Promise<WorkspaceContext> => {
+  const preferredMembership = await authRepo.findPreferredWorkspaceMembership(userId)
+
+  if (preferredMembership) {
+    return {
+      id: preferredMembership.workspaceId,
+      role: preferredMembership.role
+    }
+  }
+
   const membership = await authRepo.findDefaultWorkspaceMembership(userId)
 
   if (!membership) {
     throw AuthError.forbidden('User does not belong to a workspace')
   }
+
+  await authRepo.updatePreferredWorkspace(userId, membership.workspaceId)
 
   return {
     id: membership.workspaceId,

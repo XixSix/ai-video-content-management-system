@@ -22,13 +22,13 @@ import {
   getValidCompletedParts
 } from './media.util'
 
-export const listMedia = async (userId: string, query: ListMediaQuery): Promise<PaginatedResult<Media>> => {
+export const listMedia = async (workspaceId: string, query: ListMediaQuery): Promise<PaginatedResult<Media>> => {
   const page: number = query.page
   const limit: number = query.limit
   const skip: number = (page - 1) * limit
 
-  const [items, total] = await mediaRepo.findMediaByUserId(
-    userId,
+  const [items, total] = await mediaRepo.findMediaByWorkspaceId(
+    workspaceId,
     skip,
     limit,
     query.status,
@@ -45,8 +45,8 @@ export const listMedia = async (userId: string, query: ListMediaQuery): Promise<
   }
 }
 
-const getUploaderOwnedMedia = async (userId: string, mediaId: string): Promise<Media> => {
-  const media = await mediaRepo.findMediaById(mediaId)
+const getUploaderOwnedMedia = async (workspaceId: string, userId: string, mediaId: string): Promise<Media> => {
+  const media = await mediaRepo.findMediaByIdInWorkspace(mediaId, workspaceId)
 
   if (!media) {
     throw MediaError.notFound()
@@ -59,8 +59,8 @@ const getUploaderOwnedMedia = async (userId: string, mediaId: string): Promise<M
   return media
 }
 
-const getWorkspaceAccessibleMedia = async (userId: string, mediaId: string): Promise<Media> => {
-  const media = await mediaRepo.findWorkspaceAccessibleMediaById(mediaId, userId)
+const getWorkspaceMedia = async (workspaceId: string, mediaId: string): Promise<Media> => {
+  const media = await mediaRepo.findMediaByIdInWorkspace(mediaId, workspaceId)
 
   if (!media || media.status === MediaStatus.DELETED) {
     throw MediaError.notFound()
@@ -69,11 +69,16 @@ const getWorkspaceAccessibleMedia = async (userId: string, mediaId: string): Pro
   return media
 }
 
-export const getMedia = async (userId: string, mediaId: string): Promise<Media> =>
-  getWorkspaceAccessibleMedia(userId, mediaId)
+export const getMedia = async (workspaceId: string, mediaId: string): Promise<Media> =>
+  getWorkspaceMedia(workspaceId, mediaId)
 
-export const updateMedia = async (userId: string, mediaId: string, data: UpdateMediaBody): Promise<Media> => {
-  const media = await getUploaderOwnedMedia(userId, mediaId)
+export const updateMedia = async (
+  workspaceId: string,
+  userId: string,
+  mediaId: string,
+  data: UpdateMediaBody
+): Promise<Media> => {
+  const media = await getUploaderOwnedMedia(workspaceId, userId, mediaId)
 
   if (media.status === MediaStatus.DELETED) {
     throw MediaError.notFound()
@@ -82,15 +87,15 @@ export const updateMedia = async (userId: string, mediaId: string, data: UpdateM
   return mediaRepo.updateMedia(media.id, data)
 }
 
-export const deleteMedia = async (userId: string, mediaId: string): Promise<void> => {
-  const media = await getUploaderOwnedMedia(userId, mediaId)
+export const deleteMedia = async (workspaceId: string, userId: string, mediaId: string): Promise<void> => {
+  const media = await getUploaderOwnedMedia(workspaceId, userId, mediaId)
 
   if (media.status === MediaStatus.DELETED) {
     return
   }
 
   if (media.status === MediaStatus.UPLOADING) {
-    await abortUpload(userId, mediaId)
+    await abortUpload(workspaceId, userId, mediaId)
     return
   }
 
@@ -101,8 +106,8 @@ export const deleteMedia = async (userId: string, mediaId: string): Promise<void
   })
 }
 
-export const createDownloadUrl = async (userId: string, mediaId: string): Promise<CreateDownloadUrlResult> => {
-  const media = await getWorkspaceAccessibleMedia(userId, mediaId)
+export const createDownloadUrl = async (workspaceId: string, mediaId: string): Promise<CreateDownloadUrlResult> => {
+  const media = await getWorkspaceMedia(workspaceId, mediaId)
 
   if (media.status !== MediaStatus.UPLOADED) {
     throw MediaError.invalidState(`Cannot create download URL for media in status ${media.status}`)
@@ -120,8 +125,8 @@ export const createDownloadUrl = async (userId: string, mediaId: string): Promis
   }
 }
 
-export const createPreviewUrl = async (userId: string, mediaId: string): Promise<CreateDownloadUrlResult> => {
-  const media = await getWorkspaceAccessibleMedia(userId, mediaId)
+export const createPreviewUrl = async (workspaceId: string, mediaId: string): Promise<CreateDownloadUrlResult> => {
+  const media = await getWorkspaceMedia(workspaceId, mediaId)
 
   if (media.status !== MediaStatus.UPLOADED) {
     throw MediaError.invalidState(`Cannot create preview URL for media in status ${media.status}`)
@@ -137,12 +142,6 @@ export const createPreviewUrl = async (userId: string, mediaId: string): Promise
 
 export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<CreateUploadUrlResult> => {
   ensureSupportedFileSize(input.fileSizeBytes)
-
-  const membership = await mediaRepo.findWorkspaceMembership(input.workspaceId, input.userId)
-
-  if (!membership) {
-    throw MediaError.forbidden('User is not a member of the requested workspace')
-  }
 
   const bucket: string = config.s3.bucket
   const key: string = createUploadObjectKey(input.workspaceId, input.userId, input.mediaType, input.originalFilename)
@@ -220,7 +219,7 @@ export const createUploadUrl = async (input: CreateMediaUploadInput): Promise<Cr
 }
 
 export const completeUpload = async (input: CompleteUploadInput): Promise<CompleteUploadResult> => {
-  const media = await getUploaderOwnedMedia(input.userId, input.mediaId)
+  const media = await getUploaderOwnedMedia(input.workspaceId, input.userId, input.mediaId)
 
   if (media.status === MediaStatus.UPLOADED) {
     return { media }
@@ -277,7 +276,7 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
     return { media: completedMedia }
   }
 
-  const currentMedia = await mediaRepo.findMediaById(media.id)
+  const currentMedia = await mediaRepo.findMediaByIdInWorkspace(media.id, input.workspaceId)
 
   if (currentMedia?.status === MediaStatus.UPLOADED) {
     return { media: currentMedia }
@@ -291,8 +290,8 @@ export const completeUpload = async (input: CompleteUploadInput): Promise<Comple
   throw MediaError.invalidState('Media upload state changed before completion')
 }
 
-export const abortUpload = async (userId: string, mediaId: string): Promise<AbortUploadResult> => {
-  let media = await getUploaderOwnedMedia(userId, mediaId)
+export const abortUpload = async (workspaceId: string, userId: string, mediaId: string): Promise<AbortUploadResult> => {
+  let media = await getUploaderOwnedMedia(workspaceId, userId, mediaId)
 
   if (media.status === MediaStatus.UPLOADED) {
     throw MediaError.invalidState('Completed media cannot be aborted')
@@ -310,7 +309,7 @@ export const abortUpload = async (userId: string, mediaId: string): Promise<Abor
     if (claimedMedia) {
       media = claimedMedia
     } else {
-      media = (await mediaRepo.findMediaById(media.id)) ?? media
+      media = (await mediaRepo.findMediaByIdInWorkspace(media.id, workspaceId)) ?? media
     }
 
     if (!claimedMedia && media.status !== MediaStatus.DELETED) {

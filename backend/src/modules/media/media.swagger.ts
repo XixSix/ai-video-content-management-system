@@ -102,23 +102,22 @@
 
 /**
  * @swagger
- * /media/upload-url:
+ * /workspaces/{workspaceId}/media/upload-url:
  *   post:
  *     summary: Create a workspace media upload
  *     tags: [Media]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [workspaceId, mediaType, originalFilename, mimeType, fileSizeBytes]
+ *             required: [mediaType, originalFilename, mimeType, fileSizeBytes]
  *             properties:
- *               workspaceId:
- *                 type: string
- *                 format: uuid
  *               mediaType:
  *                 type: string
  *                 enum: [VIDEO, AUDIO, IMAGE, SUBTITLE]
@@ -162,7 +161,7 @@
 
 /**
  * @swagger
- * /media/{mediaId}/complete-upload:
+ * /workspaces/{workspaceId}/media/{mediaId}/complete-upload:
  *   post:
  *     summary: Complete a media upload
  *     description: Idempotently validates the uploaded object and marks the Media as UPLOADED.
@@ -170,6 +169,7 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true
@@ -235,7 +235,7 @@
 
 /**
  * @swagger
- * /media/{mediaId}/abort-upload:
+ * /workspaces/{workspaceId}/media/{mediaId}/abort-upload:
  *   post:
  *     summary: Abort an active media upload
  *     description: Claims the upload as DELETED and cleans its object or multipart session. Repeated calls are safe.
@@ -243,6 +243,7 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true
@@ -264,13 +265,14 @@
 
 /**
  * @swagger
- * /media:
+ * /workspaces/{workspaceId}/media:
  *   get:
- *     summary: List media owned by the authenticated user
+ *     summary: List media in the selected workspace
  *     tags: [Media]
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: query
  *         name: page
  *         schema:
@@ -304,7 +306,7 @@
 
 /**
  * @swagger
- * /media/{mediaId}:
+ * /workspaces/{workspaceId}/media/{mediaId}:
  *   get:
  *     summary: Get workspace-accessible media
  *     description: Available to any member of the Media workspace.
@@ -312,6 +314,7 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true
@@ -327,6 +330,7 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true
@@ -355,6 +359,7 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true
@@ -368,13 +373,14 @@
 
 /**
  * @swagger
- * /media/{mediaId}/preview-url:
+ * /workspaces/{workspaceId}/media/{mediaId}/preview-url:
  *   get:
  *     summary: Create an inline preview URL for uploaded media
  *     tags: [Media]
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true
@@ -392,7 +398,7 @@
 
 /**
  * @swagger
- * /media/{mediaId}/download-url:
+ * /workspaces/{workspaceId}/media/{mediaId}/download-url:
  *   get:
  *     summary: Create an attachment download URL for uploaded media
  *     description: Available to any member of the Media workspace.
@@ -400,6 +406,7 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
  *       - in: path
  *         name: mediaId
  *         required: true

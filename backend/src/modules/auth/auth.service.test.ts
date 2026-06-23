@@ -13,7 +13,9 @@ const updateSessionMetadataMock = jest.fn()
 const revokeSessionMock = jest.fn()
 const revokeAllUserSessionsMock = jest.fn()
 const findUserByIdMock = jest.fn()
+const findPreferredWorkspaceMembershipMock = jest.fn()
 const findDefaultWorkspaceMembershipMock = jest.fn()
+const updatePreferredWorkspaceMock = jest.fn()
 const isRefreshTokenBlacklistedMock = jest.fn()
 const blacklistRefreshSessionMock = jest.fn()
 const blacklistRefreshSessionsMock = jest.fn()
@@ -35,6 +37,8 @@ jest.unstable_mockModule('./auth.repository', () => ({
   revokeSession: revokeSessionMock,
   revokeAllUserSessions: revokeAllUserSessionsMock,
   findUserById: findUserByIdMock,
+  findPreferredWorkspaceMembership: findPreferredWorkspaceMembershipMock,
+  updatePreferredWorkspace: updatePreferredWorkspaceMock,
   findDefaultWorkspaceMembership: findDefaultWorkspaceMembershipMock
 }))
 
@@ -72,6 +76,7 @@ const createUser = (overrides: Partial<User> = {}): User => ({
   passwordHash: 'hashed-password',
   fullName: null,
   avatarUrl: null,
+  preferredWorkspaceId: workspaceId,
   role: 'USER',
   status: 'ACTIVE',
   createdAt: new Date(),
@@ -121,13 +126,15 @@ beforeEach(() => {
   updateSessionMetadataMock.mockResolvedValue(createSession())
   revokeSessionMock.mockResolvedValue(undefined)
   revokeAllUserSessionsMock.mockResolvedValue(undefined)
-  findDefaultWorkspaceMembershipMock.mockResolvedValue({
+  findPreferredWorkspaceMembershipMock.mockResolvedValue({
     id: '123e4567-e89b-12d3-a456-426614174040',
     userId,
     workspaceId,
     role: 'OWNER',
     createdAt: new Date()
   })
+  findDefaultWorkspaceMembershipMock.mockResolvedValue(null)
+  updatePreferredWorkspaceMock.mockResolvedValue(createUser())
 })
 
 describe('auth service', () => {
@@ -242,6 +249,7 @@ describe('auth service', () => {
 
   it('rejects login when the user has no workspace membership', async () => {
     findUserByEmailMock.mockResolvedValue(createUser())
+    findPreferredWorkspaceMembershipMock.mockResolvedValue(null)
     findDefaultWorkspaceMembershipMock.mockResolvedValue(null)
 
     await expect(authService.login({ email: 'user@example.com', password: 'Password1' }, {})).rejects.toMatchObject({
@@ -254,6 +262,7 @@ describe('auth service', () => {
 
   it('authenticates an active user without requiring workspace membership', async () => {
     findUserByIdMock.mockResolvedValue(createUser())
+    findPreferredWorkspaceMembershipMock.mockResolvedValue(null)
     findDefaultWorkspaceMembershipMock.mockResolvedValue(null)
     verifyAccessTokenMock.mockReturnValue({
       type: 'access',
@@ -263,14 +272,33 @@ describe('auth service', () => {
     await expect(authService.getAuthenticatedUser('access-token')).resolves.toMatchObject({
       id: userId
     })
-    expect(findDefaultWorkspaceMembershipMock).not.toHaveBeenCalled()
+    expect(findPreferredWorkspaceMembershipMock).not.toHaveBeenCalled()
   })
 
-  it('returns the default workspace context separately', async () => {
+  it('returns the preferred workspace context separately', async () => {
     await expect(authService.getDefaultWorkspaceMembership(userId)).resolves.toEqual({
       id: workspaceId,
       role: 'OWNER'
     })
+    expect(findDefaultWorkspaceMembershipMock).not.toHaveBeenCalled()
+    expect(updatePreferredWorkspaceMock).not.toHaveBeenCalled()
+  })
+
+  it('repairs an invalid preferred workspace with the oldest membership', async () => {
+    findPreferredWorkspaceMembershipMock.mockResolvedValue(null)
+    findDefaultWorkspaceMembershipMock.mockResolvedValue({
+      id: '123e4567-e89b-12d3-a456-426614174040',
+      userId,
+      workspaceId,
+      role: 'OWNER',
+      createdAt: new Date()
+    })
+
+    await expect(authService.getDefaultWorkspaceMembership(userId)).resolves.toEqual({
+      id: workspaceId,
+      role: 'OWNER'
+    })
+    expect(updatePreferredWorkspaceMock).toHaveBeenCalledWith(userId, workspaceId)
   })
 
   it('refreshes only the access token when the JWT session is active', async () => {

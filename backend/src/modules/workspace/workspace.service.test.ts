@@ -1,14 +1,25 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import type { WorkspaceMemberRecord, WorkspaceMembershipRecord, WorkspaceRecord } from './workspace.types'
+import type {
+  UserWorkspaceMembershipRecord,
+  WorkspaceMemberRecord,
+  WorkspaceMembershipRecord,
+  WorkspaceRecord
+} from './workspace.types'
 
 const findMembershipMock = jest.fn<(workspaceId: string, userId: string) => Promise<WorkspaceMembershipRecord | null>>()
 const findWorkspaceByIdMock = jest.fn<(workspaceId: string) => Promise<WorkspaceRecord | null>>()
 const findWorkspaceMembersMock = jest.fn<(workspaceId: string) => Promise<WorkspaceMemberRecord[]>>()
+const findUserWorkspaceMembershipsMock = jest.fn<(userId: string) => Promise<UserWorkspaceMembershipRecord[]>>()
+const findUserPreferredWorkspaceIdMock = jest.fn<(userId: string) => Promise<string | null>>()
+const updateUserPreferredWorkspaceMock = jest.fn<(userId: string, workspaceId: string) => Promise<void>>()
 
 jest.unstable_mockModule('./workspace.repository', () => ({
   findMembership: findMembershipMock,
   findWorkspaceById: findWorkspaceByIdMock,
-  findWorkspaceMembers: findWorkspaceMembersMock
+  findWorkspaceMembers: findWorkspaceMembersMock,
+  findUserWorkspaceMemberships: findUserWorkspaceMembershipsMock,
+  findUserPreferredWorkspaceId: findUserPreferredWorkspaceIdMock,
+  updateUserPreferredWorkspace: updateUserPreferredWorkspaceMock
 }))
 
 const workspaceService = await import('./workspace.service')
@@ -61,9 +72,59 @@ beforeEach(() => {
   })
   findWorkspaceByIdMock.mockResolvedValue(workspace)
   findWorkspaceMembersMock.mockResolvedValue(members)
+  findUserWorkspaceMembershipsMock.mockResolvedValue([
+    {
+      role: 'MEMBER',
+      createdAt,
+      workspace: {
+        id: workspaceId,
+        name: workspace.name,
+        slug: workspace.slug,
+        createdAt
+      }
+    }
+  ])
+  findUserPreferredWorkspaceIdMock.mockResolvedValue(workspaceId)
+  updateUserPreferredWorkspaceMock.mockResolvedValue()
 })
 
 describe('workspace service', () => {
+  it('lists user workspaces with the preferred workspace', async () => {
+    await expect(workspaceService.listUserWorkspaces(requesterId)).resolves.toEqual({
+      items: [
+        {
+          id: workspaceId,
+          name: workspace.name,
+          slug: workspace.slug,
+          role: 'MEMBER',
+          createdAt
+        }
+      ],
+      preferredWorkspaceId: workspaceId
+    })
+    expect(updateUserPreferredWorkspaceMock).not.toHaveBeenCalled()
+  })
+
+  it('repairs an inaccessible preferred workspace with the oldest membership', async () => {
+    findUserPreferredWorkspaceIdMock.mockResolvedValue('00000000-0000-4000-8000-000000000099')
+
+    await expect(workspaceService.listUserWorkspaces(requesterId)).resolves.toMatchObject({
+      preferredWorkspaceId: workspaceId
+    })
+    expect(updateUserPreferredWorkspaceMock).toHaveBeenCalledWith(requesterId, workspaceId)
+  })
+
+  it('sets the preferred workspace only for a member', async () => {
+    await expect(workspaceService.setPreferredWorkspace(workspaceId, requesterId)).resolves.toBe(workspaceId)
+    expect(updateUserPreferredWorkspaceMock).toHaveBeenCalledWith(requesterId, workspaceId)
+
+    findMembershipMock.mockResolvedValue(null)
+    await expect(workspaceService.setPreferredWorkspace(workspaceId, requesterId)).rejects.toMatchObject({
+      statusCode: 403,
+      code: 'FORBIDDEN'
+    })
+  })
+
   it('returns the selected workspace membership context', async () => {
     await expect(workspaceService.getWorkspaceMembershipContext(workspaceId, requesterId)).resolves.toEqual({
       id: workspaceId,

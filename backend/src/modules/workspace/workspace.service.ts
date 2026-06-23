@@ -1,6 +1,6 @@
 import * as repo from './workspace.repository'
 import type { WorkspaceContext } from '../auth/auth.types'
-import type { WorkspaceDetailData, WorkspaceMemberData } from './workspace.types'
+import type { WorkspaceDetailData, WorkspaceListData, WorkspaceMemberData } from './workspace.types'
 import { WorkspaceError } from './workspace.error'
 
 export const getWorkspaceMembershipContext = async (
@@ -41,6 +41,36 @@ export const getWorkspaceDetails = async (workspaceId: string, requesterId: stri
     },
     createdAt: workspace.createdAt
   }
+}
+
+export const listUserWorkspaces = async (userId: string): Promise<WorkspaceListData> => {
+  const memberships = await repo.findUserWorkspaceMemberships(userId)
+  const preferredWorkspaceId = await repo.findUserPreferredWorkspaceId(userId)
+  const validPreferredWorkspaceId = memberships.some((membership) => membership.workspace.id === preferredWorkspaceId)
+    ? preferredWorkspaceId
+    : (memberships[0]?.workspace.id ?? null)
+
+  if (validPreferredWorkspaceId && validPreferredWorkspaceId !== preferredWorkspaceId) {
+    await repo.updateUserPreferredWorkspace(userId, validPreferredWorkspaceId)
+  }
+
+  return {
+    items: memberships.map((membership) => ({
+      id: membership.workspace.id,
+      name: membership.workspace.name,
+      slug: membership.workspace.slug,
+      role: membership.role,
+      createdAt: membership.workspace.createdAt
+    })),
+    preferredWorkspaceId: validPreferredWorkspaceId
+  }
+}
+
+export const setPreferredWorkspace = async (workspaceId: string, userId: string): Promise<string> => {
+  await getWorkspaceMembershipContext(workspaceId, userId)
+  await repo.updateUserPreferredWorkspace(userId, workspaceId)
+
+  return workspaceId
 }
 
 export const listWorkspaceMembers = async (

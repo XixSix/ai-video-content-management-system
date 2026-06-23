@@ -194,19 +194,21 @@ enum PublishStatus {
 }
 
 model User {
-  id           String     @id @default(uuid()) @db.Uuid
-  email        String     @unique @db.VarChar(255)
-  passwordHash String     @map("password_hash") @db.Text
-  fullName     String?    @map("full_name") @db.VarChar(255)
-  avatarUrl    String?    @map("avatar_url") @db.Text
-  role         UserRole   @default(USER)
-  status       UserStatus @default(ACTIVE)
+  id                   String     @id @default(uuid()) @db.Uuid
+  email                String     @unique @db.VarChar(255)
+  passwordHash         String     @map("password_hash") @db.Text
+  fullName             String?    @map("full_name") @db.VarChar(255)
+  avatarUrl            String?    @map("avatar_url") @db.Text
+  preferredWorkspaceId String?    @map("preferred_workspace_id") @db.Uuid
+  role                 UserRole   @default(USER)
+  status               UserStatus @default(ACTIVE)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   media                        Media[]
   ownedWorkspaces              Workspace[]           @relation("WorkspaceOwner")
+  preferredWorkspace           Workspace?            @relation("PreferredWorkspace", fields: [preferredWorkspaceId], references: [id], onDelete: SetNull)
   workspaceMemberships         WorkspaceMember[]
   projects                     Project[]
   processingJobs               ProcessingJob[]
@@ -225,6 +227,7 @@ model User {
   receivedNotifications        Notification[]        @relation("NotificationRecipient")
   actedNotifications           Notification[]        @relation("NotificationActor")
 
+  @@index([preferredWorkspaceId])
   @@map("users")
 }
 
@@ -263,10 +266,11 @@ model Workspace {
 
   owner User @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  members     WorkspaceMember[]
-  invitations WorkspaceInvitation[]
-  media       Media[]
-  projects    Project[]
+  preferredByUsers User[]                @relation("PreferredWorkspace")
+  members          WorkspaceMember[]
+  invitations      WorkspaceInvitation[]
+  media            Media[]
+  projects         Project[]
 
   @@index([ownerId])
   @@map("workspaces")

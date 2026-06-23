@@ -12,13 +12,17 @@ export const listMediaQuerySchema = z.strictObject({
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 })
 
+const workspaceParamsShape = {
+  workspaceId: z.uuid()
+}
+
 export const mediaParamsSchema = z.strictObject({
+  ...workspaceParamsShape,
   mediaId: z.uuid()
 })
 
 export const createUploadUrlSchema = z
   .strictObject({
-    workspaceId: z.uuid(),
     mediaType: mediaTypeSchema,
     originalFilename: z.string().trim().min(1).max(255),
     mimeType: z.string().trim().min(1).max(100),

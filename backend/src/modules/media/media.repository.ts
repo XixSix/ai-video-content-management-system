@@ -1,5 +1,5 @@
 import { prisma } from '../../infrastructure/db/prisma'
-import { Media, MediaStatus, Prisma, WorkspaceMember } from '../../infrastructure/db/generated/prisma/client'
+import { Media, MediaStatus, Prisma } from '../../infrastructure/db/generated/prisma/client'
 
 type MediaSortField = 'createdAt' | 'title' | 'duration'
 type SortOrder = 'asc' | 'desc'
@@ -7,18 +7,8 @@ type SortOrder = 'asc' | 'desc'
 export const createMedia = async (data: Prisma.MediaCreateInput | Prisma.MediaUncheckedCreateInput): Promise<Media> =>
   prisma.media.create({ data })
 
-export const findWorkspaceMembership = async (workspaceId: string, userId: string): Promise<WorkspaceMember | null> =>
-  prisma.workspaceMember.findUnique({
-    where: {
-      workspaceId_userId: {
-        workspaceId,
-        userId
-      }
-    }
-  })
-
-export const findMediaByUserId = async (
-  userId: string,
+export const findMediaByWorkspaceId = async (
+  workspaceId: string,
   skip: number,
   take: number,
   status?: MediaStatus,
@@ -26,7 +16,7 @@ export const findMediaByUserId = async (
   sortOrder: SortOrder = 'desc'
 ): Promise<[Media[], number]> => {
   const where: Prisma.MediaWhereInput = {
-    userId,
+    workspaceId,
     status: status ?? {
       not: 'DELETED'
     }
@@ -53,22 +43,11 @@ export const findMediaByS3Key = async (s3Bucket: string, s3Key: string): Promise
     }
   })
 
-export const findMediaById = async (id: string): Promise<Media | null> =>
-  prisma.media.findUnique({
-    where: { id }
-  })
-
-export const findWorkspaceAccessibleMediaById = async (id: string, userId: string): Promise<Media | null> =>
+export const findMediaByIdInWorkspace = async (id: string, workspaceId: string): Promise<Media | null> =>
   prisma.media.findFirst({
     where: {
       id,
-      workspace: {
-        members: {
-          some: {
-            userId
-          }
-        }
-      }
+      workspaceId
     }
   })
 

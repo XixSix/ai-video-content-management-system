@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 const findUniqueMembershipMock = jest.fn()
 const findUniqueWorkspaceMock = jest.fn()
 const findManyMembersMock = jest.fn()
+const findUniqueUserMock = jest.fn()
+const updateUserMock = jest.fn()
 
 jest.unstable_mockModule('../../infrastructure/db/prisma', () => ({
   prisma: {
@@ -12,6 +14,10 @@ jest.unstable_mockModule('../../infrastructure/db/prisma', () => ({
     },
     workspace: {
       findUnique: findUniqueWorkspaceMock
+    },
+    user: {
+      findUnique: findUniqueUserMock,
+      update: updateUserMock
     }
   }
 }))
@@ -89,6 +95,42 @@ describe('workspace repository', () => {
       orderBy: {
         createdAt: 'asc'
       }
+    })
+  })
+
+  it('lists user workspace memberships in stable join order', async () => {
+    findManyMembersMock.mockResolvedValue([])
+
+    await workspaceRepository.findUserWorkspaceMemberships(userId)
+
+    expect(findManyMembersMock).toHaveBeenCalledWith({
+      where: { userId },
+      select: {
+        role: true,
+        createdAt: true,
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            createdAt: true
+          }
+        }
+      },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
+    })
+  })
+
+  it('reads and updates the preferred workspace', async () => {
+    findUniqueUserMock.mockResolvedValue({ preferredWorkspaceId: workspaceId })
+    updateUserMock.mockResolvedValue({})
+
+    await expect(workspaceRepository.findUserPreferredWorkspaceId(userId)).resolves.toBe(workspaceId)
+    await workspaceRepository.updateUserPreferredWorkspace(userId, workspaceId)
+
+    expect(updateUserMock).toHaveBeenCalledWith({
+      where: { id: userId },
+      data: { preferredWorkspaceId: workspaceId }
     })
   })
 })

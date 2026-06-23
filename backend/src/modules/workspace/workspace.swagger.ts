@@ -50,6 +50,67 @@
  *         joinDate:
  *           type: string
  *           format: date-time
+ *     WorkspaceListItem:
+ *       type: object
+ *       required: [id, name, slug, role, createdAt]
+ *       properties:
+ *         id: { type: string, format: uuid }
+ *         name: { type: string }
+ *         slug: { type: string }
+ *         role: { type: string, enum: [OWNER, MEMBER] }
+ *         createdAt: { type: string, format: date-time }
+ */
+
+/**
+ * @swagger
+ * /workspaces:
+ *   get:
+ *     summary: List workspaces available to the authenticated user
+ *     tags: [Workspaces]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Workspace memberships and the current preferred workspace.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data:
+ *                   type: object
+ *                   required: [items, preferredWorkspaceId]
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/WorkspaceListItem'
+ *                     preferredWorkspaceId:
+ *                       type: string
+ *                       format: uuid
+ *                       nullable: true
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * /workspaces/{workspaceId}/preferred:
+ *   put:
+ *     summary: Set the authenticated user's preferred workspace
+ *     tags: [Workspaces]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { $ref: '#/components/parameters/WorkspaceIdPath' }
+ *     responses:
+ *       200:
+ *         description: Preferred workspace updated.
+ *       400:
+ *         description: Invalid workspace ID.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: User is not a member of the workspace.
  */
 
 /**

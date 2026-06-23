@@ -38,10 +38,36 @@ export const findUserByEmail = async (email: string): Promise<User | null> =>
 
 export const findUserById = async (id: string): Promise<User | null> => prisma.user.findUnique({ where: { id } })
 
+export const findPreferredWorkspaceMembership = async (userId: string): Promise<WorkspaceMember | null> => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { preferredWorkspaceId: true }
+  })
+
+  if (!user?.preferredWorkspaceId) {
+    return null
+  }
+
+  return prisma.workspaceMember.findUnique({
+    where: {
+      workspaceId_userId: {
+        workspaceId: user.preferredWorkspaceId,
+        userId
+      }
+    }
+  })
+}
+
 export const findDefaultWorkspaceMembership = async (userId: string): Promise<WorkspaceMember | null> =>
   prisma.workspaceMember.findFirst({
     where: { userId },
-    orderBy: { createdAt: 'asc' }
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
+  })
+
+export const updatePreferredWorkspace = async (userId: string, workspaceId: string): Promise<User> =>
+  prisma.user.update({
+    where: { id: userId },
+    data: { preferredWorkspaceId: workspaceId }
   })
 
 export const registerUserWithWorkspaceAndSession = async (
@@ -56,7 +82,7 @@ export const registerUserWithWorkspaceAndSession = async (
       return null
     }
 
-    const user = await transaction.user.create({
+    await transaction.user.create({
       data: {
         id: data.id,
         email: data.email,
@@ -66,16 +92,21 @@ export const registerUserWithWorkspaceAndSession = async (
 
     const workspace = await transaction.workspace.create({
       data: {
-        ownerId: user.id,
+        ownerId: data.id,
         name: 'Workspace',
-        slug: `workspace-${user.id.replaceAll('-', '')}`,
+        slug: `workspace-${data.id.replaceAll('-', '')}`,
         members: {
           create: {
-            userId: user.id,
+            userId: data.id,
             role: WorkspaceMemberRole.OWNER
           }
         }
       }
+    })
+
+    const user = await transaction.user.update({
+      where: { id: data.id },
+      data: { preferredWorkspaceId: workspace.id }
     })
 
     await transaction.authSession.create({

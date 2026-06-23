@@ -6,7 +6,7 @@ export type UploadMediaType = 'VIDEO' | 'AUDIO' | 'IMAGE' | 'SUBTITLE'
 
 export type UploadMode = 'SINGLE' | 'MULTIPART'
 
-export type CreateMediaUploadInput = CreateUploadUrlBody & { userId: string }
+export type CreateMediaUploadInput = CreateUploadUrlBody & { userId: string; workspaceId: string }
 
 export interface SinglePresignResult {
   mode: 'SINGLE'
@@ -26,7 +26,7 @@ export interface MultipartPresignResult {
 
 export type CreateUploadUrlResult = SinglePresignResult | MultipartPresignResult
 
-export type CompleteUploadInput = CompleteUploadBody & { userId: string; mediaId: string }
+export type CompleteUploadInput = CompleteUploadBody & { userId: string; workspaceId: string; mediaId: string }
 
 export interface MediaResponseData {
   id: string

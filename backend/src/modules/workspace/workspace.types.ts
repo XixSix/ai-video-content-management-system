@@ -22,9 +22,33 @@ export interface WorkspaceMemberData {
   joinDate: Date
 }
 
+export interface WorkspaceListItemData {
+  id: string
+  name: string
+  slug: string
+  role: WorkspaceMemberRole
+  createdAt: Date
+}
+
+export interface WorkspaceListData {
+  items: WorkspaceListItemData[]
+  preferredWorkspaceId: string | null
+}
+
 export interface WorkspaceMembershipRecord {
   workspaceId: string
   role: WorkspaceMemberRole
+}
+
+export interface UserWorkspaceMembershipRecord {
+  role: WorkspaceMemberRole
+  createdAt: Date
+  workspace: {
+    id: string
+    name: string
+    slug: string
+    createdAt: Date
+  }
 }
 
 export interface WorkspaceRecord {

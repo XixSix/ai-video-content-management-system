@@ -1,16 +1,23 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import request from 'supertest'
 import type { AuthenticatedUser } from '../auth/auth.types'
+import { WorkspaceError } from '../workspace/workspace.error'
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
 import type { CreateUploadUrlResult } from './media.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
+const getWorkspaceMembershipContextMock = jest.fn()
 const createUploadUrlMock = jest.fn<(input: unknown) => Promise<CreateUploadUrlResult>>()
 const completeUploadMock = jest.fn<(input: unknown) => Promise<{ media: Media }>>()
-const abortUploadMock = jest.fn<(userId: string, mediaId: string) => Promise<{ message: string }>>()
+const abortUploadMock =
+  jest.fn<(workspaceId: string, userId: string, mediaId: string) => Promise<{ message: string }>>()
 
 jest.unstable_mockModule('../auth/auth.service', () => ({
   getAuthenticatedUser: getAuthenticatedUserMock
+}))
+
+jest.unstable_mockModule('../workspace/workspace.service', () => ({
+  getWorkspaceMembershipContext: getWorkspaceMembershipContextMock
 }))
 
 jest.unstable_mockModule('./media.service', () => ({
@@ -24,6 +31,7 @@ const { app } = await import('../../app')
 const userId = '00000000-0000-4000-8000-000000000001'
 const workspaceId = '00000000-0000-4000-8000-000000000002'
 const mediaId = '00000000-0000-4000-8000-000000000003'
+const mediaPath = `/api/v1/workspaces/${workspaceId}/media`
 const now = new Date('2026-06-19T10:00:00.000Z')
 
 const authenticatedUser: AuthenticatedUser = {
@@ -60,11 +68,16 @@ const media: Media = {
 describe('media routes', () => {
   beforeEach(() => {
     getAuthenticatedUserMock.mockReset()
+    getWorkspaceMembershipContextMock.mockReset()
     createUploadUrlMock.mockReset()
     completeUploadMock.mockReset()
     abortUploadMock.mockReset()
 
     getAuthenticatedUserMock.mockResolvedValue(authenticatedUser)
+    getWorkspaceMembershipContextMock.mockResolvedValue({
+      id: workspaceId,
+      role: 'MEMBER'
+    })
     createUploadUrlMock.mockResolvedValue({
       mode: 'SINGLE',
       mediaId,
@@ -81,15 +94,15 @@ describe('media routes', () => {
   })
 
   it.each([
-    ['GET', '/api/v1/media'],
-    ['POST', '/api/v1/media/upload-url'],
-    ['POST', `/api/v1/media/${mediaId}/complete-upload`],
-    ['POST', `/api/v1/media/${mediaId}/abort-upload`],
-    ['GET', `/api/v1/media/${mediaId}`],
-    ['GET', `/api/v1/media/${mediaId}/preview-url`],
-    ['GET', `/api/v1/media/${mediaId}/download-url`],
-    ['PATCH', `/api/v1/media/${mediaId}`],
-    ['DELETE', `/api/v1/media/${mediaId}`]
+    ['GET', mediaPath],
+    ['POST', `${mediaPath}/upload-url`],
+    ['POST', `${mediaPath}/${mediaId}/complete-upload`],
+    ['POST', `${mediaPath}/${mediaId}/abort-upload`],
+    ['GET', `${mediaPath}/${mediaId}`],
+    ['GET', `${mediaPath}/${mediaId}/preview-url`],
+    ['GET', `${mediaPath}/${mediaId}/download-url`],
+    ['PATCH', `${mediaPath}/${mediaId}`],
+    ['DELETE', `${mediaPath}/${mediaId}`]
   ])('%s %s requires an access token', async (method, path) => {
     const response = await request(app)[method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete'](path).send({})
 
@@ -105,10 +118,9 @@ describe('media routes', () => {
 
   it('creates a workspace-scoped upload URL', async () => {
     const response = await request(app)
-      .post('/api/v1/media/upload-url')
+      .post(`${mediaPath}/upload-url`)
       .set('Authorization', 'Bearer access-token')
       .send({
-        workspaceId,
         mediaType: 'VIDEO',
         originalFilename: 'upload.mp4',
         mimeType: 'video/mp4',
@@ -140,9 +152,9 @@ describe('media routes', () => {
     })
   })
 
-  it('requires workspaceId when creating an upload URL', async () => {
+  it('validates workspaceId before creating an upload URL', async () => {
     const response = await request(app)
-      .post('/api/v1/media/upload-url')
+      .post('/api/v1/workspaces/not-a-uuid/media/upload-url')
       .set('Authorization', 'Bearer access-token')
       .send({
         mediaType: 'VIDEO',
@@ -158,11 +170,25 @@ describe('media routes', () => {
         code: 'VALIDATION_ERROR'
       }
     })
+    expect(getWorkspaceMembershipContextMock).not.toHaveBeenCalled()
+    expect(createUploadUrlMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects users outside the selected workspace before calling media services', async () => {
+    getWorkspaceMembershipContextMock.mockRejectedValue(WorkspaceError.forbidden())
+
+    const response = await request(app).get(mediaPath).set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(403)
+    expect(response.body.error.code).toBe('FORBIDDEN')
+    expect(createUploadUrlMock).not.toHaveBeenCalled()
+    expect(completeUploadMock).not.toHaveBeenCalled()
+    expect(abortUploadMock).not.toHaveBeenCalled()
   })
 
   it('completes an upload with a 200 response and public media fields', async () => {
     const response = await request(app)
-      .post(`/api/v1/media/${mediaId}/complete-upload`)
+      .post(`${mediaPath}/${mediaId}/complete-upload`)
       .set('Authorization', 'Bearer access-token')
       .send({
         duration: 120.5,
@@ -195,6 +221,7 @@ describe('media routes', () => {
     })
     expect(completeUploadMock).toHaveBeenCalledWith({
       userId,
+      workspaceId,
       mediaId,
       parts: undefined,
       duration: 120.5,
@@ -205,7 +232,7 @@ describe('media routes', () => {
 
   it('validates the mediaId complete-upload path parameter', async () => {
     const response = await request(app)
-      .post('/api/v1/media/not-a-uuid/complete-upload')
+      .post(`${mediaPath}/not-a-uuid/complete-upload`)
       .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(400)
@@ -220,7 +247,7 @@ describe('media routes', () => {
 
   it('aborts an upload by mediaId', async () => {
     const response = await request(app)
-      .post(`/api/v1/media/${mediaId}/abort-upload`)
+      .post(`${mediaPath}/${mediaId}/abort-upload`)
       .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(200)
@@ -230,7 +257,7 @@ describe('media routes', () => {
         message: 'Media upload aborted successfully'
       }
     })
-    expect(abortUploadMock).toHaveBeenCalledWith(userId, mediaId)
+    expect(abortUploadMock).toHaveBeenCalledWith(workspaceId, userId, mediaId)
   })
 
   it('removes the legacy abort endpoint', async () => {
