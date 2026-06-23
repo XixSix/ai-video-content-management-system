@@ -4,6 +4,7 @@ import type {
   PointerEvent as ReactPointerEvent,
 } from "react"
 
+import type { MediaPreviewSpriteSheet } from "@/features/media-library/lib/media-previews"
 import type {
   StudioEditorProject,
   StudioProjectMediaItem,
@@ -13,6 +14,7 @@ import type {
 } from "@/features/studio-editor/studio.types"
 import {
   getTimedSegmentStyle,
+  getTimelineSegmentDuration,
   getTimelineSegmentMedia,
   getTrackContentHeight,
 } from "@/features/studio-editor/timeline/lib/layout"
@@ -39,12 +41,14 @@ export function TimelineTrackList({
   onSegmentClick,
   onSegmentContextMenu,
   onSegmentResizeStart,
+  mediaPreviewById,
   project,
   segmentDragPreview,
   selectedItem,
   sourceAudioPeaks,
   sourceMediaItem,
   timelineDurationSeconds,
+  timelineContentWidth,
 }: {
   didResizeSegmentRef: MutableRefObject<boolean>
   draggingSegmentId: string | null
@@ -80,12 +84,21 @@ export function TimelineTrackList({
     side: "left" | "right"
     trackId: StudioTimelineTrack["id"]
   }) => void
+  mediaPreviewById: Record<
+    string,
+    {
+      spriteSheets: MediaPreviewSpriteSheet[]
+      thumbnailUrl: string | null
+      waveformUrl: string | null
+    }
+  >
   project: StudioEditorProject
   segmentDragPreview: SegmentDragPreview | null
   selectedItem: StudioSelection
   sourceAudioPeaks: number[] | null
   sourceMediaItem: StudioProjectMediaItem | null
   timelineDurationSeconds: number
+  timelineContentWidth: number
 }) {
   return (
     <div className="pb-1">
@@ -171,6 +184,15 @@ export function TimelineTrackList({
                   segment.selectionId === project.sourceMedia.id
                     ? sourceMediaItem
                     : getTimelineSegmentMedia({ project, segment })
+                const segmentPreview =
+                  segmentMedia ? mediaPreviewById[segmentMedia.id] : undefined
+                const segmentMediaWithPreview = segmentMedia
+                  ? {
+                      ...segmentMedia,
+                      thumbnailUrl:
+                        segmentMedia.thumbnailUrl ?? segmentPreview?.thumbnailUrl ?? null,
+                    }
+                  : null
                 const hasTimedSegmentLayout =
                   trackUsesTimedLayout || typeof segment.startTime === "number"
                 const segmentIsText = isTextTimelineSegment(project, segment)
@@ -190,6 +212,16 @@ export function TimelineTrackList({
                   baseSegmentStyle && hasTimedSegmentLayout
                     ? getSegmentTopStyle({ segmentStyle: baseSegmentStyle })
                     : undefined
+                const segmentPixelWidth =
+                  timelineDurationSeconds > 0
+                    ? (getTimelineSegmentDuration({
+                        media: segmentMedia,
+                        projectDurationSeconds: project.media.durationSeconds,
+                        segment,
+                      }) /
+                        timelineDurationSeconds) *
+                      timelineContentWidth
+                    : timelineContentWidth
 
                 return (
                   <TimelineSegment
@@ -210,9 +242,12 @@ export function TimelineTrackList({
                     onResizeStart={onSegmentResizeStart}
                     onSegmentClick={onSegmentClick}
                     projectMediaThumbnailUrl={project.media.thumbnailUrl}
+                    segmentPreviewSprites={segmentPreview?.spriteSheets}
+                    segmentPixelWidth={segmentPixelWidth}
                     segment={segment}
-                    segmentMedia={segmentMedia}
+                    segmentMedia={segmentMediaWithPreview}
                     segmentStyle={segmentStyle}
+                    sourcePreviewSprites={mediaPreviewById[sourceMediaItem?.id ?? ""]?.spriteSheets}
                     sourceAudioPeaks={sourceAudioPeaks}
                     track={track}
                   />

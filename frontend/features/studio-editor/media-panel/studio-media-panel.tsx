@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react"
 
+import { useMediaDetails } from "@/features/media-library/hooks/use-media-detail"
+import { getMediaPreviewThumbnailUrl } from "@/features/media-library/lib/media-previews"
 import {
   useStudioProjectState,
 } from "@/features/studio-editor/store/studio-editor-store"
@@ -39,17 +41,42 @@ export function StudioMediaPanel() {
   } = useStudioMedia()
   const [activeFilter, setActiveFilter] = useState<MediaFilter>("ALL")
   const mediaItems = project.projectMedia.filter((item) => item.type !== "SUBTITLE")
+  const mediaDetailQueries = useMediaDetails(
+    workspaceId,
+    mediaItems.map((item) => item.id),
+    {
+      enabled: mediaItems.length > 0,
+      pollUntilReady: true,
+    }
+  )
+  const mediaDetailsById = useMemo(
+    () =>
+      Object.fromEntries(
+        mediaDetailQueries.flatMap((query) =>
+          query.data?.media ? [[query.data.media.id, query.data.media]] : []
+        )
+      ),
+    [mediaDetailQueries]
+  )
   const importableItems = useMemo(
     () => getImportableMediaLibraryItems(project.projectMedia, libraryItems),
     [libraryItems, project.projectMedia]
   )
   const filteredItems = useMemo(() => {
-    if (activeFilter === "ALL") {
-      return mediaItems
-    }
+    const items =
+      activeFilter === "ALL"
+        ? mediaItems
+        : mediaItems.filter((item) => item.type === activeFilter)
 
-    return mediaItems.filter((item) => item.type === activeFilter)
-  }, [activeFilter, mediaItems])
+    return items.map((item) => ({
+      ...item,
+      thumbnailUrl:
+        item.thumbnailUrl ??
+        (mediaDetailsById[item.id]
+          ? getMediaPreviewThumbnailUrl(mediaDetailsById[item.id])
+          : null),
+    }))
+  }, [activeFilter, mediaDetailsById, mediaItems])
 
   return (
     <StudioPanelShell title="Media">

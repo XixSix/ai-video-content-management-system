@@ -20,6 +20,7 @@ describe("mapMediaResponseToLibraryItem", () => {
       status: "UPLOADING",
       createdAt: "2026-06-19T10:00:00.000Z",
       updatedAt: "2026-06-19T10:00:00.000Z",
+      thumbnail: null,
     })
 
     expect(item).toMatchObject({

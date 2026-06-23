@@ -12,7 +12,10 @@ import {
   useStudioToolState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
-import { getProjectTimelineDuration } from "@/features/studio-editor/timeline/lib/layout"
+import {
+  getProjectTimelineDuration,
+  getTimelineSegmentStartTime,
+} from "@/features/studio-editor/timeline/lib/layout"
 import { cn } from "@/lib/utils"
 
 import { CanvasLayerList } from "./components/canvas-layer-list"
@@ -39,6 +42,7 @@ export function StudioCanvas() {
     isPlaying,
     mutedTrackIds,
     pausePlayback,
+    playPlayback,
     seekToTime,
   } = useStudioPlaybackState()
   const { project } = useStudioProjectState()
@@ -60,9 +64,15 @@ export function StudioCanvas() {
   const sourceTrackMuted = mutedTrackIds.includes("SOURCE")
   const overlayTrackMuted = mutedTrackIds.includes("OVERLAY_MEDIA")
   const audioTrackMuted = mutedTrackIds.includes("AUDIO")
+  const sourceMediaType =
+    compositionFrame.source?.media?.type ?? project.media.type
+  const sourceHasPlaybackMedia =
+    compositionFrame.source !== null &&
+    (sourceMediaType === "VIDEO" || sourceMediaType === "AUDIO")
 
   useCompositionClock({
     currentTime,
+    enabled: !sourceHasPlaybackMedia,
     isPlaying,
     pausePlayback,
     seekToTime,
@@ -114,6 +124,29 @@ export function StudioCanvas() {
               <CanvasSourceMedia
                 isPlaying={isPlaying}
                 muted={sourceTrackMuted}
+                onEnded={pausePlayback}
+                onLocalTimeChange={(localTime) => {
+                  if (!compositionFrame.source) {
+                    return
+                  }
+
+                  const segmentStartTime = getTimelineSegmentStartTime({
+                    media: compositionFrame.source.media,
+                    segment: compositionFrame.source.segment,
+                  })
+
+                  seekToTime(segmentStartTime + localTime)
+                }}
+                onPause={() => {
+                  if (isPlaying) {
+                    pausePlayback()
+                  }
+                }}
+                onPlay={() => {
+                  if (!isPlaying) {
+                    playPlayback()
+                  }
+                }}
                 source={compositionFrame.source}
                 sourceDetail={project.media}
                 workspaceId={workspaceId}

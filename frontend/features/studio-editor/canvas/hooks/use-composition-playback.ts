@@ -21,12 +21,14 @@ export function getNextCompositionTime({
 
 export function useCompositionClock({
   currentTime,
+  enabled = true,
   isPlaying,
   pausePlayback,
   seekToTime,
   timelineDurationSeconds,
 }: {
   currentTime: number
+  enabled?: boolean
   isPlaying: boolean
   pausePlayback: () => void
   seekToTime: (timeSeconds: number) => void
@@ -39,7 +41,7 @@ export function useCompositionClock({
   }, [currentTime])
 
   useEffect(() => {
-    if (!isPlaying) return
+    if (!enabled || !isPlaying) return
 
     let animationFrameId = 0
     let previousFrameTime = performance.now()
@@ -69,7 +71,7 @@ export function useCompositionClock({
     return () => {
       window.cancelAnimationFrame(animationFrameId)
     }
-  }, [isPlaying, pausePlayback, seekToTime, timelineDurationSeconds])
+  }, [enabled, isPlaying, pausePlayback, seekToTime, timelineDurationSeconds])
 }
 
 export function useSyncedCompositionMedia({
@@ -86,6 +88,7 @@ export function useSyncedCompositionMedia({
   const mediaRef = useRef<HTMLMediaElement | null>(null)
   const localTimeRef = useRef(localTime)
   const mutedRef = useRef(muted)
+  const onPlaybackErrorRef = useRef(onPlaybackError)
 
   const setMediaElement = useCallback((element: HTMLMediaElement | null) => {
     mediaRef.current = element
@@ -113,6 +116,10 @@ export function useSyncedCompositionMedia({
   }, [muted])
 
   useEffect(() => {
+    onPlaybackErrorRef.current = onPlaybackError
+  }, [onPlaybackError])
+
+  useEffect(() => {
     const mediaElement = mediaRef.current
 
     if (!mediaElement) return
@@ -125,14 +132,14 @@ export function useSyncedCompositionMedia({
     syncMediaElementTime(mediaElement, localTimeRef.current)
     mediaElement.play().catch((error: unknown) => {
       if (!isAbortError(error)) {
-        onPlaybackError?.()
+        onPlaybackErrorRef.current?.()
       }
     })
 
     return () => {
       mediaElement.pause()
     }
-  }, [isPlaying, onPlaybackError])
+  }, [isPlaying])
 
   return setMediaElement
 }

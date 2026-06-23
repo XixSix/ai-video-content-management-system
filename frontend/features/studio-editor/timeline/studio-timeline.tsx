@@ -2,10 +2,17 @@
 
 import { useMemo } from "react"
 
+import { useMediaDetails } from "@/features/media-library/hooks/use-media-detail"
+import {
+  getMediaPreviewThumbnailUrl,
+  getMediaWaveformAssetUrl,
+  parseMediaPreviewSpriteSheets,
+} from "@/features/media-library/lib/media-previews"
 import { TimelineRuler } from "@/features/studio-editor/timeline/components/ruler"
 import { TimelineToolbar } from "@/features/studio-editor/timeline/components/toolbar"
 import { TimelineTrackLabels } from "@/features/studio-editor/timeline/components/track-labels"
 import { TimelineTrackList } from "@/features/studio-editor/timeline/components/track-list"
+import { useEditorRouteParams } from "@/features/studio-editor/hooks/use-editor-route-params"
 import {
   useStudioPlaybackState,
   useStudioProjectState,
@@ -53,6 +60,7 @@ export function StudioTimeline({
     togglePlayback,
     toggleTrackMute,
   } = useStudioPlaybackState()
+  const { workspaceId } = useEditorRouteParams()
   const { project } = useStudioProjectState()
   const { selectedItem, setSelectedItemId } = useStudioSelectionState()
   const { setActiveTool } = useStudioToolState()
@@ -62,19 +70,66 @@ export function StudioTimeline({
     moveTimelineSegmentWithPush,
     updateTimelineSegmentTiming,
   } = useStudioTimelineActions()
+  const mediaDetailQueries = useMediaDetails(
+    workspaceId,
+    project.projectMedia.map((item) => item.id),
+    {
+      enabled: project.projectMedia.length > 0,
+      pollUntilReady: true,
+    }
+  )
+  const mediaPreviewById = useMemo(
+    () =>
+      Object.fromEntries(
+        mediaDetailQueries.flatMap((query) => {
+          const media = query.data?.media
+
+          if (!media) {
+            return []
+          }
+
+          return [
+            [
+              media.id,
+              {
+                thumbnailUrl: getMediaPreviewThumbnailUrl(media),
+                spriteSheets: parseMediaPreviewSpriteSheets(media),
+                waveformUrl: getMediaWaveformAssetUrl(media),
+              },
+            ],
+          ]
+        })
+      ),
+    [mediaDetailQueries]
+  )
+  const projectMedia = useMemo(
+    () =>
+      project.projectMedia.map((item) => ({
+        ...item,
+        thumbnailUrl:
+          item.thumbnailUrl ?? mediaPreviewById[item.id]?.thumbnailUrl ?? null,
+      })),
+    [mediaPreviewById, project.projectMedia]
+  )
   const sourceMediaItem = useMemo(
     () =>
-      project.projectMedia.find(
+      projectMedia.find(
         (item) =>
           item.linkedSelectionId === project.sourceMedia.id ||
           item.origin === "SOURCE"
       ) ?? null,
-    [project.projectMedia, project.sourceMedia.id]
+    [project.sourceMedia.id, projectMedia]
   )
   const guideAudioItem = useMemo(
-    () => project.projectMedia.find((item) => item.linkedSelectionId === "audio-bed") ?? null,
-    [project.projectMedia]
+    () => projectMedia.find((item) => item.linkedSelectionId === "audio-bed") ?? null,
+    [projectMedia]
   )
+  const sourceMediaPreview = sourceMediaItem
+    ? mediaPreviewById[sourceMediaItem.id] ?? null
+    : null
+  const guideAudioPreview = guideAudioItem
+    ? mediaPreviewById[guideAudioItem.id] ?? null
+    : null
   const timelineDurationSeconds = useMemo(
     () => getProjectTimelineDuration(project),
     [project]
@@ -103,11 +158,8 @@ export function StudioTimeline({
     moveTimelineSegmentWithPush,
     updateTimelineSegmentTiming,
   })
-  const sourceAudioPeaks = useAudioPeaks(
-    project.media.streamUrl || sourceMediaItem?.assetUrl,
-    160
-  )
-  const guideAudioPeaks = useAudioPeaks(guideAudioItem?.assetUrl, 140)
+  const sourceAudioPeaks = useAudioPeaks(sourceMediaPreview?.waveformUrl)
+  const guideAudioPeaks = useAudioPeaks(guideAudioPreview?.waveformUrl)
   const zoomPercent = getTimelineZoomSliderValue(zoomLevel)
   const timelineScaleDuration = Math.max(1, project.media.durationSeconds)
   const timelineContentWidth = Math.round(
@@ -195,12 +247,14 @@ export function StudioTimeline({
                   onSegmentClick={selectTimelineSegment}
                   onSegmentContextMenu={selectTimelineSegment}
                   onSegmentResizeStart={handleSegmentResizePointerDown}
+                  mediaPreviewById={mediaPreviewById}
                   project={project}
                   selectedItem={selectedItem}
                   draggingSegmentId={draggingSegmentId}
                   segmentDragPreview={segmentDragPreview}
                   sourceAudioPeaks={sourceAudioPeaks}
                   sourceMediaItem={sourceMediaItem}
+                  timelineContentWidth={timelineContentWidth}
                   timelineDurationSeconds={timelineDurationSeconds}
                 />
               </div>

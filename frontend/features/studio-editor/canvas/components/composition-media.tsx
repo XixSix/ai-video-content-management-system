@@ -35,12 +35,20 @@ function useCompositionPreviewUrl(
 export function CanvasSourceMedia({
   isPlaying,
   muted,
+  onEnded,
+  onLocalTimeChange,
+  onPause,
+  onPlay,
   source,
   sourceDetail,
   workspaceId,
 }: {
   isPlaying: boolean
   muted: boolean
+  onEnded: () => void
+  onLocalTimeChange: (timeSeconds: number) => void
+  onPause: () => void
+  onPlay: () => void
   source: ActiveCompositionSegment
   sourceDetail: StudioMediaDetail
   workspaceId: string
@@ -70,6 +78,12 @@ export function CanvasSourceMedia({
         playsInline
         preload="metadata"
         onError={retryPreview}
+        onEnded={onEnded}
+        onPause={onPause}
+        onPlay={onPlay}
+        onTimeUpdate={(event) => {
+          onLocalTimeChange(event.currentTarget.currentTime)
+        }}
         className="absolute inset-0 z-0 size-full object-contain"
       />
     )
@@ -82,6 +96,12 @@ export function CanvasSourceMedia({
       muted={muted}
       preload="metadata"
       onError={retryPreview}
+      onEnded={onEnded}
+      onPause={onPause}
+      onPlay={onPlay}
+      onTimeUpdate={(event) => {
+        onLocalTimeChange(event.currentTarget.currentTime)
+      }}
     />
   )
 }

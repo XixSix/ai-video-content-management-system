@@ -58,6 +58,11 @@ export type MediaApiType = "VIDEO" | "AUDIO" | "IMAGE" | "SUBTITLE"
 
 export type MediaApiStatus = MediaFileStatus
 
+export type MediaPreviewAssetType =
+  | "THUMBNAIL"
+  | "THUMBNAIL_SPRITE"
+  | "WAVEFORM_PEAKS"
+
 export type MediaResponseData = {
   id: string
   workspaceId: string
@@ -76,6 +81,30 @@ export type MediaResponseData = {
   updatedAt: string
 }
 
+export type MediaPreviewAssetResponseData = {
+  id: string
+  url: string
+  assetType: MediaPreviewAssetType
+  mimeType: string | null
+  fileSizeBytes: string | null
+  metadata: Record<string, unknown> | null
+  expiresInSeconds: number
+}
+
+export type MediaListItemResponseData = MediaResponseData & {
+  thumbnail: MediaPreviewAssetResponseData | null
+}
+
+export type MediaPreviewAssetsResponseData = {
+  thumbnail: MediaPreviewAssetResponseData | null
+  thumbnailSprites: MediaPreviewAssetResponseData[]
+  waveformPeaks: MediaPreviewAssetResponseData | null
+}
+
+export type MediaDetailResponseData = MediaResponseData & {
+  previews: MediaPreviewAssetsResponseData
+}
+
 export type MediaListMeta = {
   total: number
   page: number
@@ -84,7 +113,7 @@ export type MediaListMeta = {
 }
 
 export type MediaListResponseData = {
-  items: MediaResponseData[]
+  items: MediaListItemResponseData[]
   meta: MediaListMeta
 }
 

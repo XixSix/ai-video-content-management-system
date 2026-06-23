@@ -45,7 +45,14 @@ import {
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import type { LongToShortCandidate } from "@/features/long-to-short/long-to-short.types"
-import type { MediaLibraryItem, MediaLibraryTab } from "../media-library.types"
+import { getMediaWaveformAssetUrl } from "@/features/media-library/lib/media-previews"
+import { useAudioPeaks } from "@/features/studio-editor/timeline/hooks/use-audio-peaks"
+import { TimelineWaveform } from "@/features/studio-editor/timeline/components/waveform"
+import type {
+  MediaDetailResponseData,
+  MediaLibraryItem,
+  MediaLibraryTab,
+} from "../media-library.types"
 
 type MediaLibraryPreviewDialogProps = {
   item: MediaLibraryItem | null
@@ -58,6 +65,7 @@ type MediaLibraryPreviewDialogProps = {
   onDownload?: () => void
   onOpenChange: (open: boolean) => void
   onPreviousItem?: () => void
+  previewDetail?: MediaDetailResponseData | null
   previewError?: string | null
   previewLoading?: boolean
 }
@@ -136,9 +144,17 @@ function TranscriptAssetPreview({
 
 function NativeAssetPreview({
   item,
+  previewDetail,
 }: {
   item: MediaLibraryItem
+  previewDetail?: MediaDetailResponseData | null
 }) {
+  const waveformPeaks = useAudioPeaks(
+    item.type === "AUDIO" && previewDetail
+      ? getMediaWaveformAssetUrl(previewDetail)
+      : null
+  )
+
   if (!item.assetUrl) {
     return null
   }
@@ -172,6 +188,13 @@ function NativeAssetPreview({
         <div className="space-y-1 text-center">
           <p className="text-base font-semibold text-foreground">{item.title}</p>
           <p className="text-sm text-muted-foreground">{item.originalFilename}</p>
+        </div>
+        <div className="h-28 w-full max-w-2xl overflow-hidden rounded-xl border border-border/70 bg-surface-muted px-3 py-2">
+          <TimelineWaveform
+            className="bg-cyan-600/55 dark:bg-cyan-100/45"
+            peaks={waveformPeaks}
+            seed={29}
+          />
         </div>
         <audio src={item.assetUrl} controls preload="metadata" className="w-full max-w-2xl" />
       </div>
@@ -448,6 +471,7 @@ function PlayerControls({
 }
 
 function MediaPlayerPanel({
+  previewDetail,
   item,
   candidate,
   candidateIndex,
@@ -458,6 +482,7 @@ function MediaPlayerPanel({
   previewError,
   previewLoading,
 }: {
+  previewDetail?: MediaDetailResponseData | null
   item: MediaLibraryItem
   candidate: LongToShortCandidate | null
   candidateIndex: number
@@ -514,7 +539,7 @@ function MediaPlayerPanel({
         ) : candidate && hasCandidateNativeAssetPreview ? (
           <CandidateNativeAssetPreview item={item} candidate={candidate} />
         ) : hasNativeAssetPreview ? (
-          <NativeAssetPreview item={item} />
+          <NativeAssetPreview item={item} previewDetail={previewDetail} />
         ) : (
           <PreviewPoster
             item={item}
@@ -778,6 +803,7 @@ export function MediaLibraryPreviewDialog({
   onDownload,
   onOpenChange,
   onPreviousItem,
+  previewDetail,
   previewError,
   previewLoading,
 }: MediaLibraryPreviewDialogProps) {
@@ -844,6 +870,7 @@ export function MediaLibraryPreviewDialog({
             hasPreviousItem={hasPreviousItem}
             onNextItem={onNextItem ?? (() => undefined)}
             onPreviousItem={onPreviousItem ?? (() => undefined)}
+            previewDetail={previewDetail}
             previewError={previewError}
             previewLoading={previewLoading}
           />

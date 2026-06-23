@@ -42,7 +42,13 @@ export function MediaCard({
   const previewRetryRef = useRef(false)
   const { seekToTime } = useStudioPlaybackState()
   const { addProjectMediaToTimeline } = useStudioProjectActions()
-  const previewUrlQuery = useMediaPreviewUrl(workspaceId, item.id)
+  const shouldFetchPreviewUrl =
+    item.type === "IMAGE" || (item.type === "VIDEO" && !item.thumbnailUrl)
+  const previewUrlQuery = useMediaPreviewUrl(
+    workspaceId,
+    item.id,
+    shouldFetchPreviewUrl
+  )
   const previewUrl = previewUrlQuery.data?.url
 
   useEffect(() => {
