@@ -53,7 +53,6 @@ def process_transcript_job(message: TranscriptJobMessage) -> dict[str, Any]:
             )
 
         if current_job.status in {
-            JobStatus.EXTRACTING_AUDIO,
             JobStatus.TRANSCRIBING,
             JobStatus.QUEUED,
             JobStatus.COMPLETED,

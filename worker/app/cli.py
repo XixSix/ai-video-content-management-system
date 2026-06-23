@@ -38,3 +38,9 @@ def chaptering_worker() -> None:
     """Start the chaptering Celery worker."""
     configure_logging(settings.log_level)
     _run_worker(settings.chaptering_queue_name, log_level=settings.log_level)
+
+
+def media_previews_worker() -> None:
+    """Start the media previews Celery worker."""
+    configure_logging(settings.log_level)
+    _run_worker(settings.media_previews_queue_name, log_level=settings.log_level)

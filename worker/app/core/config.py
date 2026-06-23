@@ -34,6 +34,14 @@ class _CeleryAppSettings:
         default="chaptering_task",
         alias="CHAPTERING_TASK_NAME",
     )
+    media_previews_queue_name: str = Field(
+        default="media_previews_queue",
+        alias="MEDIA_PREVIEWS_QUEUE_NAME",
+    )
+    media_preview_task_name: str = Field(
+        default="media_preview_task",
+        alias="MEDIA_PREVIEW_TASK_NAME",
+    )
     worker_concurrency: PositiveInt = Field(default=1, alias="WORKER_CONCURRENCY")
     worker_prefetch_multiplier: PositiveInt = Field(
         default=1,
@@ -88,6 +96,31 @@ class _FfmpegSettings:
     )
     audio_sample_rate: PositiveInt = Field(default=16000, alias="AUDIO_SAMPLE_RATE")
     audio_channels: PositiveInt = Field(default=1, alias="AUDIO_CHANNELS")
+    thumbnail_candidate_count: PositiveInt = Field(
+        default=12, alias="THUMBNAIL_CANDIDATE_COUNT"
+    )
+    thumbnail_max_width: PositiveInt = Field(default=640, alias="THUMBNAIL_MAX_WIDTH")
+    thumbnail_jpeg_quality: int = Field(
+        default=85, ge=1, le=95, alias="THUMBNAIL_JPEG_QUALITY"
+    )
+    sprite_frame_width: PositiveInt = Field(default=160, alias="SPRITE_FRAME_WIDTH")
+    sprite_frame_height: PositiveInt = Field(default=90, alias="SPRITE_FRAME_HEIGHT")
+    sprite_columns: PositiveInt = Field(default=10, alias="SPRITE_COLUMNS")
+    sprite_frames_per_sheet: PositiveInt = Field(
+        default=100, alias="SPRITE_FRAMES_PER_SHEET"
+    )
+    sprite_min_frames: PositiveInt = Field(default=20, alias="SPRITE_MIN_FRAMES")
+    sprite_max_frames: PositiveInt = Field(default=2000, alias="SPRITE_MAX_FRAMES")
+    sprite_jpeg_quality: int = Field(
+        default=85, ge=1, le=95, alias="SPRITE_JPEG_QUALITY"
+    )
+    waveform_sample_rate: PositiveInt = Field(
+        default=8000, alias="WAVEFORM_SAMPLE_RATE"
+    )
+    waveform_bins_per_second: PositiveInt = Field(
+        default=20, alias="WAVEFORM_BINS_PER_SECOND"
+    )
+    waveform_max_bins: PositiveInt = Field(default=100000, alias="WAVEFORM_MAX_BINS")
 
 
 class _AiServiceGrpcSettings:

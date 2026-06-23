@@ -10,6 +10,7 @@ celery_app = Celery(
     include=[
         "app.consumers.transcript_consumer",
         "app.consumers.chaptering_consumer",
+        "app.consumers.media_preview_consumer",
     ],
 )
 
@@ -25,6 +26,11 @@ celery_app.conf.update(
             routing_key=settings.chaptering_queue_name,
             durable=True,
         ),
+        Queue(
+            settings.media_previews_queue_name,
+            routing_key=settings.media_previews_queue_name,
+            durable=True,
+        ),
     ),
     task_default_queue=settings.transcript_queue_name,
     task_default_routing_key=settings.transcript_queue_name,
@@ -36,6 +42,10 @@ celery_app.conf.update(
         settings.chaptering_task_name: {
             "queue": settings.chaptering_queue_name,
             "routing_key": settings.chaptering_queue_name,
+        },
+        settings.media_preview_task_name: {
+            "queue": settings.media_previews_queue_name,
+            "routing_key": settings.media_previews_queue_name,
         },
     },
     task_protocol=2,

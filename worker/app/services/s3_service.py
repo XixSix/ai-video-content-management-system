@@ -33,24 +33,31 @@ class S3Service:
             region_name=region_name,
         )
 
-    def download_file(self, object_key: str, destination_path: Path) -> Path:
+    def download_file(
+        self,
+        object_key: str,
+        destination_path: Path,
+        *,
+        bucket: str | None = None,
+    ) -> Path:
         """Download an object to disk and map missing sources to terminal errors."""
         destination_path.parent.mkdir(parents=True, exist_ok=True)
+        source_bucket = bucket or self.bucket
 
         try:
-            self.client.download_file(self.bucket, object_key, str(destination_path))
+            self.client.download_file(source_bucket, object_key, str(destination_path))
         except ClientError as error:
             if _is_not_found_error(error):
                 raise S3SourceObjectNotFoundError(
-                    f"{S3SourceObjectNotFoundError.error_code}: s3://{self.bucket}/{object_key} was not found"
+                    f"{S3SourceObjectNotFoundError.error_code}: s3://{source_bucket}/{object_key} was not found"
                 ) from error
 
             raise S3ServiceError(
-                f"Failed to download s3://{self.bucket}/{object_key}"
+                f"Failed to download s3://{source_bucket}/{object_key}"
             ) from error
         except BotoCoreError as error:
             raise S3ServiceError(
-                f"Failed to download s3://{self.bucket}/{object_key}"
+                f"Failed to download s3://{source_bucket}/{object_key}"
             ) from error
 
         return destination_path
@@ -67,29 +74,42 @@ class S3Service:
         return self.download_file(object_key, tmp_dir / filename)
 
     def upload_file(
-        self, source_path: Path, object_key: str, *, content_type: str | None = None
+        self,
+        source_path: Path,
+        object_key: str,
+        *,
+        content_type: str | None = None,
+        bucket: str | None = None,
     ) -> str:
         """Upload a local file and return the stored object key."""
         extra_args = {"ContentType": content_type} if content_type else None
+        destination_bucket = bucket or self.bucket
 
         try:
             if extra_args:
                 self.client.upload_file(
-                    str(source_path), self.bucket, object_key, ExtraArgs=extra_args
+                    str(source_path),
+                    destination_bucket,
+                    object_key,
+                    ExtraArgs=extra_args,
                 )
             else:
-                self.client.upload_file(str(source_path), self.bucket, object_key)
+                self.client.upload_file(
+                    str(source_path), destination_bucket, object_key
+                )
         except (BotoCoreError, ClientError) as error:
             raise S3ServiceError(
-                f"Failed to upload {source_path} to s3://{self.bucket}/{object_key}"
+                f"Failed to upload {source_path} to s3://{destination_bucket}/{object_key}"
             ) from error
 
         return object_key
 
-    def object_exists(self, object_key: str) -> bool:
+    def object_exists(self, object_key: str, *, bucket: str | None = None) -> bool:
         """Return whether an object key exists in the configured bucket."""
+        target_bucket = bucket or self.bucket
+
         try:
-            self.client.head_object(Bucket=self.bucket, Key=object_key)
+            self.client.head_object(Bucket=target_bucket, Key=object_key)
             return True
         except ClientError as error:
             status_code = error.response.get("ResponseMetadata", {}).get(
@@ -100,11 +120,11 @@ class S3Service:
                 return False
 
             raise S3ServiceError(
-                f"Failed to check s3://{self.bucket}/{object_key}"
+                f"Failed to check s3://{target_bucket}/{object_key}"
             ) from error
         except BotoCoreError as error:
             raise S3ServiceError(
-                f"Failed to check s3://{self.bucket}/{object_key}"
+                f"Failed to check s3://{target_bucket}/{object_key}"
             ) from error
 
 
