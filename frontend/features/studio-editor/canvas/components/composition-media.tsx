@@ -9,10 +9,11 @@ import type { ActiveCompositionSegment } from "../lib/composition"
 import { useSyncedCompositionMedia } from "../hooks/use-composition-playback"
 
 function useCompositionPreviewUrl(
+  workspaceId: string,
   mediaId: string | null,
   existingUrl?: string | null
 ) {
-  const query = useMediaPreviewUrl(mediaId, !existingUrl)
+  const query = useMediaPreviewUrl(workspaceId, mediaId, !existingUrl)
   const retryRef = useRef(false)
   const refetch = query.refetch
 
@@ -36,15 +37,18 @@ export function CanvasSourceMedia({
   muted,
   source,
   sourceDetail,
+  workspaceId,
 }: {
   isPlaying: boolean
   muted: boolean
   source: ActiveCompositionSegment
   sourceDetail: StudioMediaDetail
+  workspaceId: string
 }) {
   const mediaId = source.media?.id ?? sourceDetail.id
   const mediaType = source.media?.type ?? sourceDetail.type
   const { previewUrl, retryPreview } = useCompositionPreviewUrl(
+    workspaceId,
     mediaId,
     sourceDetail.streamUrl
   )
@@ -87,14 +91,17 @@ export function CanvasOverlayMedia({
   muted,
   onSelect,
   overlay,
+  workspaceId,
 }: {
   isPlaying: boolean
   muted: boolean
   onSelect: () => void
   overlay: ActiveCompositionSegment
+  workspaceId: string
 }) {
   const media = overlay.media
   const { previewUrl, retryPreview } = useCompositionPreviewUrl(
+    workspaceId,
     media?.id ?? null,
     media?.assetUrl
   )
@@ -144,13 +151,16 @@ export function CanvasAudioMedia({
   audio,
   isPlaying,
   muted,
+  workspaceId,
 }: {
   audio: ActiveCompositionSegment
   isPlaying: boolean
   muted: boolean
+  workspaceId: string
 }) {
   const media = audio.media
   const { previewUrl, retryPreview } = useCompositionPreviewUrl(
+    workspaceId,
     media?.id ?? null,
     media?.assetUrl
   )

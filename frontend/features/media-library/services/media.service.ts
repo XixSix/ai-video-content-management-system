@@ -99,87 +99,104 @@ export function getMediaUploadDescriptor(file: File): {
 }
 
 export const mediaService = {
-  list(query: MediaListQuery): Promise<MediaListResponseData> {
+  list(
+    workspaceId: string,
+    query: MediaListQuery
+  ): Promise<MediaListResponseData> {
     return unwrapApiResponse(
-      authenticatedApiClient.get<ApiSuccess<MediaListResponseData>>("/media", {
-        params: query,
-      })
+      authenticatedApiClient.get<ApiSuccess<MediaListResponseData>>(
+        `/workspaces/${workspaceId}/media`,
+        { params: query }
+      )
     )
   },
 
-  get(mediaId: string): Promise<{ media: MediaResponseData }> {
+  get(
+    workspaceId: string,
+    mediaId: string
+  ): Promise<{ media: MediaResponseData }> {
     return unwrapApiResponse(
       authenticatedApiClient.get<ApiSuccess<{ media: MediaResponseData }>>(
-        `/media/${mediaId}`
+        `/workspaces/${workspaceId}/media/${mediaId}`
       )
     )
   },
 
   update(
+    workspaceId: string,
     mediaId: string,
     input: { title?: string | null; description?: string | null }
   ): Promise<{ media: MediaResponseData }> {
     return unwrapApiResponse(
       authenticatedApiClient.patch<ApiSuccess<{ media: MediaResponseData }>>(
-        `/media/${mediaId}`,
+        `/workspaces/${workspaceId}/media/${mediaId}`,
         input
       )
     )
   },
 
-  remove(mediaId: string): Promise<{ message: string }> {
+  remove(workspaceId: string, mediaId: string): Promise<{ message: string }> {
     return unwrapApiResponse(
       authenticatedApiClient.delete<ApiSuccess<{ message: string }>>(
-        `/media/${mediaId}`
+        `/workspaces/${workspaceId}/media/${mediaId}`
       )
     )
   },
 
   getDownloadUrl(
+    workspaceId: string,
     mediaId: string
   ): Promise<{ url: string; expiresInSeconds: number }> {
     return unwrapApiResponse(
       authenticatedApiClient.get<
         ApiSuccess<{ url: string; expiresInSeconds: number }>
-      >(`/media/${mediaId}/download-url`)
+      >(`/workspaces/${workspaceId}/media/${mediaId}/download-url`)
     )
   },
 
   getPreviewUrl(
+    workspaceId: string,
     mediaId: string
   ): Promise<{ url: string; expiresInSeconds: number }> {
     return unwrapApiResponse(
       authenticatedApiClient.get<
         ApiSuccess<{ url: string; expiresInSeconds: number }>
-      >(`/media/${mediaId}/preview-url`)
+      >(`/workspaces/${workspaceId}/media/${mediaId}/preview-url`)
     )
   },
 
-  createUploadUrl(input: CreateUploadUrlInput): Promise<CreateUploadUrlResult> {
+  createUploadUrl(
+    workspaceId: string,
+    input: CreateUploadUrlInput
+  ): Promise<CreateUploadUrlResult> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<CreateUploadUrlResult>>(
-        "/media/upload-url",
+        `/workspaces/${workspaceId}/media/upload-url`,
         input
       )
     )
   },
 
   completeUpload(
+    workspaceId: string,
     mediaId: string,
     input: CompleteUploadInput = {}
   ): Promise<{ media: MediaResponseData }> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<{ media: MediaResponseData }>>(
-        `/media/${mediaId}/complete-upload`,
+        `/workspaces/${workspaceId}/media/${mediaId}/complete-upload`,
         input
       )
     )
   },
 
-  abortUpload(mediaId: string): Promise<{ message: string }> {
+  abortUpload(
+    workspaceId: string,
+    mediaId: string
+  ): Promise<{ message: string }> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<{ message: string }>>(
-        `/media/${mediaId}/abort-upload`
+        `/workspaces/${workspaceId}/media/${mediaId}/abort-upload`
       )
     )
   },
@@ -274,8 +291,7 @@ export async function uploadMediaFile({
   let mediaId: string | null = null
 
   try {
-    const session = await mediaService.createUploadUrl({
-      workspaceId,
+    const session = await mediaService.createUploadUrl(workspaceId, {
       mediaType: descriptor.mediaType,
       originalFilename: file.name,
       mimeType: descriptor.mimeType,
@@ -287,6 +303,7 @@ export async function uploadMediaFile({
     if (session.mode === "SINGLE") {
       await uploadSingle(file, session, signal, onProgress)
       const { media } = await mediaService.completeUpload(
+        workspaceId,
         session.mediaId,
         metadata
       )
@@ -300,15 +317,21 @@ export async function uploadMediaFile({
       signal,
       onProgress
     )
-    const { media } = await mediaService.completeUpload(session.mediaId, {
-      ...metadata,
-      parts,
-    })
+    const { media } = await mediaService.completeUpload(
+      workspaceId,
+      session.mediaId,
+      {
+        ...metadata,
+        parts,
+      }
+    )
     onProgress?.(100)
     return media
   } catch (error) {
     if (mediaId) {
-      await mediaService.abortUpload(mediaId).catch(() => undefined)
+      await mediaService
+        .abortUpload(workspaceId, mediaId)
+        .catch(() => undefined)
     }
     throw error
   }

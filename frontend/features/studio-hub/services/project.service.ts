@@ -12,94 +12,110 @@ import type {
 } from "../studio-projects.types"
 
 export const projectService = {
-  list(query: ProjectListQuery): Promise<ProjectListResponse> {
+  list(
+    workspaceId: string,
+    query: ProjectListQuery
+  ): Promise<ProjectListResponse> {
     return unwrapApiResponse(
-      authenticatedApiClient.get<ApiSuccess<ProjectListResponse>>("/projects", {
-        params: query,
-      })
+      authenticatedApiClient.get<ApiSuccess<ProjectListResponse>>(
+        `/workspaces/${workspaceId}/projects`,
+        { params: query }
+      )
     )
   },
 
-  get(projectId: string): Promise<{ project: ProjectDetail }> {
+  get(
+    workspaceId: string,
+    projectId: string
+  ): Promise<{ project: ProjectDetail }> {
     return unwrapApiResponse(
       authenticatedApiClient.get<ApiSuccess<{ project: ProjectDetail }>>(
-        `/projects/${projectId}`
+        `/workspaces/${workspaceId}/projects/${projectId}`
       )
     )
   },
 
   createBlank(
+    workspaceId: string,
     input: CreateBlankProjectInput
   ): Promise<{ project: ProjectDetail }> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<{ project: ProjectDetail }>>(
-        "/projects/blank",
+        `/workspaces/${workspaceId}/projects/blank`,
         input
       )
     )
   },
 
   createFromMedia(
+    workspaceId: string,
     input: CreateProjectFromMediaInput
   ): Promise<{ project: ProjectDetail }> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<{ project: ProjectDetail }>>(
-        "/projects/from-media",
+        `/workspaces/${workspaceId}/projects/from-media`,
         input
       )
     )
   },
 
   update(
+    workspaceId: string,
     projectId: string,
     input: UpdateProjectInput
   ): Promise<{ project: ProjectDetail }> {
     return unwrapApiResponse(
       authenticatedApiClient.patch<ApiSuccess<{ project: ProjectDetail }>>(
-        `/projects/${projectId}`,
+        `/workspaces/${workspaceId}/projects/${projectId}`,
         input
       )
     )
   },
 
   setSourceMedia(
+    workspaceId: string,
     projectId: string,
     mediaId: string
   ): Promise<{ project: ProjectDetail }> {
     return unwrapApiResponse(
       authenticatedApiClient.put<ApiSuccess<{ project: ProjectDetail }>>(
-        `/projects/${projectId}/source-media`,
+        `/workspaces/${workspaceId}/projects/${projectId}/source-media`,
         { mediaId }
       )
     )
   },
 
   addMedia(
+    workspaceId: string,
     projectId: string,
     mediaId: string
   ): Promise<{ projectMedia: ProjectMedia }> {
     return unwrapApiResponse(
       authenticatedApiClient.post<
         ApiSuccess<{ projectMedia: ProjectMedia }>
-      >(`/projects/${projectId}/media`, { mediaId })
+      >(`/workspaces/${workspaceId}/projects/${projectId}/media`, { mediaId })
     )
   },
 
   removeMedia(
+    workspaceId: string,
     projectId: string,
     projectMediaId: string
   ): Promise<{ message: string }> {
     return unwrapApiResponse(
       authenticatedApiClient.delete<ApiSuccess<{ message: string }>>(
-        `/projects/${projectId}/media/${projectMediaId}`
+        `/workspaces/${workspaceId}/projects/${projectId}/media/${projectMediaId}`
       )
     )
   },
 
-  remove(projectId: string): Promise<{ message: string }> {
+  remove(
+    workspaceId: string,
+    projectId: string
+  ): Promise<{ message: string }> {
     return unwrapApiResponse(
       authenticatedApiClient.delete<ApiSuccess<{ message: string }>>(
-        `/projects/${projectId}`
+        `/workspaces/${workspaceId}/projects/${projectId}`
       )
     )
   },

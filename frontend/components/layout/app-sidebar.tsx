@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Box, ChevronsUpDown, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Box, Sparkles } from "lucide-react";
 import { navigationConfig } from "./dashboard-nav";
 import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store";
 import { useSocialAccountsStore } from "@/features/social-accounts/social-accounts.store";
@@ -18,6 +19,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { WorkspaceMembersDialog } from "@/features/workspaces/components/workspace-members-dialog";
+import { WorkspaceSelector } from "@/features/workspaces/components/workspace-selector";
 
 const primaryNav = navigationConfig.filter((item) => item.section === "primary");
 const workflowNav = navigationConfig.filter((item) => item.section === "create");
@@ -25,6 +28,7 @@ const accountNav = navigationConfig.filter((item) => item.section === "account")
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
   const isSocialAccountsOpen = useSocialAccountsStore(
     (state) => state.isManagerOpen
   );
@@ -95,18 +99,9 @@ export function AppSidebar() {
 
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="h-10 rounded-lg border border-sidebar-border bg-surface-raised px-2.5 shadow-[0_1px_1px_rgba(0,0,0,0.04)] group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
-              tooltip="Workspace"
-            >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-accent">
-                <Sparkles className="size-3.5 text-primary" />
-              </span>
-              <span className="min-w-0 truncate text-[14px] font-semibold group-data-[collapsible=icon]:hidden">
-                Workspace
-              </span>
-              <ChevronsUpDown className="ml-auto size-3.5 shrink-0 text-sidebar-foreground/48 group-data-[collapsible=icon]:hidden" />
-            </SidebarMenuButton>
+            <WorkspaceSelector
+              onManageMembers={() => setIsMembersDialogOpen(true)}
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -133,7 +128,11 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="gap-3 px-3 pb-3 pt-0 group-data-[collapsible=icon]:px-2">
-        <div className="rounded-xl bg-black px-3 py-3 text-white shadow-[0_1px_0_rgba(255,255,255,0.06)_inset] group-data-[collapsible=icon]:hidden dark:bg-[#050506]">
+        <button
+          type="button"
+          className="rounded-xl bg-black px-3 py-3 text-left text-white shadow-[0_1px_0_rgba(255,255,255,0.06)_inset] transition hover:bg-black/90 group-data-[collapsible=icon]:hidden dark:bg-[#050506]"
+          onClick={() => setIsMembersDialogOpen(true)}
+        >
           <div className="mb-3 flex size-8 items-center justify-center rounded-full bg-white/10">
             <Sparkles className="size-4" />
           </div>
@@ -143,7 +142,7 @@ export function AppSidebar() {
           <p className="mt-1 text-xs leading-snug text-white/55">
             Bring your team in to review clips and publish faster.
           </p>
-        </div>
+        </button>
 
         <SidebarMenu className="gap-1">
           {renderNavItems(accountNav)}
@@ -157,6 +156,10 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      <WorkspaceMembersDialog
+        open={isMembersDialogOpen}
+        onOpenChange={setIsMembersDialogOpen}
+      />
     </Sidebar>
   );
 }

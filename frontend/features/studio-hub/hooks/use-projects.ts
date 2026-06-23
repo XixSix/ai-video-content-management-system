@@ -16,26 +16,32 @@ import type {
 } from "../studio-projects.types"
 import { projectQueryKeys } from "./project-query-keys"
 
-async function invalidateProjectLists(queryClient: QueryClient) {
-  await queryClient.invalidateQueries({ queryKey: projectQueryKeys.lists() })
-}
-
-export function useProjectList(query: ProjectListQuery) {
-  return useQuery({
-    queryKey: projectQueryKeys.list(query),
-    queryFn: () => projectService.list(query),
+async function invalidateProjectLists(
+  queryClient: QueryClient,
+  workspaceId: string
+) {
+  await queryClient.invalidateQueries({
+    queryKey: projectQueryKeys.lists(workspaceId),
   })
 }
 
-export function useProjectDetail(projectId: string) {
+export function useProjectList(workspaceId: string, query: ProjectListQuery) {
   return useQuery({
-    queryKey: projectQueryKeys.detail(projectId),
-    queryFn: () => projectService.get(projectId),
-    enabled: Boolean(projectId),
+    queryKey: projectQueryKeys.list(workspaceId, query),
+    queryFn: () => projectService.list(workspaceId, query),
+    enabled: Boolean(workspaceId),
   })
 }
 
-export function useCreateProject() {
+export function useProjectDetail(workspaceId: string, projectId: string) {
+  return useQuery({
+    queryKey: projectQueryKeys.detail(workspaceId, projectId),
+    queryFn: () => projectService.get(workspaceId, projectId),
+    enabled: Boolean(workspaceId) && Boolean(projectId),
+  })
+}
+
+export function useCreateProject(workspaceId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -45,16 +51,19 @@ export function useCreateProject() {
         | { mode: "from-media"; data: CreateProjectFromMediaInput }
     ) =>
       input.mode === "blank"
-        ? projectService.createBlank(input.data)
-        : projectService.createFromMedia(input.data),
+        ? projectService.createBlank(workspaceId, input.data)
+        : projectService.createFromMedia(workspaceId, input.data),
     onSuccess: ({ project }) => {
-      queryClient.setQueryData(projectQueryKeys.detail(project.id), { project })
-      void invalidateProjectLists(queryClient)
+      queryClient.setQueryData(
+        projectQueryKeys.detail(workspaceId, project.id),
+        { project }
+      )
+      void invalidateProjectLists(queryClient, workspaceId)
     },
   })
 }
 
-export function useRenameProject() {
+export function useRenameProject(workspaceId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -64,11 +73,13 @@ export function useRenameProject() {
     }: {
       projectId: string
       title: string
-    }) => projectService.update(projectId, { title }),
+    }) => projectService.update(workspaceId, projectId, { title }),
     onMutate: async ({ projectId, title }) => {
-      await queryClient.cancelQueries({ queryKey: projectQueryKeys.lists() })
+      await queryClient.cancelQueries({
+        queryKey: projectQueryKeys.lists(workspaceId),
+      })
       const snapshots = queryClient.getQueriesData<ProjectListResponse>({
-        queryKey: projectQueryKeys.lists(),
+        queryKey: projectQueryKeys.lists(workspaceId),
       })
 
       snapshots.forEach(([queryKey, data]) => {
@@ -92,17 +103,21 @@ export function useRenameProject() {
       })
     },
     onSuccess: ({ project }) => {
-      queryClient.setQueryData(projectQueryKeys.detail(project.id), { project })
+      queryClient.setQueryData(
+        projectQueryKeys.detail(workspaceId, project.id),
+        { project }
+      )
     },
-    onSettled: () => invalidateProjectLists(queryClient),
+    onSettled: () => invalidateProjectLists(queryClient, workspaceId),
   })
 }
 
-export function useDeleteProject() {
+export function useDeleteProject(workspaceId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (projectId: string) => projectService.remove(projectId),
-    onSuccess: () => invalidateProjectLists(queryClient),
+    mutationFn: (projectId: string) =>
+      projectService.remove(workspaceId, projectId),
+    onSuccess: () => invalidateProjectLists(queryClient, workspaceId),
   })
 }

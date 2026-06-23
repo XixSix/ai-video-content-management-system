@@ -15,6 +15,16 @@ export function setAuthenticatedSession(
   useAuthStore.getState().setAuthenticated(session.accessToken)
 }
 
+export function updateAuthSessionWorkspace(
+  queryClient: QueryClient,
+  workspaceId: string
+): void {
+  queryClient.setQueryData<AuthenticatedUser | null>(
+    authQueryKeys.session,
+    (current) => (current ? { ...current, workspaceId } : current)
+  )
+}
+
 export async function clearAuthSession(
   queryClient: QueryClient
 ): Promise<void> {

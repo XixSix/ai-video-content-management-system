@@ -7,7 +7,6 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { DataPagination } from "@/components/shared/data-pagination"
-import { useAuthSession } from "@/features/auth/hooks/use-auth-session"
 import {
   mediaLibraryItems,
   mediaLibraryTabOptions,
@@ -45,6 +44,7 @@ import type {
   MediaStatusFilter,
   MediaTypeFilter,
 } from "@/features/media-library/media-library.types"
+import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 
 const MEDIA_LIBRARY_PAGE_SIZE = 6
 
@@ -111,7 +111,8 @@ function MediaLibraryPageContent() {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const authSession = useAuthSession()
+  const { selectedWorkspaceId } = useWorkspace()
+  const workspaceId = selectedWorkspaceId ?? ""
   const [demoItems, setDemoItems] = useState<MediaLibraryItem[]>(() =>
     mediaLibraryItems.map((item) => ({ ...item, isDemo: true }))
   )
@@ -130,15 +131,15 @@ function MediaLibraryPageContent() {
   const selectedLongToShortSourceId = searchParams.get("source")
   const sort = getMediaListSort(sortKey)
   const isRealMediaTab = activeTab === "ALL" || activeTab === "ORIGINAL"
-  const mediaQuery = useMediaList({
+  const mediaQuery = useMediaList(workspaceId, {
     page: 1,
     limit: 50,
     status: statusFilter === "ALL" ? undefined : statusFilter,
     ...sort,
   })
-  const renameMutation = useRenameMedia()
-  const deleteMutation = useDeleteMedia()
-  const uploadQueue = useMediaUploadQueue(authSession.data?.workspaceId)
+  const renameMutation = useRenameMedia(workspaceId)
+  const deleteMutation = useDeleteMedia(workspaceId)
+  const uploadQueue = useMediaUploadQueue(selectedWorkspaceId ?? undefined)
   const realItems = [...uploadQueue.items, ...(mediaQuery.data?.items ?? [])]
   const items = getMediaItemsForTab(realItems, demoItems, activeTab)
   const isLoading = isRealMediaTab && mediaQuery.isLoading
@@ -312,7 +313,7 @@ function MediaLibraryPageContent() {
         return
       }
 
-      const { url } = await mediaService.getDownloadUrl(item.id)
+      const { url } = await mediaService.getDownloadUrl(workspaceId, item.id)
       openAssetUrl(url, item.originalFilename)
     } catch (error) {
       toast.error("Unable to prepare download", {
@@ -367,6 +368,7 @@ function MediaLibraryPageContent() {
       ? longToShortCandidatesBySourceId[previewItem.longToShortSourceId] ?? []
       : []
   const previewUrlQuery = useMediaPreviewUrl(
+    workspaceId,
     previewItem && !previewItem.isDemo ? previewItem.id : null,
     previewItem?.status === "UPLOADED"
   )

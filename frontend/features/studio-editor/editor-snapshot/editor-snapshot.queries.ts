@@ -5,14 +5,14 @@ import { useQuery } from "@tanstack/react-query"
 import { editorSnapshotService } from "./editor-snapshot.service"
 
 export const editorSnapshotQueryKeys = {
-  detail: (projectId: string) =>
-    ["editor-snapshot", "detail", projectId] as const,
+  detail: (workspaceId: string, projectId: string) =>
+    ["editor-snapshot", workspaceId, "detail", projectId] as const,
 }
 
-export function useEditorSnapshot(projectId: string) {
+export function useEditorSnapshot(workspaceId: string, projectId: string) {
   return useQuery({
-    queryKey: editorSnapshotQueryKeys.detail(projectId),
-    queryFn: () => editorSnapshotService.get(projectId),
-    enabled: Boolean(projectId),
+    queryKey: editorSnapshotQueryKeys.detail(workspaceId, projectId),
+    queryFn: () => editorSnapshotService.get(workspaceId, projectId),
+    enabled: Boolean(workspaceId) && Boolean(projectId),
   })
 }

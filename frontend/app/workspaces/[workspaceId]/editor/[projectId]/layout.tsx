@@ -117,10 +117,11 @@ export default function StudioLayout({
 }: {
   children: ReactNode
 }) {
-  const params = useParams<{ projectId: string }>()
+  const params = useParams<{ workspaceId: string; projectId: string }>()
+  const workspaceId = params.workspaceId ?? ""
   const projectId = params.projectId ?? ""
-  const projectQuery = useProjectDetail(projectId)
-  const snapshotQuery = useEditorSnapshot(projectId)
+  const projectQuery = useProjectDetail(workspaceId, projectId)
+  const snapshotQuery = useEditorSnapshot(workspaceId, projectId)
   const authSession = useAuthSession()
   const timelinePanelRef = usePanelRef()
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
@@ -250,13 +251,14 @@ export default function StudioLayout({
 
   return (
     <StudioEditorStoreProvider
-      key={projectId}
+      key={`${workspaceId}:${projectId}`}
       initialProject={initialProject}
       canEdit={canEdit}
     >
       <EditorSnapshotPersistenceProvider
         canEdit={canEdit}
         initialVersion={initialSnapshot?.version ?? 0}
+        workspaceId={workspaceId}
         projectId={projectId}
         reloadLatest={reloadLatestSnapshot}
       >

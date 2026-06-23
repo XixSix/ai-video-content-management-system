@@ -28,6 +28,7 @@ export function MediaCard({
   onDetach,
   onSetSource,
   settingSource,
+  workspaceId,
 }: {
   canEdit: boolean
   detaching: boolean
@@ -35,12 +36,13 @@ export function MediaCard({
   onDetach: (item: StudioProjectMediaItem) => void
   onSetSource: (item: StudioProjectMediaItem) => void
   settingSource: boolean
+  workspaceId: string
 }) {
   const [recentlyAdded, setRecentlyAdded] = useState(false)
   const previewRetryRef = useRef(false)
   const { seekToTime } = useStudioPlaybackState()
   const { addProjectMediaToTimeline } = useStudioProjectActions()
-  const previewUrlQuery = useMediaPreviewUrl(item.id)
+  const previewUrlQuery = useMediaPreviewUrl(workspaceId, item.id)
   const previewUrl = previewUrlQuery.data?.url
 
   useEffect(() => {

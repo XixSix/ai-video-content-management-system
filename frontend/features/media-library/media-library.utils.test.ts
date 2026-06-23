@@ -67,14 +67,23 @@ describe("media library data boundaries", () => {
 
   it("invalidates every media list, including recent media", async () => {
     const queryClient = new QueryClient()
-    const libraryKey = mediaQueryKeys.list({ page: 1, limit: 50 })
-    const recentKey = mediaQueryKeys.list({ page: 1, limit: 4 })
+    const workspaceId = "workspace-a"
+    const libraryKey = mediaQueryKeys.list(workspaceId, { page: 1, limit: 50 })
+    const recentKey = mediaQueryKeys.list(workspaceId, { page: 1, limit: 4 })
+    const otherWorkspaceKey = mediaQueryKeys.list("workspace-b", {
+      page: 1,
+      limit: 50,
+    })
     queryClient.setQueryData(libraryKey, { items: [] })
     queryClient.setQueryData(recentKey, { items: [] })
+    queryClient.setQueryData(otherWorkspaceKey, { items: [] })
 
-    await invalidateMediaQueries(queryClient)
+    await invalidateMediaQueries(queryClient, workspaceId)
 
     expect(queryClient.getQueryState(libraryKey)?.isInvalidated).toBe(true)
     expect(queryClient.getQueryState(recentKey)?.isInvalidated).toBe(true)
+    expect(queryClient.getQueryState(otherWorkspaceKey)?.isInvalidated).toBe(
+      false
+    )
   })
 })

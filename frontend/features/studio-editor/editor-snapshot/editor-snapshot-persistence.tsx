@@ -84,12 +84,14 @@ export function EditorSnapshotPersistenceProvider({
   initialVersion,
   projectId,
   reloadLatest,
+  workspaceId,
 }: {
   canEdit: boolean
   children: ReactNode
   initialVersion: number
   projectId: string
   reloadLatest: () => Promise<ReloadedSnapshot>
+  workspaceId: string
 }) {
   const store = useStudioEditorStoreApi()
   const project = useStore(store, (state) => state.project)
@@ -167,7 +169,7 @@ export function EditorSnapshotPersistenceProvider({
       updateStatus("saving")
 
       const request = editorSnapshotService
-        .save(projectId, {
+        .save(workspaceId, projectId, {
           baseVersion,
           document,
         })
@@ -218,6 +220,7 @@ export function EditorSnapshotPersistenceProvider({
       projectId,
       setActiveConflict,
       updateStatus,
+      workspaceId,
     ]
   )
 
