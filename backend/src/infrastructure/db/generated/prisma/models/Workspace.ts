@@ -196,6 +196,8 @@ export type WorkspaceWhereInput = {
   invitations?: Prisma.WorkspaceInvitationListRelationFilter
   media?: Prisma.MediaListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
+  platformAccounts?: Prisma.PlatformAccountListRelationFilter
+  platformOAuthStates?: Prisma.PlatformOAuthStateListRelationFilter
 }
 
 export type WorkspaceOrderByWithRelationInput = {
@@ -211,6 +213,8 @@ export type WorkspaceOrderByWithRelationInput = {
   invitations?: Prisma.WorkspaceInvitationOrderByRelationAggregateInput
   media?: Prisma.MediaOrderByRelationAggregateInput
   projects?: Prisma.ProjectOrderByRelationAggregateInput
+  platformAccounts?: Prisma.PlatformAccountOrderByRelationAggregateInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateOrderByRelationAggregateInput
 }
 
 export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
@@ -229,6 +233,8 @@ export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   invitations?: Prisma.WorkspaceInvitationListRelationFilter
   media?: Prisma.MediaListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
+  platformAccounts?: Prisma.PlatformAccountListRelationFilter
+  platformOAuthStates?: Prisma.PlatformOAuthStateListRelationFilter
 }, "id" | "slug">
 
 export type WorkspaceOrderByWithAggregationInput = {
@@ -267,6 +273,8 @@ export type WorkspaceCreateInput = {
   invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateInput = {
@@ -281,6 +289,8 @@ export type WorkspaceUncheckedCreateInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUpdateInput = {
@@ -295,6 +305,8 @@ export type WorkspaceUpdateInput = {
   invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateInput = {
@@ -309,6 +321,8 @@ export type WorkspaceUncheckedUpdateInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyInput = {
@@ -498,6 +512,34 @@ export type WorkspaceUpdateOneRequiredWithoutProjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutProjectsInput, Prisma.WorkspaceUpdateWithoutProjectsInput>, Prisma.WorkspaceUncheckedUpdateWithoutProjectsInput>
 }
 
+export type WorkspaceCreateNestedOneWithoutPlatformAccountsInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformAccountsInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformAccountsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutPlatformAccountsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneRequiredWithoutPlatformAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformAccountsInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformAccountsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutPlatformAccountsInput
+  upsert?: Prisma.WorkspaceUpsertWithoutPlatformAccountsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutPlatformAccountsInput, Prisma.WorkspaceUpdateWithoutPlatformAccountsInput>, Prisma.WorkspaceUncheckedUpdateWithoutPlatformAccountsInput>
+}
+
+export type WorkspaceCreateNestedOneWithoutPlatformOAuthStatesInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformOAuthStatesInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutPlatformOAuthStatesInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneRequiredWithoutPlatformOAuthStatesNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformOAuthStatesInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutPlatformOAuthStatesInput
+  upsert?: Prisma.WorkspaceUpsertWithoutPlatformOAuthStatesInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUpdateWithoutPlatformOAuthStatesInput>, Prisma.WorkspaceUncheckedUpdateWithoutPlatformOAuthStatesInput>
+}
+
 export type WorkspaceCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -509,6 +551,8 @@ export type WorkspaceCreateWithoutOwnerInput = {
   invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutOwnerInput = {
@@ -522,6 +566,8 @@ export type WorkspaceUncheckedCreateWithoutOwnerInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutOwnerInput = {
@@ -545,6 +591,8 @@ export type WorkspaceCreateWithoutPreferredByUsersInput = {
   invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutPreferredByUsersInput = {
@@ -558,6 +606,8 @@ export type WorkspaceUncheckedCreateWithoutPreferredByUsersInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutPreferredByUsersInput = {
@@ -615,6 +665,8 @@ export type WorkspaceUpdateWithoutPreferredByUsersInput = {
   invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutPreferredByUsersInput = {
@@ -628,6 +680,8 @@ export type WorkspaceUncheckedUpdateWithoutPreferredByUsersInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutMembersInput = {
@@ -641,6 +695,8 @@ export type WorkspaceCreateWithoutMembersInput = {
   invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutMembersInput = {
@@ -654,6 +710,8 @@ export type WorkspaceUncheckedCreateWithoutMembersInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutMembersInput = {
@@ -683,6 +741,8 @@ export type WorkspaceUpdateWithoutMembersInput = {
   invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutMembersInput = {
@@ -696,6 +756,8 @@ export type WorkspaceUncheckedUpdateWithoutMembersInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutInvitationsInput = {
@@ -709,6 +771,8 @@ export type WorkspaceCreateWithoutInvitationsInput = {
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutInvitationsInput = {
@@ -722,6 +786,8 @@ export type WorkspaceUncheckedCreateWithoutInvitationsInput = {
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutInvitationsInput = {
@@ -751,6 +817,8 @@ export type WorkspaceUpdateWithoutInvitationsInput = {
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutInvitationsInput = {
@@ -764,6 +832,8 @@ export type WorkspaceUncheckedUpdateWithoutInvitationsInput = {
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutMediaInput = {
@@ -777,6 +847,8 @@ export type WorkspaceCreateWithoutMediaInput = {
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
   invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutMediaInput = {
@@ -790,6 +862,8 @@ export type WorkspaceUncheckedCreateWithoutMediaInput = {
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
   invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutMediaInput = {
@@ -819,6 +893,8 @@ export type WorkspaceUpdateWithoutMediaInput = {
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
   invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutMediaInput = {
@@ -832,6 +908,8 @@ export type WorkspaceUncheckedUpdateWithoutMediaInput = {
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutProjectsInput = {
@@ -845,6 +923,8 @@ export type WorkspaceCreateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
   invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutProjectsInput = {
@@ -858,6 +938,8 @@ export type WorkspaceUncheckedCreateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
   invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutProjectsInput = {
@@ -887,6 +969,8 @@ export type WorkspaceUpdateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
   invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
@@ -900,6 +984,160 @@ export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutPlatformAccountsInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
+  preferredByUsers?: Prisma.UserCreateNestedManyWithoutPreferredWorkspaceInput
+  members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutPlatformAccountsInput = {
+  id?: string
+  ownerId: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  preferredByUsers?: Prisma.UserUncheckedCreateNestedManyWithoutPreferredWorkspaceInput
+  members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutPlatformAccountsInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformAccountsInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformAccountsInput>
+}
+
+export type WorkspaceUpsertWithoutPlatformAccountsInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutPlatformAccountsInput, Prisma.WorkspaceUncheckedUpdateWithoutPlatformAccountsInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformAccountsInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformAccountsInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutPlatformAccountsInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutPlatformAccountsInput, Prisma.WorkspaceUncheckedUpdateWithoutPlatformAccountsInput>
+}
+
+export type WorkspaceUpdateWithoutPlatformAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
+  preferredByUsers?: Prisma.UserUpdateManyWithoutPreferredWorkspaceNestedInput
+  members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutPlatformAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferredByUsers?: Prisma.UserUncheckedUpdateManyWithoutPreferredWorkspaceNestedInput
+  members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutPlatformOAuthStatesInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedWorkspacesInput
+  preferredByUsers?: Prisma.UserCreateNestedManyWithoutPreferredWorkspaceInput
+  members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  media?: Prisma.MediaCreateNestedManyWithoutWorkspaceInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutPlatformOAuthStatesInput = {
+  id?: string
+  ownerId: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  preferredByUsers?: Prisma.UserUncheckedCreateNestedManyWithoutPreferredWorkspaceInput
+  members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutWorkspaceInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutPlatformOAuthStatesInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformOAuthStatesInput>
+}
+
+export type WorkspaceUpsertWithoutPlatformOAuthStatesInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUncheckedUpdateWithoutPlatformOAuthStatesInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUncheckedCreateWithoutPlatformOAuthStatesInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutPlatformOAuthStatesInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutPlatformOAuthStatesInput, Prisma.WorkspaceUncheckedUpdateWithoutPlatformOAuthStatesInput>
+}
+
+export type WorkspaceUpdateWithoutPlatformOAuthStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedWorkspacesNestedInput
+  preferredByUsers?: Prisma.UserUpdateManyWithoutPreferredWorkspaceNestedInput
+  members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutPlatformOAuthStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferredByUsers?: Prisma.UserUncheckedUpdateManyWithoutPreferredWorkspaceNestedInput
+  members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyOwnerInput = {
@@ -921,6 +1159,8 @@ export type WorkspaceUpdateWithoutOwnerInput = {
   invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutOwnerInput = {
@@ -934,6 +1174,8 @@ export type WorkspaceUncheckedUpdateWithoutOwnerInput = {
   invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   media?: Prisma.MediaUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformAccounts?: Prisma.PlatformAccountUncheckedUpdateManyWithoutWorkspaceNestedInput
+  platformOAuthStates?: Prisma.PlatformOAuthStateUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateManyWithoutOwnerInput = {
@@ -955,6 +1197,8 @@ export type WorkspaceCountOutputType = {
   invitations: number
   media: number
   projects: number
+  platformAccounts: number
+  platformOAuthStates: number
 }
 
 export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -963,6 +1207,8 @@ export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   invitations?: boolean | WorkspaceCountOutputTypeCountInvitationsArgs
   media?: boolean | WorkspaceCountOutputTypeCountMediaArgs
   projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
+  platformAccounts?: boolean | WorkspaceCountOutputTypeCountPlatformAccountsArgs
+  platformOAuthStates?: boolean | WorkspaceCountOutputTypeCountPlatformOAuthStatesArgs
 }
 
 /**
@@ -1010,6 +1256,20 @@ export type WorkspaceCountOutputTypeCountProjectsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ProjectWhereInput
 }
 
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountPlatformAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformAccountWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountPlatformOAuthStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformOAuthStateWhereInput
+}
+
 
 export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1024,6 +1284,8 @@ export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   invitations?: boolean | Prisma.Workspace$invitationsArgs<ExtArgs>
   media?: boolean | Prisma.Workspace$mediaArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
+  platformAccounts?: boolean | Prisma.Workspace$platformAccountsArgs<ExtArgs>
+  platformOAuthStates?: boolean | Prisma.Workspace$platformOAuthStatesArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspace"]>
 
@@ -1064,6 +1326,8 @@ export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   invitations?: boolean | Prisma.Workspace$invitationsArgs<ExtArgs>
   media?: boolean | Prisma.Workspace$mediaArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
+  platformAccounts?: boolean | Prisma.Workspace$platformAccountsArgs<ExtArgs>
+  platformOAuthStates?: boolean | Prisma.Workspace$platformOAuthStatesArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1082,6 +1346,8 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     invitations: Prisma.$WorkspaceInvitationPayload<ExtArgs>[]
     media: Prisma.$MediaPayload<ExtArgs>[]
     projects: Prisma.$ProjectPayload<ExtArgs>[]
+    platformAccounts: Prisma.$PlatformAccountPayload<ExtArgs>[]
+    platformOAuthStates: Prisma.$PlatformOAuthStatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1490,6 +1756,8 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   invitations<T extends Prisma.Workspace$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   media<T extends Prisma.Workspace$mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$mediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projects<T extends Prisma.Workspace$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  platformAccounts<T extends Prisma.Workspace$platformAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$platformAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  platformOAuthStates<T extends Prisma.Workspace$platformOAuthStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$platformOAuthStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformOAuthStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2043,6 +2311,54 @@ export type Workspace$projectsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
+}
+
+/**
+ * Workspace.platformAccounts
+ */
+export type Workspace$platformAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformAccount
+   */
+  select?: Prisma.PlatformAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformAccount
+   */
+  omit?: Prisma.PlatformAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformAccountInclude<ExtArgs> | null
+  where?: Prisma.PlatformAccountWhereInput
+  orderBy?: Prisma.PlatformAccountOrderByWithRelationInput | Prisma.PlatformAccountOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformAccountWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformAccountScalarFieldEnum | Prisma.PlatformAccountScalarFieldEnum[]
+}
+
+/**
+ * Workspace.platformOAuthStates
+ */
+export type Workspace$platformOAuthStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformOAuthState
+   */
+  select?: Prisma.PlatformOAuthStateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformOAuthState
+   */
+  omit?: Prisma.PlatformOAuthStateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformOAuthStateInclude<ExtArgs> | null
+  where?: Prisma.PlatformOAuthStateWhereInput
+  orderBy?: Prisma.PlatformOAuthStateOrderByWithRelationInput | Prisma.PlatformOAuthStateOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformOAuthStateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformOAuthStateScalarFieldEnum | Prisma.PlatformOAuthStateScalarFieldEnum[]
 }
 
 /**

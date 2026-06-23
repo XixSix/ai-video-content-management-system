@@ -2721,7 +2721,8 @@ export type AiSuggestionScalarFieldEnum = (typeof AiSuggestionScalarFieldEnum)[k
 
 export const PlatformAccountScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
+  workspaceId: 'workspaceId',
+  connectedByUserId: 'connectedByUserId',
   platform: 'platform',
   accountName: 'accountName',
   platformUserId: 'platformUserId',
@@ -2739,7 +2740,8 @@ export type PlatformAccountScalarFieldEnum = (typeof PlatformAccountScalarFieldE
 
 export const PlatformOAuthStateScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
+  workspaceId: 'workspaceId',
+  initiatedByUserId: 'initiatedByUserId',
   platform: 'platform',
   stateHash: 'stateHash',
   expiresAt: 'expiresAt',

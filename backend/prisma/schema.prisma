@@ -215,8 +215,8 @@ model User {
   shortClips                   ShortClip[]
   generatedAssets              GeneratedAsset[]
   aiSuggestions                AiSuggestion[]
-  platformAccounts             PlatformAccount[]
-  platformOAuthStates          PlatformOAuthState[]
+  connectedPlatformAccounts    PlatformAccount[]     @relation("PlatformAccountConnectedBy")
+  initiatedPlatformOAuthStates PlatformOAuthState[]  @relation("PlatformOAuthStateInitiatedBy")
   publishTasks                 PublishTask[]
   authSessions                 AuthSession[]
   auditLogs                    AuditLog[]
@@ -266,11 +266,13 @@ model Workspace {
 
   owner User @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  preferredByUsers User[]                @relation("PreferredWorkspace")
-  members          WorkspaceMember[]
-  invitations      WorkspaceInvitation[]
-  media            Media[]
-  projects         Project[]
+  preferredByUsers    User[]                @relation("PreferredWorkspace")
+  members             WorkspaceMember[]
+  invitations         WorkspaceInvitation[]
+  media               Media[]
+  projects            Project[]
+  platformAccounts    PlatformAccount[]
+  platformOAuthStates PlatformOAuthState[]
 
   @@index([ownerId])
   @@map("workspaces")
@@ -896,8 +898,9 @@ model AiSuggestion {
 }
 
 model PlatformAccount {
-  id     String @id @default(uuid()) @db.Uuid
-  userId String @map("user_id") @db.Uuid
+  id                String @id @default(uuid()) @db.Uuid
+  workspaceId       String @map("workspace_id") @db.Uuid
+  connectedByUserId String @map("user_id") @db.Uuid
 
   platform Platform
 
@@ -914,19 +917,22 @@ model PlatformAccount {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  connectedBy User      @relation("PlatformAccountConnectedBy", fields: [connectedByUserId], references: [id], onDelete: Cascade)
 
   publishTasks PublishTask[]
 
-  @@unique([userId, platform])
-  @@index([userId])
+  @@unique([workspaceId, platform])
+  @@index([workspaceId])
+  @@index([connectedByUserId])
   @@index([platform])
   @@map("platform_accounts")
 }
 
 model PlatformOAuthState {
-  id     String @id @default(uuid()) @db.Uuid
-  userId String @map("user_id") @db.Uuid
+  id                String @id @default(uuid()) @db.Uuid
+  workspaceId       String @map("workspace_id") @db.Uuid
+  initiatedByUserId String @map("user_id") @db.Uuid
 
   platform  Platform
   stateHash String   @unique @map("state_hash") @db.Text
@@ -935,9 +941,11 @@ model PlatformOAuthState {
   consumedAt DateTime? @map("consumed_at")
   createdAt  DateTime  @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  initiatedBy User      @relation("PlatformOAuthStateInitiatedBy", fields: [initiatedByUserId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+  @@index([workspaceId])
+  @@index([initiatedByUserId])
   @@index([platform])
   @@index([expiresAt])
   @@map("platform_oauth_states")

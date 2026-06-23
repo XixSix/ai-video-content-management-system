@@ -8,6 +8,7 @@ import type { PlatformOAuthCallbackQuery, PlatformRoute } from './platform-accou
 
 export interface PlatformAccountData {
   id: string
+  workspaceId: string
   platform: Platform
   accountName: string | null
   platformUserId: string | null
@@ -54,14 +55,16 @@ export interface FacebookPageProfile {
 }
 
 export interface CreatePlatformOAuthStateInput {
-  userId: string
+  workspaceId: string
+  initiatedByUserId: string
   platform: Platform
   stateHash: string
   expiresAt: Date
 }
 
 export interface UpsertConnectedPlatformAccountInput {
-  userId: string
+  workspaceId: string
+  connectedByUserId: string
   platform: Platform
   accountName: string
   platformUserId: string
