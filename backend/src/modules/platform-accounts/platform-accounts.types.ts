@@ -12,6 +12,7 @@ export interface PlatformAccountData {
   platform: Platform
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   status: PlatformAccountStatus
   expiresAt: Date | null
   createdAt: Date
@@ -40,6 +41,7 @@ export interface YouTubeConnectionTokens {
 export interface YouTubeChannelProfile {
   accountName: string
   platformUserId: string
+  avatarUrl: string | null
 }
 
 export interface FacebookConnectionTokens {
@@ -51,6 +53,7 @@ export interface FacebookConnectionTokens {
 export interface FacebookPageProfile {
   accountName: string
   platformUserId: string
+  avatarUrl: string | null
   pageAccessToken: string
 }
 
@@ -68,6 +71,7 @@ export interface UpsertConnectedPlatformAccountInput {
   platform: Platform
   accountName: string
   platformUserId: string
+  avatarUrl: string | null
   accessTokenEncrypted: string
   refreshTokenEncrypted: string | null
   tokenLast4: string | null

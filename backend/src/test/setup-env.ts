@@ -23,4 +23,4 @@ process.env.FACEBOOK_REDIRECT_URI ??= 'http://localhost:3000/api/v1/platform-acc
 process.env.FACEBOOK_GRAPH_API_VERSION ??= 'v25.0'
 process.env.PLATFORM_TOKEN_ENCRYPTION_KEY ??= Buffer.alloc(32, 1).toString('base64')
 process.env.PLATFORM_OAUTH_STATE_TTL_MS ??= '600000'
-process.env.FRONTEND_OAUTH_REDIRECT_URL ??= 'http://localhost:5173/settings/integrations'
+process.env.FRONTEND_OAUTH_REDIRECT_URL ??= 'http://localhost:5173/social-accounts/callback'

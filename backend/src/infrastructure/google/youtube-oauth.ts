@@ -83,6 +83,7 @@ export const getAuthenticatedYouTubeChannel = async (
   const channel = response.data.items?.[0]
   const platformUserId = channel?.id
   const accountName = channel?.snippet?.title
+  const avatarUrl = channel?.snippet?.thumbnails?.default?.url ?? null
 
   if (!platformUserId || !accountName) {
     throw new Error('Authenticated YouTube channel not found')
@@ -90,7 +91,8 @@ export const getAuthenticatedYouTubeChannel = async (
 
   return {
     accountName,
-    platformUserId
+    platformUserId,
+    avatarUrl
   }
 }
 

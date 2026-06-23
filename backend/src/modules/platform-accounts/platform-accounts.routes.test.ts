@@ -53,6 +53,7 @@ const createAccount = (): PlatformAccountData => ({
   platform: 'YOUTUBE',
   accountName: 'VidPilot Channel',
   platformUserId: 'UC1234567890',
+  avatarUrl: 'https://yt3.ggpht.com/default-avatar',
   status: 'CONNECTED',
   expiresAt: now,
   createdAt: now,

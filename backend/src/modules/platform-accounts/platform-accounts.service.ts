@@ -208,6 +208,7 @@ export const handlePlatformCallback = async (
     platform,
     accountName: profile.accountName,
     platformUserId: profile.platformUserId,
+    avatarUrl: profile.avatarUrl,
     accessTokenEncrypted: encryptToken(tokens.accessToken),
     refreshTokenEncrypted,
     tokenLast4,

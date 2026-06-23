@@ -95,6 +95,7 @@ const createPlatformAccountRecord = (overrides: Record<string, unknown> = {}) =>
   platform: Platform.YOUTUBE,
   accountName: 'VidPilot Channel',
   platformUserId: 'UC1234567890',
+  avatarUrl: 'https://yt3.ggpht.com/default-avatar',
   accessTokenEncrypted: platformAccountsUtil.encryptToken('existing-access-token'),
   refreshTokenEncrypted: platformAccountsUtil.encryptToken('existing-refresh-token'),
   tokenLast4: 'oken',
@@ -163,11 +164,13 @@ describe('platform account service', () => {
     })
     getAuthenticatedYouTubeChannelMock.mockResolvedValue({
       accountName: 'VidPilot Channel',
-      platformUserId: 'UC1234567890'
+      platformUserId: 'UC1234567890',
+      avatarUrl: 'https://yt3.ggpht.com/default-avatar'
     })
     getAuthenticatedFacebookPageMock.mockResolvedValue({
       accountName: 'VidPilot Page',
       platformUserId: '123456789',
+      avatarUrl: 'https://graph.facebook.com/123456789/picture',
       pageAccessToken: 'facebook-page-token'
     })
     refreshYouTubeAccessTokenMock.mockResolvedValue({

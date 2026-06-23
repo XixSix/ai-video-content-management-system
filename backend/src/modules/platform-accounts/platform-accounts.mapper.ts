@@ -6,6 +6,7 @@ export const toPlatformAccountData = (account: PlatformAccountRecord): PlatformA
   platform: account.platform,
   accountName: account.accountName,
   platformUserId: account.platformUserId,
+  avatarUrl: account.avatarUrl,
   status: account.status,
   expiresAt: account.expiresAt,
   createdAt: account.createdAt,

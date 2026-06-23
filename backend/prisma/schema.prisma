@@ -906,6 +906,7 @@ model PlatformAccount {
 
   accountName    String? @map("account_name") @db.VarChar(255)
   platformUserId String? @map("platform_user_id") @db.VarChar(255)
+  avatarUrl      String? @map("avatar_url") @db.Text
 
   accessTokenEncrypted  String?   @map("access_token_encrypted") @db.Text
   refreshTokenEncrypted String?   @map("refresh_token_encrypted") @db.Text

@@ -2726,6 +2726,7 @@ export const PlatformAccountScalarFieldEnum = {
   platform: 'platform',
   accountName: 'accountName',
   platformUserId: 'platformUserId',
+  avatarUrl: 'avatarUrl',
   accessTokenEncrypted: 'accessTokenEncrypted',
   refreshTokenEncrypted: 'refreshTokenEncrypted',
   tokenLast4: 'tokenLast4',

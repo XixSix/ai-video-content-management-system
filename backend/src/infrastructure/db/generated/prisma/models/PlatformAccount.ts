@@ -31,6 +31,7 @@ export type PlatformAccountMinAggregateOutputType = {
   platform: $Enums.Platform | null
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   tokenLast4: string | null
@@ -47,6 +48,7 @@ export type PlatformAccountMaxAggregateOutputType = {
   platform: $Enums.Platform | null
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   tokenLast4: string | null
@@ -63,6 +65,7 @@ export type PlatformAccountCountAggregateOutputType = {
   platform: number
   accountName: number
   platformUserId: number
+  avatarUrl: number
   accessTokenEncrypted: number
   refreshTokenEncrypted: number
   tokenLast4: number
@@ -81,6 +84,7 @@ export type PlatformAccountMinAggregateInputType = {
   platform?: true
   accountName?: true
   platformUserId?: true
+  avatarUrl?: true
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   tokenLast4?: true
@@ -97,6 +101,7 @@ export type PlatformAccountMaxAggregateInputType = {
   platform?: true
   accountName?: true
   platformUserId?: true
+  avatarUrl?: true
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   tokenLast4?: true
@@ -113,6 +118,7 @@ export type PlatformAccountCountAggregateInputType = {
   platform?: true
   accountName?: true
   platformUserId?: true
+  avatarUrl?: true
   accessTokenEncrypted?: true
   refreshTokenEncrypted?: true
   tokenLast4?: true
@@ -202,6 +208,7 @@ export type PlatformAccountGroupByOutputType = {
   platform: $Enums.Platform
   accountName: string | null
   platformUserId: string | null
+  avatarUrl: string | null
   accessTokenEncrypted: string | null
   refreshTokenEncrypted: string | null
   tokenLast4: string | null
@@ -239,6 +246,7 @@ export type PlatformAccountWhereInput = {
   platform?: Prisma.EnumPlatformFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
@@ -258,6 +266,7 @@ export type PlatformAccountOrderByWithRelationInput = {
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrderInput | Prisma.SortOrder
   platformUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   tokenLast4?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -281,6 +290,7 @@ export type PlatformAccountWhereUniqueInput = Prisma.AtLeast<{
   platform?: Prisma.EnumPlatformFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
@@ -300,6 +310,7 @@ export type PlatformAccountOrderByWithAggregationInput = {
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrderInput | Prisma.SortOrder
   platformUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   tokenLast4?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -322,6 +333,7 @@ export type PlatformAccountScalarWhereWithAggregatesInput = {
   platform?: Prisma.EnumPlatformWithAggregatesFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableWithAggregatesFilter<"PlatformAccount"> | string | null
@@ -336,6 +348,7 @@ export type PlatformAccountCreateInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -355,6 +368,7 @@ export type PlatformAccountUncheckedCreateInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -370,6 +384,7 @@ export type PlatformAccountUpdateInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -389,6 +404,7 @@ export type PlatformAccountUncheckedUpdateInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -406,6 +422,7 @@ export type PlatformAccountCreateManyInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -420,6 +437,7 @@ export type PlatformAccountUpdateManyMutationInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -436,6 +454,7 @@ export type PlatformAccountUncheckedUpdateManyInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -467,6 +486,7 @@ export type PlatformAccountCountOrderByAggregateInput = {
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   platformUserId?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   tokenLast4?: Prisma.SortOrder
@@ -483,6 +503,7 @@ export type PlatformAccountMaxOrderByAggregateInput = {
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   platformUserId?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   tokenLast4?: Prisma.SortOrder
@@ -499,6 +520,7 @@ export type PlatformAccountMinOrderByAggregateInput = {
   platform?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   platformUserId?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
   accessTokenEncrypted?: Prisma.SortOrder
   refreshTokenEncrypted?: Prisma.SortOrder
   tokenLast4?: Prisma.SortOrder
@@ -626,6 +648,7 @@ export type PlatformAccountCreateWithoutConnectedByInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -643,6 +666,7 @@ export type PlatformAccountUncheckedCreateWithoutConnectedByInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -689,6 +713,7 @@ export type PlatformAccountScalarWhereInput = {
   platform?: Prisma.EnumPlatformFilter<"PlatformAccount"> | $Enums.Platform
   accountName?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   platformUserId?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   accessTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   refreshTokenEncrypted?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
   tokenLast4?: Prisma.StringNullableFilter<"PlatformAccount"> | string | null
@@ -703,6 +728,7 @@ export type PlatformAccountCreateWithoutWorkspaceInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -720,6 +746,7 @@ export type PlatformAccountUncheckedCreateWithoutWorkspaceInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -761,6 +788,7 @@ export type PlatformAccountCreateWithoutPublishTasksInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -779,6 +807,7 @@ export type PlatformAccountUncheckedCreateWithoutPublishTasksInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -809,6 +838,7 @@ export type PlatformAccountUpdateWithoutPublishTasksInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -827,6 +857,7 @@ export type PlatformAccountUncheckedUpdateWithoutPublishTasksInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -842,6 +873,7 @@ export type PlatformAccountCreateManyConnectedByInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -856,6 +888,7 @@ export type PlatformAccountUpdateWithoutConnectedByInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -873,6 +906,7 @@ export type PlatformAccountUncheckedUpdateWithoutConnectedByInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -889,6 +923,7 @@ export type PlatformAccountUncheckedUpdateManyWithoutConnectedByInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -904,6 +939,7 @@ export type PlatformAccountCreateManyWorkspaceInput = {
   platform: $Enums.Platform
   accountName?: string | null
   platformUserId?: string | null
+  avatarUrl?: string | null
   accessTokenEncrypted?: string | null
   refreshTokenEncrypted?: string | null
   tokenLast4?: string | null
@@ -918,6 +954,7 @@ export type PlatformAccountUpdateWithoutWorkspaceInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -935,6 +972,7 @@ export type PlatformAccountUncheckedUpdateWithoutWorkspaceInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -951,6 +989,7 @@ export type PlatformAccountUncheckedUpdateManyWithoutWorkspaceInput = {
   platform?: Prisma.EnumPlatformFieldUpdateOperationsInput | $Enums.Platform
   accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tokenLast4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -998,6 +1037,7 @@ export type PlatformAccountSelect<ExtArgs extends runtime.Types.Extensions.Inter
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -1018,6 +1058,7 @@ export type PlatformAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -1036,6 +1077,7 @@ export type PlatformAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -1054,6 +1096,7 @@ export type PlatformAccountSelectScalar = {
   platform?: boolean
   accountName?: boolean
   platformUserId?: boolean
+  avatarUrl?: boolean
   accessTokenEncrypted?: boolean
   refreshTokenEncrypted?: boolean
   tokenLast4?: boolean
@@ -1063,7 +1106,7 @@ export type PlatformAccountSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlatformAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workspaceId" | "connectedByUserId" | "platform" | "accountName" | "platformUserId" | "accessTokenEncrypted" | "refreshTokenEncrypted" | "tokenLast4" | "expiresAt" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["platformAccount"]>
+export type PlatformAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workspaceId" | "connectedByUserId" | "platform" | "accountName" | "platformUserId" | "avatarUrl" | "accessTokenEncrypted" | "refreshTokenEncrypted" | "tokenLast4" | "expiresAt" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["platformAccount"]>
 export type PlatformAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   connectedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1093,6 +1136,7 @@ export type $PlatformAccountPayload<ExtArgs extends runtime.Types.Extensions.Int
     platform: $Enums.Platform
     accountName: string | null
     platformUserId: string | null
+    avatarUrl: string | null
     accessTokenEncrypted: string | null
     refreshTokenEncrypted: string | null
     tokenLast4: string | null
@@ -1532,6 +1576,7 @@ export interface PlatformAccountFieldRefs {
   readonly platform: Prisma.FieldRef<"PlatformAccount", 'Platform'>
   readonly accountName: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly platformUserId: Prisma.FieldRef<"PlatformAccount", 'String'>
+  readonly avatarUrl: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly accessTokenEncrypted: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly refreshTokenEncrypted: Prisma.FieldRef<"PlatformAccount", 'String'>
   readonly tokenLast4: Prisma.FieldRef<"PlatformAccount", 'String'>
