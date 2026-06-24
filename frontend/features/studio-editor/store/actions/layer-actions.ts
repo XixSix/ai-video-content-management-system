@@ -5,6 +5,7 @@ import {
   studioCaptionPresets,
 } from "../../data/caption-presets.data"
 import { studioTextPresets } from "../../data/text-style.data"
+import { getLayerCanvasGeometry } from "../../canvas/lib/geometry"
 import type { StudioCanvasLayer } from "../../studio.types"
 import {
   getSmartTimelineInsertStartTime,
@@ -59,6 +60,8 @@ export function createLayerActions(
         presetId: preset.id,
         textAlign: "center",
         textColor: preset.defaultStyle.textColor,
+        widthPercent: 46,
+        heightPercent: 18,
         xPercent: 50,
         yPercent: 50,
       }
@@ -200,6 +203,50 @@ export function createLayerActions(
           layers: state.project.layers.map((layer) =>
             layer.id === layerId && (layer.kind === "text" || layer.kind === "captions")
               ? { ...layer, ...position }
+              : layer
+          ),
+        },
+      }))
+    },
+    updateCanvasLayerGeometry: (
+      layerId: string,
+      geometry: {
+        xPercent: number
+        yPercent: number
+        widthPercent: number
+        heightPercent: number
+      },
+      options?: {
+        recordHistory?: boolean
+      }
+    ) => {
+      const layer = get().project.layers.find((item) => item.id === layerId)
+
+      if (!layer || (layer.kind !== "text" && layer.kind !== "captions")) {
+        return
+      }
+
+      const currentGeometry = getLayerCanvasGeometry(layer)
+
+      if (
+        currentGeometry.xPercent === geometry.xPercent &&
+        currentGeometry.yPercent === geometry.yPercent &&
+        currentGeometry.widthPercent === geometry.widthPercent &&
+        currentGeometry.heightPercent === geometry.heightPercent
+      ) {
+        return
+      }
+
+      if (options?.recordHistory) {
+        recordEditorHistory(set, get)
+      }
+
+      set((state) => ({
+        project: {
+          ...state.project,
+          layers: state.project.layers.map((layer) =>
+            layer.id === layerId && (layer.kind === "text" || layer.kind === "captions")
+              ? { ...layer, ...geometry }
               : layer
           ),
         },

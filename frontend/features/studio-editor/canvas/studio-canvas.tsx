@@ -9,27 +9,19 @@ import {
   useStudioPlaybackState,
   useStudioProjectState,
   useStudioSelectionState,
+  useStudioTimelineActions,
   useStudioToolState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
-import {
-  getProjectTimelineDuration,
-  getTimelineSegmentStartTime,
-} from "@/features/studio-editor/timeline/lib/layout"
 import { cn } from "@/lib/utils"
 
-import { CanvasLayerList } from "./components/canvas-layer-list"
-import {
-  CanvasAudioMedia,
-  CanvasOverlayMedia,
-  CanvasSourceMedia,
-} from "./components/composition-media"
+import { EditorOverlayLayerList } from "./components/editor-overlay-layer-list"
 import { CanvasFallbackArtwork } from "./components/fallback-artwork"
-import { CanvasSelectionFrame } from "./components/selection-frame"
-import { useCompositionClock } from "./hooks/use-composition-playback"
 import { usePreviewSize } from "./hooks/use-preview-size"
+import type { ActiveCompositionSegment } from "./lib/composition"
 import { resolveCompositionFrame } from "./lib/composition"
 import { useEditorRouteParams } from "../hooks/use-editor-route-params"
+import { StudioRemotionPlayerPreview } from "../render-preview/studio-remotion-player-preview"
 
 export function StudioCanvas() {
   const { workspaceId } = useEditorRouteParams()
@@ -42,42 +34,21 @@ export function StudioCanvas() {
     isPlaying,
     mutedTrackIds,
     pausePlayback,
-    playPlayback,
     seekToTime,
   } = useStudioPlaybackState()
   const { project } = useStudioProjectState()
-  const { updateCanvasLayerPosition } = useStudioLayerActions()
-  const { selectedItem, selectedTargetId, setSelectedItemId } =
+  const { updateCanvasLayerGeometry } = useStudioLayerActions()
+  const { updateTimelineSegmentGeometry } = useStudioTimelineActions()
+  const { selectedItemId, selectedTargetId, setSelectedItemId } =
     useStudioSelectionState()
   const { setActiveTool } = useStudioToolState()
   const canvasAspectRatio = getAspectRatioValue(project.media.aspectRatio)
   const { canvasAreaRef, previewSize } = usePreviewSize(canvasAspectRatio)
   const isSourceSelected = selectedTargetId === project.sourceMedia.id
-  const timelineDurationSeconds = useMemo(
-    () => getProjectTimelineDuration(project),
-    [project]
-  )
   const compositionFrame = useMemo(
     () => resolveCompositionFrame(project, currentTime),
     [currentTime, project]
   )
-  const sourceTrackMuted = mutedTrackIds.includes("SOURCE")
-  const overlayTrackMuted = mutedTrackIds.includes("OVERLAY_MEDIA")
-  const audioTrackMuted = mutedTrackIds.includes("AUDIO")
-  const sourceMediaType =
-    compositionFrame.source?.media?.type ?? project.media.type
-  const sourceHasPlaybackMedia =
-    compositionFrame.source !== null &&
-    (sourceMediaType === "VIDEO" || sourceMediaType === "AUDIO")
-
-  useCompositionClock({
-    currentTime,
-    enabled: !sourceHasPlaybackMedia,
-    isPlaying,
-    pausePlayback,
-    seekToTime,
-    timelineDurationSeconds,
-  })
 
   const captionCues = useMemo(
     () => buildCaptionCues(project.transcriptSegments, project.transcriptWords),
@@ -93,6 +64,10 @@ export function StudioCanvas() {
           : "assets"
     )
     setSelectedItemId(layer.id)
+  }
+  const handleSelectOverlaySegment = (overlay: ActiveCompositionSegment) => {
+    setActiveTool("media")
+    setSelectedItemId(overlay.segment.id)
   }
 
   return (
@@ -120,72 +95,28 @@ export function StudioCanvas() {
           >
             <CanvasFallbackArtwork />
 
-            {compositionFrame.source ? (
-              <CanvasSourceMedia
-                isPlaying={isPlaying}
-                muted={sourceTrackMuted}
-                onEnded={pausePlayback}
-                onLocalTimeChange={(localTime) => {
-                  if (!compositionFrame.source) {
-                    return
-                  }
+            <StudioRemotionPlayerPreview
+              currentTime={currentTime}
+              isPlaying={isPlaying}
+              mutedTrackIds={mutedTrackIds}
+              pausePlayback={pausePlayback}
+              project={project}
+              seekToTime={seekToTime}
+              workspaceId={workspaceId}
+            />
 
-                  const segmentStartTime = getTimelineSegmentStartTime({
-                    media: compositionFrame.source.media,
-                    segment: compositionFrame.source.segment,
-                  })
-
-                  seekToTime(segmentStartTime + localTime)
-                }}
-                onPause={() => {
-                  if (isPlaying) {
-                    pausePlayback()
-                  }
-                }}
-                onPlay={() => {
-                  if (!isPlaying) {
-                    playPlayback()
-                  }
-                }}
-                source={compositionFrame.source}
-                sourceDetail={project.media}
-                workspaceId={workspaceId}
-              />
-            ) : null}
-
-            {compositionFrame.overlays.map((overlay) => (
-              <CanvasOverlayMedia
-                key={overlay.segment.id}
-                isPlaying={isPlaying}
-                muted={overlayTrackMuted}
-                onSelect={() => {
-                  setActiveTool("media")
-                  setSelectedItemId(overlay.segment.id)
-                }}
-                overlay={overlay}
-                workspaceId={workspaceId}
-              />
-            ))}
-
-            {compositionFrame.audio.map((audio) => (
-              <CanvasAudioMedia
-                key={audio.segment.id}
-                audio={audio}
-                isPlaying={isPlaying}
-                muted={audioTrackMuted}
-                workspaceId={workspaceId}
-              />
-            ))}
-
-            <CanvasLayerList
+            <EditorOverlayLayerList
               captionCues={captionCues}
+              compositionFrame={compositionFrame}
               currentTime={currentTime}
               layers={project.layers}
               onLayerDragGuideChange={setLayerDragGuide}
-              onMoveLayer={updateCanvasLayerPosition}
+              onLayerGeometryChange={updateCanvasLayerGeometry}
               onSelectLayer={handleSelectLayer}
+              onSelectOverlaySegment={handleSelectOverlaySegment}
+              onSegmentGeometryChange={updateTimelineSegmentGeometry}
+              selectedItemId={selectedItemId}
               selectedTargetId={selectedTargetId}
-              visibleLayerIds={compositionFrame.visibleLayerIds}
             />
 
             {layerDragGuide ? (
@@ -199,13 +130,6 @@ export function StudioCanvas() {
               </div>
             ) : null}
 
-            <CanvasSelectionFrame
-              layers={project.layers.filter((layer) =>
-                compositionFrame.visibleLayerIds.has(layer.id)
-              )}
-              selectedItem={selectedItem}
-              selectedTargetId={selectedTargetId}
-            />
           </div>
         </div>
       </div>

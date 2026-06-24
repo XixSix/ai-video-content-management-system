@@ -1,20 +1,32 @@
-import { createTikTokStyleCaptions, type Caption, type TikTokPage } from "@remotion/captions";
+import { createTikTokStyleCaptions, type TikTokPage } from "@remotion/captions";
 import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
+
+import type { RenderCaptionLayer } from "../render-document";
 
 const SWITCH_CAPTIONS_EVERY_MS = 1200;
 
 export const CaptionLayer: React.FC<{
-  captions: Caption[];
-  style: React.CSSProperties;
-}> = ({ captions, style }) => {
+  layer: RenderCaptionLayer;
+}> = ({ layer }) => {
   const { fps } = useVideoConfig();
   const { pages } = createTikTokStyleCaptions({
-    captions,
+    captions: layer.captions,
     combineTokensWithinMilliseconds: SWITCH_CAPTIONS_EVERY_MS,
   });
 
   return (
-    <AbsoluteFill>
+    <AbsoluteFill
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        left: `${layer.xPercent}%`,
+        top: `${layer.yPercent}%`,
+        width: `${layer.widthPercent}%`,
+        height: `${layer.heightPercent}%`,
+        pointerEvents: "none",
+        translate: "-50% -50%",
+      }}
+    >
       {pages.map((page, index) => {
         const nextPage = pages[index + 1] ?? null;
         const startFrame = Math.round((page.startMs / 1000) * fps);
@@ -30,7 +42,7 @@ export const CaptionLayer: React.FC<{
 
         return (
           <Sequence key={`${page.startMs}-${index}`} from={startFrame} durationInFrames={durationInFrames}>
-            <CaptionPage page={page} style={style} />
+            <CaptionPage page={page} style={layer.style} />
           </Sequence>
         );
       })}
@@ -47,7 +59,7 @@ const CaptionPage: React.FC<{ page: TikTokPage; style: React.CSSProperties }> = 
   const absoluteTimeMs = page.startMs + (frame / fps) * 1000;
 
   return (
-    <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: "12%" }}>
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
       <div style={{ ...style, whiteSpace: "pre" }}>
         {page.tokens.map((token) => {
           const isActive = token.fromMs <= absoluteTimeMs && token.toMs > absoluteTimeMs;

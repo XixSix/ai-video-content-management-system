@@ -36,8 +36,8 @@
   "peerDependencies": {
     "@remotion/captions": "4.0.482",
     "@remotion/media": "4.0.482",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": ">=19.2.3 <20",
+    "react-dom": ">=19.2.3 <20",
     "remotion": "4.0.482"
   },
   "devDependencies": {

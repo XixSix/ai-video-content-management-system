@@ -28,6 +28,7 @@ export const TextLayer: React.FC<{ layer: RenderTextLayer }> = ({ layer }) => {
         height: `${layer.heightPercent}%`,
         opacity,
         pointerEvents: "none",
+        translate: "-50% -50%",
       }}
     >
       <div style={layer.style}>{layer.text}</div>

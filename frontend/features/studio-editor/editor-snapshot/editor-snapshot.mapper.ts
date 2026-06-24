@@ -16,6 +16,10 @@ import type {
   StudioTimelineTrack,
   StudioTimelineTrackId,
 } from "../studio.types"
+import {
+  getLayerCanvasGeometry,
+  getOverlaySegmentCanvasGeometry,
+} from "../canvas/lib/geometry"
 import { getTimelineWidthClassName } from "../timeline/lib/operations"
 import type { EditorDocument } from "./editor-snapshot.schema"
 
@@ -227,8 +231,7 @@ function toEditorLayer(
     visible:
       layer.visible ??
       (layer.kind === "captions" ? layer.enabled !== false : true),
-    xPercent: layer.xPercent,
-    yPercent: layer.yPercent,
+    ...getLayerCanvasGeometry(layer),
     style: getLayerStyle(layer),
   }
 
@@ -318,6 +321,9 @@ export function serializeEditorDocument(
             ...reference,
             startTime: Math.max(0, segment.startTime ?? 0),
             durationSeconds: Math.max(0.25, segment.durationSeconds ?? 0.25),
+            ...(trackId === "OVERLAY_MEDIA"
+              ? getOverlaySegmentCanvasGeometry(segment)
+              : {}),
             ...(segment.laneIndex === undefined
               ? {}
               : { laneIndex: segment.laneIndex }),
@@ -386,8 +392,17 @@ function hydrateLayer(
     ...(layer.kind === "image" ? { mediaId: layer.mediaId } : {}),
     ...(layer.kind === "captions" ? { enabled: layer.visible } : {}),
     visible: layer.visible,
-    xPercent: layer.xPercent,
-    yPercent: layer.yPercent,
+    ...getLayerCanvasGeometry({
+      id: layer.id,
+      kind: layer.kind,
+      ...presentation,
+      ...style,
+      visible: layer.visible,
+      widthPercent: layer.widthPercent,
+      heightPercent: layer.heightPercent,
+      xPercent: layer.xPercent,
+      yPercent: layer.yPercent,
+    } as StudioCanvasLayer),
   }
 }
 
@@ -452,6 +467,26 @@ export function hydrateEditorDocument(
           segment.durationSeconds,
           project.media.durationSeconds
         ),
+        ...(id === "OVERLAY_MEDIA"
+          ? getOverlaySegmentCanvasGeometry({
+              id: segment.id,
+              label: display.label,
+              durationSeconds: segment.durationSeconds,
+              laneIndex: segment.laneIndex,
+              selectionId: selectionId!,
+              startTime: segment.startTime,
+              summary: display.summary,
+              tone: "muted",
+              widthClassName: getTimelineWidthClassName(
+                segment.durationSeconds,
+                project.media.durationSeconds
+              ),
+              widthPercent: segment.widthPercent,
+              heightPercent: segment.heightPercent,
+              xPercent: segment.xPercent,
+              yPercent: segment.yPercent,
+            })
+          : {}),
       }
     })
 

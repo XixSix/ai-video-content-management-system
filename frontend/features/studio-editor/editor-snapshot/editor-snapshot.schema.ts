@@ -18,6 +18,8 @@ const styleSchema = z.record(z.string(), jsonValueSchema)
 const layerBaseShape = {
   id: z.string().min(1).max(128),
   visible: z.boolean(),
+  widthPercent: z.number().min(1).max(100).optional(),
+  heightPercent: z.number().min(1).max(100).optional(),
   xPercent: z.number().min(0).max(100).optional(),
   yPercent: z.number().min(0).max(100).optional(),
   style: styleSchema,
@@ -47,6 +49,10 @@ const editorTimelineSegmentSchema = z
     mediaId: z.string().uuid().optional(),
     startTime: z.number().nonnegative(),
     durationSeconds: z.number().positive(),
+    widthPercent: z.number().min(1).max(100).optional(),
+    heightPercent: z.number().min(1).max(100).optional(),
+    xPercent: z.number().min(0).max(100).optional(),
+    yPercent: z.number().min(0).max(100).optional(),
     laneIndex: z.number().int().min(0).max(100).optional(),
   })
   .refine(

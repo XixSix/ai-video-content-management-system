@@ -12,6 +12,7 @@ import {
   getTimelineWidthClassName,
   insertSegmentWithPush,
 } from "../../timeline/lib/operations"
+import { getDefaultCanvasGeometry } from "../../canvas/lib/geometry"
 import type {
   StudioEditorGet,
   StudioEditorSet,
@@ -62,6 +63,9 @@ function createMediaTimelineSegment({
     selectionId: media.id,
     summary: media.summary,
     tone: media.type === "AUDIO" ? "base" : "muted",
+    ...(media.type === "IMAGE" || media.type === "VIDEO"
+      ? getDefaultCanvasGeometry("overlay")
+      : {}),
     widthClassName: getTimelineWidthClassName(
       segmentDurationSeconds,
       durationSeconds

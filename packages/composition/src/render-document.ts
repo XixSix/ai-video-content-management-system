@@ -19,6 +19,27 @@ const layerBaseSchema = z.object({
   durationInFrames: z.number().int().positive(),
 });
 
+const positionedLayerSchema = layerBaseSchema.extend({
+  xPercent: z.number().min(0).max(100).default(50),
+  yPercent: z.number().min(0).max(100).default(50),
+  widthPercent: z.number().min(1).max(100).default(100),
+  heightPercent: z.number().min(1).max(100).default(100),
+});
+
+const textPositionedLayerSchema = layerBaseSchema.extend({
+  xPercent: z.number().min(0).max(100).default(0),
+  yPercent: z.number().min(0).max(100).default(0),
+  widthPercent: z.number().min(1).max(100).default(100),
+  heightPercent: z.number().min(1).max(100).default(100),
+});
+
+const captionPositionedLayerSchema = layerBaseSchema.extend({
+  xPercent: z.number().min(0).max(100).default(50),
+  yPercent: z.number().min(0).max(100).default(82),
+  widthPercent: z.number().min(1).max(100).default(76),
+  heightPercent: z.number().min(1).max(100).default(15),
+});
+
 export const renderDocumentSchema = z.object({
   version: z.literal(1),
   width: z.number().int().positive(),
@@ -33,18 +54,34 @@ export const renderDocumentSchema = z.object({
     fit: z.enum(["cover", "contain"]).default("cover"),
     muted: z.boolean().default(false),
   }),
+  overlayMediaLayers: z
+    .array(
+      positionedLayerSchema.extend({
+        src: z.string(),
+        mediaType: z.enum(["VIDEO", "IMAGE"]),
+        fit: z.enum(["cover", "contain"]).default("contain"),
+        muted: z.boolean().default(true),
+        style: styleSchema.default({}),
+      }),
+    )
+    .default([]),
+  audioLayers: z
+    .array(
+      layerBaseSchema.extend({
+        src: z.string(),
+        volume: z.number().min(0).default(1),
+        muted: z.boolean().default(false),
+      }),
+    )
+    .default([]),
   textLayers: z.array(
-    layerBaseSchema.extend({
+    textPositionedLayerSchema.extend({
       text: z.string(),
-      xPercent: z.number().min(0).max(100).default(0),
-      yPercent: z.number().min(0).max(100).default(0),
-      widthPercent: z.number().min(1).max(100).default(100),
-      heightPercent: z.number().min(1).max(100).default(100),
       style: styleSchema,
     }),
   ),
   captionLayers: z.array(
-    layerBaseSchema.extend({
+    captionPositionedLayerSchema.extend({
       captions: z.array(captionSchema),
       style: styleSchema,
     }),
@@ -56,6 +93,8 @@ export type RenderTextLayer = RenderDocument["textLayers"][number];
 export type RenderCaptionLayer = RenderDocument["captionLayers"][number] & {
   captions: Caption[];
 };
+export type RenderOverlayMediaLayer = RenderDocument["overlayMediaLayers"][number];
+export type RenderAudioLayer = RenderDocument["audioLayers"][number];
 
 export const DEFAULT_RENDER_DOCUMENT: RenderDocument = {
   version: 1,
@@ -71,6 +110,8 @@ export const DEFAULT_RENDER_DOCUMENT: RenderDocument = {
     fit: "cover",
     muted: false,
   },
+  overlayMediaLayers: [],
+  audioLayers: [],
   textLayers: [],
   captionLayers: [],
 };

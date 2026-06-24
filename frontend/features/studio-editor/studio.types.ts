@@ -100,6 +100,8 @@ export type StudioCanvasLayer = {
   textColor?: string
   textDecoration?: StudioCaptionTextDecoration
   textTransform?: StudioCaptionTextTransform
+  widthPercent?: number
+  heightPercent?: number
   xPercent?: number
   yPercent?: number
 }
@@ -144,6 +146,10 @@ export type StudioTimelineSegment = {
   selectionId: string
   summary: string
   startTime?: number
+  widthPercent?: number
+  heightPercent?: number
+  xPercent?: number
+  yPercent?: number
 }
 
 export type StudioTimelineTrack = {

@@ -13,6 +13,7 @@ class RenderExportMedia:
     id: UUID
     user_id: UUID
     workspace_id: UUID
+    media_type: str
     s3_bucket: str
     s3_key: str
     s3_region: str | None
@@ -20,6 +21,13 @@ class RenderExportMedia:
     width: int | None
     height: int | None
     mime_type: str | None
+
+
+@dataclass(frozen=True)
+class RenderExportProjectMedia:
+    id: UUID
+    role: str
+    media: RenderExportMedia
 
 
 @dataclass(frozen=True)
@@ -37,6 +45,7 @@ class RenderExportProject:
     aspect_ratio: str
     duration: float | None
     media: RenderExportMedia
+    project_media: list[RenderExportProjectMedia]
     snapshot: RenderExportSnapshot
 
 
@@ -74,6 +83,7 @@ def find_project_render_source(
                   m.id AS media_id,
                   m.user_id AS media_user_id,
                   m.workspace_id AS media_workspace_id,
+                  m.type::text AS media_type,
                   m.s3_bucket,
                   m.s3_key,
                   m.s3_region,
@@ -102,6 +112,39 @@ def find_project_render_source(
     if row is None:
         return None
 
+    project_media_rows = (
+        session.execute(
+            text(
+                """
+                SELECT
+                  pm.id AS project_media_id,
+                  pm.role::text AS project_media_role,
+                  m.id AS media_id,
+                  m.user_id AS media_user_id,
+                  m.workspace_id AS media_workspace_id,
+                  m.type::text AS media_type,
+                  m.s3_bucket,
+                  m.s3_key,
+                  m.s3_region,
+                  m.duration AS media_duration,
+                  m.width,
+                  m.height,
+                  m.mime_type
+                FROM project_media pm
+                JOIN media m ON m.id = pm.media_id
+                WHERE pm.project_id = :project_id
+                  AND pm.role IN ('OVERLAY', 'AUDIO_BED')
+                  AND m.status = 'UPLOADED'
+                  AND m.type IN ('VIDEO', 'IMAGE', 'AUDIO')
+                ORDER BY pm.created_at ASC, pm.id ASC
+                """
+            ),
+            {"project_id": project_id},
+        )
+        .mappings()
+        .all()
+    )
+
     return RenderExportProject(
         id=UUID(str(row["project_id"])),
         user_id=UUID(str(row["project_user_id"])),
@@ -112,6 +155,7 @@ def find_project_render_source(
             id=UUID(str(row["media_id"])),
             user_id=UUID(str(row["media_user_id"])),
             workspace_id=UUID(str(row["media_workspace_id"])),
+            media_type=row["media_type"],
             s3_bucket=row["s3_bucket"],
             s3_key=row["s3_key"],
             s3_region=row["s3_region"],
@@ -120,6 +164,26 @@ def find_project_render_source(
             height=row["height"],
             mime_type=row["mime_type"],
         ),
+        project_media=[
+            RenderExportProjectMedia(
+                id=UUID(str(project_media_row["project_media_id"])),
+                role=project_media_row["project_media_role"],
+                media=RenderExportMedia(
+                    id=UUID(str(project_media_row["media_id"])),
+                    user_id=UUID(str(project_media_row["media_user_id"])),
+                    workspace_id=UUID(str(project_media_row["media_workspace_id"])),
+                    media_type=project_media_row["media_type"],
+                    s3_bucket=project_media_row["s3_bucket"],
+                    s3_key=project_media_row["s3_key"],
+                    s3_region=project_media_row["s3_region"],
+                    duration=_to_float(project_media_row["media_duration"]),
+                    width=project_media_row["width"],
+                    height=project_media_row["height"],
+                    mime_type=project_media_row["mime_type"],
+                ),
+            )
+            for project_media_row in project_media_rows
+        ],
         snapshot=RenderExportSnapshot(
             id=UUID(str(row["snapshot_id"])),
             version=row["snapshot_version"],

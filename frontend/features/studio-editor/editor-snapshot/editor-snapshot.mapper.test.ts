@@ -198,7 +198,37 @@ describe("editor snapshot mapper", () => {
       "00000000-0000-4000-8000-000000000006"
     )
     expect(editorProject.projectMedia[0].id).toBe(sourceMediaId)
-    expect(result).toEqual(document)
+    expect(result).toEqual({
+      ...document,
+      layers: [
+        {
+          ...document.layers[0],
+          widthPercent: 46,
+          heightPercent: 18,
+        },
+        {
+          ...document.layers[1],
+          xPercent: 50,
+          yPercent: 50,
+          widthPercent: 70,
+          heightPercent: 40,
+        },
+      ],
+      timelineTracks: document.timelineTracks.map((track) =>
+        track.id === "OVERLAY_MEDIA"
+          ? {
+              ...track,
+              segments: track.segments.map((segment) => ({
+                ...segment,
+                xPercent: 50,
+                yPercent: 50,
+                widthPercent: 70,
+                heightPercent: 40,
+              })),
+            }
+          : track
+      ),
+    })
     expect(result.layers[0].style).not.toHaveProperty("className")
     expect(result.layers[0]).not.toHaveProperty("label")
     expect(result).not.toHaveProperty("currentTime")
