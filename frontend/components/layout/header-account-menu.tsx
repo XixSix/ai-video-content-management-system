@@ -18,7 +18,7 @@ import { useLogout } from "@/features/auth/hooks/use-logout"
 import {
   getEmailDisplayName,
   getEmailInitials,
-} from "@/features/auth/auth.utils"
+} from "@/features/auth/utils/auth.utils"
 
 export function HeaderAccountMenu() {
   const router = useRouter()

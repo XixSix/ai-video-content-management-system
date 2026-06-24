@@ -253,6 +253,7 @@ export default function StudioLayout({
     <StudioEditorStoreProvider
       key={`${workspaceId}:${projectId}`}
       initialProject={initialProject}
+      initialMutedTrackIds={initialDocument.settings.mutedTrackIds}
       canEdit={canEdit}
     >
       <EditorSnapshotPersistenceProvider

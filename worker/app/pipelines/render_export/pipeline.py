@@ -161,6 +161,7 @@ def build_render_document(
     width, height = _dimensions_for_aspect_ratio(
         _get(snapshot, "settings", "aspectRatio") or project.aspect_ratio
     )
+    muted_track_ids = _muted_track_ids(snapshot)
     duration_seconds = _resolve_duration_seconds(project, snapshot)
     duration_in_frames = max(1, _seconds_to_frames(duration_seconds, fps))
     layer_by_id = {
@@ -232,7 +233,7 @@ def build_render_document(
                         "startFrame": start_frame,
                         "durationInFrames": duration_frames,
                         "fit": "contain",
-                        "muted": True,
+                        "muted": "OVERLAY_MEDIA" in muted_track_ids,
                         **geometry,
                         "style": {},
                     }
@@ -260,7 +261,7 @@ def build_render_document(
                         "startFrame": start_frame,
                         "durationInFrames": duration_frames,
                         "volume": 1,
-                        "muted": False,
+                        "muted": "AUDIO" in muted_track_ids,
                     }
                 )
                 continue
@@ -282,6 +283,9 @@ def build_render_document(
                         "startFrame": start_frame,
                         "durationInFrames": max(1, duration_frames),
                         **geometry,
+                        "animationName": _text_animation_name(layer),
+                        "animationBy": _text_animation_by(layer),
+                        "animationDuration": _text_animation_duration(layer),
                         "style": _text_style(layer.get("style")),
                     }
                 )
@@ -311,7 +315,7 @@ def build_render_document(
             "startFrame": source_start_frame,
             "durationInFrames": max(1, source_duration_frames),
             "fit": "cover",
-            "muted": False,
+            "muted": "SOURCE" in muted_track_ids,
         },
         "overlayMediaLayers": overlay_media_layers,
         "audioLayers": audio_layers,
@@ -381,6 +385,60 @@ def _dimensions_for_aspect_ratio(aspect_ratio: Any) -> tuple[int, int]:
             return 1920, 1080
         case _:
             return 1080, 1920
+
+
+def _muted_track_ids(snapshot: dict[str, Any]) -> set[str]:
+    raw_track_ids = _get(snapshot, "settings", "mutedTrackIds")
+
+    if not isinstance(raw_track_ids, list):
+        return set()
+
+    return {
+        track_id
+        for track_id in raw_track_ids
+        if track_id in {"TEXT", "OVERLAY_MEDIA", "SOURCE", "AUDIO"}
+    }
+
+
+def _text_animation_name(layer: dict[str, Any]) -> str:
+    style = layer.get("style") if isinstance(layer.get("style"), dict) else {}
+    animation_name = style.get("animationName")
+
+    return (
+        animation_name
+        if animation_name
+        in {
+            "none",
+            "fadeIn",
+            "blurIn",
+            "blurInUp",
+            "blurInDown",
+            "slideUp",
+            "slideDown",
+            "slideLeft",
+            "slideRight",
+            "scaleUp",
+            "scaleDown",
+        }
+        else "none"
+    )
+
+
+def _text_animation_by(layer: dict[str, Any]) -> str:
+    style = layer.get("style") if isinstance(layer.get("style"), dict) else {}
+    animation_by = style.get("animationBy")
+
+    return (
+        animation_by
+        if animation_by in {"text", "word", "character", "line"}
+        else "text"
+    )
+
+
+def _text_animation_duration(layer: dict[str, Any]) -> float:
+    style = layer.get("style") if isinstance(layer.get("style"), dict) else {}
+
+    return max(0.01, _number(style.get("animationDuration"), 0.2))
 
 
 def _text_style(raw_style: Any) -> dict[str, Any]:

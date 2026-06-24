@@ -145,7 +145,10 @@ def test_build_render_document_emits_overlay_and_audio_layers() -> None:
                 id=SNAPSHOT_ID,
                 version=3,
                 document={
-                    "settings": {"aspectRatio": "16:9"},
+                    "settings": {
+                        "aspectRatio": "16:9",
+                        "mutedTrackIds": ["OVERLAY_MEDIA", "AUDIO"],
+                    },
                     "layers": [],
                     "timelineTracks": [
                         {
@@ -227,7 +230,7 @@ def test_build_render_document_emits_overlay_and_audio_layers() -> None:
             "startFrame": 30,
             "durationInFrames": 240,
             "volume": 1,
-            "muted": False,
+            "muted": True,
         }
     ]
 
@@ -267,7 +270,11 @@ def test_build_render_document_applies_default_editor_geometry() -> None:
                             "kind": "text",
                             "content": "Hello",
                             "visible": True,
-                            "style": {},
+                            "style": {
+                                "animationName": "blurInUp",
+                                "animationBy": "word",
+                                "animationDuration": 0.6,
+                            },
                         },
                         {
                             "id": "captions",
@@ -343,6 +350,9 @@ def test_build_render_document_applies_default_editor_geometry() -> None:
         "yPercent": 50,
         "widthPercent": 46,
         "heightPercent": 18,
+        "animationName": "blurInUp",
+        "animationBy": "word",
+        "animationDuration": 0.6,
         "style": {},
     }
     assert document["captionLayers"][0] | {"style": {}} == {
@@ -363,7 +373,7 @@ def test_build_render_document_applies_default_editor_geometry() -> None:
         "startFrame": 0,
         "durationInFrames": 90,
         "fit": "contain",
-        "muted": True,
+        "muted": False,
         "xPercent": 50,
         "yPercent": 50,
         "widthPercent": 70,
