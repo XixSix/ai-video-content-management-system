@@ -52,7 +52,7 @@ export const StudioPreviewComposition: React.FC<RenderDocument> = (document) => 
           from={layer.startFrame}
           durationInFrames={layer.durationInFrames}
         >
-          <CaptionLayer captions={layer.captions} style={layer.style} />
+          <CaptionLayer layer={layer} />
         </Sequence>
       ))}
       {document.audioLayers.map((layer) =>

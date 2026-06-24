@@ -33,6 +33,13 @@ const textPositionedLayerSchema = layerBaseSchema.extend({
   heightPercent: z.number().min(1).max(100).default(100),
 });
 
+const captionPositionedLayerSchema = layerBaseSchema.extend({
+  xPercent: z.number().min(0).max(100).default(50),
+  yPercent: z.number().min(0).max(100).default(82),
+  widthPercent: z.number().min(1).max(100).default(76),
+  heightPercent: z.number().min(1).max(100).default(15),
+});
+
 export const renderDocumentSchema = z.object({
   version: z.literal(1),
   width: z.number().int().positive(),
@@ -74,7 +81,7 @@ export const renderDocumentSchema = z.object({
     }),
   ),
   captionLayers: z.array(
-    layerBaseSchema.extend({
+    captionPositionedLayerSchema.extend({
       captions: z.array(captionSchema),
       style: styleSchema,
     }),

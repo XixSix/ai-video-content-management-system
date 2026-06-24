@@ -9,15 +9,16 @@ import {
   useStudioPlaybackState,
   useStudioProjectState,
   useStudioSelectionState,
+  useStudioTimelineActions,
   useStudioToolState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
-import { CanvasLayerList } from "./components/canvas-layer-list"
+import { EditorOverlayLayerList } from "./components/editor-overlay-layer-list"
 import { CanvasFallbackArtwork } from "./components/fallback-artwork"
-import { CanvasSelectionFrame } from "./components/selection-frame"
 import { usePreviewSize } from "./hooks/use-preview-size"
+import type { ActiveCompositionSegment } from "./lib/composition"
 import { resolveCompositionFrame } from "./lib/composition"
 import { useEditorRouteParams } from "../hooks/use-editor-route-params"
 import { StudioRemotionPlayerPreview } from "../render-preview/studio-remotion-player-preview"
@@ -36,8 +37,9 @@ export function StudioCanvas() {
     seekToTime,
   } = useStudioPlaybackState()
   const { project } = useStudioProjectState()
-  const { updateCanvasLayerPosition } = useStudioLayerActions()
-  const { selectedItem, selectedTargetId, setSelectedItemId } =
+  const { updateCanvasLayerGeometry } = useStudioLayerActions()
+  const { updateTimelineSegmentGeometry } = useStudioTimelineActions()
+  const { selectedItemId, selectedTargetId, setSelectedItemId } =
     useStudioSelectionState()
   const { setActiveTool } = useStudioToolState()
   const canvasAspectRatio = getAspectRatioValue(project.media.aspectRatio)
@@ -62,6 +64,10 @@ export function StudioCanvas() {
           : "assets"
     )
     setSelectedItemId(layer.id)
+  }
+  const handleSelectOverlaySegment = (overlay: ActiveCompositionSegment) => {
+    setActiveTool("media")
+    setSelectedItemId(overlay.segment.id)
   }
 
   return (
@@ -99,16 +105,18 @@ export function StudioCanvas() {
               workspaceId={workspaceId}
             />
 
-            <CanvasLayerList
+            <EditorOverlayLayerList
               captionCues={captionCues}
+              compositionFrame={compositionFrame}
               currentTime={currentTime}
               layers={project.layers}
               onLayerDragGuideChange={setLayerDragGuide}
-              onMoveLayer={updateCanvasLayerPosition}
+              onLayerGeometryChange={updateCanvasLayerGeometry}
               onSelectLayer={handleSelectLayer}
-              renderPreviewContent={false}
+              onSelectOverlaySegment={handleSelectOverlaySegment}
+              onSegmentGeometryChange={updateTimelineSegmentGeometry}
+              selectedItemId={selectedItemId}
               selectedTargetId={selectedTargetId}
-              visibleLayerIds={compositionFrame.visibleLayerIds}
             />
 
             {layerDragGuide ? (
@@ -122,13 +130,6 @@ export function StudioCanvas() {
               </div>
             ) : null}
 
-            <CanvasSelectionFrame
-              layers={project.layers.filter((layer) =>
-                compositionFrame.visibleLayerIds.has(layer.id)
-              )}
-              selectedItem={selectedItem}
-              selectedTargetId={selectedTargetId}
-            />
           </div>
         </div>
       </div>

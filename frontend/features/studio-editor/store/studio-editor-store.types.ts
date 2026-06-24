@@ -12,6 +12,7 @@ import type {
   StudioShortClip,
   StudioToolId,
 } from "../studio.types"
+import type { StudioCanvasGeometry } from "../canvas/lib/geometry"
 import type { StudioEditorState } from "./studio-editor-state"
 
 export type CaptionLayerStyleUpdate = Partial<
@@ -59,6 +60,8 @@ export type TextLayerStyleUpdate = Partial<
     | "fontWeight"
     | "textAlign"
     | "textColor"
+    | "widthPercent"
+    | "heightPercent"
     | "xPercent"
     | "yPercent"
   >
@@ -159,9 +162,23 @@ export type StudioEditorActions = {
       recordHistory?: boolean
     }
   ) => void
+  updateCanvasLayerGeometry: (
+    layerId: string,
+    geometry: StudioCanvasGeometry,
+    options?: {
+      recordHistory?: boolean
+    }
+  ) => void
   updateProjectAspectRatio: (aspectRatio: StudioAspectRatio) => void
   updateTextLayerContent: (layerId: string, content: string) => void
   updateTextLayerStyle: (layerId: string, style: TextLayerStyleUpdate) => void
+  updateTimelineSegmentGeometry: (
+    segmentId: string,
+    geometry: StudioCanvasGeometry,
+    options?: {
+      recordHistory?: boolean
+    }
+  ) => void
   updateTimelineSegmentTiming: (
     segmentId: string,
     timing: {

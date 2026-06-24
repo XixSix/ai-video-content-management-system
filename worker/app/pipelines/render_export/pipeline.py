@@ -21,6 +21,28 @@ class TerminalRenderExportPipelineError(Exception):
         super().__init__(f"{error_code}: {message}" if error_code else message)
 
 
+GEOMETRY_DEFAULTS = {
+    "captions": {
+        "xPercent": 50,
+        "yPercent": 82,
+        "widthPercent": 76,
+        "heightPercent": 15,
+    },
+    "overlay": {
+        "xPercent": 50,
+        "yPercent": 50,
+        "widthPercent": 70,
+        "heightPercent": 40,
+    },
+    "text": {
+        "xPercent": 50,
+        "yPercent": 50,
+        "widthPercent": 46,
+        "heightPercent": 18,
+    },
+}
+
+
 def run_render_export_pipeline(
     message: RenderExportJobMessage,
 ) -> RenderExportCompletedOutput:
@@ -201,7 +223,7 @@ def build_render_document(
                         f"Overlay segment {segment.get('id', 'unknown')} references unsupported media type {media_type}"
                     )
 
-                layer = layer_by_id.get(layer_id) if isinstance(layer_id, str) else None
+                geometry = _geometry(segment, "overlay")
                 overlay_media_layers.append(
                     {
                         "id": str(segment.get("id", media_id)),
@@ -211,20 +233,7 @@ def build_render_document(
                         "durationInFrames": duration_frames,
                         "fit": "contain",
                         "muted": True,
-                        "xPercent": _number(
-                            layer.get("xPercent") if layer else None, 50
-                        ),
-                        "yPercent": _number(
-                            layer.get("yPercent") if layer else None, 50
-                        ),
-                        "widthPercent": _number(
-                            _get(layer or {}, "style", "widthPercent"),
-                            100,
-                        ),
-                        "heightPercent": _number(
-                            _get(layer or {}, "style", "heightPercent"),
-                            100,
-                        ),
+                        **geometry,
                         "style": {},
                     }
                 )
@@ -265,26 +274,26 @@ def build_render_document(
                 continue
 
             if layer.get("kind") == "text":
+                geometry = _geometry(layer, "text")
                 text_layers.append(
                     {
                         "id": f"{segment.get('id', layer_id)}-{layer_id}",
                         "text": layer.get("content", ""),
                         "startFrame": start_frame,
                         "durationInFrames": max(1, duration_frames),
-                        "xPercent": _number(layer.get("xPercent"), 0),
-                        "yPercent": _number(layer.get("yPercent"), 0),
-                        "widthPercent": 100,
-                        "heightPercent": 100,
+                        **geometry,
                         "style": _text_style(layer.get("style")),
                     }
                 )
 
             if layer.get("kind") == "captions" and captions and captions.captions:
+                geometry = _geometry(layer, "captions")
                 caption_layers.append(
                     {
                         "id": f"{segment.get('id', layer_id)}-{layer_id}",
                         "startFrame": start_frame,
                         "durationInFrames": max(1, duration_frames),
+                        **geometry,
                         "captions": captions.captions,
                         "style": _caption_style(layer.get("style")),
                     }
@@ -411,6 +420,19 @@ def _seconds_to_frames(value: Any, fps: int) -> int:
 
 def _number(value: Any, fallback: float) -> float:
     return float(value) if isinstance(value, int | float) else fallback
+
+
+def _geometry(source: dict[str, Any], kind: str) -> dict[str, float]:
+    defaults = GEOMETRY_DEFAULTS[kind]
+
+    return {
+        "xPercent": _number(source.get("xPercent"), defaults["xPercent"]),
+        "yPercent": _number(source.get("yPercent"), defaults["yPercent"]),
+        "widthPercent": _number(source.get("widthPercent"), defaults["widthPercent"]),
+        "heightPercent": _number(
+            source.get("heightPercent"), defaults["heightPercent"]
+        ),
+    }
 
 
 def _segment_media_id(

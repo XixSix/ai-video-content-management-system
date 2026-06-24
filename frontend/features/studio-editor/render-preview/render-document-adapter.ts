@@ -14,6 +14,10 @@ import {
   getTimelineSegmentMedia,
   getTimelineSegmentStartTime,
 } from "../timeline/lib/layout"
+import {
+  getLayerCanvasGeometry,
+  getOverlaySegmentCanvasGeometry,
+} from "../canvas/lib/geometry"
 
 export const STUDIO_PREVIEW_FPS = 30
 
@@ -240,7 +244,7 @@ function getTextLayerStyle(layer: StudioCanvasLayer): RenderStyle {
     fontStyle: layer.fontStyle,
     fontWeight: layer.fontWeight === "bold" ? 700 : 500,
     lineHeight: 1.05,
-    maxWidth: layer.boxWidth ? `${Math.min(layer.boxWidth, 92)}%` : undefined,
+    maxWidth: "100%",
     padding: backgroundColor && backgroundColor !== "transparent" ? "0.65em 0.8em" : undefined,
     textAlign: layer.textAlign,
     whiteSpace: "pre-wrap",
@@ -379,6 +383,7 @@ export function buildRenderDocumentFromStudioProject(
         project,
         segment,
       })
+      const geometry = getOverlaySegmentCanvasGeometry(segment)
 
       return [
         {
@@ -388,10 +393,7 @@ export function buildRenderDocumentFromStudioProject(
           ...timing,
           fit: "contain" as const,
           muted: true,
-          xPercent: 50,
-          yPercent: 50,
-          widthPercent: 100,
-          heightPercent: 100,
+          ...geometry,
           style: {},
         },
       ]
@@ -429,15 +431,13 @@ export function buildRenderDocumentFromStudioProject(
           project,
           segment,
         })
+        const geometry = getLayerCanvasGeometry(layer)
 
         return {
           id: `${segment.id}-${layer.id}`,
           text: layer.content ?? layer.label,
           ...timing,
-          xPercent: layer.xPercent ?? 50,
-          yPercent: layer.yPercent ?? 50,
-          widthPercent: 100,
-          heightPercent: 100,
+          ...geometry,
           style: getTextLayerStyle(layer),
         }
       })
@@ -452,10 +452,12 @@ export function buildRenderDocumentFromStudioProject(
           project,
           segment,
         })
+        const geometry = getLayerCanvasGeometry(layer)
 
         return {
           id: `${segment.id}-${layer.id}`,
           ...timing,
+          ...geometry,
           captions: captionEntries,
           style: getCaptionLayerStyle(layer),
         }

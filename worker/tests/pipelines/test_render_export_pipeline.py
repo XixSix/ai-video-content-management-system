@@ -167,6 +167,10 @@ def test_build_render_document_emits_overlay_and_audio_layers() -> None:
                                     "mediaId": str(OVERLAY_MEDIA_ID),
                                     "startTime": 2,
                                     "durationSeconds": 5,
+                                    "xPercent": 62,
+                                    "yPercent": 38,
+                                    "widthPercent": 34,
+                                    "heightPercent": 22,
                                 }
                             ],
                         },
@@ -209,10 +213,10 @@ def test_build_render_document_emits_overlay_and_audio_layers() -> None:
             "durationInFrames": 150,
             "fit": "contain",
             "muted": True,
-            "xPercent": 50,
-            "yPercent": 50,
-            "widthPercent": 100,
-            "heightPercent": 100,
+            "xPercent": 62,
+            "yPercent": 38,
+            "widthPercent": 34,
+            "heightPercent": 22,
             "style": {},
         }
     ]
@@ -226,6 +230,146 @@ def test_build_render_document_emits_overlay_and_audio_layers() -> None:
             "muted": False,
         }
     ]
+
+
+def test_build_render_document_applies_default_editor_geometry() -> None:
+    project = _project()
+    project = RenderExportProject(
+        **{
+            **project.__dict__,
+            "project_media": [
+                RenderExportProjectMedia(
+                    id=UUID("00000000-0000-4000-8000-000000000010"),
+                    role="OVERLAY",
+                    media=RenderExportMedia(
+                        id=OVERLAY_MEDIA_ID,
+                        user_id=USER_ID,
+                        workspace_id=WORKSPACE_ID,
+                        media_type="IMAGE",
+                        s3_bucket="vidpilot-media",
+                        s3_key="uploads/overlay.png",
+                        s3_region="ap-southeast-1",
+                        duration=None,
+                        width=1080,
+                        height=1080,
+                        mime_type="image/png",
+                    ),
+                ),
+            ],
+            "snapshot": RenderExportSnapshot(
+                id=SNAPSHOT_ID,
+                version=3,
+                document={
+                    "settings": {"aspectRatio": "16:9"},
+                    "layers": [
+                        {
+                            "id": "headline",
+                            "kind": "text",
+                            "content": "Hello",
+                            "visible": True,
+                            "style": {},
+                        },
+                        {
+                            "id": "captions",
+                            "kind": "captions",
+                            "visible": True,
+                            "style": {},
+                        },
+                    ],
+                    "timelineTracks": [
+                        {
+                            "id": "TEXT",
+                            "segments": [
+                                {
+                                    "id": "text-segment",
+                                    "layerId": "headline",
+                                    "startTime": 0,
+                                    "durationSeconds": 3,
+                                },
+                                {
+                                    "id": "caption-segment",
+                                    "layerId": "captions",
+                                    "startTime": 0,
+                                    "durationSeconds": 3,
+                                },
+                            ],
+                        },
+                        {
+                            "id": "OVERLAY_MEDIA",
+                            "segments": [
+                                {
+                                    "id": "overlay-segment",
+                                    "mediaId": str(OVERLAY_MEDIA_ID),
+                                    "startTime": 0,
+                                    "durationSeconds": 3,
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ),
+        }
+    )
+    captions = pipeline.render_export_repository.TranscriptCaptionSource(
+        transcript_id=UUID("00000000-0000-4000-8000-000000000012"),
+        transcript_version=1,
+        captions=[
+            {
+                "text": "Hello",
+                "startMs": 0,
+                "endMs": 1000,
+                "timestampMs": 0,
+                "confidence": 1,
+            }
+        ],
+    )
+    document = pipeline.build_render_document(
+        project,
+        source_url="http://localhost:9000/vidpilot-media/uploads/source.mp4?signature=test",
+        media_url_by_id={
+            str(
+                OVERLAY_MEDIA_ID
+            ): "http://localhost:9000/vidpilot-media/uploads/overlay.png?signature=test",
+        },
+        captions=captions,
+    )
+
+    assert document["textLayers"][0] | {"style": {}} == {
+        "id": "text-segment-headline",
+        "text": "Hello",
+        "startFrame": 0,
+        "durationInFrames": 90,
+        "xPercent": 50,
+        "yPercent": 50,
+        "widthPercent": 46,
+        "heightPercent": 18,
+        "style": {},
+    }
+    assert document["captionLayers"][0] | {"style": {}} == {
+        "id": "caption-segment-captions",
+        "startFrame": 0,
+        "durationInFrames": 90,
+        "xPercent": 50,
+        "yPercent": 82,
+        "widthPercent": 76,
+        "heightPercent": 15,
+        "captions": captions.captions,
+        "style": {},
+    }
+    assert document["overlayMediaLayers"][0] == {
+        "id": "overlay-segment",
+        "src": "http://localhost:9000/vidpilot-media/uploads/overlay.png?signature=test",
+        "mediaType": "IMAGE",
+        "startFrame": 0,
+        "durationInFrames": 90,
+        "fit": "contain",
+        "muted": True,
+        "xPercent": 50,
+        "yPercent": 50,
+        "widthPercent": 70,
+        "heightPercent": 40,
+        "style": {},
+    }
 
 
 def test_build_render_document_fails_for_missing_referenced_media() -> None:

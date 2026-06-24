@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest"
+import { renderDocumentSchema } from "@vidpilot/composition/render-document"
 
+import { brandMarkItem, bRollMediaItem, createStudioMediaItem } from "../data/media.mock"
 import { studioEditorProject } from "../data/project.mock"
-import { createStudioMediaItem, brandMarkItem, bRollMediaItem } from "../data/media.mock"
 import { cloneProject } from "../store/studio-editor-state"
 import {
   buildRenderDocumentFromStudioProject,
@@ -9,7 +10,6 @@ import {
   secondsToFrame,
   STUDIO_PREVIEW_FPS,
 } from "./render-document-adapter"
-import { renderDocumentSchema } from "@vidpilot/composition/render-document"
 
 describe("buildRenderDocumentFromStudioProject", () => {
   it("maps project duration and source media into a render document", () => {
@@ -43,6 +43,8 @@ describe("buildRenderDocumentFromStudioProject", () => {
       durationInFrames: secondsToFrame(textSegment.durationSeconds ?? 0),
       xPercent: textLayer.xPercent,
       yPercent: textLayer.yPercent,
+      widthPercent: textLayer.widthPercent,
+      heightPercent: textLayer.heightPercent,
     })
   })
 
@@ -58,6 +60,12 @@ describe("buildRenderDocumentFromStudioProject", () => {
       endMs: Math.round(firstWord.endTime * 1000),
       timestampMs: Math.round(firstWord.startTime * 1000),
       confidence: firstWord.confidence,
+    })
+    expect(document.captionLayers[0]).toMatchObject({
+      xPercent: 50,
+      yPercent: 82,
+      widthPercent: 76,
+      heightPercent: 15,
     })
   })
 
@@ -101,6 +109,29 @@ describe("buildRenderDocumentFromStudioProject", () => {
     expect(parsed.audioLayers).toEqual([])
   })
 
+  it("parses old caption render layers without geometry fields", () => {
+    const project = cloneProject(studioEditorProject)
+    const document = buildRenderDocumentFromStudioProject(project)
+    const oldCaptionLayers = document.captionLayers.map((captionLayer) => ({
+      id: captionLayer.id,
+      startFrame: captionLayer.startFrame,
+      durationInFrames: captionLayer.durationInFrames,
+      captions: captionLayer.captions,
+      style: captionLayer.style,
+    }))
+    const parsed = renderDocumentSchema.parse({
+      ...document,
+      captionLayers: oldCaptionLayers,
+    })
+
+    expect(parsed.captionLayers[0]).toMatchObject({
+      xPercent: 50,
+      yPercent: 82,
+      widthPercent: 76,
+      heightPercent: 15,
+    })
+  })
+
   it("emits overlay video and image layers from overlay media segments", () => {
     const project = cloneProject(studioEditorProject)
     const overlayVideo = createStudioMediaItem(bRollMediaItem, {
@@ -128,6 +159,10 @@ describe("buildRenderDocumentFromStudioProject", () => {
                 widthClassName: "w-[25%]",
                 startTime: 2,
                 durationSeconds: 7,
+                xPercent: 62,
+                yPercent: 38,
+                widthPercent: 34,
+                heightPercent: 22,
               },
               {
                 id: "overlay-image-segment",
@@ -159,6 +194,10 @@ describe("buildRenderDocumentFromStudioProject", () => {
       muted: true,
       startFrame: secondsToFrame(2),
       durationInFrames: secondsToFrame(7),
+      xPercent: 62,
+      yPercent: 38,
+      widthPercent: 34,
+      heightPercent: 22,
     })
     expect(document.overlayMediaLayers[1]).toMatchObject({
       id: "overlay-image-segment",

@@ -54,6 +54,7 @@ const READ_ONLY_ACTIONS: Partial<StudioEditorActions> = {
   setProjectSource: () => undefined,
   setClipCandidateStatus: () => undefined,
   undoEditorChange: () => undefined,
+  updateCanvasLayerGeometry: () => undefined,
   updateCanvasLayerPosition: () => undefined,
   updateCaptionLayerStyle: () => undefined,
   updateChapterTiming: () => undefined,
@@ -65,6 +66,7 @@ const READ_ONLY_ACTIONS: Partial<StudioEditorActions> = {
   updateShortClipTiming: () => undefined,
   updateTextLayerContent: () => undefined,
   updateTextLayerStyle: () => undefined,
+  updateTimelineSegmentGeometry: () => undefined,
   updateTimelineSegmentTiming: () => undefined,
   updateTranscriptWordText: () => undefined,
   upsertProjectMedia: () => undefined,
@@ -228,6 +230,7 @@ export function useStudioTimelineActions() {
       deleteTimelineSegment: state.deleteTimelineSegment,
       duplicateTimelineSegment: state.duplicateTimelineSegment,
       moveTimelineSegmentWithPush: state.moveTimelineSegmentWithPush,
+      updateTimelineSegmentGeometry: state.updateTimelineSegmentGeometry,
       updateTimelineSegmentTiming: state.updateTimelineSegmentTiming,
     }))
   )
@@ -238,6 +241,7 @@ export function useStudioLayerActions() {
     useShallow((state) => ({
       addTextLayerFromPreset: state.addTextLayerFromPreset,
       applyCaptionPreset: state.applyCaptionPreset,
+      updateCanvasLayerGeometry: state.updateCanvasLayerGeometry,
       updateCanvasLayerPosition: state.updateCanvasLayerPosition,
       updateCaptionLayerStyle: state.updateCaptionLayerStyle,
       updateTextLayerContent: state.updateTextLayerContent,

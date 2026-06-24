@@ -137,6 +137,12 @@ describe("Studio editor permissions", () => {
 
     store.getState().updateProjectAspectRatio("16:9")
     store.getState().addTextLayerFromPreset("hook-title")
+    store.getState().updateCanvasLayerGeometry("hook-copy", {
+      xPercent: 40,
+      yPercent: 40,
+      widthPercent: 30,
+      heightPercent: 15,
+    })
     store.getState().seekToTime(12)
 
     expect(store.getState().project.media.aspectRatio).toBe(initialAspectRatio)
@@ -144,6 +150,77 @@ describe("Studio editor permissions", () => {
       studioEditorProject.layers.length
     )
     expect(store.getState().currentTime).toBe(12)
+  })
+
+  it("updates canvas layer geometry for drag and resize gestures", () => {
+    const store = createStudioEditorStore(
+      cloneProject(studioEditorProject),
+      true
+    )
+
+    store.getState().updateCanvasLayerGeometry(
+      "hook-copy",
+      {
+        xPercent: 42,
+        yPercent: 35,
+        widthPercent: 38,
+        heightPercent: 20,
+      },
+      {
+        recordHistory: true,
+      }
+    )
+
+    const layer = store
+      .getState()
+      .project.layers.find((layer) => layer.id === "hook-copy")
+
+    expect(layer).toMatchObject({
+      xPercent: 42,
+      yPercent: 35,
+      widthPercent: 38,
+      heightPercent: 20,
+    })
+    expect(store.getState().historyPast).toHaveLength(1)
+  })
+
+  it("updates overlay media segment geometry independently from media selection", () => {
+    const project = cloneProject(studioEditorProject)
+    const video = createStudioMediaItem(bRollMediaItem)
+    project.projectMedia.push(video)
+    const store = createStudioEditorStore(project, true)
+    store.getState().addProjectMediaToTimeline(video.id)
+    const segmentId = store
+      .getState()
+      .project.timelineTracks.find((track) => track.id === "OVERLAY_MEDIA")!
+      .segments.find((segment) => segment.selectionId === video.id)!.id
+
+    store.getState().updateTimelineSegmentGeometry(
+      segmentId,
+      {
+        xPercent: 58,
+        yPercent: 44,
+        widthPercent: 36,
+        heightPercent: 24,
+      },
+      {
+        recordHistory: true,
+      }
+    )
+
+    const segment = store
+      .getState()
+      .project.timelineTracks.find((track) => track.id === "OVERLAY_MEDIA")!
+      .segments.find((segment) => segment.id === segmentId)
+
+    expect(segment).toMatchObject({
+      xPercent: 58,
+      yPercent: 44,
+      widthPercent: 36,
+      heightPercent: 24,
+    })
+    expect(store.getState().selectedItemId).toBe(segmentId)
+    expect(store.getState().historyPast).toHaveLength(2)
   })
 
   it("toggles playback without resetting the current timeline position", () => {
