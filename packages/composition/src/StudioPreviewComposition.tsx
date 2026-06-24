@@ -1,7 +1,9 @@
 import { Video } from "@remotion/media";
 import { AbsoluteFill, Sequence } from "remotion";
 
+import { AudioLayer } from "./layers/AudioLayer";
 import { CaptionLayer } from "./layers/CaptionLayer";
+import { OverlayMediaLayer } from "./layers/OverlayMediaLayer";
 import { TextLayer } from "./layers/TextLayer";
 import type { RenderDocument } from "./render-document";
 
@@ -24,6 +26,17 @@ export const StudioPreviewComposition: React.FC<RenderDocument> = (document) => 
           />
         </Sequence>
       ) : null}
+      {document.overlayMediaLayers.map((layer) =>
+        layer.src ? (
+          <Sequence
+            key={layer.id}
+            from={layer.startFrame}
+            durationInFrames={layer.durationInFrames}
+          >
+            <OverlayMediaLayer layer={layer} />
+          </Sequence>
+        ) : null,
+      )}
       {document.textLayers.map((layer) => (
         <Sequence
           key={layer.id}
@@ -42,6 +55,17 @@ export const StudioPreviewComposition: React.FC<RenderDocument> = (document) => 
           <CaptionLayer captions={layer.captions} style={layer.style} />
         </Sequence>
       ))}
+      {document.audioLayers.map((layer) =>
+        layer.src ? (
+          <Sequence
+            key={layer.id}
+            from={layer.startFrame}
+            durationInFrames={layer.durationInFrames}
+          >
+            <AudioLayer layer={layer} />
+          </Sequence>
+        ) : null,
+      )}
     </AbsoluteFill>
   );
 };

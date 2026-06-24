@@ -59,9 +59,11 @@ def run_render_export_pipeline(
                 bucket=project.media.s3_bucket,
                 expires_in_seconds=settings.renderer_timeout_seconds + 300,
             )
+            media_url_by_id = _presign_project_media(project)
             document = build_render_document(
                 project,
                 source_url=source_url,
+                media_url_by_id=media_url_by_id,
                 captions=captions,
             )
             document_path.write_text(json.dumps(document), encoding="utf-8")
@@ -128,7 +130,8 @@ def build_render_document(
     project: render_export_repository.RenderExportProject,
     *,
     source_url: str,
-    captions: render_export_repository.TranscriptCaptionSource | None,
+    media_url_by_id: dict[str, str] | None = None,
+    captions: render_export_repository.TranscriptCaptionSource | None = None,
 ) -> dict[str, Any]:
     """Map a persisted editor snapshot into the renderer JSON document."""
     snapshot = project.snapshot.document
@@ -143,8 +146,15 @@ def build_render_document(
         for layer in snapshot.get("layers", [])
         if isinstance(layer, dict) and layer.get("visible", True)
     }
+    project_media_by_id = {
+        str(project_media.media.id): project_media
+        for project_media in project.project_media
+    }
+    media_urls = media_url_by_id or {}
     text_layers: list[dict[str, Any]] = []
     caption_layers: list[dict[str, Any]] = []
+    overlay_media_layers: list[dict[str, Any]] = []
+    audio_layers: list[dict[str, Any]] = []
     source_duration_frames = duration_in_frames
     source_start_frame = 0
 
@@ -169,6 +179,82 @@ def build_render_document(
                 continue
 
             layer_id = segment.get("layerId")
+            start_frame = _seconds_to_frames(segment.get("startTime", 0), fps)
+            duration_frames = max(
+                1,
+                _seconds_to_frames(segment.get("durationSeconds", 1), fps),
+            )
+
+            if track_id == "OVERLAY_MEDIA":
+                media_id = _segment_media_id(segment, layer_by_id)
+                project_media = project_media_by_id.get(media_id) if media_id else None
+
+                if not project_media:
+                    raise ValueError(
+                        f"Overlay segment {segment.get('id', 'unknown')} references missing project media"
+                    )
+
+                media_type = project_media.media.media_type
+
+                if media_type not in {"VIDEO", "IMAGE"}:
+                    raise ValueError(
+                        f"Overlay segment {segment.get('id', 'unknown')} references unsupported media type {media_type}"
+                    )
+
+                layer = layer_by_id.get(layer_id) if isinstance(layer_id, str) else None
+                overlay_media_layers.append(
+                    {
+                        "id": str(segment.get("id", media_id)),
+                        "src": _media_url(media_id, media_urls),
+                        "mediaType": media_type,
+                        "startFrame": start_frame,
+                        "durationInFrames": duration_frames,
+                        "fit": "contain",
+                        "muted": True,
+                        "xPercent": _number(
+                            layer.get("xPercent") if layer else None, 50
+                        ),
+                        "yPercent": _number(
+                            layer.get("yPercent") if layer else None, 50
+                        ),
+                        "widthPercent": _number(
+                            _get(layer or {}, "style", "widthPercent"),
+                            100,
+                        ),
+                        "heightPercent": _number(
+                            _get(layer or {}, "style", "heightPercent"),
+                            100,
+                        ),
+                        "style": {},
+                    }
+                )
+                continue
+
+            if track_id == "AUDIO":
+                media_id = _segment_media_id(segment, layer_by_id)
+                project_media = project_media_by_id.get(media_id) if media_id else None
+
+                if not project_media:
+                    raise ValueError(
+                        f"Audio segment {segment.get('id', 'unknown')} references missing project media"
+                    )
+
+                if project_media.media.media_type != "AUDIO":
+                    raise ValueError(
+                        f"Audio segment {segment.get('id', 'unknown')} references unsupported media type {project_media.media.media_type}"
+                    )
+
+                audio_layers.append(
+                    {
+                        "id": str(segment.get("id", media_id)),
+                        "src": _media_url(media_id, media_urls),
+                        "startFrame": start_frame,
+                        "durationInFrames": duration_frames,
+                        "volume": 1,
+                        "muted": False,
+                    }
+                )
+                continue
 
             if not isinstance(layer_id, str):
                 continue
@@ -177,9 +263,6 @@ def build_render_document(
 
             if not layer:
                 continue
-
-            start_frame = _seconds_to_frames(segment.get("startTime", 0), fps)
-            duration_frames = _seconds_to_frames(segment.get("durationSeconds", 1), fps)
 
             if layer.get("kind") == "text":
                 text_layers.append(
@@ -221,8 +304,23 @@ def build_render_document(
             "fit": "cover",
             "muted": False,
         },
+        "overlayMediaLayers": overlay_media_layers,
+        "audioLayers": audio_layers,
         "textLayers": text_layers,
         "captionLayers": caption_layers,
+    }
+
+
+def _presign_project_media(
+    project: render_export_repository.RenderExportProject,
+) -> dict[str, str]:
+    return {
+        str(project_media.media.id): s3_service.create_presigned_get_url(
+            project_media.media.s3_key,
+            bucket=project_media.media.s3_bucket,
+            expires_in_seconds=settings.renderer_timeout_seconds + 300,
+        )
+        for project_media in project.project_media
     }
 
 
@@ -313,6 +411,38 @@ def _seconds_to_frames(value: Any, fps: int) -> int:
 
 def _number(value: Any, fallback: float) -> float:
     return float(value) if isinstance(value, int | float) else fallback
+
+
+def _segment_media_id(
+    segment: dict[str, Any], layer_by_id: dict[str, Any]
+) -> str | None:
+    media_id = segment.get("mediaId")
+
+    if isinstance(media_id, str):
+        return media_id
+
+    layer_id = segment.get("layerId")
+
+    if not isinstance(layer_id, str):
+        return None
+
+    layer = layer_by_id.get(layer_id)
+
+    if not isinstance(layer, dict):
+        return None
+
+    layer_media_id = layer.get("mediaId")
+
+    return layer_media_id if isinstance(layer_media_id, str) else None
+
+
+def _media_url(media_id: str, media_url_by_id: dict[str, str]) -> str:
+    media_url = media_url_by_id.get(media_id)
+
+    if not media_url:
+        raise ValueError(f"Render document media URL is missing for media {media_id}")
+
+    return media_url
 
 
 def _get(source: dict[str, Any], *path: str) -> Any:

@@ -4,7 +4,9 @@ import type {
   StudioAspectRatio,
   StudioCanvasLayer,
   StudioEditorProject,
+  StudioProjectMediaItem,
   StudioTimelineSegment,
+  StudioTimelineTrackId,
 } from "../studio.types"
 import {
   getProjectTimelineDuration,
@@ -16,6 +18,10 @@ import {
 export const STUDIO_PREVIEW_FPS = 30
 
 type RenderStyle = RenderDocument["textLayers"][number]["style"]
+export type BuildRenderDocumentOptions = {
+  mediaPreviewUrlById?: Record<string, string>
+  mutedTrackIds?: string[]
+}
 
 export function secondsToFrame(
   seconds: number,
@@ -76,11 +82,35 @@ export function getSourcePreviewMediaId(project: StudioEditorProject) {
   return getSourceMediaItem(project)?.id ?? project.media.id
 }
 
-function getSourcePreviewUrl(project: StudioEditorProject) {
-  return project.media.streamUrl || getSourceMediaItem(project)?.assetUrl || ""
+function getMediaPreviewUrl(
+  media: StudioProjectMediaItem | null,
+  mediaPreviewUrlById: Record<string, string>
+) {
+  if (!media) {
+    return ""
+  }
+
+  return mediaPreviewUrlById[media.id] || media.assetUrl || ""
 }
 
-function getTrackSegments(project: StudioEditorProject, trackId: string) {
+function getSourcePreviewUrl(
+  project: StudioEditorProject,
+  mediaPreviewUrlById: Record<string, string>
+) {
+  const sourceMediaItem = getSourceMediaItem(project)
+
+  return (
+    mediaPreviewUrlById[getSourcePreviewMediaId(project)] ||
+    project.media.streamUrl ||
+    sourceMediaItem?.assetUrl ||
+    ""
+  )
+}
+
+function getTrackSegments(
+  project: StudioEditorProject,
+  trackId: StudioTimelineTrackId
+) {
   return (
     project.timelineTracks.find((track) => track.id === trackId)?.segments ?? []
   )
@@ -145,6 +175,28 @@ function getSegmentFrameTiming({
       Math.min(segmentDurationFrames, Math.max(1, durationInFrames - startFrame))
     ),
   }
+}
+
+function getSegmentMedia({
+  project,
+  segment,
+}: {
+  project: StudioEditorProject
+  segment: StudioTimelineSegment
+}) {
+  const directMedia = getTimelineSegmentMedia({ project, segment })
+
+  if (directMedia) {
+    return directMedia
+  }
+
+  const layer = project.layers.find((item) => item.id === segment.selectionId)
+
+  if (!layer?.mediaId) {
+    return null
+  }
+
+  return project.projectMedia.find((item) => item.id === layer.mediaId) ?? null
 }
 
 function compactStyle(style: Record<string, string | number | undefined>) {
@@ -281,9 +333,28 @@ function getCaptionEntries(project: StudioEditorProject) {
     })
 }
 
+export function getRenderPreviewMediaIds(project: StudioEditorProject) {
+  const ids = new Set<string>([getSourcePreviewMediaId(project)])
+
+  for (const trackId of ["OVERLAY_MEDIA", "AUDIO"] as const) {
+    for (const segment of getTrackSegments(project, trackId)) {
+      const media = getSegmentMedia({ project, segment })
+
+      if (media) {
+        ids.add(media.id)
+      }
+    }
+  }
+
+  return Array.from(ids)
+}
+
 export function buildRenderDocumentFromStudioProject(
-  project: StudioEditorProject
+  project: StudioEditorProject,
+  options: BuildRenderDocumentOptions = {}
 ): RenderDocument {
+  const mediaPreviewUrlById = options.mediaPreviewUrlById ?? {}
+  const mutedTrackIds = options.mutedTrackIds ?? []
   const timelineDurationSeconds = Math.max(0, getProjectTimelineDuration(project))
   const durationInFrames = Math.max(
     1,
@@ -295,6 +366,60 @@ export function buildRenderDocumentFromStudioProject(
   })
   const sourceTiming = getSourceTiming(project, durationInFrames)
   const captionEntries = getCaptionEntries(project)
+  const overlayMediaLayers = getTrackSegments(project, "OVERLAY_MEDIA").flatMap(
+    (segment) => {
+      const media = getSegmentMedia({ project, segment })
+
+      if (!media || (media.type !== "VIDEO" && media.type !== "IMAGE")) {
+        return []
+      }
+
+      const timing = getSegmentFrameTiming({
+        durationInFrames,
+        project,
+        segment,
+      })
+
+      return [
+        {
+          id: segment.id,
+          src: getMediaPreviewUrl(media, mediaPreviewUrlById),
+          mediaType: media.type,
+          ...timing,
+          fit: "contain" as const,
+          muted: true,
+          xPercent: 50,
+          yPercent: 50,
+          widthPercent: 100,
+          heightPercent: 100,
+          style: {},
+        },
+      ]
+    }
+  )
+  const audioLayers = getTrackSegments(project, "AUDIO").flatMap((segment) => {
+    const media = getSegmentMedia({ project, segment })
+
+    if (!media || media.type !== "AUDIO") {
+      return []
+    }
+
+    const timing = getSegmentFrameTiming({
+      durationInFrames,
+      project,
+      segment,
+    })
+
+    return [
+      {
+        id: segment.id,
+        src: getMediaPreviewUrl(media, mediaPreviewUrlById),
+        ...timing,
+        volume: 1,
+        muted: mutedTrackIds.includes("AUDIO"),
+      },
+    ]
+  })
   const textLayers = project.layers
     .filter((layer) => layer.kind === "text" && isLayerVisible(layer))
     .flatMap((layer) =>
@@ -344,11 +469,13 @@ export function buildRenderDocumentFromStudioProject(
     durationInFrames,
     backgroundColor: "#000000",
     sourceVideo: {
-      src: getSourcePreviewUrl(project),
+      src: getSourcePreviewUrl(project, mediaPreviewUrlById),
       ...sourceTiming,
       fit: "cover",
-      muted: false,
+      muted: mutedTrackIds.includes("SOURCE"),
     },
+    overlayMediaLayers,
+    audioLayers,
     textLayers,
     captionLayers,
   }

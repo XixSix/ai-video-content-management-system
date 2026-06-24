@@ -47,7 +47,6 @@ export function StudioCanvas() {
     () => resolveCompositionFrame(project, currentTime),
     [currentTime, project]
   )
-  const sourceTrackMuted = mutedTrackIds.includes("SOURCE")
 
   const captionCues = useMemo(
     () => buildCaptionCues(project.transcriptSegments, project.transcriptWords),
@@ -93,10 +92,10 @@ export function StudioCanvas() {
             <StudioRemotionPlayerPreview
               currentTime={currentTime}
               isPlaying={isPlaying}
+              mutedTrackIds={mutedTrackIds}
               pausePlayback={pausePlayback}
               project={project}
               seekToTime={seekToTime}
-              sourceMuted={sourceTrackMuted}
               workspaceId={workspaceId}
             />
 

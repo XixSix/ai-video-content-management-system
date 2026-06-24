@@ -2,16 +2,18 @@
 
 import { Player, type CallbackListener, type PlayerRef } from "@remotion/player"
 import { StudioPreviewComposition } from "@vidpilot/composition"
+import { useQueries } from "@tanstack/react-query"
 import { useEffect, useMemo, useRef } from "react"
 
-import { useMediaPreviewUrl } from "@/features/media-library/hooks/use-media-mutations"
+import { mediaQueryKeys } from "@/features/media-library/hooks/media-query-keys"
+import { mediaService } from "@/features/media-library/services/media.service"
 
 import type { StudioEditorProject } from "../studio.types"
 import {
   buildRenderDocumentFromStudioProject,
   clampPlaybackFrame,
   frameToSeconds,
-  getSourcePreviewMediaId,
+  getRenderPreviewMediaIds,
   secondsToFrame,
 } from "./render-document-adapter"
 
@@ -21,44 +23,50 @@ export function StudioRemotionPlayerPreview({
   pausePlayback,
   project,
   seekToTime,
-  sourceMuted,
+  mutedTrackIds,
   workspaceId,
 }: {
   currentTime: number
   isPlaying: boolean
+  mutedTrackIds: string[]
   pausePlayback: () => void
   project: StudioEditorProject
   seekToTime: (timeSeconds: number) => void
-  sourceMuted: boolean
   workspaceId: string
 }) {
   const playerRef = useRef<PlayerRef>(null)
   const playerOriginFrameRef = useRef<number | null>(null)
-  const baseDocument = useMemo(
-    () => buildRenderDocumentFromStudioProject(project),
+  const renderPreviewMediaIds = useMemo(
+    () => getRenderPreviewMediaIds(project),
     [project]
   )
-  const sourceMediaId = useMemo(
-    () => getSourcePreviewMediaId(project),
-    [project]
+  const previewUrlQueries = useQueries({
+    queries: renderPreviewMediaIds.map((mediaId) => ({
+      queryKey: mediaQueryKeys.preview(workspaceId, mediaId),
+      queryFn: () => mediaService.getPreviewUrl(workspaceId, mediaId),
+      enabled: Boolean(workspaceId) && Boolean(mediaId),
+      staleTime: 4 * 60 * 1000,
+      retry: 1,
+    })),
+  })
+  const mediaPreviewUrlById = useMemo(
+    () =>
+      Object.fromEntries(
+        previewUrlQueries.flatMap((query, index) => {
+          const url = query.data?.url
+
+          return url ? [[renderPreviewMediaIds[index], url]] : []
+        })
+      ),
+    [previewUrlQueries, renderPreviewMediaIds]
   )
-  const previewUrlQuery = useMediaPreviewUrl(
-    workspaceId,
-    sourceMediaId,
-    !baseDocument.sourceVideo.src
-  )
-  const sourcePreviewUrl =
-    baseDocument.sourceVideo.src || previewUrlQuery.data?.url || ""
   const renderDocument = useMemo(
-    () => ({
-      ...baseDocument,
-      sourceVideo: {
-        ...baseDocument.sourceVideo,
-        muted: sourceMuted,
-        src: sourcePreviewUrl,
-      },
-    }),
-    [baseDocument, sourceMuted, sourcePreviewUrl]
+    () =>
+      buildRenderDocumentFromStudioProject(project, {
+        mediaPreviewUrlById,
+        mutedTrackIds,
+      }),
+    [mediaPreviewUrlById, mutedTrackIds, project]
   )
 
   useEffect(() => {
