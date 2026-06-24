@@ -49,8 +49,10 @@ type ReloadedSnapshot = {
 type EditorSnapshotPersistenceContextValue = {
   conflict: EditorSnapshotConflict | null
   discardChanges: () => Promise<void>
+  hasPendingChanges: boolean
   overwrite: () => void
   retry: () => void
+  saveNow: () => Promise<boolean>
   status: EditorSnapshotSaveStatus
 }
 
@@ -76,6 +78,71 @@ export function getEditorSnapshotVersionConflict(
     typeof baseVersion === "number"
     ? { currentVersion, baseVersion }
     : null
+}
+
+export function canSaveEditorSnapshotNow({
+  canEdit,
+  conflict,
+  status,
+}: {
+  canEdit: boolean
+  conflict: EditorSnapshotConflict | null
+  status: EditorSnapshotSaveStatus
+}) {
+  return (
+    canEdit &&
+    !conflict &&
+    status !== "conflict" &&
+    status !== "error" &&
+    status !== "view-only"
+  )
+}
+
+export async function saveEditorSnapshotNow({
+  canStart,
+  clearTimer,
+  getInFlight,
+  isDirty,
+  markTrailingSave,
+  saveLatest,
+}: {
+  canStart: () => boolean
+  clearTimer: () => void
+  getInFlight: () => Promise<boolean> | null
+  isDirty: () => boolean
+  markTrailingSave: () => void
+  saveLatest: () => Promise<boolean>
+}) {
+  if (!canStart()) {
+    return false
+  }
+
+  clearTimer()
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const inFlight = getInFlight()
+
+    if (inFlight) {
+      markTrailingSave()
+
+      if (!(await inFlight)) {
+        return false
+      }
+
+      await Promise.resolve()
+      continue
+    }
+
+    if (!isDirty()) {
+      return true
+    }
+
+    if (!(await saveLatest())) {
+      return false
+    }
+  }
+
+  return !isDirty()
 }
 
 export function EditorSnapshotPersistenceProvider({
@@ -114,12 +181,14 @@ export function EditorSnapshotPersistenceProvider({
     getEditorDocumentFingerprint(normalizedInitialDocument)
   )
   const versionRef = useRef(initialVersion)
-  const inFlightRef = useRef<Promise<void> | null>(null)
+  const inFlightRef = useRef<Promise<boolean> | null>(null)
   const trailingSaveRef = useRef(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const conflictRef = useRef<EditorSnapshotConflict | null>(null)
   const mountedRef = useRef(true)
-  const saveLatestRef = useRef<(baseVersion?: number) => void>(() => undefined)
+  const saveLatestRef = useRef<(baseVersion?: number) => Promise<boolean>>(
+    () => Promise.resolve(false)
+  )
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -145,23 +214,23 @@ export function EditorSnapshotPersistenceProvider({
   )
 
   const saveLatest = useCallback(
-    (baseVersionOverride?: number) => {
+    (baseVersionOverride?: number): Promise<boolean> => {
       if (!canEdit || conflictRef.current) {
-        return
+        return Promise.resolve(false)
       }
 
       clearTimer()
 
       if (inFlightRef.current) {
         trailingSaveRef.current = true
-        return
+        return inFlightRef.current
       }
 
       const document = latestDocumentRef.current
       const fingerprint = latestFingerprintRef.current
 
       if (fingerprint === baselineFingerprintRef.current) {
-        return
+        return Promise.resolve(true)
       }
 
       const baseVersion = baseVersionOverride ?? versionRef.current
@@ -187,6 +256,8 @@ export function EditorSnapshotPersistenceProvider({
             trailingSaveRef.current = true
             updateStatus("dirty")
           }
+
+          return true
         })
         .catch((error: unknown) => {
           const nextConflict = getEditorSnapshotVersionConflict(error)
@@ -194,10 +265,11 @@ export function EditorSnapshotPersistenceProvider({
           if (nextConflict) {
             setActiveConflict(nextConflict)
             updateStatus("conflict")
-            return
+            return false
           }
 
           updateStatus("error")
+          return false
         })
         .finally(() => {
           inFlightRef.current = null
@@ -208,11 +280,12 @@ export function EditorSnapshotPersistenceProvider({
             latestFingerprintRef.current !== baselineFingerprintRef.current
           ) {
             trailingSaveRef.current = false
-            queueMicrotask(() => saveLatestRef.current())
+            queueMicrotask(() => void saveLatestRef.current())
           }
         })
 
       inFlightRef.current = request
+      return request
     },
     [
       canEdit,
@@ -254,7 +327,10 @@ export function EditorSnapshotPersistenceProvider({
 
     updateStatus("dirty")
     clearTimer()
-    timerRef.current = setTimeout(() => saveLatestRef.current(), AUTOSAVE_DELAY_MS)
+    timerRef.current = setTimeout(
+      () => void saveLatestRef.current(),
+      AUTOSAVE_DELAY_MS
+    )
   }, [canEdit, clearTimer, project, status, updateStatus])
 
   useEffect(() => {
@@ -272,11 +348,11 @@ export function EditorSnapshotPersistenceProvider({
     }
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        saveLatestRef.current()
+        void saveLatestRef.current()
       }
     }
     const handlePageHide = () => {
-      saveLatestRef.current()
+      void saveLatestRef.current()
     }
 
     window.addEventListener("beforeunload", handleBeforeUnload)
@@ -286,7 +362,7 @@ export function EditorSnapshotPersistenceProvider({
     return () => {
       mountedRef.current = false
       clearTimer()
-      saveLatestRef.current()
+      void saveLatestRef.current()
       window.removeEventListener("beforeunload", handleBeforeUnload)
       window.removeEventListener("pagehide", handlePageHide)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
@@ -295,7 +371,7 @@ export function EditorSnapshotPersistenceProvider({
 
   const retry = useCallback(() => {
     if (status !== "error") return
-    saveLatestRef.current()
+    void saveLatestRef.current()
   }, [status])
 
   const overwrite = useCallback(() => {
@@ -305,8 +381,28 @@ export function EditorSnapshotPersistenceProvider({
 
     versionRef.current = activeConflict.currentVersion
     setActiveConflict(null)
-    saveLatestRef.current(activeConflict.currentVersion)
+    void saveLatestRef.current(activeConflict.currentVersion)
   }, [setActiveConflict])
+
+  const saveNow = useCallback(async () => {
+    return saveEditorSnapshotNow({
+      canStart: () =>
+        canSaveEditorSnapshotNow({
+          canEdit,
+          conflict: conflictRef.current,
+          status,
+        }),
+      clearTimer,
+      getInFlight: () => inFlightRef.current,
+      isDirty: () =>
+        latestFingerprintRef.current !== baselineFingerprintRef.current ||
+        Boolean(conflictRef.current),
+      markTrailingSave: () => {
+        trailingSaveRef.current = true
+      },
+      saveLatest: () => saveLatestRef.current(),
+    })
+  }, [canEdit, clearTimer, status])
 
   const discardChanges = useCallback(async () => {
     clearTimer()
@@ -350,11 +446,17 @@ export function EditorSnapshotPersistenceProvider({
     () => ({
       conflict,
       discardChanges,
+      hasPendingChanges:
+        status === "dirty" ||
+        status === "saving" ||
+        status === "error" ||
+        status === "conflict",
       overwrite,
       retry,
+      saveNow,
       status,
     }),
-    [conflict, discardChanges, overwrite, retry, status]
+    [conflict, discardChanges, overwrite, retry, saveNow, status]
   )
 
   return (

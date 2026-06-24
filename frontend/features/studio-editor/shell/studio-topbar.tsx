@@ -6,6 +6,7 @@ import {
   Check,
   CloudAlert,
   CloudUpload,
+  Download,
   Eye,
   LoaderCircle,
   Menu,
@@ -35,6 +36,8 @@ import {
   useStudioProjectState,
 } from "@/features/studio-editor/store/studio-editor-store"
 import { useEditorSnapshotPersistence } from "@/features/studio-editor/editor-snapshot/editor-snapshot-persistence"
+import { useEditorRouteParams } from "@/features/studio-editor/hooks/use-editor-route-params"
+import { useRenderExportFlow } from "@/features/studio-editor/render-export/use-render-export-flow"
 
 type StudioTopbarProps = {
   projectName: string
@@ -88,7 +91,8 @@ export function StudioTopbar({
   const { canRedo, canUndo, redoEditorChange, undoEditorChange } =
     useStudioHistoryState()
   const { project } = useStudioProjectState()
-  const { retry, status } = useEditorSnapshotPersistence()
+  const { retry, saveNow, status } = useEditorSnapshotPersistence()
+  const { projectId, workspaceId } = useEditorRouteParams()
   const saveIndicator = {
     "view-only": {
       icon: Eye,
@@ -127,6 +131,20 @@ export function StudioTopbar({
     },
   }[status]
   const SaveIndicatorIcon = saveIndicator.icon
+  const exportBlockedBySnapshot =
+    status === "conflict" || status === "error" || status === "view-only"
+  const renderExport = useRenderExportFlow({
+    blockedBySnapshot: exportBlockedBySnapshot,
+    projectId,
+    saveNow,
+    workspaceId,
+  })
+  const exportLabel =
+    renderExport.phase === "saving"
+      ? "Saving…"
+      : renderExport.phase === "rendering"
+        ? "Rendering…"
+        : "Export"
 
   return (
     <header className="relative flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/88">
@@ -199,7 +217,18 @@ export function StudioTopbar({
         <Button variant="outline" size="sm">
           Publish
         </Button>
-        <Button size="sm">Export</Button>
+        <Button
+          size="sm"
+          onClick={() => void renderExport.startExport()}
+          disabled={renderExport.disabled}
+        >
+          {renderExport.phase === "idle" ? (
+            <Download />
+          ) : (
+            <LoaderCircle className="animate-spin" />
+          )}
+          {exportLabel}
+        </Button>
       </div>
     </header>
   )
