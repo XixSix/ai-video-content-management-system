@@ -32,11 +32,11 @@ import {
   registerSchema,
   type LoginInput,
   type RegisterInput,
-} from "../auth.schema"
+} from "../schemas/auth.schema"
 import { useLogin } from "../hooks/use-login"
 import { useRegister } from "../hooks/use-register"
-import type { AuthMode } from "../auth.types"
-import { getSafeRedirectPath } from "../auth.utils"
+import type { AuthMode } from "../types/auth.types"
+import { getSafeRedirectPath } from "../utils/auth.utils"
 
 type AuthFormInput = LoginInput | RegisterInput
 

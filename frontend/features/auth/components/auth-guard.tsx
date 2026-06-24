@@ -1,21 +1,15 @@
 "use client"
 
-import { Loader2Icon } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, type ReactNode } from "react"
 
-import { getSafeRedirectPath } from "../auth.utils"
+import { AppLoading } from "@/components/shared/app-loading"
+
+import { getSafeRedirectPath } from "../utils/auth.utils"
 import { useAuthStore } from "../store/auth.store"
 
 function AuthLoadingScreen() {
-  return (
-    <div className="flex min-h-svh items-center justify-center bg-background">
-      <Loader2Icon
-        className="size-6 animate-spin text-muted-foreground"
-        aria-label="Loading session"
-      />
-    </div>
-  )
+  return <AppLoading label="Loading session..." />
 }
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {

@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import { useQuery } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
-import type { AuthenticatedUser } from "../auth.types"
-import { authService } from "../services/auth.service"
-import { useAuthStore } from "../store/auth.store"
-import { authQueryKeys } from "./auth-query-keys"
+import type { AuthenticatedUser } from "../types/auth.types";
+import { authService } from "../services/auth.service";
+import { useAuthStore } from "../store/auth.store";
+import { authQueryKeys } from "./auth-query-keys";
 
 export function useAuthSession() {
-  const setAuthenticated = useAuthStore((state) => state.setAuthenticated)
-  const setAnonymous = useAuthStore((state) => state.setAnonymous)
+  const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
+  const setAnonymous = useAuthStore((state) => state.setAnonymous);
   const query = useQuery<AuthenticatedUser | null>({
     queryKey: authQueryKeys.session,
     queryFn: async () => {
-      const accessToken = await authService.refreshAccessToken()
-      useAuthStore.getState().setAccessToken(accessToken)
+      const accessToken = await authService.refreshAccessToken();
+      useAuthStore.getState().setAccessToken(accessToken);
 
-      const { user } = await authService.getCurrentUser()
+      const { user } = await authService.getCurrentUser();
 
-      return user
+      return user;
     },
     staleTime: Number.POSITIVE_INFINITY,
-  })
+  });
 
   useEffect(() => {
     if (query.data) {
-      const accessToken = useAuthStore.getState().accessToken
+      const accessToken = useAuthStore.getState().accessToken;
 
       if (accessToken) {
-        setAuthenticated(accessToken)
+        setAuthenticated(accessToken);
       }
-      return
+      return;
     }
 
     if (query.isError) {
-      setAnonymous()
+      setAnonymous();
     }
-  }, [query.data, query.isError, setAnonymous, setAuthenticated])
+  }, [query.data, query.isError, setAnonymous, setAuthenticated]);
 
-  return query
+  return query;
 }

@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { create } from "zustand"
+import { create } from "zustand";
 
-import type { AuthStatus } from "../auth.types"
+import type { AuthStatus } from "../types/auth.types";
 
 type AuthState = {
-  status: AuthStatus
-  accessToken: string | null
-  setAccessToken: (accessToken: string) => void
-  setAuthenticated: (accessToken: string) => void
-  setAnonymous: () => void
-}
+  status: AuthStatus;
+  accessToken: string | null;
+  setAccessToken: (accessToken: string) => void;
+  setAuthenticated: (accessToken: string) => void;
+  setAnonymous: () => void;
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   status: "initializing",
@@ -26,4 +26,4 @@ export const useAuthStore = create<AuthState>((set) => ({
       status: "anonymous",
       accessToken: null,
     }),
-}))
+}));
