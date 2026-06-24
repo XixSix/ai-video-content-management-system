@@ -1,13 +1,17 @@
 .agents/
+node_modules/
+packages/*/dist/
 skills-lock.json
 .env
 docs
 AGENTS.md
 !frontend/AGENTS.md
 .vscode
+.codex
 frontend/public/transcript-thumbnail-mock.png
 frontend/public/transcript-thumbnail-retail.png
 frontend/CODE_ORGANIZATION.md
 todo.txt
 .kiro/
 .config.kiro/
+.pytest_cache

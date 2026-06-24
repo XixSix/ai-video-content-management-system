@@ -1,8 +1,8 @@
 import { bundle } from "@remotion/bundler";
 import { renderMedia, selectComposition } from "@remotion/renderer";
+import { renderDocumentSchema } from "@vidpilot/composition/render-document";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { renderDocumentSchema } from "./render-document";
 
 const args = new Map<string, string>();
 

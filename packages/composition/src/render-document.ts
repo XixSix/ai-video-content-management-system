@@ -56,3 +56,21 @@ export type RenderTextLayer = RenderDocument["textLayers"][number];
 export type RenderCaptionLayer = RenderDocument["captionLayers"][number] & {
   captions: Caption[];
 };
+
+export const DEFAULT_RENDER_DOCUMENT: RenderDocument = {
+  version: 1,
+  width: 1920,
+  height: 1080,
+  fps: 30,
+  durationInFrames: 150,
+  backgroundColor: "#000000",
+  sourceVideo: {
+    src: "",
+    startFrame: 0,
+    durationInFrames: 150,
+    fit: "cover",
+    muted: false,
+  },
+  textLayers: [],
+  captionLayers: [],
+};

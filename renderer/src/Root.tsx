@@ -1,20 +1,24 @@
 import "./index.css";
+import {
+  DEFAULT_RENDER_DOCUMENT,
+  StudioPreviewComposition,
+  renderDocumentSchema,
+  type RenderDocument,
+} from "@vidpilot/composition";
 import { Composition, type CalculateMetadataFunction } from "remotion";
-import { ExportRenderComposition } from "./Composition";
-import { renderDocumentSchema, type RenderDocument } from "./render-document";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Composition
         id="ExportRender"
-        component={ExportRenderComposition}
-        defaultProps={defaultRenderDocument}
+        component={StudioPreviewComposition}
+        defaultProps={DEFAULT_RENDER_DOCUMENT}
         calculateMetadata={calculateMetadata}
-        durationInFrames={defaultRenderDocument.durationInFrames}
+        durationInFrames={DEFAULT_RENDER_DOCUMENT.durationInFrames}
         fps={30}
-        width={defaultRenderDocument.width}
-        height={defaultRenderDocument.height}
+        width={DEFAULT_RENDER_DOCUMENT.width}
+        height={DEFAULT_RENDER_DOCUMENT.height}
       />
     </>
   );
@@ -30,22 +34,4 @@ const calculateMetadata: CalculateMetadataFunction<RenderDocument> = async ({ pr
     fps: document.fps,
     durationInFrames: document.durationInFrames,
   };
-};
-
-const defaultRenderDocument: RenderDocument = {
-  version: 1,
-  width: 1920,
-  height: 1080,
-  fps: 30,
-  durationInFrames: 150,
-  backgroundColor: "#000000",
-  sourceVideo: {
-    src: "",
-    startFrame: 0,
-    durationInFrames: 150,
-    fit: "cover",
-    muted: false,
-  },
-  textLayers: [],
-  captionLayers: [],
 };

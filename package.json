@@ -1,0 +1,9 @@
+{
+  "name": "vid-pilot",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "renderer",
+    "packages/*"
+  ]
+}

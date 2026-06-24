@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@vidpilot/composition": "0.1.0",
     "@remotion/bundler": "4.0.482",
     "@remotion/captions": "4.0.482",
     "@remotion/cli": "4.0.482",
@@ -26,11 +27,11 @@
     "typescript": "5.9.3"
   },
   "scripts": {
-    "dev": "remotion studio --port=3005",
-    "build": "remotion bundle",
-    "render:document": "tsx src/cli.ts",
+    "dev": "npm run build --workspace @vidpilot/composition && remotion studio --port=3005",
+    "build": "npm run build --workspace @vidpilot/composition && remotion bundle",
+    "render:document": "npm run build --workspace @vidpilot/composition && tsx src/cli.ts",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "npm run build --workspace @vidpilot/composition && eslint src && tsc"
   },
   "sideEffects": [
     "*.css"
