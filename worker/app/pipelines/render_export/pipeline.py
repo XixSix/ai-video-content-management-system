@@ -50,19 +50,18 @@ def run_render_export_pipeline(
         dir=settings.tmp_dir,
     ) as temporary_directory:
         workspace = Path(temporary_directory)
-        source_path = workspace / f"source{Path(project.media.s3_key).suffix or '.mp4'}"
         document_path = workspace / "render-document.json"
         output_path = workspace / "export.mp4"
 
         try:
-            s3_service.download_file(
+            source_url = s3_service.create_presigned_get_url(
                 project.media.s3_key,
-                source_path,
                 bucket=project.media.s3_bucket,
+                expires_in_seconds=settings.renderer_timeout_seconds + 300,
             )
             document = build_render_document(
                 project,
-                source_path=source_path,
+                source_url=source_url,
                 captions=captions,
             )
             document_path.write_text(json.dumps(document), encoding="utf-8")
@@ -128,7 +127,7 @@ def run_render_export_pipeline(
 def build_render_document(
     project: render_export_repository.RenderExportProject,
     *,
-    source_path: Path,
+    source_url: str,
     captions: render_export_repository.TranscriptCaptionSource | None,
 ) -> dict[str, Any]:
     """Map a persisted editor snapshot into the renderer JSON document."""
@@ -216,7 +215,7 @@ def build_render_document(
         "durationInFrames": duration_in_frames,
         "backgroundColor": "#000000",
         "sourceVideo": {
-            "src": source_path.resolve().as_uri(),
+            "src": source_url,
             "startFrame": source_start_frame,
             "durationInFrames": max(1, source_duration_frames),
             "fit": "cover",

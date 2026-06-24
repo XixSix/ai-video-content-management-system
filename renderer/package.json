@@ -26,7 +26,7 @@
     "typescript": "5.9.3"
   },
   "scripts": {
-    "dev": "remotion studio",
+    "dev": "remotion studio --port=3005",
     "build": "remotion bundle",
     "render:document": "tsx src/cli.ts",
     "upgrade": "remotion upgrade",

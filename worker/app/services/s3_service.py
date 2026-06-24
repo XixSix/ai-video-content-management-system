@@ -20,6 +20,7 @@ class S3Service:
         *,
         bucket: str = settings.s3_bucket,
         endpoint_url: str = settings.s3_endpoint,
+        public_endpoint_url: str = settings.s3_public_endpoint,
         region_name: str = settings.s3_region,
         access_key_id: str = settings.s3_access_key_id,
         secret_access_key: str = settings.s3_secret_access_key,
@@ -28,6 +29,13 @@ class S3Service:
         self.client = boto3.client(
             "s3",
             endpoint_url=endpoint_url,
+            aws_access_key_id=access_key_id,
+            aws_secret_access_key=secret_access_key,
+            region_name=region_name,
+        )
+        self.presign_client = boto3.client(
+            "s3",
+            endpoint_url=public_endpoint_url or endpoint_url,
             aws_access_key_id=access_key_id,
             aws_secret_access_key=secret_access_key,
             region_name=region_name,
@@ -126,6 +134,43 @@ class S3Service:
             raise S3ServiceError(
                 f"Failed to check s3://{target_bucket}/{object_key}"
             ) from error
+
+    def create_presigned_get_url(
+        self,
+        object_key: str,
+        *,
+        bucket: str | None = None,
+        expires_in_seconds: int = 3600,
+    ) -> str:
+        """Create a temporary HTTP URL for reading an object."""
+        target_bucket = bucket or self.bucket
+
+        if not self.object_exists(object_key, bucket=target_bucket):
+            raise S3SourceObjectNotFoundError(
+                f"{S3SourceObjectNotFoundError.error_code}: s3://{target_bucket}/{object_key} was not found"
+            )
+
+        try:
+            url = self.presign_client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": target_bucket, "Key": object_key},
+                ExpiresIn=expires_in_seconds,
+            )
+        except ClientError as error:
+            if _is_not_found_error(error):
+                raise S3SourceObjectNotFoundError(
+                    f"{S3SourceObjectNotFoundError.error_code}: s3://{target_bucket}/{object_key} was not found"
+                ) from error
+
+            raise S3ServiceError(
+                f"Failed to create download URL for s3://{target_bucket}/{object_key}"
+            ) from error
+        except BotoCoreError as error:
+            raise S3ServiceError(
+                f"Failed to create download URL for s3://{target_bucket}/{object_key}"
+            ) from error
+
+        return url
 
 
 def _is_not_found_error(error: ClientError) -> bool:
