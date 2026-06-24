@@ -24,6 +24,8 @@ const layerBaseShape = {
   visible: z.boolean().default(true),
   xPercent: z.number().min(0).max(100).optional(),
   yPercent: z.number().min(0).max(100).optional(),
+  widthPercent: z.number().min(1).max(100).optional(),
+  heightPercent: z.number().min(1).max(100).optional(),
   style: styleSchema.default({})
 }
 
@@ -53,6 +55,10 @@ export const editorTimelineSegmentSchema = z
     mediaId: z.uuid().optional(),
     startTime: z.number().nonnegative(),
     durationSeconds: z.number().positive(),
+    widthPercent: z.number().min(1).max(100).optional(),
+    heightPercent: z.number().min(1).max(100).optional(),
+    xPercent: z.number().min(0).max(100).optional(),
+    yPercent: z.number().min(0).max(100).optional(),
     laneIndex: z.number().int().min(0).max(100).optional()
   })
   .refine((segment) => Number(segment.layerId !== undefined) + Number(segment.mediaId !== undefined) === 1, {
@@ -69,7 +75,11 @@ export const editorDocumentSchema = z
   .strictObject({
     schemaVersion: z.literal(1),
     settings: z.strictObject({
-      aspectRatio: z.enum(['9:16', '1:1', '4:5', '16:9'])
+      aspectRatio: z.enum(['9:16', '1:1', '4:5', '16:9']),
+      mutedTrackIds: z
+        .array(z.enum(['TEXT', 'OVERLAY_MEDIA', 'SOURCE', 'AUDIO']))
+        .max(4)
+        .default([])
     }),
     layers: z.array(editorLayerSchema).max(200),
     timelineTracks: z.array(editorTimelineTrackSchema).max(4)

@@ -12,6 +12,10 @@
  *           required: [aspectRatio]
  *           properties:
  *             aspectRatio: { type: string, enum: ['9:16', '1:1', '4:5', '16:9'] }
+ *             mutedTrackIds:
+ *               type: array
+ *               items: { type: string, enum: [TEXT, OVERLAY_MEDIA, SOURCE, AUDIO] }
+ *               maxItems: 4
  *         layers:
  *           type: array
  *           maxItems: 200
@@ -24,6 +28,8 @@
  *               visible: { type: boolean }
  *               xPercent: { type: number, minimum: 0, maximum: 100 }
  *               yPercent: { type: number, minimum: 0, maximum: 100 }
+ *               widthPercent: { type: number, minimum: 1, maximum: 100 }
+ *               heightPercent: { type: number, minimum: 1, maximum: 100 }
  *               content: { type: string }
  *               mediaId: { type: string, format: uuid }
  *               style: { type: object, additionalProperties: true }
@@ -46,6 +52,10 @@
  *                     mediaId: { type: string, format: uuid }
  *                     startTime: { type: number, minimum: 0 }
  *                     durationSeconds: { type: number, exclusiveMinimum: 0 }
+ *                     xPercent: { type: number, minimum: 0, maximum: 100 }
+ *                     yPercent: { type: number, minimum: 0, maximum: 100 }
+ *                     widthPercent: { type: number, minimum: 1, maximum: 100 }
+ *                     heightPercent: { type: number, minimum: 1, maximum: 100 }
  *                     laneIndex: { type: integer, minimum: 0, maximum: 100 }
  *     EditorSnapshot:
  *       type: object

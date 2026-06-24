@@ -6,7 +6,8 @@ const mediaId = '00000000-0000-4000-8000-000000000001'
 const createDocument = () => ({
   schemaVersion: 1 as const,
   settings: {
-    aspectRatio: '9:16' as const
+    aspectRatio: '9:16' as const,
+    mutedTrackIds: ['SOURCE', 'AUDIO'] as const
   },
   layers: [
     {
@@ -15,6 +16,8 @@ const createDocument = () => ({
       visible: true,
       xPercent: 50,
       yPercent: 20,
+      widthPercent: 46,
+      heightPercent: 18,
       content: 'Launch day',
       style: {
         fontFamily: 'anton',
@@ -38,6 +41,10 @@ const createDocument = () => ({
           layerId: 'title-layer',
           startTime: 0,
           durationSeconds: 5,
+          xPercent: 52,
+          yPercent: 24,
+          widthPercent: 48,
+          heightPercent: 20,
           laneIndex: 0
         }
       ]
@@ -76,7 +83,8 @@ describe('editor snapshot schemas', () => {
       document: {
         schemaVersion: 1,
         settings: {
-          aspectRatio: '9:16'
+          aspectRatio: '9:16',
+          mutedTrackIds: ['SOURCE', 'AUDIO']
         }
       }
     })
@@ -97,7 +105,7 @@ describe('editor snapshot schemas', () => {
     const invalidPosition = createDocument()
     invalidPosition.layers[0] = {
       ...invalidPosition.layers[0],
-      xPercent: 101
+      widthPercent: 101
     }
     expect(editorDocumentSchema.safeParse(invalidPosition).success).toBe(false)
 
