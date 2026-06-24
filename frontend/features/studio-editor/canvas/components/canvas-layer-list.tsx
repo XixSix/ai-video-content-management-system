@@ -12,6 +12,7 @@ export function CanvasLayerList({
   onLayerDragGuideChange,
   onMoveLayer,
   onSelectLayer,
+  renderPreviewContent = true,
   selectedTargetId,
   visibleLayerIds,
 }: {
@@ -33,6 +34,7 @@ export function CanvasLayerList({
     }
   ) => void
   onSelectLayer: (layer: StudioCanvasLayer) => void
+  renderPreviewContent?: boolean
   selectedTargetId: string
   visibleLayerIds: Set<string>
 }) {
@@ -57,6 +59,7 @@ export function CanvasLayerList({
         onLayerDragGuideChange={onLayerDragGuideChange}
         onMoveLayer={onMoveLayer}
         onSelect={onSelectLayer}
+        renderPreviewContent={renderPreviewContent}
       />
     ))
 }

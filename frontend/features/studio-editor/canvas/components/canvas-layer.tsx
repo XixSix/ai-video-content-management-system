@@ -26,6 +26,7 @@ export function CanvasLayer({
   onLayerDragGuideChange,
   onMoveLayer,
   onSelect,
+  renderPreviewContent = true,
 }: {
   activeCue: StudioCaptionCue | null
   currentTime: number
@@ -46,6 +47,7 @@ export function CanvasLayer({
     }
   ) => void
   onSelect: (layer: StudioCanvasLayer) => void
+  renderPreviewContent?: boolean
 }) {
   const didDragRef = useRef(false)
 
@@ -209,6 +211,7 @@ export function CanvasLayer({
           : layer.kind === "captions"
             ? "z-30 flex items-center justify-center"
             : null,
+        !renderPreviewContent ? "z-40 bg-transparent shadow-none" : null,
         isSelected
           ? "ring-2 ring-sky-300/75 ring-offset-0"
           : "hover:ring-2 hover:ring-white/20",
@@ -216,14 +219,34 @@ export function CanvasLayer({
       )}
       style={
         layer.kind === "text"
-          ? getTextLayerStyle(layer)
+          ? {
+              ...getTextLayerStyle(layer),
+              ...(renderPreviewContent
+                ? {}
+                : {
+                    backgroundColor: "transparent",
+                    color: "transparent",
+                  }),
+            }
           : layer.kind === "captions"
-            ? getCaptionContainerStyle(layer)
+            ? {
+                ...getCaptionContainerStyle(layer),
+                ...(renderPreviewContent
+                  ? {}
+                  : {
+                      backgroundColor: "transparent",
+                      color: "transparent",
+                    }),
+              }
             : undefined
       }
     >
       {layer.kind === "text" ? (
-        layer.animationName && layer.animationName !== "none" ? (
+        !renderPreviewContent ? (
+          <span className="invisible block whitespace-pre-wrap">
+            {layer.content ?? layer.label}
+          </span>
+        ) : layer.animationName && layer.animationName !== "none" ? (
           <TextAnimate
             key={`${layer.id}-${layer.animationName}-${layer.animationBy}-${layer.animationDuration}-${layer.content ?? ""}`}
             animation={layer.animationName}
@@ -243,7 +266,12 @@ export function CanvasLayer({
         )
       ) : layer.kind === "captions" ? (
         activeCue ? (
-          <span className="block max-w-full text-center leading-[1.02]">
+          <span
+            className={cn(
+              "block max-w-full text-center leading-[1.02]",
+              !renderPreviewContent ? "invisible" : null
+            )}
+          >
             {activeCue.wordGroups.map((wordGroup, index) => (
               <CaptionWord
                 key={wordGroup.id}
