@@ -6,6 +6,7 @@ export const toPublishTaskData = (task: PublishTaskRecord): PublishTaskData => (
   id: task.id,
   userId: task.userId,
   mediaId: task.mediaId,
+  projectId: task.projectId,
   shortClipId: task.shortClipId,
   platformAccountId: task.platformAccountId,
   jobId: task.jobId,

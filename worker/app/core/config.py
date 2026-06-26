@@ -50,6 +50,14 @@ class _CeleryAppSettings:
         default="render_export_task",
         alias="RENDER_EXPORT_TASK_NAME",
     )
+    publish_queue_name: str = Field(
+        default="publish_queue",
+        alias="PUBLISH_QUEUE_NAME",
+    )
+    publish_task_name: str = Field(
+        default="publish_task",
+        alias="PUBLISH_TASK_NAME",
+    )
     worker_concurrency: PositiveInt = Field(default=1, alias="WORKER_CONCURRENCY")
     worker_prefetch_multiplier: PositiveInt = Field(
         default=1,

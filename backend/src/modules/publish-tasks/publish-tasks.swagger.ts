@@ -15,6 +15,10 @@
  *           type: string
  *           format: uuid
  *           nullable: true
+ *         projectId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
  *         shortClipId:
  *           type: string
  *           format: uuid
@@ -75,6 +79,9 @@
  *       required: [platform, platformAccountId]
  *       properties:
  *         mediaId:
+ *           type: string
+ *           format: uuid
+ *         projectId:
  *           type: string
  *           format: uuid
  *         shortClipId:
@@ -216,6 +223,11 @@
  *           enum: [DRAFT, SCHEDULED, PUBLISHING, PUBLISHED, FAILED, CANCELED]
  *       - in: query
  *         name: mediaId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: projectId
  *         schema:
  *           type: string
  *           format: uuid

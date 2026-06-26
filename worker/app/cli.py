@@ -81,3 +81,13 @@ def render_exports_worker() -> None:
         default_hostname="render-exports@%h",
         log_level=settings.log_level,
     )
+
+
+def publish_worker() -> None:
+    """Start the publish Celery worker."""
+    configure_logging(settings.log_level)
+    _run_worker(
+        settings.publish_queue_name,
+        default_hostname="publish@%h",
+        log_level=settings.log_level,
+    )

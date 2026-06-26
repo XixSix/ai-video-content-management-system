@@ -4,6 +4,10 @@ from typing import Any
 from app.core.config import settings
 from app.db import jobs_repository, render_export_repository
 from app.db.client import get_db_session
+from app.handlers.publish_handler import (
+    dispatch_chained_publish_job,
+    record_chained_publish_render_failure,
+)
 from app.pipelines.render_export.pipeline import run_render_export_pipeline
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.render_export_message import (
@@ -68,11 +72,13 @@ def process_render_export_job(message: RenderExportJobMessage) -> dict[str, Any]
     if existing_asset:
         output = _completed_output(existing_asset, summary={"reused": True})
         _mark_completed(job_id, output)
+        _dispatch_chained_publish_if_needed(queued_job, output)
         return _result_message(message, status=JobStatus.COMPLETED, skipped=True)
 
     _mark_processing_started(job_id)
     output = run_render_export_pipeline(message)
     _mark_completed(job_id, output)
+    _dispatch_chained_publish_if_needed(queued_job, output)
 
     return _result_message(message, status=JobStatus.COMPLETED, skipped=False)
 
@@ -80,6 +86,7 @@ def process_render_export_job(message: RenderExportJobMessage) -> dict[str, Any]
 def record_render_export_job_failure(job_id: str, error_message: str) -> None:
     with get_db_session() as session:
         jobs_repository.mark_job_failed(session, job_id, error_message)
+    record_chained_publish_render_failure(job_id, error_message)
 
 
 def increment_render_export_job_attempt(job_id: str) -> int | None:
@@ -157,6 +164,14 @@ def _mark_completed(job_id: str, output: RenderExportCompletedOutput) -> None:
             job_id,
             output=output.model_dump(mode="json", by_alias=True),
         )
+
+
+def _dispatch_chained_publish_if_needed(
+    job: ProcessingJobRow,
+    output: RenderExportCompletedOutput,
+) -> None:
+    asset_id = str(output.asset.id)
+    dispatch_chained_publish_job(job, export_asset_id=asset_id)
 
 
 def _completed_output(

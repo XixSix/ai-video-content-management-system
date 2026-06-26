@@ -5,7 +5,9 @@ export interface PublishTaskJobMessage {
   jobId: string
   publishTaskId: string
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
+  exportAssetId: string | null
   userId: string
   platform: string
   platformAccountId: string

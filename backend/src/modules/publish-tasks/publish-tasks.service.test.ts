@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import {
   Prisma,
+  type EditorSnapshot,
+  type GeneratedAsset,
   type Media,
   type PlatformAccount,
   type ProcessingJob,
+  type Project,
   type PublishTask,
   type ShortClip
 } from '../../infrastructure/db/generated/prisma/client'
@@ -26,20 +29,27 @@ const findPublishTaskByIdMock = jest.fn<(id: string) => Promise<PublishTask | nu
 const updatePublishTaskMock = jest.fn<(id: string, data: unknown) => Promise<PublishTask>>()
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
 const findShortClipByIdMock = jest.fn<(id: string) => Promise<ShortClip | null>>()
+const findProjectByIdMock = jest.fn<(id: string) => Promise<unknown | null>>()
+const findFreshProjectExportAssetMock = jest.fn<() => Promise<GeneratedAsset | null>>()
+const isDeletedProjectMock = jest.fn<(status: string) => boolean>()
 const getUsablePlatformAccountMock =
   jest.fn<(workspaceId: string, platform: string, id: string) => Promise<PlatformAccount>>()
 const getWorkspaceMembershipContextMock =
   jest.fn<(workspaceId: string, userId: string) => Promise<{ id: string; role: 'OWNER' | 'MEMBER' }>>()
 const publishPublishTaskJobMock = jest.fn<(message: unknown, eta?: string) => Promise<void>>()
+const publishRenderExportJobMock = jest.fn<(message: unknown) => Promise<void>>()
 
 jest.unstable_mockModule('./publish-tasks.repository', () => ({
   createProcessingJob: createProcessingJobMock,
   createPublishTask: createPublishTaskMock,
+  findFreshProjectExportAsset: findFreshProjectExportAssetMock,
   findMediaById: findMediaByIdMock,
   findProcessingJobById: findProcessingJobByIdMock,
+  findProjectById: findProjectByIdMock,
   findPublishTaskById: findPublishTaskByIdMock,
   findPublishTasksByUserId: findPublishTasksByUserIdMock,
   findShortClipById: findShortClipByIdMock,
+  isDeletedProject: isDeletedProjectMock,
   updateProcessingJob: updateProcessingJobMock,
   updatePublishTask: updatePublishTaskMock
 }))
@@ -56,6 +66,10 @@ jest.unstable_mockModule('./publish-tasks.queue', () => ({
   publishPublishTaskJob: publishPublishTaskJobMock
 }))
 
+jest.unstable_mockModule('../render-exports/render-exports.queue', () => ({
+  publishRenderExportJob: publishRenderExportJobMock
+}))
+
 const publishTasksService = await import('./publish-tasks.service')
 
 const userId = '00000000-0000-4000-8000-000000000001'
@@ -66,6 +80,9 @@ const mediaId = '00000000-0000-4000-8000-000000000003'
 const workspaceId = '00000000-0000-4000-8000-000000000008'
 const otherWorkspaceId = '00000000-0000-4000-8000-000000000009'
 const shortClipId = '00000000-0000-4000-8000-000000000004'
+const projectId = '00000000-0000-4000-8000-000000000010'
+const snapshotId = '00000000-0000-4000-8000-000000000011'
+const exportAssetId = '00000000-0000-4000-8000-000000000012'
 const platformAccountId = '00000000-0000-4000-8000-000000000005'
 const replacementPlatformAccountId = '00000000-0000-4000-8000-000000000006'
 const now = new Date('2026-06-09T10:00:00.000Z')
@@ -89,6 +106,7 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
   mimeType: 'video/mp4',
   width: 1920,
   height: 1080,
+  metadata: null,
   status: 'UPLOADED',
   createdAt: now,
   updatedAt: now,
@@ -139,10 +157,75 @@ const createPlatformAccount = (overrides: Partial<PlatformAccount> = {}): Platfo
   ...overrides
 })
 
+const createEditorSnapshot = (overrides: Partial<EditorSnapshot> = {}): EditorSnapshot => ({
+  id: snapshotId,
+  projectId,
+  version: 3,
+  snapshot: {
+    schemaVersion: 1,
+    layers: [],
+    timelineTracks: []
+  },
+  savedByUserId: userId,
+  savedAt: now,
+  createdAt: now,
+  updatedAt: now,
+  ...overrides
+})
+
+const createProject = (
+  overrides: Partial<Project> & {
+    sourceMedia?: Media | null
+    editorSnapshot?: EditorSnapshot | null
+  } = {}
+) => ({
+  id: projectId,
+  userId,
+  workspaceId,
+  sourceMediaId: mediaId,
+  thumbnailMediaId: null,
+  title: 'Studio Project',
+  slug: 'studio-project',
+  status: 'DRAFT',
+  aspectRatio: '9:16',
+  duration: 120,
+  createdAt: now,
+  updatedAt: now,
+  sourceMedia: createMedia(),
+  editorSnapshot: createEditorSnapshot(),
+  ...overrides
+})
+
+const createExportAsset = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset => ({
+  id: exportAssetId,
+  userId,
+  mediaId,
+  projectId,
+  transcriptId: null,
+  chapterId: null,
+  shortClipId: null,
+  jobId,
+  assetType: 'EXPORT_VIDEO',
+  transcriptVersion: null,
+  s3Bucket: 'vidpilot-media',
+  s3Key: 'exports/project.mp4',
+  s3Region: 'us-east-1',
+  s3Etag: null,
+  mimeType: 'video/mp4',
+  fileSizeBytes: BigInt(2048),
+  metadata: {
+    snapshotId,
+    snapshotVersion: 3
+  },
+  createdAt: now,
+  ...overrides
+})
+
 const createPublishTask = (overrides: Partial<PublishTask> = {}): PublishTask => ({
   id: publishTaskId,
   userId,
   mediaId,
+  projectId: null,
   shortClipId: null,
   platformAccountId,
   jobId: null,
@@ -194,11 +277,18 @@ describe('publish task service', () => {
     updatePublishTaskMock.mockReset()
     findMediaByIdMock.mockReset()
     findShortClipByIdMock.mockReset()
+    findProjectByIdMock.mockReset()
+    findFreshProjectExportAssetMock.mockReset()
+    isDeletedProjectMock.mockReset()
     getUsablePlatformAccountMock.mockReset()
     getWorkspaceMembershipContextMock.mockReset()
     publishPublishTaskJobMock.mockReset()
+    publishRenderExportJobMock.mockReset()
     getUsablePlatformAccountMock.mockResolvedValue(createPlatformAccount())
     getWorkspaceMembershipContextMock.mockResolvedValue({ id: workspaceId, role: 'MEMBER' })
+    findFreshProjectExportAssetMock.mockResolvedValue(null)
+    isDeletedProjectMock.mockReturnValue(false)
+    publishRenderExportJobMock.mockResolvedValue()
   })
 
   it('creates a media publish task with a required connected platform account', async () => {
@@ -258,6 +348,35 @@ describe('publish task service', () => {
     )
     expect(result).toMatchObject({
       shortClipId,
+      status: 'DRAFT'
+    })
+  })
+
+  it('creates a project publish task with a required connected platform account', async () => {
+    findProjectByIdMock.mockResolvedValue(createProject())
+    createPublishTaskMock.mockResolvedValue(createPublishTask({ mediaId: null, projectId }))
+
+    const result = await publishTasksService.createPublishTask(userId, {
+      projectId,
+      platform: 'FACEBOOK',
+      platformAccountId,
+      title: 'Project publish'
+    })
+
+    expect(findProjectByIdMock).toHaveBeenCalledWith(projectId)
+    expect(getUsablePlatformAccountMock).toHaveBeenCalledWith(workspaceId, 'FACEBOOK', platformAccountId)
+    expect(createPublishTaskMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId: null,
+        projectId,
+        shortClipId: null,
+        platform: 'FACEBOOK',
+        platformAccountId,
+        status: 'DRAFT'
+      })
+    )
+    expect(result).toMatchObject({
+      projectId,
       status: 'DRAFT'
     })
   })
@@ -497,7 +616,9 @@ describe('publish task service', () => {
         input: expect.objectContaining({
           publishTaskId,
           mediaId,
+          projectId: null,
           shortClipId: null,
+          exportAssetId: null,
           platform: 'FACEBOOK',
           platformAccountId,
           scheduledAt: null
@@ -518,7 +639,9 @@ describe('publish task service', () => {
         jobId,
         publishTaskId,
         mediaId,
+        projectId: null,
         shortClipId: null,
+        exportAssetId: null,
         userId,
         platform: 'FACEBOOK',
         platformAccountId,
@@ -579,6 +702,97 @@ describe('publish task service', () => {
       scheduledAtIso
     )
     expect(result.publishTask).toMatchObject({ status: 'SCHEDULED', scheduledAt: futureScheduledAt })
+  })
+
+  it('publishes a project task directly when a fresh export asset exists', async () => {
+    findPublishTaskByIdMock.mockResolvedValue(createPublishTask({ mediaId: null, projectId }))
+    findProjectByIdMock.mockResolvedValue(createProject())
+    findFreshProjectExportAssetMock.mockResolvedValue(createExportAsset())
+    createProcessingJobMock.mockResolvedValue(createProcessingJob({ projectId }))
+    updatePublishTaskMock.mockResolvedValue(
+      createPublishTask({ mediaId: null, projectId, jobId, status: 'PUBLISHING' })
+    )
+    publishPublishTaskJobMock.mockResolvedValue()
+
+    const result = await publishTasksService.publishPublishTask(userId, publishTaskId)
+
+    expect(createProcessingJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId,
+        projectId,
+        jobType: 'PUBLISH',
+        queueName: 'publish_queue',
+        taskName: 'publish_task',
+        input: expect.objectContaining({
+          publishTaskId,
+          mediaId: null,
+          projectId,
+          exportAssetId,
+          scheduledAt: null
+        })
+      })
+    )
+    expect(publishPublishTaskJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobId,
+        publishTaskId,
+        mediaId: null,
+        projectId,
+        exportAssetId,
+        scheduledAt: null
+      }),
+      undefined
+    )
+    expect(result.job).toMatchObject({ jobType: 'PUBLISH' })
+  })
+
+  it('creates a render export job first for project publish when no fresh export exists', async () => {
+    findPublishTaskByIdMock.mockResolvedValue(createPublishTask({ mediaId: null, projectId }))
+    findProjectByIdMock.mockResolvedValue(createProject())
+    findFreshProjectExportAssetMock.mockResolvedValue(null)
+    createProcessingJobMock.mockResolvedValue(createProcessingJob({ projectId, jobType: 'EXPORT_RENDER' }))
+    updatePublishTaskMock.mockResolvedValue(
+      createPublishTask({ mediaId: null, projectId, jobId, status: 'PUBLISHING' })
+    )
+    publishRenderExportJobMock.mockResolvedValue()
+
+    const result = await publishTasksService.publishPublishTask(userId, publishTaskId)
+
+    expect(createProcessingJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId,
+        projectId,
+        jobType: 'EXPORT_RENDER',
+        queueName: 'render_exports_queue',
+        taskName: 'export_render',
+        input: expect.objectContaining({
+          projectId,
+          workspaceId,
+          mediaId,
+          editorSnapshotId: snapshotId,
+          editorSnapshotVersion: 3,
+          publishTaskId,
+          publishScheduledAt: null
+        })
+      })
+    )
+    expect(updatePublishTaskMock).toHaveBeenCalledWith(
+      publishTaskId,
+      expect.objectContaining({
+        jobId,
+        status: 'PUBLISHING',
+        scheduledAt: null
+      })
+    )
+    expect(publishRenderExportJobMock).toHaveBeenCalledWith({
+      jobId,
+      mediaId,
+      projectId,
+      workspaceId,
+      userId
+    })
+    expect(publishPublishTaskJobMock).not.toHaveBeenCalled()
+    expect(result.job).toMatchObject({ jobType: 'EXPORT_RENDER' })
   })
 
   it('cancels a scheduled publish task and fails a pending linked publish job', async () => {

@@ -16,6 +16,7 @@ const futureScheduledAtSchema = scheduledAtSchema.refine((value) => value.getTim
 export const createPublishTaskSchema = z
   .strictObject({
     mediaId: z.uuid().optional(),
+    projectId: z.uuid().optional(),
     shortClipId: z.uuid().optional(),
     platform: publishTaskPlatformSchema,
     platformAccountId: z.uuid(),
@@ -25,8 +26,8 @@ export const createPublishTaskSchema = z
     hashtags: hashtagsSchema.optional().nullable(),
     scheduledAt: scheduledAtSchema.optional()
   })
-  .refine((value) => Boolean(value.mediaId) !== Boolean(value.shortClipId), {
-    message: 'Exactly one of mediaId or shortClipId is required',
+  .refine((value) => [value.mediaId, value.projectId, value.shortClipId].filter(Boolean).length === 1, {
+    message: 'Exactly one of mediaId, projectId, or shortClipId is required',
     path: ['mediaId']
   })
 
@@ -36,6 +37,7 @@ export const listPublishTasksQuerySchema = z.strictObject({
   platform: publishTaskPlatformSchema.optional(),
   status: z.enum(PublishStatus).optional(),
   mediaId: z.uuid().optional(),
+  projectId: z.uuid().optional(),
   shortClipId: z.uuid().optional(),
   platformAccountId: z.uuid().optional(),
   sortBy: z.enum(['createdAt', 'scheduledAt', 'publishedAt']).default('createdAt'),

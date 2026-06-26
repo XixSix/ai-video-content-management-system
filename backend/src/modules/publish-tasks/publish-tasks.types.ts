@@ -9,6 +9,7 @@ export interface PublishTaskData {
   id: string
   userId: string
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
   platformAccountId: string | null
   jobId: string | null

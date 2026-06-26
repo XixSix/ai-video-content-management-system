@@ -39,7 +39,11 @@ def _message() -> RenderExportJobMessage:
     )
 
 
-def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
+def _job(
+    status: JobStatus = JobStatus.PENDING,
+    *,
+    input_payload: dict[str, object] | None = None,
+) -> ProcessingJobRow:
     return ProcessingJobRow.model_validate(
         {
             "id": str(JOB_ID),
@@ -55,7 +59,7 @@ def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
             "taskName": "export_render",
             "externalTaskId": None,
             "attemptCount": 0,
-            "input": None,
+            "input": input_payload,
             "output": None,
             "createdAt": "2026-06-24T00:00:00Z",
             "updatedAt": "2026-06-24T00:00:00Z",
@@ -177,3 +181,58 @@ def test_process_render_export_job_reuses_existing_asset(
         "reused": True,
         "assetId": str(ASSET_ID),
     }
+
+
+def test_process_render_export_job_dispatches_chained_publish(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = _patch_job_lifecycle(monkeypatch)
+    chained_job = _job(
+        JobStatus.QUEUED,
+        input_payload={
+            "publishTaskId": "00000000-0000-4000-8000-000000000007",
+        },
+    )
+    dispatched: list[tuple[ProcessingJobRow, str]] = []
+    monkeypatch.setattr(
+        render_export_handler.jobs_repository,
+        "mark_job_queued_from_pending",
+        lambda session, job_id, current_step: chained_job,
+    )
+    monkeypatch.setattr(
+        render_export_handler,
+        "dispatch_chained_publish_job",
+        lambda job, *, export_asset_id: dispatched.append((job, export_asset_id)),
+    )
+
+    result = render_export_handler.process_render_export_job(_message())
+
+    assert result["status"] == "COMPLETED"
+    assert calls["pipeline"] == 1
+    assert dispatched == [(chained_job, str(ASSET_ID))]
+
+
+def test_record_render_export_job_failure_marks_dependent_publish_failed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, str, str]] = []
+    monkeypatch.setattr(render_export_handler, "get_db_session", _session)
+    monkeypatch.setattr(
+        render_export_handler.jobs_repository,
+        "mark_job_failed",
+        lambda session, job_id, error_message: calls.append(
+            ("job", job_id, error_message)
+        ),
+    )
+    monkeypatch.setattr(
+        render_export_handler,
+        "record_chained_publish_render_failure",
+        lambda job_id, error_message: calls.append(("publish", job_id, error_message)),
+    )
+
+    render_export_handler.record_render_export_job_failure(str(JOB_ID), "Render failed")
+
+    assert calls == [
+        ("job", str(JOB_ID), "Render failed"),
+        ("publish", str(JOB_ID), "Render failed"),
+    ]

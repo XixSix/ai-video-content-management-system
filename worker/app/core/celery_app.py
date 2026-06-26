@@ -12,6 +12,7 @@ celery_app = Celery(
         "app.consumers.chaptering_consumer",
         "app.consumers.media_preview_consumer",
         "app.consumers.render_export_consumer",
+        "app.consumers.publish_consumer",
     ],
 )
 
@@ -37,6 +38,11 @@ celery_app.conf.update(
             routing_key=settings.render_exports_queue_name,
             durable=True,
         ),
+        Queue(
+            settings.publish_queue_name,
+            routing_key=settings.publish_queue_name,
+            durable=True,
+        ),
     ),
     task_default_queue=settings.transcript_queue_name,
     task_default_routing_key=settings.transcript_queue_name,
@@ -56,6 +62,10 @@ celery_app.conf.update(
         settings.render_export_task_name: {
             "queue": settings.render_exports_queue_name,
             "routing_key": settings.render_exports_queue_name,
+        },
+        settings.publish_task_name: {
+            "queue": settings.publish_queue_name,
+            "routing_key": settings.publish_queue_name,
         },
     },
     task_protocol=2,

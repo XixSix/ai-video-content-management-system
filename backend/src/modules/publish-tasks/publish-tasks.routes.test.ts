@@ -50,6 +50,7 @@ const createPublishTask = (overrides: Partial<PublishTaskData> = {}): PublishTas
   id: publishTaskId,
   userId,
   mediaId,
+  projectId: null,
   shortClipId: null,
   platformAccountId,
   jobId: null,
