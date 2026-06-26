@@ -1,5 +1,13 @@
 import type { JobStatus, JobType, Prisma } from '../../infrastructure/db/generated/prisma/client'
 
+export interface PaginatedResult<TItem> {
+  items: TItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 export interface JobResponseData {
   id: string
   mediaId: string

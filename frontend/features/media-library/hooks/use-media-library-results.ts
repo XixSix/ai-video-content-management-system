@@ -4,7 +4,6 @@ import type {
   MediaLibraryItem,
   MediaLibrarySortKey,
   MediaLibraryTab,
-  MediaStatusFilter,
   MediaTypeFilter,
 } from "../types/media-library.types";
 import {
@@ -21,7 +20,6 @@ type UseMediaLibraryResultsParams = {
   items: MediaLibraryItem[];
   searchQuery: string;
   sortKey: MediaLibrarySortKey;
-  statusFilter: MediaStatusFilter;
   typeFilter: MediaTypeFilter;
 };
 
@@ -32,14 +30,12 @@ export function useMediaLibraryResults({
   items,
   searchQuery,
   sortKey,
-  statusFilter,
   typeFilter,
 }: UseMediaLibraryResultsParams) {
   const visibleItems = filterAndSortMediaItems(items, {
     searchQuery,
     activeTab,
     typeFilter,
-    statusFilter,
     sortKey,
   });
   const pageCount = Math.max(

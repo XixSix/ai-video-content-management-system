@@ -46,7 +46,6 @@ export function StudioMediaPanel() {
     mediaItems.map((item) => item.id),
     {
       enabled: mediaItems.length > 0,
-      pollUntilReady: true,
     }
   )
   const mediaDetailsById = useMemo(

@@ -16,8 +16,6 @@ export type MediaAssetType = "VIDEO" | "AUDIO" | "IMAGE" | "TRANSCRIPT"
 
 export type MediaTypeFilter = "ALL" | MediaAssetType
 
-export type MediaStatusFilter = "ALL" | "UPLOADING" | "UPLOADED" | "FAILED"
-
 export type MediaLibraryItem = {
   id: string
   title: string

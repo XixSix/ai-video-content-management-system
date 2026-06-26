@@ -186,15 +186,20 @@ export function StudioTopbar({
       }),
     [project.media.aspectRatio, project.media.durationSeconds, projectId, projectName]
   )
-  const publishDisabled =
+  const isPublishBusy =
     isPreparingPublish ||
     createPublishTask.isPending ||
     publishNow.isPending ||
-    schedulePublish.isPending ||
-    exportBlockedBySnapshot ||
-    !workspaceId ||
-    !projectId ||
-    accountOptions.length < 1
+    schedulePublish.isPending
+  const publishBlockedReason =
+    exportBlockedBySnapshot
+      ? "Resolve the current snapshot save state before publishing."
+      : !workspaceId || !projectId
+        ? "Studio route is missing workspace or project context."
+        : accountOptions.length < 1
+          ? "Connect a social account before publishing."
+          : null
+  const publishDisabled = isPublishBusy
 
   useEffect(
     () => () => {
@@ -264,7 +269,14 @@ export function StudioTopbar({
   }
 
   const openPublishSheet = async () => {
-    if (publishDisabled) {
+    if (isPublishBusy) {
+      return
+    }
+
+    if (publishBlockedReason) {
+      toast.error("Publish blocked", {
+        description: publishBlockedReason,
+      })
       return
     }
 

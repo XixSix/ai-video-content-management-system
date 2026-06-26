@@ -2,7 +2,6 @@ import type {
   FilterChipOption,
   MediaLibrarySortKey,
   MediaLibraryTab,
-  MediaStatusFilter,
   MediaTypeFilter,
 } from "../types/media-library.types";
 
@@ -19,13 +18,6 @@ export const mediaTypeFilterOptions: FilterChipOption<MediaTypeFilter>[] = [
   { label: "Audio", value: "AUDIO" },
   { label: "Image", value: "IMAGE" },
   { label: "Transcript", value: "TRANSCRIPT" },
-];
-
-export const mediaStatusFilterOptions: FilterChipOption<MediaStatusFilter>[] = [
-  { label: "All", value: "ALL" },
-  { label: "Uploading", value: "UPLOADING" },
-  { label: "Uploaded", value: "UPLOADED" },
-  { label: "Failed", value: "FAILED" },
 ];
 
 export const mediaSortOptions: FilterChipOption<MediaLibrarySortKey>[] = [

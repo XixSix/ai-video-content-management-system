@@ -206,7 +206,6 @@ export function TimelineSegment({
                 <TimelineWaveform
                   className="bg-blue-500/55 dark:bg-blue-200/45"
                   peaks={sourceAudioPeaks}
-                  seed={19}
                 />
               </div>
             </div>
@@ -218,7 +217,6 @@ export function TimelineSegment({
                 <TimelineWaveform
                   className="bg-cyan-600/55 dark:bg-cyan-100/45"
                   peaks={guideAudioPeaks}
-                  seed={23}
                 />
               </div>
             ) : isOverlayMedia ? (

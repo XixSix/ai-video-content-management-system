@@ -35,13 +35,19 @@ const otherUserId = '00000000-0000-4000-8000-000000000002'
 const assetId = '00000000-0000-4000-8000-000000000003'
 const transcriptId = '00000000-0000-4000-8000-000000000004'
 const chapterId = '00000000-0000-4000-8000-000000000005'
+const mediaId = '00000000-0000-4000-8000-000000000006'
+const projectId = '00000000-0000-4000-8000-000000000007'
 const now = new Date('2026-06-07T10:00:00.000Z')
 
 const createAsset = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset => ({
   id: assetId,
   userId,
+  mediaId,
+  projectId,
   transcriptId,
   chapterId: null,
+  shortClipId: null,
+  jobId: null,
   assetType: 'SUBTITLE_SRT',
   transcriptVersion: 2,
   s3Bucket: 'vidpilot-media',
@@ -71,6 +77,8 @@ describe('assets service', () => {
       page: 2,
       limit: 10,
       assetType: 'SUBTITLE_SRT',
+      mediaId,
+      projectId,
       transcriptId,
       chapterId,
       sortBy: 'assetType',
@@ -81,6 +89,8 @@ describe('assets service', () => {
       {
         userId,
         assetType: 'SUBTITLE_SRT',
+        mediaId,
+        projectId,
         transcriptId,
         chapterId
       },
@@ -93,6 +103,8 @@ describe('assets service', () => {
       items: [
         {
           id: assetId,
+          mediaId,
+          projectId,
           transcriptId,
           chapterId: null,
           assetType: 'SUBTITLE_SRT',

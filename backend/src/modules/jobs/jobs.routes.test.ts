@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import request from 'supertest'
 import type { AuthenticatedUser } from '../auth/auth.types'
 import { JobsError } from './jobs.error'
-import type { JobResponseData } from './jobs.types'
+import type { JobResponseData, PaginatedResult } from './jobs.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
+const listJobsMock = jest.fn<(userId: string, query: unknown) => Promise<PaginatedResult<JobResponseData>>>()
 const getJobMock = jest.fn<(userId: string, jobId: string) => Promise<JobResponseData>>()
 
 jest.unstable_mockModule('../auth/auth.service', () => ({
@@ -15,6 +16,7 @@ jest.unstable_mockModule('./jobs.service', () => ({
   JOB_EVENT_HEARTBEAT_INTERVAL_MS: 15000,
   JOB_EVENT_POLL_INTERVAL_MS: 2000,
   getJob: getJobMock,
+  listJobs: listJobsMock,
   getJobEventName: (job: JobResponseData) => {
     if (job.status === 'COMPLETED') return 'job.completed'
     if (job.status === 'FAILED') return 'job.failed'
@@ -58,12 +60,21 @@ const createJob = (overrides: Partial<JobResponseData> = {}): JobResponseData =>
 describe('jobs routes', () => {
   beforeEach(() => {
     getAuthenticatedUserMock.mockReset()
+    listJobsMock.mockReset()
     getJobMock.mockReset()
     getAuthenticatedUserMock.mockResolvedValue(user)
+    listJobsMock.mockResolvedValue({
+      items: [createJob()],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1
+    })
     getJobMock.mockResolvedValue(createJob())
   })
 
   it.each([
+    ['GET', '/api/v1/jobs'],
     ['GET', `/api/v1/jobs/${jobId}`],
     ['GET', `/api/v1/jobs/${jobId}/events`]
   ])('%s %s requires an access token', async (method, path) => {
@@ -81,6 +92,62 @@ describe('jobs routes', () => {
 
   it('returns validation errors for invalid job ids', async () => {
     const response = await request(app).get('/api/v1/jobs/not-a-uuid').set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed'
+      }
+    })
+  })
+
+  it('lists recent jobs with pagination and filters', async () => {
+    const response = await request(app)
+      .get('/api/v1/jobs')
+      .query({
+        page: '1',
+        limit: '10',
+        status: 'TRANSCRIBING',
+        jobType: 'TRANSCRIBE'
+      })
+      .set('Authorization', 'Bearer access-token')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        items: [
+          {
+            ...createJob(),
+            createdAt: now.toISOString(),
+            updatedAt: now.toISOString(),
+            startedAt: now.toISOString(),
+            completedAt: null
+          }
+        ],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1
+        }
+      }
+    })
+    expect(listJobsMock).toHaveBeenCalledWith(userId, {
+      page: 1,
+      limit: 10,
+      status: 'TRANSCRIBING',
+      jobType: 'TRANSCRIBE'
+    })
+  })
+
+  it('returns validation errors for invalid list filters', async () => {
+    const response = await request(app)
+      .get('/api/v1/jobs')
+      .query({ status: 'GENERATING_SUGGESTIONS' })
+      .set('Authorization', 'Bearer access-token')
 
     expect(response.status).toBe(400)
     expect(response.body).toMatchObject({

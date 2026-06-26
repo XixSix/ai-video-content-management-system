@@ -9,6 +9,8 @@ export const listAssetsQuerySchema = z.strictObject({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(10),
   assetType: z.enum(AssetType).optional(),
+  mediaId: z.uuid().optional(),
+  projectId: z.uuid().optional(),
   transcriptId: z.uuid().optional(),
   chapterId: z.uuid().optional(),
   sortBy: z.enum(['createdAt', 'assetType']).default('createdAt'),

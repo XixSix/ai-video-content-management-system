@@ -7,6 +7,8 @@ import type {
   JobEventHandler,
   JobSubscription,
   ProcessingJobData,
+  ProcessingJobListQuery,
+  ProcessingJobListResponse,
   ProcessingJobResponse,
 } from "./job.types"
 
@@ -50,6 +52,15 @@ export function isTerminalJob(job: ProcessingJobData) {
 }
 
 export const jobService = {
+  async list(query: ProcessingJobListQuery): Promise<ProcessingJobListResponse> {
+    return unwrapApiResponse(
+      authenticatedApiClient.get<ApiSuccess<ProcessingJobListResponse>>(
+        "/jobs",
+        { params: query }
+      )
+    )
+  },
+
   async get(jobId: string): Promise<ProcessingJobResponse> {
     return unwrapApiResponse(
       authenticatedApiClient.get<ApiSuccess<ProcessingJobResponse>>(

@@ -12,7 +12,6 @@ import {
 
 import type {
   FeaturedTool,
-  ProcessingSummary,
   QuickAction,
   ToolShortcut,
 } from "./home.types"
@@ -115,10 +114,3 @@ export const homeToolShortcuts: ToolShortcut[] = [
     icon: MoreHorizontal,
   },
 ]
-
-export const homeProcessingSummary: ProcessingSummary = {
-  activeCount: 2,
-  queuedCount: 1,
-  completedTodayCount: 6,
-  failedCount: 1,
-}

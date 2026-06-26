@@ -75,7 +75,6 @@ export function StudioTimeline({
     project.projectMedia.map((item) => item.id),
     {
       enabled: project.projectMedia.length > 0,
-      pollUntilReady: true,
     }
   )
   const mediaPreviewById = useMemo(

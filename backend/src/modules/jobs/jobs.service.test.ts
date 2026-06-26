@@ -2,9 +2,12 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import type { ProcessingJob } from '../../infrastructure/db/generated/prisma/client'
 
 const findJobByIdAndUserIdMock = jest.fn<(id: string, userId: string) => Promise<ProcessingJob | null>>()
+const findJobsByUserIdMock =
+  jest.fn<(filters: unknown, skip: number, take: number) => Promise<[ProcessingJob[], number]>>()
 
 jest.unstable_mockModule('./jobs.repository', () => ({
-  findJobByIdAndUserId: findJobByIdAndUserIdMock
+  findJobByIdAndUserId: findJobByIdAndUserIdMock,
+  findJobsByUserId: findJobsByUserIdMock
 }))
 
 const jobsService = await import('./jobs.service')
@@ -38,6 +41,50 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
 describe('jobs service', () => {
   beforeEach(() => {
     findJobByIdAndUserIdMock.mockReset()
+    findJobsByUserIdMock.mockReset()
+  })
+
+  it('lists recent jobs with filters and pagination', async () => {
+    findJobsByUserIdMock.mockResolvedValue([[createProcessingJob()], 1])
+
+    const result = await jobsService.listJobs(userId, {
+      page: 2,
+      limit: 5,
+      status: 'TRANSCRIBING',
+      jobType: 'TRANSCRIBE'
+    })
+
+    expect(findJobsByUserIdMock).toHaveBeenCalledWith(
+      {
+        userId,
+        status: 'TRANSCRIBING',
+        jobType: 'TRANSCRIBE'
+      },
+      5,
+      5
+    )
+    expect(result).toEqual({
+      items: [
+        {
+          id: jobId,
+          mediaId,
+          jobType: 'TRANSCRIBE',
+          status: 'TRANSCRIBING',
+          progress: 55,
+          errorMessage: null,
+          output: { transcriptId: '00000000-0000-4000-8000-000000000004' },
+          attemptCount: 1,
+          createdAt: now,
+          updatedAt: now,
+          startedAt: now,
+          completedAt: null
+        }
+      ],
+      total: 1,
+      page: 2,
+      limit: 5,
+      totalPages: 1
+    })
   })
 
   it('returns a mapped job owned by the user', async () => {

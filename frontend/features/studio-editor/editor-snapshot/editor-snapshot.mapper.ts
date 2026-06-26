@@ -1,4 +1,9 @@
 import { formatDuration } from "@/features/media-library/utils/media-library.utils"
+import type { ChapterData } from "@/features/chapters/chapter.types"
+import type {
+  TranscriptEditorData,
+  TranscriptSummaryData,
+} from "@/features/transcripts/transcript.types"
 import type {
   ProjectDetail,
   ProjectMedia,
@@ -10,8 +15,12 @@ import { cloneProject } from "../store/studio-editor-state"
 import type {
   StudioAspectRatio,
   StudioCanvasLayer,
+  StudioChapter,
   StudioEditorProject,
   StudioProjectMediaItem,
+  StudioTranscript,
+  StudioTranscriptSegment,
+  StudioTranscriptWord,
   StudioTimelineSegment,
   StudioTimelineTrack,
   StudioTimelineTrackId,
@@ -63,6 +72,17 @@ const LAYER_STYLE_KEYS = [
   "textDecoration",
   "textTransform",
 ] as const satisfies readonly (keyof StudioCanvasLayer)[]
+
+const emptyTranscript: StudioTranscript = {
+  id: "",
+  language: "und",
+  version: 0,
+  wordCount: 0,
+  isEdited: false,
+  fullText: "",
+  source: "NONE",
+  createdAt: "",
+}
 
 function isAspectRatio(value: string): value is StudioAspectRatio {
   return ["9:16", "1:1", "4:5", "16:9"].includes(value)
@@ -165,6 +185,14 @@ export function createStudioProjectFromDetail(
       streamUrl: "",
       thumbnailUrl: "",
     },
+    transcript: emptyTranscript,
+    transcriptSegments: [],
+    transcriptWords: [],
+    chapters: [],
+    clipCandidates: [],
+    shortClips: [],
+    generatedAssets: [],
+    processingJobs: [],
     projectMedia,
     sourceMedia: {
       id: sourceId,
@@ -178,6 +206,95 @@ export function createStudioProjectFromDetail(
     },
     layers: [],
     timelineTracks: [],
+  }
+}
+
+export function hydrateStudioProjectAiOutputs(
+  project: StudioEditorProject,
+  input: {
+    chapters?: ChapterData[]
+    transcript?: TranscriptSummaryData | null
+    transcriptEditor?: TranscriptEditorData | null
+  }
+): StudioEditorProject {
+  const transcriptSegments = input.transcriptEditor
+    ? mapTranscriptSegments(input.transcriptEditor)
+    : project.transcriptSegments
+  const transcriptWords = input.transcriptEditor
+    ? mapTranscriptWords(input.transcriptEditor)
+    : project.transcriptWords
+  const transcript = input.transcriptEditor
+    ? mapTranscript(input.transcriptEditor, input.transcript, transcriptSegments)
+    : project.transcript
+  const chapters = input.chapters
+    ? input.chapters.map(mapChapter)
+    : project.chapters
+
+  return {
+    ...project,
+    transcript,
+    transcriptSegments,
+    transcriptWords,
+    chapters,
+  }
+}
+
+function mapTranscript(
+  editorData: TranscriptEditorData,
+  summary: TranscriptSummaryData | null | undefined,
+  segments: StudioTranscriptSegment[]
+): StudioTranscript {
+  return {
+    id: editorData.transcript.id,
+    language: editorData.transcript.language ?? "und",
+    version: editorData.transcript.version,
+    wordCount: summary?.wordCount ?? editorData.words.length,
+    isEdited: editorData.transcript.isEdited,
+    fullText: segments.map((segment) => segment.text).join(" "),
+    source: summary?.source ?? "LOCAL",
+    createdAt: summary?.createdAt ?? new Date().toISOString(),
+  }
+}
+
+function mapTranscriptSegments(
+  editorData: TranscriptEditorData
+): StudioTranscriptSegment[] {
+  return editorData.segments.map((segment) => ({
+    id: segment.id,
+    segmentIndex: segment.segmentIndex,
+    startTime: segment.startTime,
+    endTime: segment.endTime,
+    text: segment.text,
+    speakerLabel: segment.speakerLabel ?? "Speaker",
+    confidence: segment.confidence ?? 1,
+  }))
+}
+
+function mapTranscriptWords(
+  editorData: TranscriptEditorData
+): StudioTranscriptWord[] {
+  return editorData.words.map((word) => ({
+    id: word.id,
+    segmentId: word.segmentId,
+    wordIndex: word.wordIndex,
+    startTime: word.startTime,
+    endTime: word.endTime,
+    sourceText: word.text,
+    text: word.text,
+    confidence: word.confidence ?? 1,
+  }))
+}
+
+function mapChapter(chapter: ChapterData): StudioChapter {
+  return {
+    id: chapter.id,
+    chapterIndex: chapter.chapterIndex,
+    startTime: chapter.startTime,
+    endTime: chapter.endTime,
+    title: chapter.title,
+    summary: chapter.source.replaceAll("_", " ").toLowerCase(),
+    transcriptVersion: chapter.transcriptVersion,
+    score: chapter.score ?? 0,
   }
 }
 

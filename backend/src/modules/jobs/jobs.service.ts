@@ -1,7 +1,8 @@
 import type { ProcessingJob } from '../../infrastructure/db/generated/prisma/client'
 import { JobsError } from './jobs.error'
 import * as jobsRepo from './jobs.repository'
-import type { JobEventData, JobEventName, JobResponseData } from './jobs.types'
+import type { ListJobsQuery } from './jobs.schema'
+import type { JobEventData, JobEventName, JobResponseData, PaginatedResult } from './jobs.types'
 
 export const JOB_EVENT_POLL_INTERVAL_MS = 2000
 export const JOB_EVENT_HEARTBEAT_INTERVAL_MS = 15000
@@ -14,6 +15,29 @@ export const getJob = async (userId: string, jobId: string): Promise<JobResponse
   }
 
   return toJobResponseData(job)
+}
+
+export const listJobs = async (userId: string, query: ListJobsQuery): Promise<PaginatedResult<JobResponseData>> => {
+  const page = query.page
+  const limit = query.limit
+  const skip = (page - 1) * limit
+  const [items, total] = await jobsRepo.findJobsByUserId(
+    {
+      userId,
+      status: query.status,
+      jobType: query.jobType
+    },
+    skip,
+    limit
+  )
+
+  return {
+    items: items.map(toJobResponseData),
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+  }
 }
 
 export const toJobEventData = (job: JobResponseData): JobEventData => ({

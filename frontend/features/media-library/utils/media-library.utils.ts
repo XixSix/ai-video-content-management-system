@@ -2,7 +2,6 @@ import type {
   MediaLibraryItem,
   MediaLibrarySortKey,
   MediaLibraryTab,
-  MediaStatusFilter,
   MediaTypeFilter,
 } from "../types/media-library.types";
 
@@ -10,7 +9,6 @@ type MediaLibraryFilterState = {
   searchQuery: string;
   activeTab: MediaLibraryTab;
   typeFilter: MediaTypeFilter;
-  statusFilter: MediaStatusFilter;
   sortKey: MediaLibrarySortKey;
 };
 
@@ -98,9 +96,6 @@ export function filterAndSortMediaItems(
     const matchesType =
       filters.typeFilter === "ALL" || item.type === filters.typeFilter;
 
-    const matchesStatus =
-      filters.statusFilter === "ALL" || item.status === filters.statusFilter;
-
     const matchesTab =
       filters.activeTab === "ALL" ||
       (filters.activeTab === "ORIGINAL" && item.libraryGroup === "ORIGINAL") ||
@@ -110,7 +105,7 @@ export function filterAndSortMediaItems(
         item.libraryGroup === "ORIGINAL" &&
         Boolean(item.longToShortSourceId));
 
-    return matchesQuery && matchesType && matchesStatus && matchesTab;
+    return matchesQuery && matchesType && matchesTab;
   });
 
   return filteredItems.sort((left, right) => {

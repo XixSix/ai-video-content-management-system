@@ -16,7 +16,7 @@ export function LongToShortTrigger({
   const openLongToShort = useLongToShortStore((state) => state.openManager)
 
   return (
-    <button type="button" className={className} onClick={openLongToShort}>
+    <button type="button" className={className} onClick={() => openLongToShort()}>
       {children}
     </button>
   )

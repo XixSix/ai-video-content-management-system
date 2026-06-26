@@ -7,12 +7,6 @@ import {
   parseWaveformPeaksPayload,
 } from "@/features/media-library/lib/media-previews"
 
-export function buildFallbackPeaks(barCount: number, seed: number) {
-  return Array.from({ length: barCount }).map(
-    (_, barIndex) => (18 + ((barIndex * seed + (barIndex % 7) * 11) % 76)) / 100
-  )
-}
-
 export function useAudioPeaks(waveformUrl: string | null | undefined) {
   const [peaksState, setPeaksState] = useState<{
     peaks: number[]

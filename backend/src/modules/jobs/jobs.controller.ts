@@ -1,9 +1,29 @@
 import type { ParamsRequestHandler } from '../../types/express'
+import type { QueryRequestHandler } from '../../types/express'
 import { sendSuccess } from '../../utils/response'
 import { streamJobEvents } from './jobs.events'
-import type { JobParams } from './jobs.schema'
+import type { JobParams, ListJobsQuery } from './jobs.schema'
 import * as jobsService from './jobs.service'
-import type { JobResponseData } from './jobs.types'
+import type { JobResponseData, PaginatedResult } from './jobs.types'
+
+export const list: QueryRequestHandler<ListJobsQuery> = async (req, res, next): Promise<void> => {
+  try {
+    const query = req.query as ListJobsQuery
+    const result = await jobsService.listJobs(req.user!.id, query)
+
+    sendSuccess<{ items: JobResponseData[]; meta: Omit<PaginatedResult<never>, 'items'> }>(res, {
+      items: result.items,
+      meta: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages
+      }
+    })
+  } catch (error: unknown) {
+    next(error)
+  }
+}
 
 export const get: ParamsRequestHandler<JobParams> = async (req, res, next): Promise<void> => {
   try {

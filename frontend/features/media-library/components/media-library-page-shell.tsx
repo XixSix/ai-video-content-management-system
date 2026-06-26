@@ -10,7 +10,6 @@ import type { LongToShortCandidate } from "@/features/long-to-short/long-to-shor
 import {
   mediaLibraryTabOptions,
   mediaSortOptions,
-  mediaStatusFilterOptions,
   mediaTypeFilterOptions,
 } from "../constants/media-library.data"
 import type {
@@ -19,7 +18,6 @@ import type {
   MediaLibrarySortKey,
   MediaLibraryTab,
   MediaLibraryViewMode,
-  MediaStatusFilter,
   MediaTypeFilter,
 } from "../types/media-library.types"
 import { MediaFilterBar } from "./media-filter-bar"
@@ -59,13 +57,14 @@ export type MediaLibraryPageShellProps = {
   showGeneratedOutputNotice: boolean
   showPagination: boolean
   sortKey: MediaLibrarySortKey
-  statusFilter: MediaStatusFilter
   totalVisibleItems: number
   typeFilter: MediaTypeFilter
   viewMode: MediaLibraryViewMode
   onDeleteItem: (item: MediaLibraryItem) => void
+  onCreateClips: (item: MediaLibraryItem) => void
   onDismissUpload: (item: MediaLibraryItem) => void
   onDownloadItem: (item: MediaLibraryItem) => void
+  onOpenEditor: (item: MediaLibraryItem) => void
   onNextPreviewItem: () => void
   onOpenMediaPreview: (item: MediaLibraryItem) => void
   onOpenLongToShortSource: (item: MediaLibraryItem) => void
@@ -79,7 +78,6 @@ export type MediaLibraryPageShellProps = {
   onRetryUpload: (item: MediaLibraryItem) => void
   onSearchChange: (value: string) => void
   onSortChange: (value: MediaLibrarySortKey) => void
-  onStatusFilterChange: (value: MediaStatusFilter) => void
   onTabChange: (tab: MediaLibraryTab) => void
   onTypeFilterChange: (value: MediaTypeFilter) => void
   onUploadSelection: (event: ChangeEvent<HTMLInputElement>) => void
@@ -142,12 +140,10 @@ function MediaLibraryControls({
   shouldShowEmptyState,
   showGeneratedOutputNotice,
   sortKey,
-  statusFilter,
   typeFilter,
   viewMode,
   onSearchChange,
   onSortChange,
-  onStatusFilterChange,
   onTabChange,
   onTypeFilterChange,
   onViewModeChange,
@@ -158,12 +154,10 @@ function MediaLibraryControls({
   | "shouldShowEmptyState"
   | "showGeneratedOutputNotice"
   | "sortKey"
-  | "statusFilter"
   | "typeFilter"
   | "viewMode"
   | "onSearchChange"
   | "onSortChange"
-  | "onStatusFilterChange"
   | "onTabChange"
   | "onTypeFilterChange"
   | "onViewModeChange"
@@ -179,10 +173,11 @@ function MediaLibraryControls({
         <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-500/25 bg-amber-500/8 px-4 py-3">
           <div>
             <p className="text-sm font-semibold text-foreground">
-              Generated outputs are not connected yet
+              Generated outputs are loaded from API
             </p>
             <p className="text-xs leading-5 text-muted-foreground">
-              This view will populate after the generated-output API is wired.
+              Editor exports, subtitles, and generated assets appear here when
+              background jobs finish.
             </p>
           </div>
           <span className="rounded-full border border-amber-500/30 bg-background/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700 dark:text-amber-300">
@@ -204,10 +199,7 @@ function MediaLibraryControls({
           <MediaFilterBar
             typeFilter={typeFilter}
             onTypeFilterChange={onTypeFilterChange}
-            statusFilter={statusFilter}
-            onStatusFilterChange={onStatusFilterChange}
             typeOptions={mediaTypeFilterOptions}
-            statusOptions={mediaStatusFilterOptions}
           />
         </>
       ) : null}
@@ -370,13 +362,14 @@ export function MediaLibraryPageShell({
   showGeneratedOutputNotice,
   showPagination,
   sortKey,
-  statusFilter,
   totalVisibleItems,
   typeFilter,
   viewMode,
   onDeleteItem,
+  onCreateClips,
   onDismissUpload,
   onDownloadItem,
+  onOpenEditor,
   onNextPreviewItem,
   onOpenMediaPreview,
   onOpenLongToShortSource,
@@ -390,7 +383,6 @@ export function MediaLibraryPageShell({
   onRetryUpload,
   onSearchChange,
   onSortChange,
-  onStatusFilterChange,
   onTabChange,
   onTypeFilterChange,
   onUploadSelection,
@@ -420,12 +412,10 @@ export function MediaLibraryPageShell({
         shouldShowEmptyState={shouldShowEmptyState}
         showGeneratedOutputNotice={showGeneratedOutputNotice}
         sortKey={sortKey}
-        statusFilter={statusFilter}
         typeFilter={typeFilter}
         viewMode={viewMode}
         onSearchChange={onSearchChange}
         onSortChange={onSortChange}
-        onStatusFilterChange={onStatusFilterChange}
         onTabChange={onTabChange}
         onTypeFilterChange={onTypeFilterChange}
         onViewModeChange={onViewModeChange}
@@ -471,7 +461,15 @@ export function MediaLibraryPageShell({
         onDownload={
           preview.item ? () => onDownloadItem(preview.item!) : undefined
         }
+        onCreateClips={
+          preview.item?.type === "VIDEO"
+            ? () => onCreateClips(preview.item!)
+            : undefined
+        }
         onNextItem={onNextPreviewItem}
+        onOpenEditor={
+          preview.item ? () => onOpenEditor(preview.item!) : undefined
+        }
         onOpenChange={onPreviewOpenChange}
         onPreviousItem={onPreviousPreviewItem}
         previewDetail={preview.detail}

@@ -187,9 +187,14 @@ export function EditorSnapshotPersistenceProvider({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const conflictRef = useRef<EditorSnapshotConflict | null>(null)
   const mountedRef = useRef(true)
-  const saveLatestRef = useRef<(baseVersion?: number) => Promise<boolean>>(
-    () => Promise.resolve(false)
-  )
+  const saveLatestRef = useRef<
+    (
+      baseVersion?: number,
+      options?: {
+        force?: boolean
+      }
+    ) => Promise<boolean>
+  >(() => Promise.resolve(false))
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -215,7 +220,12 @@ export function EditorSnapshotPersistenceProvider({
   )
 
   const saveLatest = useCallback(
-    (baseVersionOverride?: number): Promise<boolean> => {
+    (
+      baseVersionOverride?: number,
+      options: {
+        force?: boolean
+      } = {}
+    ): Promise<boolean> => {
       if (!canEdit || conflictRef.current) {
         return Promise.resolve(false)
       }
@@ -230,7 +240,7 @@ export function EditorSnapshotPersistenceProvider({
       const document = latestDocumentRef.current
       const fingerprint = latestFingerprintRef.current
 
-      if (fingerprint === baselineFingerprintRef.current) {
+      if (!options.force && fingerprint === baselineFingerprintRef.current) {
         return Promise.resolve(true)
       }
 
@@ -397,11 +407,15 @@ export function EditorSnapshotPersistenceProvider({
       getInFlight: () => inFlightRef.current,
       isDirty: () =>
         latestFingerprintRef.current !== baselineFingerprintRef.current ||
-        Boolean(conflictRef.current),
+        Boolean(conflictRef.current) ||
+        versionRef.current === 0,
       markTrailingSave: () => {
         trailingSaveRef.current = true
       },
-      saveLatest: () => saveLatestRef.current(),
+      saveLatest: () =>
+        saveLatestRef.current(undefined, {
+          force: versionRef.current === 0,
+        }),
     })
   }, [canEdit, clearTimer, status])
 

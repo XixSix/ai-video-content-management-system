@@ -60,6 +60,18 @@ import type {
   LongToShortSettings,
   LongToShortSource,
 } from "@/features/long-to-short/long-to-short.types"
+import { jobService, isTerminalJob } from "@/features/jobs/job.service"
+import type { ProcessingJobData } from "@/features/jobs/job.types"
+import { useMediaDetail } from "@/features/media-library/hooks/use-media-detail"
+import { getMediaPreviewThumbnailUrl } from "@/features/media-library/lib/media-previews"
+import type { MediaDetailResponseData } from "@/features/media-library/types/media-library.types"
+import type { ClipCandidateData } from "@/features/short-clips/short-clips.types"
+import {
+  useClipCandidates,
+  useGenerateShortClips,
+  useShortClips,
+} from "@/features/short-clips/use-short-clips"
+import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 import { cn } from "@/lib/utils"
 
 type PresetTab = "QUICK_PRESETS" | "MY_TEMPLATES"
@@ -193,6 +205,63 @@ function buildMockUploadSource(fileName: string, type: LongToShortSource["type"]
     transcriptStatus: "READY" as const,
     chapterStatus: "READY" as const,
     status: "READY" as const,
+  }
+}
+
+function buildMediaSource(media: MediaDetailResponseData): LongToShortSource {
+  const durationSeconds = media.duration ?? 0
+  const title = media.title ?? media.originalFilename
+
+  return {
+    id: media.id,
+    projectSlug: media.id,
+    title,
+    sourceFileName: media.originalFilename,
+    assetUrl: null,
+    thumbnailUrl: getMediaPreviewThumbnailUrl(media),
+    type: media.type === "AUDIO" ? "AUDIO" : "VIDEO",
+    durationSeconds,
+    durationLabel: formatSecondsAsClock(durationSeconds),
+    resolutionLabel:
+      media.width && media.height
+        ? `${media.width} x ${media.height}`
+        : media.type === "AUDIO"
+          ? "Audio only"
+          : "Source video",
+    transcriptStatus: "READY",
+    chapterStatus: "READY",
+    status: media.status === "UPLOADED" ? "READY" : "PROCESSING",
+  }
+}
+
+function mapClipCandidate(candidate: ClipCandidateData): LongToShortCandidate {
+  return {
+    id: candidate.id,
+    sourceId: candidate.mediaId,
+    sourceChapterLabel: candidate.chapterId ? "Generated chapter" : undefined,
+    title: candidate.cleanText?.slice(0, 64) || "Generated clip candidate",
+    caption: candidate.text ?? candidate.cleanText ?? "",
+    thumbnailUrl: null,
+    startTime: candidate.startTime,
+    endTime: candidate.endTime,
+    duration: candidate.duration,
+    transcript: candidate.text ?? candidate.cleanText ?? "",
+    reviewNotes: [
+      candidate.llmReason,
+      typeof candidate.finalScore === "number"
+        ? `Score ${(candidate.finalScore * 100).toFixed(0)}`
+        : null,
+    ].filter((note): note is string => Boolean(note)),
+    status:
+      candidate.status === "SELECTED"
+        ? "SELECTED"
+        : candidate.status === "REJECTED"
+          ? "REJECTED"
+          : "RECOMMENDED",
+    aspectRatio: "9:16",
+    platform: "TIKTOK",
+    burnSubtitles: true,
+    transcriptVersionLabel: `Transcript v${candidate.transcriptVersion}`,
   }
 }
 
@@ -456,14 +525,18 @@ function CandidatePreviewMedia({
 
 type LongToShortWorkspaceProps = {
   open?: boolean
+  sourceMediaId?: string | null
   onOpenChange?: (isOpen: boolean) => void
 }
 
 export function LongToShortWorkspace({
   open = true,
+  sourceMediaId = null,
   onOpenChange,
 }: LongToShortWorkspaceProps = {}) {
   const router = useRouter()
+  const { selectedWorkspaceId } = useWorkspace()
+  const workspaceId = selectedWorkspaceId ?? ""
   const srtInputId = useId()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const srtInputRef = useRef<HTMLInputElement | null>(null)
@@ -483,17 +556,38 @@ export function LongToShortWorkspace({
   const [candidatesBySource, setCandidatesBySource] = useState(
     longToShortCandidatesBySourceId
   )
+  const [generationJob, setGenerationJob] = useState<ProcessingJobData | null>(null)
+  const [hydratedSourceMediaId, setHydratedSourceMediaId] = useState<string | null>(null)
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
   const [candidateSearch, setCandidateSearch] = useState("")
+  const sourceMediaQuery = useMediaDetail(workspaceId, sourceMediaId, {
+    enabled: open && Boolean(sourceMediaId),
+    pollUntilReady: true,
+  })
+  const generateShortClips = useGenerateShortClips()
+  const apiCandidateQuery = useClipCandidates(
+    selectedSourceId,
+    { page: 1, limit: 50, sortBy: "finalScore", sortOrder: "desc" },
+    Boolean(selectedSourceId) && selectedSourceId === sourceMediaId
+  )
+  const apiShortClipsQuery = useShortClips(
+    selectedSourceId,
+    { page: 1, limit: 50, sortBy: "createdAt", sortOrder: "desc" },
+    Boolean(selectedSourceId) && selectedSourceId === sourceMediaId
+  )
 
   const selectedSource =
     sources.find((source) => source.id === selectedSourceId) ?? null
   const selectedPreset =
     longToShortCaptionPresets.find((preset) => preset.id === settings.captionPresetId) ??
     longToShortCaptionPresets[0]
-  const sourceCandidates = selectedSource
-    ? candidatesBySource[selectedSource.id] ?? []
-    : []
+  const apiCandidates = apiCandidateQuery.data?.items.map(mapClipCandidate) ?? []
+  const sourceCandidates =
+    selectedSource && selectedSource.id === sourceMediaId
+      ? apiCandidates
+      : selectedSource
+        ? candidatesBySource[selectedSource.id] ?? []
+        : []
   const filteredCandidates = sourceCandidates.filter((candidate) => {
     const query = candidateSearch.trim().toLowerCase()
 
@@ -534,6 +628,21 @@ export function LongToShortWorkspace({
   }
 
   useEffect(() => {
+    const media = sourceMediaQuery.data?.media
+
+    if (!open || !media || hydratedSourceMediaId === media.id) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      finalizePendingSource(buildMediaSource(media))
+      setHydratedSourceMediaId(media.id)
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [hydratedSourceMediaId, open, sourceMediaQuery.data?.media])
+
+  useEffect(() => {
     if (uploadState !== "UPLOADING" || !pendingSource) {
       return
     }
@@ -557,7 +666,7 @@ export function LongToShortWorkspace({
   }, [pendingSource, uploadState])
 
   useEffect(() => {
-    if (runState !== "GENERATING") {
+    if (runState !== "GENERATING" || generationJob) {
       return
     }
 
@@ -574,7 +683,41 @@ export function LongToShortWorkspace({
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [runState])
+  }, [generationJob, runState])
+
+  useEffect(() => {
+    if (!generationJob || isTerminalJob(generationJob)) {
+      return
+    }
+
+    const subscription = jobService.subscribeToJobEvents({
+      jobId: generationJob.id,
+      onError: () => undefined,
+      onJob: (job) => {
+        setGenerationJob(job)
+
+        if (isTerminalJob(job)) {
+          setRunState(job.status === "COMPLETED" ? "COMPLETED" : "IDLE")
+          setNotification({
+            id: `clips-job-${job.id}`,
+            status: job.status === "COMPLETED" ? "SUCCESS" : "PROCESSING",
+            title:
+              job.status === "COMPLETED"
+                ? "Clip job completed"
+                : "Clip job stopped",
+            description:
+              job.status === "COMPLETED"
+                ? "Refresh generated candidates and clips for review."
+                : job.errorMessage ?? "The short clip job did not complete.",
+          })
+          void apiCandidateQuery.refetch()
+          void apiShortClipsQuery.refetch()
+        }
+      },
+    })
+
+    return () => subscription.close()
+  }, [apiCandidateQuery, apiShortClipsQuery, generationJob])
 
   const selectSource = (source: LongToShortSource) => {
     setSelectedSourceId(source.id)
@@ -627,7 +770,7 @@ export function LongToShortWorkspace({
     setNotification(null)
   }
 
-  const handleStartGeneration = () => {
+  const handleStartGeneration = async () => {
     if (!selectedSource) {
       return
     }
@@ -640,6 +783,26 @@ export function LongToShortWorkspace({
       title: "Generating clips",
       description: `${selectedSource.sourceFileName} is processing in the background.`,
     })
+
+    if (selectedSource.id === sourceMediaId) {
+      try {
+        const result = await generateShortClips.mutateAsync(selectedSource.id)
+        setGenerationJob(result.job)
+      } catch (error) {
+        setRunState("IDLE")
+        setNotification({
+          id: `clips-failed-${Date.now()}`,
+          status: "PROCESSING",
+          title: "Unable to start clip generation",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Please check the media transcript and try again.",
+        })
+        return
+      }
+    }
+
     onOpenChange?.(false)
   }
 
@@ -1337,8 +1500,9 @@ export function LongToShortWorkspace({
                     No clips generated yet
                   </p>
                   <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                    This source does not have mock candidates yet. Return to setup
-                    and choose another source from the media library.
+                    This source does not have generated candidates yet. Start
+                    generation, then return here when the background job
+                    produces clip candidates.
                   </p>
                   <Button
                     type="button"

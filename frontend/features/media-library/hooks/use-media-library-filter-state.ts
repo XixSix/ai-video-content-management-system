@@ -5,7 +5,6 @@ import { useState } from "react";
 import type {
   MediaLibrarySortKey,
   MediaLibraryViewMode,
-  MediaStatusFilter,
   MediaTypeFilter,
 } from "../types/media-library.types";
 
@@ -13,14 +12,12 @@ export function useMediaLibraryFilterState() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<MediaLibraryViewMode>("grid");
   const [typeFilter, setTypeFilter] = useState<MediaTypeFilter>("ALL");
-  const [statusFilter, setStatusFilter] = useState<MediaStatusFilter>("ALL");
   const [sortKey, setSortKey] = useState<MediaLibrarySortKey>("newest");
   const [currentPage, setCurrentPage] = useState(1);
 
   const resetFilters = () => {
     setSearchQuery("");
     setTypeFilter("ALL");
-    setStatusFilter("ALL");
     setSortKey("newest");
     setCurrentPage(1);
   };
@@ -29,7 +26,6 @@ export function useMediaLibraryFilterState() {
     currentPage,
     searchQuery,
     sortKey,
-    statusFilter,
     typeFilter,
     viewMode,
     resetFilters,
@@ -40,10 +36,6 @@ export function useMediaLibraryFilterState() {
     },
     onSortChange: (value: MediaLibrarySortKey) => {
       setSortKey(value);
-      setCurrentPage(1);
-    },
-    onStatusFilterChange: (value: MediaStatusFilter) => {
-      setStatusFilter(value);
       setCurrentPage(1);
     },
     onTypeFilterChange: (value: MediaTypeFilter) => {

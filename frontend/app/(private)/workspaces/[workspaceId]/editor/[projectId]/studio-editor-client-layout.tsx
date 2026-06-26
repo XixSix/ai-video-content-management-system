@@ -158,7 +158,9 @@ export default function StudioLayout({
       (snapshotQuery.error instanceof ApiError &&
         snapshotQuery.error.status === 404)
     const loadError =
-      projectQuery.error ?? snapshotQuery.error ?? authSession.error
+      projectQuery.error ??
+      snapshotQuery.error ??
+      authSession.error
 
     return (
       <div className="flex h-screen items-center justify-center bg-background p-6 text-foreground">

@@ -3,9 +3,10 @@
 import type {
   MediaLibrarySortKey,
   MediaLibraryTab,
-  MediaStatusFilter,
 } from "../types/media-library.types";
 import { getMediaItemsForTab } from "../utils/media-library.utils";
+import { useGeneratedAssets } from "@/features/assets/use-assets";
+import { mapGeneratedAssetToLibraryItem } from "../utils/media-library.mapper";
 import { useMediaList } from "./use-media-list";
 import { useMediaUploadQueue } from "./use-media-upload-queue";
 
@@ -29,7 +30,6 @@ type UseMediaLibraryItemsParams = {
   activeTab: MediaLibraryTab;
   selectedWorkspaceId: string | undefined;
   sortKey: MediaLibrarySortKey;
-  statusFilter: MediaStatusFilter;
   workspaceId: string;
 };
 
@@ -37,19 +37,32 @@ export function useMediaLibraryItems({
   activeTab,
   selectedWorkspaceId,
   sortKey,
-  statusFilter,
   workspaceId,
 }: UseMediaLibraryItemsParams) {
   const sort = getMediaListSort(sortKey);
   const isRealMediaTab = activeTab === "ALL" || activeTab === "ORIGINAL";
+  const shouldLoadGeneratedAssets =
+    activeTab === "ALL" || activeTab === "EDITOR_OUTPUTS";
   const mediaQuery = useMediaList(workspaceId, {
     page: 1,
     limit: 50,
-    status: statusFilter === "ALL" ? undefined : statusFilter,
     ...sort,
   });
+  const assetsQuery = useGeneratedAssets(
+    {
+      page: 1,
+      limit: 50,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    },
+    shouldLoadGeneratedAssets,
+  );
   const uploadQueue = useMediaUploadQueue(selectedWorkspaceId);
-  const realItems = [...uploadQueue.items, ...(mediaQuery.data?.items ?? [])];
+  const realItems = [
+    ...uploadQueue.items,
+    ...(mediaQuery.data?.items ?? []),
+    ...(assetsQuery.data?.items.map(mapGeneratedAssetToLibraryItem) ?? []),
+  ];
   const items = getMediaItemsForTab(realItems, activeTab);
 
   return {
@@ -58,11 +71,20 @@ export function useMediaLibraryItems({
         ? mediaQuery.error instanceof Error
           ? mediaQuery.error.message
           : "Please check the API connection and try again."
+        : activeTab === "EDITOR_OUTPUTS" && assetsQuery.isError
+          ? assetsQuery.error instanceof Error
+            ? assetsQuery.error.message
+            : "Please check the generated assets API and try again."
         : null,
-    isLoading: isRealMediaTab && mediaQuery.isLoading,
+    isLoading:
+      (isRealMediaTab && mediaQuery.isLoading) ||
+      (activeTab === "EDITOR_OUTPUTS" && assetsQuery.isLoading),
     items,
     uploadQueue,
-    onRetryLoad: () => void mediaQuery.refetch(),
+    onRetryLoad: () => {
+      void mediaQuery.refetch();
+      void assetsQuery.refetch();
+    },
   };
 }
 

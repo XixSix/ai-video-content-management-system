@@ -1,5 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
+import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store";
+import { useCreateProject } from "@/features/studio-hub/hooks/use-projects";
+import { getEditorHref } from "@/features/studio-hub/studio-projects.utils";
 import { useWorkspace } from "@/features/workspaces/components/workspace-provider";
 
 import type { MediaLibraryPageShellProps } from "../components/media-library-page-shell";
@@ -12,15 +17,17 @@ import { useMediaLibraryResults } from "./use-media-library-results";
 import { useMediaLibraryUrlState } from "./use-media-library-url-state";
 
 export function useMediaLibraryPage(): MediaLibraryPageShellProps {
+  const router = useRouter();
   const { selectedWorkspaceId } = useWorkspace();
   const workspaceId = selectedWorkspaceId ?? "";
+  const createProject = useCreateProject(workspaceId);
+  const openLongToShort = useLongToShortStore((state) => state.openManager);
   const urlState = useMediaLibraryUrlState();
   const filters = useMediaLibraryFilterState();
   const library = useMediaLibraryItems({
     activeTab: urlState.activeTab,
     selectedWorkspaceId: selectedWorkspaceId ?? undefined,
     sortKey: filters.sortKey,
-    statusFilter: filters.statusFilter,
     workspaceId,
   });
   const results = useMediaLibraryResults({
@@ -30,7 +37,6 @@ export function useMediaLibraryPage(): MediaLibraryPageShellProps {
     items: library.items,
     searchQuery: filters.searchQuery,
     sortKey: filters.sortKey,
-    statusFilter: filters.statusFilter,
     typeFilter: filters.typeFilter,
   });
   const actions = useMediaLibraryActions({
@@ -59,6 +65,26 @@ export function useMediaLibraryPage(): MediaLibraryPageShellProps {
     urlState.updateLibraryUrl(nextTab);
   };
 
+  const handleOpenEditor = async (item: { id: string; title: string }) => {
+    if (!workspaceId) {
+      return;
+    }
+
+    const { project } = await createProject.mutateAsync({
+      mode: "from-media",
+      data: {
+        mediaId: item.id,
+        title: item.title,
+      },
+    });
+
+    router.push(getEditorHref(workspaceId, project.id));
+  };
+
+  const handleCreateClips = (item: { id: string }) => {
+    openLongToShort({ mediaId: item.id });
+  };
+
   return {
     activeTab: urlState.activeTab,
     currentPage: results.currentPage,
@@ -75,17 +101,17 @@ export function useMediaLibraryPage(): MediaLibraryPageShellProps {
     shouldShowEmptyState: results.shouldShowEmptyState,
     shouldShowNoResults: results.shouldShowNoResults,
     showGeneratedOutputNotice:
-      urlState.activeTab === "EDITOR_OUTPUTS" ||
-      urlState.activeTab === "LONG_TO_SHORT",
+      urlState.activeTab === "EDITOR_OUTPUTS",
     showPagination: results.showPagination,
     sortKey: filters.sortKey,
-    statusFilter: filters.statusFilter,
     totalVisibleItems: results.totalVisibleItems,
     typeFilter: filters.typeFilter,
     viewMode: filters.viewMode,
     onDeleteItem: actions.onDeleteItem,
+    onCreateClips: handleCreateClips,
     onDismissUpload: actions.onDismissUpload,
     onDownloadItem: actions.onDownloadItem,
+    onOpenEditor: handleOpenEditor,
     onNextPreviewItem: preview.onNextPreviewItem,
     onOpenLongToShortSource: preview.onOpenLongToShortSource,
     onOpenMediaPreview: preview.onOpenMediaPreview,
@@ -99,7 +125,6 @@ export function useMediaLibraryPage(): MediaLibraryPageShellProps {
     onRetryUpload: actions.onRetryUpload,
     onSearchChange: filters.onSearchChange,
     onSortChange: filters.onSortChange,
-    onStatusFilterChange: filters.onStatusFilterChange,
     onTabChange: handleTabChange,
     onTypeFilterChange: filters.onTypeFilterChange,
     onUploadSelection: actions.onUploadSelection,

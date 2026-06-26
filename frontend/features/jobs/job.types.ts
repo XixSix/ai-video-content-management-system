@@ -7,7 +7,6 @@ export type ProcessingJobStatus =
   | "BURNING_SUBTITLE"
   | "GENERATING_CHAPTERS"
   | "GENERATING_SHORT_CLIPS"
-  | "GENERATING_SUGGESTIONS"
   | "GENERATING_MEDIA_PREVIEW"
   | "PUBLISHING"
   | "COMPLETED"
@@ -19,7 +18,7 @@ export type ProcessingJobData = {
   mediaId: string | null
   jobType: string
   status: ProcessingJobStatus
-  progress: number
+  progress: number | null
   errorMessage: string | null
   output: Record<string, unknown> | null
   attemptCount: number
@@ -31,6 +30,23 @@ export type ProcessingJobData = {
 
 export type ProcessingJobResponse = {
   job: ProcessingJobData
+}
+
+export type ProcessingJobListQuery = {
+  page?: number
+  limit?: number
+  status?: ProcessingJobStatus
+  jobType?: string
+}
+
+export type ProcessingJobListResponse = {
+  items: ProcessingJobData[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
 export type JobEventHandler = (job: ProcessingJobData) => void

@@ -2,6 +2,12 @@
 
 import type { StoreApi } from "zustand/vanilla"
 
+import type { ChapterData } from "@/features/chapters/chapter.types"
+import type {
+  TranscriptEditorData,
+  TranscriptSummaryData,
+} from "@/features/transcripts/transcript.types"
+
 import type {
   StudioAspectRatio,
   StudioCanvasLayer,
@@ -110,6 +116,11 @@ export type StudioEditorActions = {
   selectShortClip: (shortClipId: string) => void
   selectTranscriptSegment: (segmentId: string) => void
   setActiveTool: (toolId: StudioToolId) => void
+  hydrateProjectAiOutputs: (input: {
+    chapters?: ChapterData[]
+    transcript?: TranscriptSummaryData | null
+    transcriptEditor?: TranscriptEditorData | null
+  }) => void
   setClipCandidateStatus: (
     clipCandidateId: string,
     status: StudioClipCandidateStatus

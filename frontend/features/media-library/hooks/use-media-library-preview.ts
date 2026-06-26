@@ -3,10 +3,43 @@
 import { useState } from "react";
 
 import type { LongToShortCandidate } from "@/features/long-to-short/long-to-short.types";
+import type { ClipCandidateData } from "@/features/short-clips/short-clips.types";
+import { useClipCandidates } from "@/features/short-clips/use-short-clips";
 
 import type { MediaLibraryItem, MediaLibraryTab } from "../types/media-library.types";
 import { useMediaDetail } from "./use-media-detail";
 import { useMediaPreviewUrl } from "./use-media-mutations";
+
+function mapClipCandidate(candidate: ClipCandidateData): LongToShortCandidate {
+  return {
+    id: candidate.id,
+    sourceId: candidate.mediaId,
+    sourceChapterLabel: candidate.chapterId ? "Generated chapter" : undefined,
+    title: candidate.cleanText?.slice(0, 64) || "Generated clip candidate",
+    caption: candidate.text ?? candidate.cleanText ?? "",
+    thumbnailUrl: null,
+    startTime: candidate.startTime,
+    endTime: candidate.endTime,
+    duration: candidate.duration,
+    transcript: candidate.text ?? candidate.cleanText ?? "",
+    reviewNotes: [
+      candidate.llmReason,
+      typeof candidate.finalScore === "number"
+        ? `Score ${(candidate.finalScore * 100).toFixed(0)}`
+        : null,
+    ].filter((note): note is string => Boolean(note)),
+    status:
+      candidate.status === "SELECTED"
+        ? "SELECTED"
+        : candidate.status === "REJECTED"
+          ? "REJECTED"
+          : "RECOMMENDED",
+    aspectRatio: "9:16",
+    platform: "TIKTOK",
+    burnSubtitles: true,
+    transcriptVersionLabel: `Transcript v${candidate.transcriptVersion}`,
+  };
+}
 
 type UseMediaLibraryPreviewParams = {
   activeTab: MediaLibraryTab;
@@ -62,7 +95,13 @@ export function useMediaLibraryPreview({
   const hasNextPreviewItem =
     previewItemIndex >= 0 &&
     previewItemIndex < navigablePreviewItems.length - 1;
-  const previewCandidates: LongToShortCandidate[] = [];
+  const clipCandidatesQuery = useClipCandidates(
+    selectedLongToShortSourceId,
+    { page: 1, limit: 50, sortBy: "finalScore", sortOrder: "desc" },
+    activeTab === "LONG_TO_SHORT" && Boolean(selectedLongToShortSourceId),
+  );
+  const previewCandidates: LongToShortCandidate[] =
+    clipCandidatesQuery.data?.items.map(mapClipCandidate) ?? [];
   const previewUrlQuery = useMediaPreviewUrl(
     workspaceId,
     previewItem ? previewItem.id : null,

@@ -2,17 +2,13 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type {
   FilterChipOption,
-  MediaStatusFilter,
   MediaTypeFilter,
 } from "../types/media-library.types"
 
 type MediaFilterBarProps = {
   typeFilter: MediaTypeFilter
   onTypeFilterChange: (value: MediaTypeFilter) => void
-  statusFilter: MediaStatusFilter
-  onStatusFilterChange: (value: MediaStatusFilter) => void
   typeOptions: FilterChipOption<MediaTypeFilter>[]
-  statusOptions: FilterChipOption<MediaStatusFilter>[]
 }
 
 type FilterGroupProps<TValue extends string> = {
@@ -61,10 +57,7 @@ function FilterGroup<TValue extends string>({
 export function MediaFilterBar({
   typeFilter,
   onTypeFilterChange,
-  statusFilter,
-  onStatusFilterChange,
   typeOptions,
-  statusOptions,
 }: MediaFilterBarProps) {
   return (
     <div className="overflow-x-auto pb-1">
@@ -74,12 +67,6 @@ export function MediaFilterBar({
           value={typeFilter}
           onValueChange={onTypeFilterChange}
           options={typeOptions}
-        />
-        <FilterGroup
-          label="Status"
-          value={statusFilter}
-          onValueChange={onStatusFilterChange}
-          options={statusOptions}
         />
       </div>
     </div>

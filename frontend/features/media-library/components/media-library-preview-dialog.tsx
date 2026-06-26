@@ -62,7 +62,9 @@ type MediaLibraryPreviewDialogProps = {
   hasPreviousItem?: boolean
   open: boolean
   onNextItem?: () => void
+  onCreateClips?: () => void
   onDownload?: () => void
+  onOpenEditor?: () => void
   onOpenChange: (open: boolean) => void
   onPreviousItem?: () => void
   previewDetail?: MediaDetailResponseData | null
@@ -193,7 +195,6 @@ function NativeAssetPreview({
           <TimelineWaveform
             className="bg-cyan-600/55 dark:bg-cyan-100/45"
             peaks={waveformPeaks}
-            seed={29}
           />
         </div>
         <audio src={item.assetUrl} controls preload="metadata" className="w-full max-w-2xl" />
@@ -657,10 +658,14 @@ function ContextPanel({
 
 function ActionRail({
   isLongToShort,
+  onCreateClips,
   onDownload,
+  onOpenEditor,
 }: {
   isLongToShort: boolean
+  onCreateClips?: () => void
   onDownload?: () => void
+  onOpenEditor?: () => void
 }) {
   const actions = isLongToShort
     ? [
@@ -672,7 +677,7 @@ function ActionRail({
         { label: "More", icon: MoreHorizontal },
       ]
     : [
-        { label: "Open Studio", icon: Clapperboard, href: "/studio" },
+        { label: "Open Editor", icon: Clapperboard },
         { label: "Create clips", icon: Sparkles },
         { label: "Download", icon: Download },
         { label: "Share", icon: Share2 },
@@ -684,6 +689,10 @@ function ActionRail({
       <aside className="flex gap-2 overflow-x-auto border-b border-border/70 p-3 lg:flex-col lg:items-center lg:overflow-visible lg:border-b-0 lg:border-r">
         {actions.map((action) => {
           const Icon = action.icon
+          const isDisabled =
+            (action.label === "Open Editor" && !onOpenEditor) ||
+            (action.label === "Create clips" && !onCreateClips) ||
+            (action.label === "Download" && !onDownload)
           const button = (
             <Button
               type="button"
@@ -691,7 +700,16 @@ function ActionRail({
               size="icon-lg"
               className="rounded-xl"
               asChild={Boolean(action.href)}
-              onClick={action.label === "Download" ? onDownload : undefined}
+              disabled={!action.href && isDisabled}
+              onClick={
+                action.label === "Download"
+                  ? onDownload
+                  : action.label === "Open Editor"
+                    ? onOpenEditor
+                    : action.label === "Create clips"
+                      ? onCreateClips
+                      : undefined
+              }
             >
               {action.href ? (
                 <Link href={action.href}>
@@ -800,7 +818,9 @@ export function MediaLibraryPreviewDialog({
   hasPreviousItem = false,
   open,
   onNextItem,
+  onCreateClips,
   onDownload,
+  onOpenEditor,
   onOpenChange,
   onPreviousItem,
   previewDetail,
@@ -880,7 +900,9 @@ export function MediaLibraryPreviewDialog({
           />
           <ActionRail
             isLongToShort={isLongToShortPreview}
+            onCreateClips={onCreateClips}
             onDownload={onDownload}
+            onOpenEditor={onOpenEditor}
           />
           {isLongToShortPreview ? (
             <ClipSelector

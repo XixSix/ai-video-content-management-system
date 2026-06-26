@@ -5,6 +5,7 @@ import type { ProjectDetail } from "@/features/studio-hub/studio-projects.types"
 import {
   createDefaultEditorDocument,
   createStudioProjectFromDetail,
+  hydrateStudioProjectAiOutputs,
   hydrateEditorDocument,
   serializeEditorDocument,
 } from "./editor-snapshot.mapper"
@@ -189,6 +190,17 @@ describe("editor snapshot mapper", () => {
     expect(editorProject.sourceMedia.durationLabel).toBe("0:00")
   })
 
+  it("does not carry mock transcript or chapter data into API-backed projects", () => {
+    const editorProject = createStudioProjectFromDetail(project)
+
+    expect(editorProject.transcript.fullText).toBe("")
+    expect(editorProject.transcriptSegments).toEqual([])
+    expect(editorProject.transcriptWords).toEqual([])
+    expect(editorProject.chapters).toEqual([])
+    expect(editorProject.clipCandidates).toEqual([])
+    expect(editorProject.shortClips).toEqual([])
+  })
+
   it("hydrates and serializes only the persisted composition contract", () => {
     const editorProject = hydrateEditorDocument(
       createStudioProjectFromDetail(project),
@@ -245,6 +257,112 @@ describe("editor snapshot mapper", () => {
       "mediaId",
       sourceMediaId
     )
+  })
+
+  it("hydrates API transcript and chapters over mock editor outputs", () => {
+    const editorProject = hydrateStudioProjectAiOutputs(
+      createStudioProjectFromDetail(project),
+      {
+        transcript: {
+          id: "00000000-0000-4000-8000-000000000008",
+          mediaId: sourceMediaId,
+          jobId: null,
+          language: "en",
+          source: "LOCAL",
+          asrModel: null,
+          modelSize: null,
+          fullTextPreview: "Hello world",
+          wordCount: 2,
+          isEdited: false,
+          version: 3,
+          fullTextUpdatedAt: "2026-06-21T00:00:00.000Z",
+          createdAt: "2026-06-21T00:00:00.000Z",
+          updatedAt: "2026-06-21T00:00:00.000Z",
+        },
+        transcriptEditor: {
+          transcript: {
+            id: "00000000-0000-4000-8000-000000000008",
+            mediaId: sourceMediaId,
+            version: 3,
+            isEdited: false,
+            language: "en",
+          },
+          segments: [
+            {
+              id: "segment-1",
+              transcriptId: "00000000-0000-4000-8000-000000000008",
+              mediaId: sourceMediaId,
+              segmentIndex: 0,
+              startTime: 0,
+              endTime: 2,
+              text: "Hello world",
+              cleanText: "hello world",
+              confidence: 0.9,
+              speakerLabel: "Host",
+              createdAt: "2026-06-21T00:00:00.000Z",
+            },
+          ],
+          words: [
+            {
+              id: "word-1",
+              transcriptId: "00000000-0000-4000-8000-000000000008",
+              segmentId: "segment-1",
+              mediaId: sourceMediaId,
+              wordIndex: 0,
+              segmentWordIndex: 0,
+              startTime: 0,
+              endTime: 0.5,
+              text: "Hello",
+              cleanText: "hello",
+              confidence: 0.9,
+              speakerLabel: "Host",
+              createdAt: "2026-06-21T00:00:00.000Z",
+            },
+          ],
+          draft: null,
+        },
+        chapters: [
+          {
+            id: "chapter-1",
+            mediaId: sourceMediaId,
+            transcriptId: "00000000-0000-4000-8000-000000000008",
+            jobId: null,
+            chapterIndex: 0,
+            startTime: 0,
+            endTime: 30,
+            title: "Opening",
+            transcriptVersion: 3,
+            version: 1,
+            isEdited: false,
+            source: "AI",
+            score: 0.8,
+            boundaryScore: null,
+            pauseScore: null,
+            discourseMarkerScore: null,
+            semanticShiftScore: null,
+            lexicalShiftScore: null,
+            valleyDepthScore: null,
+            boundaryQualityScore: null,
+            durationScore: null,
+            llmConfidenceScore: null,
+            createdAt: "2026-06-21T00:00:00.000Z",
+            updatedAt: "2026-06-21T00:00:00.000Z",
+          },
+        ],
+      }
+    )
+
+    expect(editorProject.transcript.id).toBe("00000000-0000-4000-8000-000000000008")
+    expect(editorProject.transcript.fullText).toBe("Hello world")
+    expect(editorProject.transcriptSegments).toEqual([
+      expect.objectContaining({ id: "segment-1", text: "Hello world" }),
+    ])
+    expect(editorProject.transcriptWords).toEqual([
+      expect.objectContaining({ id: "word-1", text: "Hello" }),
+    ])
+    expect(editorProject.chapters).toEqual([
+      expect.objectContaining({ id: "chapter-1", title: "Opening" }),
+    ])
   })
 })
 

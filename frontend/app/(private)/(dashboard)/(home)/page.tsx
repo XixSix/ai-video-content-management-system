@@ -1,12 +1,11 @@
 import { SectionHeader } from "@/components/shared/section-header"
 import {
   homeFeaturedTools,
-  homeProcessingSummary,
   homeToolShortcuts,
 } from "@/features/home/home.data"
-import { ProcessingSummaryStrip } from "@/features/home/components/processing-summary-strip"
 import { ToolLauncher } from "@/features/home/components/tool-launcher"
 import { RecentMediaSection } from "@/features/home/components/recent-media-section"
+import { RecentJobsSection } from "@/features/home/components/recent-jobs-section"
 
 export default function Home() {
   return (
@@ -22,7 +21,7 @@ export default function Home() {
         />
       </section>
 
-      <ProcessingSummaryStrip summary={homeProcessingSummary} />
+      <RecentJobsSection />
 
       <RecentMediaSection />
     </div>

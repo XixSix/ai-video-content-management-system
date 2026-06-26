@@ -9,7 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import type { ExportTranscriptFormat } from "@/features/transcripts/transcript.types"
 
 export function CaptionsToolbar({
   captionLayerEnabled,
@@ -18,10 +25,13 @@ export function CaptionsToolbar({
   isSearchOpen,
   language,
   onCloseSearch,
-  onDiscardChanges,
+  onDownloadTranscript,
   onOpenSearch,
+  onRegenerateCaptions,
   onSearchInputChange,
   onToggleCaptionLayer,
+  isDownloading,
+  isRegenerating,
   searchInput,
 }: {
   captionLayerEnabled: boolean
@@ -30,10 +40,13 @@ export function CaptionsToolbar({
   isSearchOpen: boolean
   language: string
   onCloseSearch: () => void
-  onDiscardChanges: () => void
+  onDownloadTranscript: (format: ExportTranscriptFormat) => void
   onOpenSearch: () => void
+  onRegenerateCaptions: () => void
   onSearchInputChange: (value: string) => void
   onToggleCaptionLayer: () => void
+  isDownloading?: boolean
+  isRegenerating?: boolean
   searchInput: string
 }) {
   return (
@@ -72,56 +85,95 @@ export function CaptionsToolbar({
           </div>
         ) : null}
 
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-sm"
-          aria-label="Regenerate captions"
-          onClick={onDiscardChanges}
-        >
-          <RotateCcw />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label="Regenerate captions"
+                disabled={isRegenerating}
+                onClick={onRegenerateCaptions}
+              >
+                <RotateCcw className={cn(isRegenerating && "animate-spin")} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Regenerate captions</TooltipContent>
+          </Tooltip>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-sm"
-          aria-label={
-            captionLayerEnabled ? "Hide caption layer" : "Show caption layer"
-          }
-          aria-pressed={captionLayerEnabled}
-          onClick={onToggleCaptionLayer}
-        >
-          {captionLayerEnabled ? <Eye /> : <EyeOff />}
-        </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label={
+                  captionLayerEnabled ? "Hide captions" : "Show captions"
+                }
+                aria-pressed={captionLayerEnabled}
+                onClick={onToggleCaptionLayer}
+              >
+                {captionLayerEnabled ? <Eye /> : <EyeOff />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {captionLayerEnabled ? "Hide captions" : "Show captions"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {!isSearchOpen ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            aria-label="Open caption search"
-            onClick={onOpenSearch}
-          >
-            <Search />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Search captions"
+                  onClick={onOpenSearch}
+                >
+                  <Search />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Search captions</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : null}
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              aria-label="Download captions"
-            >
-              <Download />
-            </Button>
-          </DropdownMenuTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label="Download transcript"
+                    disabled={isDownloading}
+                  >
+                    <Download />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Download transcript</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>SRT export</DropdownMenuItem>
-            <DropdownMenuItem>VTT export</DropdownMenuItem>
-            <DropdownMenuItem>TXT export</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDownloadTranscript("srt")}>
+              SRT export
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDownloadTranscript("vtt")}>
+              VTT export
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDownloadTranscript("txt")}>
+              TXT export
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDownloadTranscript("json")}>
+              JSON export
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

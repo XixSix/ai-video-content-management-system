@@ -10,6 +10,7 @@ import { useStore } from "zustand"
 import { useShallow } from "zustand/react/shallow"
 import { createStore } from "zustand/vanilla"
 
+import { createAiOutputActions } from "./actions/ai-output-actions"
 import { createChapterActions } from "./actions/chapter-actions"
 import { createClipActions } from "./actions/clip-actions"
 import { createHistoryActions } from "./actions/history-actions"
@@ -79,6 +80,7 @@ export function createStudioEditorStore(
 ) {
   return createStore<StudioEditorStore>((set, get) => ({
     ...createInitialStudioEditorState(initialProject, canEdit, initialMutedTrackIds),
+    ...createAiOutputActions(set, get),
     ...createToolActions(set),
     ...createPlaybackActions(set, get),
     ...createSelectionActions(set, get),
@@ -153,6 +155,7 @@ export function useStudioProjectActions() {
   return useStudioEditorStore(
     useShallow((state) => ({
       addProjectMediaToTimeline: state.addProjectMediaToTimeline,
+      hydrateProjectAiOutputs: state.hydrateProjectAiOutputs,
       removeProjectMedia: state.removeProjectMedia,
       setProjectSource: state.setProjectSource,
       updateProjectAspectRatio: state.updateProjectAspectRatio,
