@@ -34,7 +34,7 @@ export function createLayerActions(
 
       recordEditorHistory(set, get)
 
-      const layerId = `text-${Date.now()}`
+      const layerId = `text-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
       const defaultTextContent = "Text"
       const segmentDurationSeconds = 5
       const nextLayer: StudioCanvasLayer = {
@@ -60,7 +60,7 @@ export function createLayerActions(
         presetId: preset.id,
         textAlign: "center",
         textColor: preset.defaultStyle.textColor,
-        widthPercent: 46,
+        widthPercent: preset.defaultStyle.boxWidth,
         heightPercent: 18,
         xPercent: 50,
         yPercent: 50,

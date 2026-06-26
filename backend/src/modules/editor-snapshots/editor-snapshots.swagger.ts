@@ -24,7 +24,7 @@
  *             required: [id, kind, visible, style]
  *             properties:
  *               id: { type: string }
- *               kind: { type: string, enum: [text, image, captions] }
+ *               kind: { type: string, enum: [text, media_overlay, captions] }
  *               visible: { type: boolean }
  *               xPercent: { type: number, minimum: 0, maximum: 100 }
  *               yPercent: { type: number, minimum: 0, maximum: 100 }

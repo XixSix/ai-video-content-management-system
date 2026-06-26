@@ -26,7 +26,7 @@ const createDocument = () => ({
     },
     {
       id: 'logo-layer',
-      kind: 'image' as const,
+      kind: 'media_overlay' as const,
       visible: true,
       mediaId,
       style: {}

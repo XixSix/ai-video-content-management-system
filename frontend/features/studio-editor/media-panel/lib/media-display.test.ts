@@ -1,11 +1,11 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from "vitest";
 
-import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
+import type { MediaLibraryItem } from "@/features/media-library/types/media-library.types";
 
-import { getMediaImportMetadata } from "./media-display"
+import { getMediaImportMetadata } from "./media-display";
 
 function createMediaItem(
-  overrides: Partial<MediaLibraryItem>
+  overrides: Partial<MediaLibraryItem>,
 ): MediaLibraryItem {
   return {
     id: "00000000-0000-4000-8000-000000000001",
@@ -29,7 +29,7 @@ function createMediaItem(
     hasSubtitles: false,
     activeJobCount: 0,
     ...overrides,
-  }
+  };
 }
 
 describe("studio media display", () => {
@@ -40,13 +40,13 @@ describe("studio media display", () => {
           duration: null,
           mimeType: "image/png",
           type: "IMAGE",
-        })
-      )
-    ).toBe("image · 1920×1080")
-  })
+        }),
+      ),
+    ).toBe("image · 1920×1080");
+  });
 
   it("shows duration for video and audio media", () => {
-    expect(getMediaImportMetadata(createMediaItem({}))).toBe("video · 6:01")
+    expect(getMediaImportMetadata(createMediaItem({}))).toBe("video · 6:01");
     expect(
       getMediaImportMetadata(
         createMediaItem({
@@ -55,8 +55,8 @@ describe("studio media display", () => {
           type: "AUDIO",
           width: null,
           height: null,
-        })
-      )
-    ).toBe("audio · Pending")
-  })
-})
+        }),
+      ),
+    ).toBe("audio · Pending");
+  });
+});

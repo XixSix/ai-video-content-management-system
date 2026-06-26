@@ -79,8 +79,15 @@ export function createTimelineActions(
       timing: {
         durationSeconds: number
         startTime: number
+      },
+      options?: {
+        recordHistory?: boolean
       }
     ) => {
+      if (options?.recordHistory) {
+        recordEditorHistory(set, get)
+      }
+
       set((state) => ({
         project: updateTimelineSegmentTimingInProject({
           project: state.project,

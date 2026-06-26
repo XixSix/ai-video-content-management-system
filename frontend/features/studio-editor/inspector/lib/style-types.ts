@@ -45,5 +45,6 @@ export type TextLayerStyleUpdate = Partial<
     | "fontWeight"
     | "textAlign"
     | "textColor"
+    | "widthPercent"
   >
 >

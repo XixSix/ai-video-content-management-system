@@ -16,7 +16,7 @@ export type StudioRailItem = {
   icon: LucideIcon
 }
 
-export type StudioLayerKind = "image" | "text" | "captions"
+export type StudioLayerKind = "media_overlay" | "text" | "captions"
 
 export type StudioTextPresetCategory =
   | "TITLES"

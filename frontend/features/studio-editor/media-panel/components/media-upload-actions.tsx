@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
+import type { MediaLibraryItem } from "@/features/media-library/types/media-library.types"
 import { cn } from "@/lib/utils"
 
 import { getMediaImportMetadata } from "../lib/media-display"

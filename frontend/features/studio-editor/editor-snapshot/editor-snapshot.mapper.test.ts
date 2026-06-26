@@ -84,6 +84,7 @@ const document: EditorDocument = {
   schemaVersion: 1,
   settings: {
     aspectRatio: "9:16",
+    mutedTrackIds: ["SOURCE", "AUDIO"],
   },
   layers: [
     {
@@ -101,7 +102,7 @@ const document: EditorDocument = {
     },
     {
       id: "logo",
-      kind: "image",
+      kind: "media_overlay",
       mediaId: imageMediaId,
       visible: false,
       style: {},
@@ -153,6 +154,7 @@ describe("editor snapshot mapper", () => {
     const result = createDefaultEditorDocument(project)
 
     expect(result.settings.aspectRatio).toBe("16:9")
+    expect(result.settings.mutedTrackIds).toEqual([])
     expect(result.layers).toEqual([])
     expect(result.timelineTracks.map((track) => track.id)).toEqual([
       "TEXT",
@@ -192,7 +194,9 @@ describe("editor snapshot mapper", () => {
       createStudioProjectFromDetail(project),
       document
     )
-    const result = serializeEditorDocument(editorProject)
+    const result = serializeEditorDocument(editorProject, {
+      mutedTrackIds: ["SOURCE", "AUDIO"],
+    })
 
     expect(editorProject.projectMedia[0].projectMediaId).toBe(
       "00000000-0000-4000-8000-000000000006"

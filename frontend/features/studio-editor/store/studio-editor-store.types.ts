@@ -184,6 +184,9 @@ export type StudioEditorActions = {
     timing: {
       durationSeconds: number
       startTime: number
+    },
+    options?: {
+      recordHistory?: boolean
     }
   ) => void
   updateTranscriptWordText: (wordId: string, text: string) => void

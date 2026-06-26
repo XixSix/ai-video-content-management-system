@@ -1,4 +1,4 @@
-import type { MediaListQuery } from "../media-library.types"
+import type { MediaListQuery } from "../types/media-library.types";
 
 export const mediaQueryKeys = {
   all: ["media"] as const,
@@ -12,4 +12,4 @@ export const mediaQueryKeys = {
     [...mediaQueryKeys.workspace(workspaceId), "detail", mediaId] as const,
   preview: (workspaceId: string, mediaId: string) =>
     [...mediaQueryKeys.workspace(workspaceId), "preview", mediaId] as const,
-}
+};

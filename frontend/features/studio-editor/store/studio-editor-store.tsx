@@ -74,10 +74,11 @@ const READ_ONLY_ACTIONS: Partial<StudioEditorActions> = {
 
 export function createStudioEditorStore(
   initialProject: StudioEditorProject,
-  canEdit: boolean
+  canEdit: boolean,
+  initialMutedTrackIds: string[] = []
 ) {
   return createStore<StudioEditorStore>((set, get) => ({
-    ...createInitialStudioEditorState(initialProject, canEdit),
+    ...createInitialStudioEditorState(initialProject, canEdit, initialMutedTrackIds),
     ...createToolActions(set),
     ...createPlaybackActions(set, get),
     ...createSelectionActions(set, get),
@@ -96,16 +97,18 @@ export function createStudioEditorStore(
 }
 
 export function StudioEditorStoreProvider({
+  canEdit,
   children,
   initialProject,
-  canEdit,
+  initialMutedTrackIds = [],
 }: {
+  canEdit: boolean
   children: ReactNode
   initialProject: StudioEditorProject
-  canEdit: boolean
+  initialMutedTrackIds?: string[]
 }) {
   const [store] = useState(() =>
-    createStudioEditorStore(initialProject, canEdit)
+    createStudioEditorStore(initialProject, canEdit, initialMutedTrackIds)
   )
 
   return (

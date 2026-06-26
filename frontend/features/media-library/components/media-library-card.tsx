@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { MediaLibraryItem } from "../media-library.types"
+import type { MediaLibraryItem } from "../types/media-library.types"
 import { MediaLibraryActionsMenu } from "./media-library-actions-menu"
 
 type MediaLibraryCardProps = {

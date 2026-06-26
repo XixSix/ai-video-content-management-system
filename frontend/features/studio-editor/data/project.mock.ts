@@ -1,4 +1,4 @@
-import { formatDuration } from "@/features/media-library/media-library.utils"
+import { formatDuration } from "@/features/media-library/utils/media-library.utils"
 
 import type { StudioEditorProject } from "../studio.types"
 import {

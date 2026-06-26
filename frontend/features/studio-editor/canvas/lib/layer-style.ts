@@ -38,6 +38,7 @@ export function getTextLayerStyle(layer: StudioCanvasLayer): CSSProperties {
       : layer.backgroundColor
   const hasPosition =
     typeof layer.xPercent === "number" && typeof layer.yPercent === "number"
+  const widthPercent = layer.widthPercent ?? layer.boxWidth
 
   return {
     backgroundColor,
@@ -49,7 +50,7 @@ export function getTextLayerStyle(layer: StudioCanvasLayer): CSSProperties {
     fontStyle: layer.fontStyle,
     fontWeight: layer.fontWeight === "bold" ? 700 : 500,
     maxWidth: "none",
-    minWidth: layer.boxWidth ? `${Math.min(layer.boxWidth, 92)}%` : undefined,
+    minWidth: undefined,
     overflowWrap: "normal",
     textAlign: layer.textAlign,
     left: hasPosition ? `${layer.xPercent}%` : undefined,
@@ -57,7 +58,7 @@ export function getTextLayerStyle(layer: StudioCanvasLayer): CSSProperties {
     top: hasPosition ? `${layer.yPercent}%` : undefined,
     bottom: hasPosition ? "auto" : undefined,
     transform: hasPosition ? "translate(-50%, -50%)" : undefined,
-    width: "max-content",
+    width: widthPercent ? `${Math.min(widthPercent, 100)}%` : "max-content",
   }
 }
 

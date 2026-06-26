@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import type {
   FilterChipOption,
   MediaLibraryTab,
-} from "../media-library.types"
+} from "../types/media-library.types"
 
 type MediaLibraryTabsProps = {
   activeTab: MediaLibraryTab

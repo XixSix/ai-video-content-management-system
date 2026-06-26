@@ -1,11 +1,11 @@
 import type {
   MediaListItemResponseData,
   MediaLibraryItem,
-} from "./media-library.types"
-import { getMediaListThumbnailUrl } from "./lib/media-previews"
+} from "../types/media-library.types";
+import { getMediaListThumbnailUrl } from "../lib/media-previews";
 
 export function mapMediaResponseToLibraryItem(
-  media: MediaListItemResponseData
+  media: MediaListItemResponseData,
 ): MediaLibraryItem {
   return {
     id: media.id,
@@ -29,5 +29,5 @@ export function mapMediaResponseToLibraryItem(
     hasSubtitles: media.type === "SUBTITLE",
     activeJobCount: 0,
     uploadInterrupted: media.status === "UPLOADING",
-  }
+  };
 }

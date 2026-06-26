@@ -1,4 +1,4 @@
-import { formatDuration } from "@/features/media-library/media-library.utils"
+import { formatDuration } from "@/features/media-library/utils/media-library.utils"
 import type {
   ProjectDetail,
   ProjectMedia,
@@ -193,6 +193,7 @@ export function createDefaultEditorDocument(
       aspectRatio: isAspectRatio(detail.aspectRatio)
         ? detail.aspectRatio
         : "9:16",
+      mutedTrackIds: [],
     },
     layers: [],
     timelineTracks: TRACK_ORDER.map((id) => ({
@@ -256,7 +257,7 @@ function toEditorLayer(
 
   return {
     ...base,
-    kind: "image",
+    kind: "media_overlay",
     mediaId: layer.mediaId,
   }
 }
@@ -288,7 +289,10 @@ function getSegmentReference(
 }
 
 export function serializeEditorDocument(
-  project: StudioEditorProject
+  project: StudioEditorProject,
+  options: {
+    mutedTrackIds?: string[]
+  } = {}
 ): EditorDocument {
   const layers = project.layers
     .map(toEditorLayer)
@@ -299,6 +303,9 @@ export function serializeEditorDocument(
     schemaVersion: 1,
     settings: {
       aspectRatio: project.media.aspectRatio,
+      mutedTrackIds: TRACK_ORDER.filter((trackId) =>
+        options.mutedTrackIds?.includes(trackId)
+      ),
     },
     layers,
     timelineTracks: TRACK_ORDER.map((trackId) => {
@@ -356,10 +363,10 @@ function getLayerPresentation(
     }
   }
 
-  if (layer.kind === "image") {
+  if (layer.kind === "media_overlay") {
     return {
-      label: "Image overlay",
-      summary: "Image layer",
+      label: "Media overlay",
+      summary: "Media overlay layer",
       className:
         "absolute left-[10%] top-[10%] rounded-xl border border-white/10 bg-black/30 p-3 text-xs text-white",
       frameClassName:
@@ -389,7 +396,7 @@ function hydrateLayer(
     ...presentation,
     ...style,
     ...(layer.kind === "text" ? { content: layer.content } : {}),
-    ...(layer.kind === "image" ? { mediaId: layer.mediaId } : {}),
+    ...(layer.kind === "media_overlay" ? { mediaId: layer.mediaId } : {}),
     ...(layer.kind === "captions" ? { enabled: layer.visible } : {}),
     visible: layer.visible,
     ...getLayerCanvasGeometry({

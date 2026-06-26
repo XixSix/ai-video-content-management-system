@@ -4,7 +4,7 @@ import type {
   FilterChipOption,
   MediaStatusFilter,
   MediaTypeFilter,
-} from "../media-library.types"
+} from "../types/media-library.types"
 
 type MediaFilterBarProps = {
   typeFilter: MediaTypeFilter

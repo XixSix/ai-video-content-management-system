@@ -104,7 +104,8 @@ export function createHistorySnapshot(
 
 export function createInitialStudioEditorState(
   project: StudioEditorProject = studioEditorProject,
-  canEdit = true
+  canEdit = true,
+  mutedTrackIds: string[] = []
 ): StudioEditorState {
   return {
     activeTool: "media",
@@ -114,7 +115,7 @@ export function createInitialStudioEditorState(
     historyFuture: [],
     historyPast: [],
     isPlaying: false,
-    mutedTrackIds: ["OVERLAY_MEDIA"],
+    mutedTrackIds,
     project,
     savedTranscriptState: cloneSavedTranscriptState(project),
     selectedChapterId: null,

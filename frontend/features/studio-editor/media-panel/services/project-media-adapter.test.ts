@@ -1,16 +1,16 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from "vitest";
 
-import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
-import type { ProjectMedia } from "@/features/studio-hub/studio-projects.types"
+import type { MediaLibraryItem } from "@/features/media-library/types/media-library.types";
+import type { ProjectMedia } from "@/features/studio-hub/studio-projects.types";
 
 import {
   assignStudioUploadPurposes,
   createProjectMediaFromResponse,
   getImportableMediaLibraryItems,
-} from "./project-media-adapter"
+} from "./project-media-adapter";
 
-const mediaId = "00000000-0000-4000-8000-000000000001"
-const projectMediaId = "00000000-0000-4000-8000-000000000002"
+const mediaId = "00000000-0000-4000-8000-000000000001";
+const projectMediaId = "00000000-0000-4000-8000-000000000002";
 
 const projectMedia: ProjectMedia = {
   id: projectMediaId,
@@ -27,7 +27,7 @@ const projectMedia: ProjectMedia = {
     height: 800,
     status: "UPLOADED",
   },
-}
+};
 
 function createLibraryItem(id: string): MediaLibraryItem {
   return {
@@ -51,38 +51,36 @@ function createLibraryItem(id: string): MediaLibraryItem {
     hasClips: false,
     hasSubtitles: false,
     activeJobCount: 0,
-  }
+  };
 }
 
 describe("project media adapter", () => {
   it("assigns the first uploaded video or audio as source for a blank project", () => {
     expect(
-      assignStudioUploadPurposes(
-        ["IMAGE", "VIDEO", "AUDIO", "VIDEO"],
-        false
-      )
-    ).toEqual(["PROJECT_MEDIA", "SOURCE", "PROJECT_MEDIA", "PROJECT_MEDIA"])
-    expect(
-      assignStudioUploadPurposes(["VIDEO", "AUDIO"], true)
-    ).toEqual(["PROJECT_MEDIA", "PROJECT_MEDIA"])
-  })
+      assignStudioUploadPurposes(["IMAGE", "VIDEO", "AUDIO", "VIDEO"], false),
+    ).toEqual(["PROJECT_MEDIA", "SOURCE", "PROJECT_MEDIA", "PROJECT_MEDIA"]);
+    expect(assignStudioUploadPurposes(["VIDEO", "AUDIO"], true)).toEqual([
+      "PROJECT_MEDIA",
+      "PROJECT_MEDIA",
+    ]);
+  });
 
   it("keeps media and project-media identifiers separate", () => {
-    const result = createProjectMediaFromResponse(projectMedia)
+    const result = createProjectMediaFromResponse(projectMedia);
 
-    expect(result.id).toBe(mediaId)
-    expect(result.projectMediaId).toBe(projectMediaId)
-  })
+    expect(result.id).toBe(mediaId);
+    expect(result.projectMediaId).toBe(projectMediaId);
+  });
 
   it("filters already attached media from the import list", () => {
-    const attached = createProjectMediaFromResponse(projectMedia)
-    const availableId = "00000000-0000-4000-8000-000000000003"
+    const attached = createProjectMediaFromResponse(projectMedia);
+    const availableId = "00000000-0000-4000-8000-000000000003";
 
     expect(
       getImportableMediaLibraryItems(
         [attached],
-        [createLibraryItem(mediaId), createLibraryItem(availableId)]
-      ).map((item) => item.id)
-    ).toEqual([availableId])
-  })
-})
+        [createLibraryItem(mediaId), createLibraryItem(availableId)],
+      ).map((item) => item.id),
+    ).toEqual([availableId]);
+  });
+});
