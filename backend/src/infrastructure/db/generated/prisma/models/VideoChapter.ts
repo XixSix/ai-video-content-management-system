@@ -437,7 +437,6 @@ export type VideoChapterWhereInput = {
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
   project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
-  shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
 }
 
@@ -472,7 +471,6 @@ export type VideoChapterOrderByWithRelationInput = {
   job?: Prisma.ProcessingJobOrderByWithRelationInput
   project?: Prisma.ProjectOrderByWithRelationInput
   clipCandidates?: Prisma.ClipCandidateOrderByRelationAggregateInput
-  shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
   generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
 }
 
@@ -511,7 +509,6 @@ export type VideoChapterWhereUniqueInput = Prisma.AtLeast<{
   job?: Prisma.XOR<Prisma.ProcessingJobNullableScalarRelationFilter, Prisma.ProcessingJobWhereInput> | null
   project?: Prisma.XOR<Prisma.ProjectNullableScalarRelationFilter, Prisma.ProjectWhereInput> | null
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
-  shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
 }, "id" | "transcriptId_chapterIndex">
 
@@ -606,7 +603,6 @@ export type VideoChapterCreateInput = {
   job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
   project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
 }
 
@@ -637,7 +633,6 @@ export type VideoChapterUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
 }
 
@@ -668,7 +663,6 @@ export type VideoChapterUpdateInput = {
   job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
   project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
 }
 
@@ -699,7 +693,6 @@ export type VideoChapterUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
 }
 
@@ -1111,22 +1104,6 @@ export type VideoChapterUpdateOneWithoutClipCandidatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VideoChapterUpdateToOneWithWhereWithoutClipCandidatesInput, Prisma.VideoChapterUpdateWithoutClipCandidatesInput>, Prisma.VideoChapterUncheckedUpdateWithoutClipCandidatesInput>
 }
 
-export type VideoChapterCreateNestedOneWithoutShortClipsInput = {
-  create?: Prisma.XOR<Prisma.VideoChapterCreateWithoutShortClipsInput, Prisma.VideoChapterUncheckedCreateWithoutShortClipsInput>
-  connectOrCreate?: Prisma.VideoChapterCreateOrConnectWithoutShortClipsInput
-  connect?: Prisma.VideoChapterWhereUniqueInput
-}
-
-export type VideoChapterUpdateOneWithoutShortClipsNestedInput = {
-  create?: Prisma.XOR<Prisma.VideoChapterCreateWithoutShortClipsInput, Prisma.VideoChapterUncheckedCreateWithoutShortClipsInput>
-  connectOrCreate?: Prisma.VideoChapterCreateOrConnectWithoutShortClipsInput
-  upsert?: Prisma.VideoChapterUpsertWithoutShortClipsInput
-  disconnect?: Prisma.VideoChapterWhereInput | boolean
-  delete?: Prisma.VideoChapterWhereInput | boolean
-  connect?: Prisma.VideoChapterWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.VideoChapterUpdateToOneWithWhereWithoutShortClipsInput, Prisma.VideoChapterUpdateWithoutShortClipsInput>, Prisma.VideoChapterUncheckedUpdateWithoutShortClipsInput>
-}
-
 export type VideoChapterCreateNestedOneWithoutGeneratedAssetsInput = {
   create?: Prisma.XOR<Prisma.VideoChapterCreateWithoutGeneratedAssetsInput, Prisma.VideoChapterUncheckedCreateWithoutGeneratedAssetsInput>
   connectOrCreate?: Prisma.VideoChapterCreateOrConnectWithoutGeneratedAssetsInput
@@ -1169,7 +1146,6 @@ export type VideoChapterCreateWithoutMediaInput = {
   job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
   project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
 }
 
@@ -1199,7 +1175,6 @@ export type VideoChapterUncheckedCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
 }
 
@@ -1286,7 +1261,6 @@ export type VideoChapterCreateWithoutProjectInput = {
   transcript: Prisma.TranscriptCreateNestedOneWithoutVideoChaptersInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
 }
 
@@ -1316,7 +1290,6 @@ export type VideoChapterUncheckedCreateWithoutProjectInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
 }
 
@@ -1372,7 +1345,6 @@ export type VideoChapterCreateWithoutJobInput = {
   transcript: Prisma.TranscriptCreateNestedOneWithoutVideoChaptersInput
   project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
 }
 
@@ -1402,7 +1374,6 @@ export type VideoChapterUncheckedCreateWithoutJobInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
 }
 
@@ -1458,7 +1429,6 @@ export type VideoChapterCreateWithoutTranscriptInput = {
   job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
   project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
 }
 
@@ -1488,7 +1458,6 @@ export type VideoChapterUncheckedCreateWithoutTranscriptInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
 }
 
@@ -1544,7 +1513,6 @@ export type VideoChapterCreateWithoutClipCandidatesInput = {
   transcript: Prisma.TranscriptCreateNestedOneWithoutVideoChaptersInput
   job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
   project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
 }
 
@@ -1574,7 +1542,6 @@ export type VideoChapterUncheckedCreateWithoutClipCandidatesInput = {
   llmConfidenceScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
 }
 
@@ -1620,7 +1587,6 @@ export type VideoChapterUpdateWithoutClipCandidatesInput = {
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutVideoChaptersNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
   project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
 }
 
@@ -1650,143 +1616,6 @@ export type VideoChapterUncheckedUpdateWithoutClipCandidatesInput = {
   llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
-}
-
-export type VideoChapterCreateWithoutShortClipsInput = {
-  id?: string
-  chapterIndex: number
-  startTime: number
-  endTime: number
-  title: string
-  transcriptVersion: number
-  version?: number
-  isEdited?: boolean
-  source?: $Enums.ChapterSource
-  score?: number | null
-  boundaryScore?: number | null
-  pauseScore?: number | null
-  discourseMarkerScore?: number | null
-  semanticShiftScore?: number | null
-  lexicalShiftScore?: number | null
-  valleyDepthScore?: number | null
-  boundaryQualityScore?: number | null
-  durationScore?: number | null
-  llmConfidenceScore?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  media: Prisma.MediaCreateNestedOneWithoutVideoChaptersInput
-  transcript: Prisma.TranscriptCreateNestedOneWithoutVideoChaptersInput
-  job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
-  project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutChapterInput
-}
-
-export type VideoChapterUncheckedCreateWithoutShortClipsInput = {
-  id?: string
-  mediaId: string
-  transcriptId: string
-  jobId?: string | null
-  projectId?: string | null
-  chapterIndex: number
-  startTime: number
-  endTime: number
-  title: string
-  transcriptVersion: number
-  version?: number
-  isEdited?: boolean
-  source?: $Enums.ChapterSource
-  score?: number | null
-  boundaryScore?: number | null
-  pauseScore?: number | null
-  discourseMarkerScore?: number | null
-  semanticShiftScore?: number | null
-  lexicalShiftScore?: number | null
-  valleyDepthScore?: number | null
-  boundaryQualityScore?: number | null
-  durationScore?: number | null
-  llmConfidenceScore?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutChapterInput
-}
-
-export type VideoChapterCreateOrConnectWithoutShortClipsInput = {
-  where: Prisma.VideoChapterWhereUniqueInput
-  create: Prisma.XOR<Prisma.VideoChapterCreateWithoutShortClipsInput, Prisma.VideoChapterUncheckedCreateWithoutShortClipsInput>
-}
-
-export type VideoChapterUpsertWithoutShortClipsInput = {
-  update: Prisma.XOR<Prisma.VideoChapterUpdateWithoutShortClipsInput, Prisma.VideoChapterUncheckedUpdateWithoutShortClipsInput>
-  create: Prisma.XOR<Prisma.VideoChapterCreateWithoutShortClipsInput, Prisma.VideoChapterUncheckedCreateWithoutShortClipsInput>
-  where?: Prisma.VideoChapterWhereInput
-}
-
-export type VideoChapterUpdateToOneWithWhereWithoutShortClipsInput = {
-  where?: Prisma.VideoChapterWhereInput
-  data: Prisma.XOR<Prisma.VideoChapterUpdateWithoutShortClipsInput, Prisma.VideoChapterUncheckedUpdateWithoutShortClipsInput>
-}
-
-export type VideoChapterUpdateWithoutShortClipsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  chapterIndex?: Prisma.IntFieldUpdateOperationsInput | number
-  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
-  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  version?: Prisma.IntFieldUpdateOperationsInput | number
-  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
-  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  media?: Prisma.MediaUpdateOneRequiredWithoutVideoChaptersNestedInput
-  transcript?: Prisma.TranscriptUpdateOneRequiredWithoutVideoChaptersNestedInput
-  job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
-  project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
-}
-
-export type VideoChapterUncheckedUpdateWithoutShortClipsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  mediaId?: Prisma.StringFieldUpdateOperationsInput | string
-  transcriptId?: Prisma.StringFieldUpdateOperationsInput | string
-  jobId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  projectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterIndex?: Prisma.IntFieldUpdateOperationsInput | number
-  startTime?: Prisma.FloatFieldUpdateOperationsInput | number
-  endTime?: Prisma.FloatFieldUpdateOperationsInput | number
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  transcriptVersion?: Prisma.IntFieldUpdateOperationsInput | number
-  version?: Prisma.IntFieldUpdateOperationsInput | number
-  isEdited?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  source?: Prisma.EnumChapterSourceFieldUpdateOperationsInput | $Enums.ChapterSource
-  score?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  boundaryScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  pauseScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  discourseMarkerScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  semanticShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  lexicalShiftScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  valleyDepthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  boundaryQualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  durationScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  llmConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
 }
 
@@ -1817,7 +1646,6 @@ export type VideoChapterCreateWithoutGeneratedAssetsInput = {
   job?: Prisma.ProcessingJobCreateNestedOneWithoutVideoChaptersInput
   project?: Prisma.ProjectCreateNestedOneWithoutVideoChaptersInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutChapterInput
 }
 
 export type VideoChapterUncheckedCreateWithoutGeneratedAssetsInput = {
@@ -1847,7 +1675,6 @@ export type VideoChapterUncheckedCreateWithoutGeneratedAssetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutChapterInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutChapterInput
 }
 
 export type VideoChapterCreateOrConnectWithoutGeneratedAssetsInput = {
@@ -1893,7 +1720,6 @@ export type VideoChapterUpdateWithoutGeneratedAssetsInput = {
   job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
   project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
 }
 
 export type VideoChapterUncheckedUpdateWithoutGeneratedAssetsInput = {
@@ -1923,7 +1749,6 @@ export type VideoChapterUncheckedUpdateWithoutGeneratedAssetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
 }
 
 export type VideoChapterCreateManyMediaInput = {
@@ -1979,7 +1804,6 @@ export type VideoChapterUpdateWithoutMediaInput = {
   job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
   project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
 }
 
@@ -2009,7 +1833,6 @@ export type VideoChapterUncheckedUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
 }
 
@@ -2093,7 +1916,6 @@ export type VideoChapterUpdateWithoutProjectInput = {
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutVideoChaptersNestedInput
   job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
 }
 
@@ -2123,7 +1945,6 @@ export type VideoChapterUncheckedUpdateWithoutProjectInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
 }
 
@@ -2207,7 +2028,6 @@ export type VideoChapterUpdateWithoutJobInput = {
   transcript?: Prisma.TranscriptUpdateOneRequiredWithoutVideoChaptersNestedInput
   project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
 }
 
@@ -2237,7 +2057,6 @@ export type VideoChapterUncheckedUpdateWithoutJobInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
 }
 
@@ -2321,7 +2140,6 @@ export type VideoChapterUpdateWithoutTranscriptInput = {
   job?: Prisma.ProcessingJobUpdateOneWithoutVideoChaptersNestedInput
   project?: Prisma.ProjectUpdateOneWithoutVideoChaptersNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutChapterNestedInput
 }
 
@@ -2351,7 +2169,6 @@ export type VideoChapterUncheckedUpdateWithoutTranscriptInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutChapterNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutChapterNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutChapterNestedInput
 }
 
@@ -2389,13 +2206,11 @@ export type VideoChapterUncheckedUpdateManyWithoutTranscriptInput = {
 
 export type VideoChapterCountOutputType = {
   clipCandidates: number
-  shortClips: number
   generatedAssets: number
 }
 
 export type VideoChapterCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clipCandidates?: boolean | VideoChapterCountOutputTypeCountClipCandidatesArgs
-  shortClips?: boolean | VideoChapterCountOutputTypeCountShortClipsArgs
   generatedAssets?: boolean | VideoChapterCountOutputTypeCountGeneratedAssetsArgs
 }
 
@@ -2414,13 +2229,6 @@ export type VideoChapterCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
  */
 export type VideoChapterCountOutputTypeCountClipCandidatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ClipCandidateWhereInput
-}
-
-/**
- * VideoChapterCountOutputType without action
- */
-export type VideoChapterCountOutputTypeCountShortClipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ShortClipWhereInput
 }
 
 /**
@@ -2462,7 +2270,6 @@ export type VideoChapterSelect<ExtArgs extends runtime.Types.Extensions.Internal
   job?: boolean | Prisma.VideoChapter$jobArgs<ExtArgs>
   project?: boolean | Prisma.VideoChapter$projectArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.VideoChapter$clipCandidatesArgs<ExtArgs>
-  shortClips?: boolean | Prisma.VideoChapter$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.VideoChapter$generatedAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.VideoChapterCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["videoChapter"]>
@@ -2566,7 +2373,6 @@ export type VideoChapterInclude<ExtArgs extends runtime.Types.Extensions.Interna
   job?: boolean | Prisma.VideoChapter$jobArgs<ExtArgs>
   project?: boolean | Prisma.VideoChapter$projectArgs<ExtArgs>
   clipCandidates?: boolean | Prisma.VideoChapter$clipCandidatesArgs<ExtArgs>
-  shortClips?: boolean | Prisma.VideoChapter$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.VideoChapter$generatedAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.VideoChapterCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2591,7 +2397,6 @@ export type $VideoChapterPayload<ExtArgs extends runtime.Types.Extensions.Intern
     job: Prisma.$ProcessingJobPayload<ExtArgs> | null
     project: Prisma.$ProjectPayload<ExtArgs> | null
     clipCandidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
-    shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
     generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3019,7 +2824,6 @@ export interface Prisma__VideoChapterClient<T, Null = never, ExtArgs extends run
   job<T extends Prisma.VideoChapter$jobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VideoChapter$jobArgs<ExtArgs>>): Prisma.Prisma__ProcessingJobClient<runtime.Types.Result.GetResult<Prisma.$ProcessingJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   project<T extends Prisma.VideoChapter$projectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VideoChapter$projectArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   clipCandidates<T extends Prisma.VideoChapter$clipCandidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VideoChapter$clipCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  shortClips<T extends Prisma.VideoChapter$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VideoChapter$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   generatedAssets<T extends Prisma.VideoChapter$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VideoChapter$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3535,30 +3339,6 @@ export type VideoChapter$clipCandidatesArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.ClipCandidateScalarFieldEnum | Prisma.ClipCandidateScalarFieldEnum[]
-}
-
-/**
- * VideoChapter.shortClips
- */
-export type VideoChapter$shortClipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ShortClip
-   */
-  select?: Prisma.ShortClipSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ShortClip
-   */
-  omit?: Prisma.ShortClipOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ShortClipInclude<ExtArgs> | null
-  where?: Prisma.ShortClipWhereInput
-  orderBy?: Prisma.ShortClipOrderByWithRelationInput | Prisma.ShortClipOrderByWithRelationInput[]
-  cursor?: Prisma.ShortClipWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ShortClipScalarFieldEnum | Prisma.ShortClipScalarFieldEnum[]
 }
 
 /**
