@@ -71,7 +71,6 @@ export const ModelName = {
   ClipCandidate: 'ClipCandidate',
   ShortClip: 'ShortClip',
   GeneratedAsset: 'GeneratedAsset',
-  AiSuggestion: 'AiSuggestion',
   PlatformAccount: 'PlatformAccount',
   PlatformOAuthState: 'PlatformOAuthState',
   PublishTask: 'PublishTask',
@@ -478,22 +477,6 @@ export const GeneratedAssetScalarFieldEnum = {
 } as const
 
 export type GeneratedAssetScalarFieldEnum = (typeof GeneratedAssetScalarFieldEnum)[keyof typeof GeneratedAssetScalarFieldEnum]
-
-
-export const AiSuggestionScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  projectId: 'projectId',
-  targetType: 'targetType',
-  targetId: 'targetId',
-  suggestionType: 'suggestionType',
-  platform: 'platform',
-  content: 'content',
-  model: 'model',
-  createdAt: 'createdAt'
-} as const
-
-export type AiSuggestionScalarFieldEnum = (typeof AiSuggestionScalarFieldEnum)[keyof typeof AiSuggestionScalarFieldEnum]
 
 
 export const PlatformAccountScalarFieldEnum = {

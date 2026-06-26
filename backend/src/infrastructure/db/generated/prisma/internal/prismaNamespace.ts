@@ -404,7 +404,6 @@ export const ModelName = {
   ClipCandidate: 'ClipCandidate',
   ShortClip: 'ShortClip',
   GeneratedAsset: 'GeneratedAsset',
-  AiSuggestion: 'AiSuggestion',
   PlatformAccount: 'PlatformAccount',
   PlatformOAuthState: 'PlatformOAuthState',
   PublishTask: 'PublishTask',
@@ -424,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "workspace" | "workspaceMember" | "workspaceInvitation" | "notification" | "media" | "project" | "projectMedia" | "editorSnapshot" | "processingJob" | "jobEvent" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "aiSuggestion" | "platformAccount" | "platformOAuthState" | "publishTask" | "auditLog"
+    modelProps: "user" | "authSession" | "workspace" | "workspaceMember" | "workspaceInvitation" | "notification" | "media" | "project" | "projectMedia" | "editorSnapshot" | "processingJob" | "jobEvent" | "transcript" | "transcriptSegment" | "transcriptWord" | "transcriptEditDraft" | "videoChapter" | "clipCandidate" | "shortClip" | "generatedAsset" | "platformAccount" | "platformOAuthState" | "publishTask" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1908,80 +1907,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    AiSuggestion: {
-      payload: Prisma.$AiSuggestionPayload<ExtArgs>
-      fields: Prisma.AiSuggestionFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AiSuggestionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AiSuggestionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>
-        }
-        findFirst: {
-          args: Prisma.AiSuggestionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AiSuggestionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>
-        }
-        findMany: {
-          args: Prisma.AiSuggestionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>[]
-        }
-        create: {
-          args: Prisma.AiSuggestionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>
-        }
-        createMany: {
-          args: Prisma.AiSuggestionCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AiSuggestionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>[]
-        }
-        delete: {
-          args: Prisma.AiSuggestionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>
-        }
-        update: {
-          args: Prisma.AiSuggestionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>
-        }
-        deleteMany: {
-          args: Prisma.AiSuggestionDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AiSuggestionUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AiSuggestionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>[]
-        }
-        upsert: {
-          args: Prisma.AiSuggestionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiSuggestionPayload>
-        }
-        aggregate: {
-          args: Prisma.AiSuggestionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAiSuggestion>
-        }
-        groupBy: {
-          args: Prisma.AiSuggestionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AiSuggestionGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AiSuggestionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AiSuggestionCountAggregateOutputType> | number
-        }
-      }
-    }
     PlatformAccount: {
       payload: Prisma.$PlatformAccountPayload<ExtArgs>
       fields: Prisma.PlatformAccountFieldRefs
@@ -2703,22 +2628,6 @@ export const GeneratedAssetScalarFieldEnum = {
 export type GeneratedAssetScalarFieldEnum = (typeof GeneratedAssetScalarFieldEnum)[keyof typeof GeneratedAssetScalarFieldEnum]
 
 
-export const AiSuggestionScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  projectId: 'projectId',
-  targetType: 'targetType',
-  targetId: 'targetId',
-  suggestionType: 'suggestionType',
-  platform: 'platform',
-  content: 'content',
-  model: 'model',
-  createdAt: 'createdAt'
-} as const
-
-export type AiSuggestionScalarFieldEnum = (typeof AiSuggestionScalarFieldEnum)[keyof typeof AiSuggestionScalarFieldEnum]
-
-
 export const PlatformAccountScalarFieldEnum = {
   id: 'id',
   workspaceId: 'workspaceId',
@@ -3191,34 +3100,6 @@ export type ListEnumAssetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 
 
 /**
- * Reference to a field of type 'TargetType'
- */
-export type EnumTargetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TargetType'>
-    
-
-
-/**
- * Reference to a field of type 'TargetType[]'
- */
-export type ListEnumTargetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TargetType[]'>
-    
-
-
-/**
- * Reference to a field of type 'SuggestionType'
- */
-export type EnumSuggestionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SuggestionType'>
-    
-
-
-/**
- * Reference to a field of type 'SuggestionType[]'
- */
-export type ListEnumSuggestionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SuggestionType[]'>
-    
-
-
-/**
  * Reference to a field of type 'Platform'
  */
 export type EnumPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Platform'>
@@ -3389,7 +3270,6 @@ export type GlobalOmitConfig = {
   clipCandidate?: Prisma.ClipCandidateOmit
   shortClip?: Prisma.ShortClipOmit
   generatedAsset?: Prisma.GeneratedAssetOmit
-  aiSuggestion?: Prisma.AiSuggestionOmit
   platformAccount?: Prisma.PlatformAccountOmit
   platformOAuthState?: Prisma.PlatformOAuthStateOmit
   publishTask?: Prisma.PublishTaskOmit

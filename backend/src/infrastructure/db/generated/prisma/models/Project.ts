@@ -284,7 +284,6 @@ export type ProjectWhereInput = {
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
-  aiSuggestions?: Prisma.AiSuggestionListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }
 
@@ -313,7 +312,6 @@ export type ProjectOrderByWithRelationInput = {
   clipCandidates?: Prisma.ClipCandidateOrderByRelationAggregateInput
   shortClips?: Prisma.ShortClipOrderByRelationAggregateInput
   generatedAssets?: Prisma.GeneratedAssetOrderByRelationAggregateInput
-  aiSuggestions?: Prisma.AiSuggestionOrderByRelationAggregateInput
   publishTasks?: Prisma.PublishTaskOrderByRelationAggregateInput
 }
 
@@ -346,7 +344,6 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   clipCandidates?: Prisma.ClipCandidateListRelationFilter
   shortClips?: Prisma.ShortClipListRelationFilter
   generatedAssets?: Prisma.GeneratedAssetListRelationFilter
-  aiSuggestions?: Prisma.AiSuggestionListRelationFilter
   publishTasks?: Prisma.PublishTaskListRelationFilter
 }, "id" | "workspaceId_slug">
 
@@ -409,7 +406,6 @@ export type ProjectCreateInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -434,7 +430,6 @@ export type ProjectUncheckedCreateInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -459,7 +454,6 @@ export type ProjectUpdateInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -484,7 +478,6 @@ export type ProjectUncheckedUpdateInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -903,22 +896,6 @@ export type ProjectUpdateOneWithoutGeneratedAssetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutGeneratedAssetsInput, Prisma.ProjectUpdateWithoutGeneratedAssetsInput>, Prisma.ProjectUncheckedUpdateWithoutGeneratedAssetsInput>
 }
 
-export type ProjectCreateNestedOneWithoutAiSuggestionsInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutAiSuggestionsInput, Prisma.ProjectUncheckedCreateWithoutAiSuggestionsInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutAiSuggestionsInput
-  connect?: Prisma.ProjectWhereUniqueInput
-}
-
-export type ProjectUpdateOneWithoutAiSuggestionsNestedInput = {
-  create?: Prisma.XOR<Prisma.ProjectCreateWithoutAiSuggestionsInput, Prisma.ProjectUncheckedCreateWithoutAiSuggestionsInput>
-  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutAiSuggestionsInput
-  upsert?: Prisma.ProjectUpsertWithoutAiSuggestionsInput
-  disconnect?: Prisma.ProjectWhereInput | boolean
-  delete?: Prisma.ProjectWhereInput | boolean
-  connect?: Prisma.ProjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutAiSuggestionsInput, Prisma.ProjectUpdateWithoutAiSuggestionsInput>, Prisma.ProjectUncheckedUpdateWithoutAiSuggestionsInput>
-}
-
 export type ProjectCreateNestedOneWithoutPublishTasksInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutPublishTasksInput, Prisma.ProjectUncheckedCreateWithoutPublishTasksInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutPublishTasksInput
@@ -955,7 +932,6 @@ export type ProjectCreateWithoutUserInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -979,7 +955,6 @@ export type ProjectUncheckedCreateWithoutUserInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1047,7 +1022,6 @@ export type ProjectCreateWithoutWorkspaceInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1071,7 +1045,6 @@ export type ProjectUncheckedCreateWithoutWorkspaceInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1121,7 +1094,6 @@ export type ProjectCreateWithoutSourceMediaInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1145,7 +1117,6 @@ export type ProjectUncheckedCreateWithoutSourceMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1179,7 +1150,6 @@ export type ProjectCreateWithoutThumbnailMediaInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1203,7 +1173,6 @@ export type ProjectUncheckedCreateWithoutThumbnailMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1269,7 +1238,6 @@ export type ProjectCreateWithoutProjectMediaInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1293,7 +1261,6 @@ export type ProjectUncheckedCreateWithoutProjectMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1333,7 +1300,6 @@ export type ProjectUpdateWithoutProjectMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -1357,7 +1323,6 @@ export type ProjectUncheckedUpdateWithoutProjectMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -1381,7 +1346,6 @@ export type ProjectCreateWithoutEditorSnapshotInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1405,7 +1369,6 @@ export type ProjectUncheckedCreateWithoutEditorSnapshotInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1445,7 +1408,6 @@ export type ProjectUpdateWithoutEditorSnapshotInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -1469,7 +1431,6 @@ export type ProjectUncheckedUpdateWithoutEditorSnapshotInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -1493,7 +1454,6 @@ export type ProjectCreateWithoutProcessingJobsInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1517,7 +1477,6 @@ export type ProjectUncheckedCreateWithoutProcessingJobsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1557,7 +1516,6 @@ export type ProjectUpdateWithoutProcessingJobsInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -1581,7 +1539,6 @@ export type ProjectUncheckedUpdateWithoutProcessingJobsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -1605,7 +1562,6 @@ export type ProjectCreateWithoutTranscriptsInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1629,7 +1585,6 @@ export type ProjectUncheckedCreateWithoutTranscriptsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1669,7 +1624,6 @@ export type ProjectUpdateWithoutTranscriptsInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -1693,7 +1647,6 @@ export type ProjectUncheckedUpdateWithoutTranscriptsInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -1717,7 +1670,6 @@ export type ProjectCreateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1741,7 +1693,6 @@ export type ProjectUncheckedCreateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1781,7 +1732,6 @@ export type ProjectUpdateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -1805,7 +1755,6 @@ export type ProjectUncheckedUpdateWithoutVideoChaptersInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -1829,7 +1778,6 @@ export type ProjectCreateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1853,7 +1801,6 @@ export type ProjectUncheckedCreateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -1893,7 +1840,6 @@ export type ProjectUpdateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -1917,7 +1863,6 @@ export type ProjectUncheckedUpdateWithoutClipCandidatesInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -1941,7 +1886,6 @@ export type ProjectCreateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -1965,7 +1909,6 @@ export type ProjectUncheckedCreateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -2005,7 +1948,6 @@ export type ProjectUpdateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -2029,7 +1971,6 @@ export type ProjectUncheckedUpdateWithoutShortClipsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -2053,7 +1994,6 @@ export type ProjectCreateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
 }
 
@@ -2077,7 +2017,6 @@ export type ProjectUncheckedCreateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
   publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
 }
 
@@ -2117,7 +2056,6 @@ export type ProjectUpdateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -2141,119 +2079,6 @@ export type ProjectUncheckedUpdateWithoutGeneratedAssetsInput = {
   videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectCreateWithoutAiSuggestionsInput = {
-  id?: string
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutProjectsInput
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutProjectsInput
-  sourceMedia?: Prisma.MediaCreateNestedOneWithoutSourceProjectsInput
-  thumbnailMedia?: Prisma.MediaCreateNestedOneWithoutThumbnailProjectsInput
-  projectMedia?: Prisma.ProjectMediaCreateNestedManyWithoutProjectInput
-  editorSnapshot?: Prisma.EditorSnapshotCreateNestedOneWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectUncheckedCreateWithoutAiSuggestionsInput = {
-  id?: string
-  userId: string
-  workspaceId: string
-  sourceMediaId?: string | null
-  thumbnailMediaId?: string | null
-  title: string
-  slug: string
-  status?: $Enums.ProjectStatus
-  aspectRatio?: string
-  duration?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedCreateNestedManyWithoutProjectInput
-  editorSnapshot?: Prisma.EditorSnapshotUncheckedCreateNestedOneWithoutProjectInput
-  processingJobs?: Prisma.ProcessingJobUncheckedCreateNestedManyWithoutProjectInput
-  transcripts?: Prisma.TranscriptUncheckedCreateNestedManyWithoutProjectInput
-  videoChapters?: Prisma.VideoChapterUncheckedCreateNestedManyWithoutProjectInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
-  shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  publishTasks?: Prisma.PublishTaskUncheckedCreateNestedManyWithoutProjectInput
-}
-
-export type ProjectCreateOrConnectWithoutAiSuggestionsInput = {
-  where: Prisma.ProjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutAiSuggestionsInput, Prisma.ProjectUncheckedCreateWithoutAiSuggestionsInput>
-}
-
-export type ProjectUpsertWithoutAiSuggestionsInput = {
-  update: Prisma.XOR<Prisma.ProjectUpdateWithoutAiSuggestionsInput, Prisma.ProjectUncheckedUpdateWithoutAiSuggestionsInput>
-  create: Prisma.XOR<Prisma.ProjectCreateWithoutAiSuggestionsInput, Prisma.ProjectUncheckedCreateWithoutAiSuggestionsInput>
-  where?: Prisma.ProjectWhereInput
-}
-
-export type ProjectUpdateToOneWithWhereWithoutAiSuggestionsInput = {
-  where?: Prisma.ProjectWhereInput
-  data: Prisma.XOR<Prisma.ProjectUpdateWithoutAiSuggestionsInput, Prisma.ProjectUncheckedUpdateWithoutAiSuggestionsInput>
-}
-
-export type ProjectUpdateWithoutAiSuggestionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
-  sourceMedia?: Prisma.MediaUpdateOneWithoutSourceProjectsNestedInput
-  thumbnailMedia?: Prisma.MediaUpdateOneWithoutThumbnailProjectsNestedInput
-  projectMedia?: Prisma.ProjectMediaUpdateManyWithoutProjectNestedInput
-  editorSnapshot?: Prisma.EditorSnapshotUpdateOneWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
-}
-
-export type ProjectUncheckedUpdateWithoutAiSuggestionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailMediaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  aspectRatio?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectMedia?: Prisma.ProjectMediaUncheckedUpdateManyWithoutProjectNestedInput
-  editorSnapshot?: Prisma.EditorSnapshotUncheckedUpdateOneWithoutProjectNestedInput
-  processingJobs?: Prisma.ProcessingJobUncheckedUpdateManyWithoutProjectNestedInput
-  transcripts?: Prisma.TranscriptUncheckedUpdateManyWithoutProjectNestedInput
-  videoChapters?: Prisma.VideoChapterUncheckedUpdateManyWithoutProjectNestedInput
-  clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
-  shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
-  generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -2278,7 +2103,6 @@ export type ProjectCreateWithoutPublishTasksInput = {
   clipCandidates?: Prisma.ClipCandidateCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutPublishTasksInput = {
@@ -2302,7 +2126,6 @@ export type ProjectUncheckedCreateWithoutPublishTasksInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
   shortClips?: Prisma.ShortClipUncheckedCreateNestedManyWithoutProjectInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedCreateNestedManyWithoutProjectInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutPublishTasksInput = {
@@ -2342,7 +2165,6 @@ export type ProjectUpdateWithoutPublishTasksInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutPublishTasksInput = {
@@ -2366,7 +2188,6 @@ export type ProjectUncheckedUpdateWithoutPublishTasksInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyUserInput = {
@@ -2403,7 +2224,6 @@ export type ProjectUpdateWithoutUserInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -2427,7 +2247,6 @@ export type ProjectUncheckedUpdateWithoutUserInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -2479,7 +2298,6 @@ export type ProjectUpdateWithoutWorkspaceInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -2503,7 +2321,6 @@ export type ProjectUncheckedUpdateWithoutWorkspaceInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -2569,7 +2386,6 @@ export type ProjectUpdateWithoutSourceMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -2593,7 +2409,6 @@ export type ProjectUncheckedUpdateWithoutSourceMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -2631,7 +2446,6 @@ export type ProjectUpdateWithoutThumbnailMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUpdateManyWithoutProjectNestedInput
 }
 
@@ -2655,7 +2469,6 @@ export type ProjectUncheckedUpdateWithoutThumbnailMediaInput = {
   clipCandidates?: Prisma.ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
   shortClips?: Prisma.ShortClipUncheckedUpdateManyWithoutProjectNestedInput
   generatedAssets?: Prisma.GeneratedAssetUncheckedUpdateManyWithoutProjectNestedInput
-  aiSuggestions?: Prisma.AiSuggestionUncheckedUpdateManyWithoutProjectNestedInput
   publishTasks?: Prisma.PublishTaskUncheckedUpdateManyWithoutProjectNestedInput
 }
 
@@ -2686,7 +2499,6 @@ export type ProjectCountOutputType = {
   clipCandidates: number
   shortClips: number
   generatedAssets: number
-  aiSuggestions: number
   publishTasks: number
 }
 
@@ -2698,7 +2510,6 @@ export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   clipCandidates?: boolean | ProjectCountOutputTypeCountClipCandidatesArgs
   shortClips?: boolean | ProjectCountOutputTypeCountShortClipsArgs
   generatedAssets?: boolean | ProjectCountOutputTypeCountGeneratedAssetsArgs
-  aiSuggestions?: boolean | ProjectCountOutputTypeCountAiSuggestionsArgs
   publishTasks?: boolean | ProjectCountOutputTypeCountPublishTasksArgs
 }
 
@@ -2764,13 +2575,6 @@ export type ProjectCountOutputTypeCountGeneratedAssetsArgs<ExtArgs extends runti
 /**
  * ProjectCountOutputType without action
  */
-export type ProjectCountOutputTypeCountAiSuggestionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AiSuggestionWhereInput
-}
-
-/**
- * ProjectCountOutputType without action
- */
 export type ProjectCountOutputTypeCountPublishTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PublishTaskWhereInput
 }
@@ -2801,7 +2605,6 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   clipCandidates?: boolean | Prisma.Project$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Project$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.Project$generatedAssetsArgs<ExtArgs>
-  aiSuggestions?: boolean | Prisma.Project$aiSuggestionsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.Project$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -2873,7 +2676,6 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   clipCandidates?: boolean | Prisma.Project$clipCandidatesArgs<ExtArgs>
   shortClips?: boolean | Prisma.Project$shortClipsArgs<ExtArgs>
   generatedAssets?: boolean | Prisma.Project$generatedAssetsArgs<ExtArgs>
-  aiSuggestions?: boolean | Prisma.Project$aiSuggestionsArgs<ExtArgs>
   publishTasks?: boolean | Prisma.Project$publishTasksArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2905,7 +2707,6 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     clipCandidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
     shortClips: Prisma.$ShortClipPayload<ExtArgs>[]
     generatedAssets: Prisma.$GeneratedAssetPayload<ExtArgs>[]
-    aiSuggestions: Prisma.$AiSuggestionPayload<ExtArgs>[]
     publishTasks: Prisma.$PublishTaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3327,7 +3128,6 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   clipCandidates<T extends Prisma.Project$clipCandidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$clipCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shortClips<T extends Prisma.Project$shortClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$shortClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   generatedAssets<T extends Prisma.Project$generatedAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$generatedAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  aiSuggestions<T extends Prisma.Project$aiSuggestionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$aiSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AiSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   publishTasks<T extends Prisma.Project$publishTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$publishTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PublishTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3993,30 +3793,6 @@ export type Project$generatedAssetsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.GeneratedAssetScalarFieldEnum | Prisma.GeneratedAssetScalarFieldEnum[]
-}
-
-/**
- * Project.aiSuggestions
- */
-export type Project$aiSuggestionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the AiSuggestion
-   */
-  select?: Prisma.AiSuggestionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the AiSuggestion
-   */
-  omit?: Prisma.AiSuggestionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.AiSuggestionInclude<ExtArgs> | null
-  where?: Prisma.AiSuggestionWhereInput
-  orderBy?: Prisma.AiSuggestionOrderByWithRelationInput | Prisma.AiSuggestionOrderByWithRelationInput[]
-  cursor?: Prisma.AiSuggestionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AiSuggestionScalarFieldEnum | Prisma.AiSuggestionScalarFieldEnum[]
 }
 
 /**

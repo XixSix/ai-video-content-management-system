@@ -118,11 +118,6 @@ export type ShortClip = Prisma.ShortClipModel
  */
 export type GeneratedAsset = Prisma.GeneratedAssetModel
 /**
- * Model AiSuggestion
- * 
- */
-export type AiSuggestion = Prisma.AiSuggestionModel
-/**
  * Model PlatformAccount
  * 
  */

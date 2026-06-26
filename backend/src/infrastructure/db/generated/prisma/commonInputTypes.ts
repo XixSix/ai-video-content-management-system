@@ -745,57 +745,6 @@ export type EnumAssetTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
 }
 
-export type EnumTargetTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.TargetType | Prisma.EnumTargetTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTargetTypeFilter<$PrismaModel> | $Enums.TargetType
-}
-
-export type EnumSuggestionTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.SuggestionType | Prisma.EnumSuggestionTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSuggestionTypeFilter<$PrismaModel> | $Enums.SuggestionType
-}
-
-export type EnumPlatformNullableFilter<$PrismaModel = never> = {
-  equals?: $Enums.Platform | Prisma.EnumPlatformFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumPlatformNullableFilter<$PrismaModel> | $Enums.Platform | null
-}
-
-export type EnumTargetTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.TargetType | Prisma.EnumTargetTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTargetTypeWithAggregatesFilter<$PrismaModel> | $Enums.TargetType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumTargetTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumTargetTypeFilter<$PrismaModel>
-}
-
-export type EnumSuggestionTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.SuggestionType | Prisma.EnumSuggestionTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSuggestionTypeWithAggregatesFilter<$PrismaModel> | $Enums.SuggestionType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumSuggestionTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumSuggestionTypeFilter<$PrismaModel>
-}
-
-export type EnumPlatformNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Platform | Prisma.EnumPlatformFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumPlatformNullableWithAggregatesFilter<$PrismaModel> | $Enums.Platform | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumPlatformNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumPlatformNullableFilter<$PrismaModel>
-}
-
 export type EnumPlatformFilter<$PrismaModel = never> = {
   equals?: $Enums.Platform | Prisma.EnumPlatformFieldRefInput<$PrismaModel>
   in?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel>
@@ -1509,57 +1458,6 @@ export type NestedEnumAssetTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
-}
-
-export type NestedEnumTargetTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.TargetType | Prisma.EnumTargetTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTargetTypeFilter<$PrismaModel> | $Enums.TargetType
-}
-
-export type NestedEnumSuggestionTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.SuggestionType | Prisma.EnumSuggestionTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSuggestionTypeFilter<$PrismaModel> | $Enums.SuggestionType
-}
-
-export type NestedEnumPlatformNullableFilter<$PrismaModel = never> = {
-  equals?: $Enums.Platform | Prisma.EnumPlatformFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumPlatformNullableFilter<$PrismaModel> | $Enums.Platform | null
-}
-
-export type NestedEnumTargetTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.TargetType | Prisma.EnumTargetTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TargetType[] | Prisma.ListEnumTargetTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTargetTypeWithAggregatesFilter<$PrismaModel> | $Enums.TargetType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumTargetTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumTargetTypeFilter<$PrismaModel>
-}
-
-export type NestedEnumSuggestionTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.SuggestionType | Prisma.EnumSuggestionTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.SuggestionType[] | Prisma.ListEnumSuggestionTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSuggestionTypeWithAggregatesFilter<$PrismaModel> | $Enums.SuggestionType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumSuggestionTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumSuggestionTypeFilter<$PrismaModel>
-}
-
-export type NestedEnumPlatformNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Platform | Prisma.EnumPlatformFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Platform[] | Prisma.ListEnumPlatformFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumPlatformNullableWithAggregatesFilter<$PrismaModel> | $Enums.Platform | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumPlatformNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumPlatformNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumPlatformFilter<$PrismaModel = never> = {

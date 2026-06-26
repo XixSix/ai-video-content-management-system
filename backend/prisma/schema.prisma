@@ -216,7 +216,6 @@ model User {
   processingJobs               ProcessingJob[]
   shortClips                   ShortClip[]
   generatedAssets              GeneratedAsset[]
-  aiSuggestions                AiSuggestion[]
   connectedPlatformAccounts    PlatformAccount[]     @relation("PlatformAccountConnectedBy")
   initiatedPlatformOAuthStates PlatformOAuthState[]  @relation("PlatformOAuthStateInitiatedBy")
   publishTasks                 PublishTask[]
@@ -427,7 +426,6 @@ model Project {
   clipCandidates  ClipCandidate[]
   shortClips      ShortClip[]
   generatedAssets GeneratedAsset[]
-  aiSuggestions   AiSuggestion[]
   publishTasks    PublishTask[]
 
   @@unique([workspaceId, slug])
@@ -871,33 +869,6 @@ model GeneratedAsset {
   @@index([assetType])
   @@index([mediaId, assetType, createdAt])
   @@map("generated_assets")
-}
-
-model AiSuggestion {
-  id        String  @id @default(uuid()) @db.Uuid
-  userId    String  @map("user_id") @db.Uuid
-  projectId String? @map("project_id") @db.Uuid
-
-  targetType TargetType @map("target_type")
-  targetId   String     @map("target_id") @db.Uuid
-
-  suggestionType SuggestionType @map("suggestion_type")
-  platform       Platform?
-
-  content Json
-  model   String? @db.VarChar(100)
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@index([projectId])
-  @@index([targetType, targetId])
-  @@index([suggestionType])
-  @@index([platform])
-  @@map("ai_suggestions")
 }
 
 model PlatformAccount {
