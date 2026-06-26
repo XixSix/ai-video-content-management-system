@@ -97,8 +97,6 @@ export const JobType = {
   GENERATE_SUBTITLE: 'GENERATE_SUBTITLE',
   GENERATE_CHAPTERS: 'GENERATE_CHAPTERS',
   GENERATE_SHORT_CLIPS: 'GENERATE_SHORT_CLIPS',
-  GENERATE_AI_SUGGESTIONS: 'GENERATE_AI_SUGGESTIONS',
-  GENERATE_SUGGESTIONS: 'GENERATE_SUGGESTIONS',
   EXPORT_RENDER: 'EXPORT_RENDER',
   BURN_SUBTITLE: 'BURN_SUBTITLE',
   PUBLISH: 'PUBLISH',
@@ -119,7 +117,6 @@ export const JobStatus = {
   BURNING_SUBTITLE: 'BURNING_SUBTITLE',
   GENERATING_CHAPTERS: 'GENERATING_CHAPTERS',
   GENERATING_SHORT_CLIPS: 'GENERATING_SHORT_CLIPS',
-  GENERATING_SUGGESTIONS: 'GENERATING_SUGGESTIONS',
   GENERATING_MEDIA_PREVIEW: 'GENERATING_MEDIA_PREVIEW',
   PUBLISHING: 'PUBLISHING',
   COMPLETED: 'COMPLETED',
@@ -203,29 +200,6 @@ export const AssetType = {
 } as const
 
 export type AssetType = (typeof AssetType)[keyof typeof AssetType]
-
-
-export const TargetType = {
-  MEDIA: 'MEDIA',
-  PROJECT: 'PROJECT',
-  TRANSCRIPT: 'TRANSCRIPT',
-  VIDEO_CHAPTER: 'VIDEO_CHAPTER',
-  SHORT_CLIP: 'SHORT_CLIP',
-  PUBLISH_TASK: 'PUBLISH_TASK'
-} as const
-
-export type TargetType = (typeof TargetType)[keyof typeof TargetType]
-
-
-export const SuggestionType = {
-  TITLE: 'TITLE',
-  CAPTION: 'CAPTION',
-  HASHTAG: 'HASHTAG',
-  DESCRIPTION: 'DESCRIPTION',
-  PLATFORM_CONTENT: 'PLATFORM_CONTENT'
-} as const
-
-export type SuggestionType = (typeof SuggestionType)[keyof typeof SuggestionType]
 
 
 export const Platform = {
