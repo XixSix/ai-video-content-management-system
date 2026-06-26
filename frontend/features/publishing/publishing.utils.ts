@@ -154,7 +154,6 @@ export function getPublishStatusCounts(tasks: PublishTask[]): PublishStatusCount
     "SCHEDULED",
     "PUBLISHING",
     "FAILED",
-    "CANCELED",
     "PUBLISHED",
   ]
 

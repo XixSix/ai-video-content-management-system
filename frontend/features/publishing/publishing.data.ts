@@ -15,7 +15,6 @@ export const publishStatusFilterOptions: {
   { label: "Publishing", value: "PUBLISHING" },
   { label: "Published", value: "PUBLISHED" },
   { label: "Failed", value: "FAILED" },
-  { label: "Canceled", value: "CANCELED" },
 ]
 
 export const publishPlatformFilterOptions: {

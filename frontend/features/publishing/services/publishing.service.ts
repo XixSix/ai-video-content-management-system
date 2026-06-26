@@ -51,6 +51,7 @@ export type PublishTaskResponseData = {
 export type PublishTaskListQuery = {
   page?: number
   limit?: number
+  search?: string
   platform?: PublishPlatform
   status?: PublishTaskStatus
   mediaId?: string

@@ -80,6 +80,7 @@ export const listPublishTasks = async (
   const [items, total] = await publishTasksRepo.findPublishTasksByUserId(
     {
       userId,
+      search: query.search,
       platform: query.platform,
       status: query.status,
       mediaId: query.mediaId,

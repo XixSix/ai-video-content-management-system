@@ -13,6 +13,7 @@ import type { PublishTaskSortField, SortOrder } from './publish-tasks.types'
 
 export interface ListPublishTasksFilters {
   userId: string
+  search?: string
   platform?: Platform
   status?: PublishStatus
   mediaId?: string
@@ -57,7 +58,47 @@ const buildPublishTaskWhere = (filters: ListPublishTasksFilters): Prisma.Publish
   ...(filters.mediaId ? { mediaId: filters.mediaId } : {}),
   ...(filters.projectId ? { projectId: filters.projectId } : {}),
   ...(filters.shortClipId ? { shortClipId: filters.shortClipId } : {}),
-  ...(filters.platformAccountId ? { platformAccountId: filters.platformAccountId } : {})
+  ...(filters.platformAccountId ? { platformAccountId: filters.platformAccountId } : {}),
+  ...(filters.search
+    ? {
+        OR: [
+          { title: { contains: filters.search, mode: 'insensitive' } },
+          { caption: { contains: filters.search, mode: 'insensitive' } },
+          { description: { contains: filters.search, mode: 'insensitive' } },
+          {
+            media: {
+              is: {
+                OR: [
+                  { title: { contains: filters.search, mode: 'insensitive' } },
+                  { originalFilename: { contains: filters.search, mode: 'insensitive' } }
+                ]
+              }
+            }
+          },
+          {
+            project: {
+              is: {
+                title: { contains: filters.search, mode: 'insensitive' }
+              }
+            }
+          },
+          {
+            shortClip: {
+              is: {
+                title: { contains: filters.search, mode: 'insensitive' }
+              }
+            }
+          },
+          {
+            platformAccount: {
+              is: {
+                accountName: { contains: filters.search, mode: 'insensitive' }
+              }
+            }
+          }
+        ]
+      }
+    : {})
 })
 
 export const createPublishTask = async (data: Prisma.PublishTaskUncheckedCreateInput): Promise<PublishTaskRecord> =>

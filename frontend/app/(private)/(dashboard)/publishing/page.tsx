@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { Link2, LoaderCircle, Plus } from "lucide-react"
+import { AlertCircle, Link2, LoaderCircle, Plus, RotateCcw } from "lucide-react"
 import { toast } from "sonner"
 
 import { DataPagination } from "@/components/shared/data-pagination"
@@ -38,6 +38,7 @@ import {
 } from "@/features/publishing/publishing.mapper"
 import type {
   NewPublishPayload,
+  PublishTaskStatus,
   PublishPlatformFilter,
   PublishSortKey,
   PublishStatusFilter,
@@ -46,7 +47,6 @@ import type {
 } from "@/features/publishing/publishing.types"
 import {
   buildScheduledIso,
-  filterAndSortPublishTasks,
   getPublishedThisWeekCount,
   getPublishStatusCounts,
   isFutureScheduledTime,
@@ -56,6 +56,21 @@ import { useSocialAccountsStore } from "@/features/social-accounts/social-accoun
 import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 
 const PUBLISHING_PAGE_SIZE = 4
+
+function getSortQuery(sortKey: PublishSortKey): {
+  sortBy: "createdAt" | "scheduledAt" | "publishedAt"
+  sortOrder: "asc" | "desc"
+} {
+  if (sortKey === "scheduledSoon") {
+    return { sortBy: "scheduledAt", sortOrder: "asc" }
+  }
+
+  if (sortKey === "recentlyPublished") {
+    return { sortBy: "publishedAt", sortOrder: "desc" }
+  }
+
+  return { sortBy: "createdAt", sortOrder: "desc" }
+}
 
 export default function PublishingPage() {
   const queryClient = useQueryClient()
@@ -77,12 +92,23 @@ export default function PublishingPage() {
     (state) => state.setManagerOpen
   )
 
-  const publishTasksQuery = usePublishTasks({
-    page: 1,
-    limit: 50,
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  })
+  const publishTasksListQuery = useMemo(() => {
+    const sortQuery = getSortQuery(sortKey)
+    const search = searchQuery.trim()
+
+    return {
+      page: currentPage,
+      limit: PUBLISHING_PAGE_SIZE,
+      ...(search ? { search } : {}),
+      ...(statusFilter !== "ALL"
+        ? { status: statusFilter as PublishTaskStatus }
+        : {}),
+      ...(platformFilter !== "ALL" ? { platform: platformFilter } : {}),
+      ...sortQuery,
+    }
+  }, [currentPage, platformFilter, searchQuery, sortKey, statusFilter])
+
+  const publishTasksQuery = usePublishTasks(publishTasksListQuery)
   const mediaQuery = useMediaList(workspaceId, {
     page: 1,
     limit: 25,
@@ -129,32 +155,12 @@ export default function PublishingPage() {
     [accountsQuery.data?.accounts]
   )
 
-  const visibleTasks = useMemo(
-    () =>
-      filterAndSortPublishTasks(tasks, {
-        searchQuery,
-        statusFilter,
-        platformFilter,
-        sortKey,
-      }),
-    [platformFilter, searchQuery, sortKey, statusFilter, tasks]
-  )
-  const pageCount = Math.max(
-    1,
-    Math.ceil(visibleTasks.length / PUBLISHING_PAGE_SIZE)
-  )
+  const totalItems = publishTasksQuery.data?.meta.total ?? 0
+  const pageCount = Math.max(1, publishTasksQuery.data?.meta.totalPages ?? 1)
   const safeCurrentPage = Math.min(currentPage, pageCount)
-  const paginatedTasks = useMemo(
-    () =>
-      visibleTasks.slice(
-        (safeCurrentPage - 1) * PUBLISHING_PAGE_SIZE,
-        safeCurrentPage * PUBLISHING_PAGE_SIZE
-      ),
-    [safeCurrentPage, visibleTasks]
-  )
   const selectedTask =
-    visibleTasks.find((task) => task.id === selectedTaskId) ??
-    visibleTasks[0] ??
+    tasks.find((task) => task.id === selectedTaskId) ??
+    tasks[0] ??
     null
   const statusCounts = useMemo(() => getPublishStatusCounts(tasks), [tasks])
   const publishedThisWeek = useMemo(
@@ -274,13 +280,15 @@ export default function PublishingPage() {
       }
 
       if (action === "cancel") {
-        await cancelTask.mutateAsync(task.id)
+        const response = await cancelTask.mutateAsync(task.id)
+        setSelectedTaskId(response.publishTask.id)
         toast.success("Publish canceled", { description: task.sourceTitle })
         return
       }
 
       if (action === "retry" || action === "publish-now") {
-        await publishNow.mutateAsync(task.id)
+        const response = await publishNow.mutateAsync(task.id)
+        setSelectedTaskId(response.publishTask.id)
         toast.loading("Publishing started", { description: task.sourceTitle })
         return
       }
@@ -293,10 +301,11 @@ export default function PublishingPage() {
           return
         }
 
-        await scheduleTask.mutateAsync({
+        const response = await scheduleTask.mutateAsync({
           publishTaskId: task.id,
           scheduledAt: task.scheduledAt,
         })
+        setSelectedTaskId(response.publishTask.id)
         toast.success("Publish scheduled", { description: task.sourceTitle })
         return
       }
@@ -316,10 +325,11 @@ export default function PublishingPage() {
     update: PublishTaskContentUpdate
   ) => {
     try {
-      await updateTask.mutateAsync({
+      const response = await updateTask.mutateAsync({
         publishTaskId: task.id,
         input: update,
       })
+      setSelectedTaskId(response.publishTask.id)
       setDetailMode("view")
       toast.success("Publish copy updated", { description: task.sourceTitle })
     } catch (error) {
@@ -382,7 +392,17 @@ export default function PublishingPage() {
   }
 
   const isLoading =
-    publishTasksQuery.isLoading || mediaQuery.isLoading || accountsQuery.isLoading
+      publishTasksQuery.isLoading || mediaQuery.isLoading || accountsQuery.isLoading
+  const loadError =
+    publishTasksQuery.error ?? mediaQuery.error ?? accountsQuery.error ?? null
+  const hasAccountOptions = accountOptions.length > 0
+  const hasSourceOptions = sourceOptions.length > 0
+  const newPublishDisabled = !hasAccountOptions || !hasSourceOptions
+  const newPublishBlockReason = !hasAccountOptions
+    ? "Connect a YouTube or Facebook account before creating publish tasks."
+    : !hasSourceOptions
+      ? "Upload a ready video in Media Library before creating publish tasks."
+      : null
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 py-6 lg:gap-8">
@@ -423,7 +443,8 @@ export default function PublishingPage() {
               type="button"
               size="lg"
               onClick={() => setIsPublishSheetOpen(true)}
-              disabled={accountOptions.length < 1 || sourceOptions.length < 1}
+              disabled={newPublishDisabled}
+              title={newPublishBlockReason ?? undefined}
             >
               <Plus className="size-4" />
               New publish
@@ -436,6 +457,43 @@ export default function PublishingPage() {
         counts={statusCounts}
         publishedThisWeek={publishedThisWeek}
       />
+
+      {!isLoading && !loadError && (!hasAccountOptions || !hasSourceOptions) ? (
+        <section className="grid gap-3 md:grid-cols-2">
+          {!hasAccountOptions ? (
+            <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <Link2 className="mt-0.5 size-4 text-amber-700 dark:text-amber-300" />
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-foreground">
+                    Connect a publishing account
+                  </p>
+                  <p className="text-sm leading-5 text-muted-foreground">
+                    You need a connected YouTube or Facebook account before
+                    creating publish tasks.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+          {!hasSourceOptions ? (
+            <div className="rounded-xl border border-border/70 bg-card/95 p-4">
+              <div className="flex items-start gap-3">
+                <Plus className="mt-0.5 size-4 text-muted-foreground" />
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-foreground">
+                    Add a ready video source
+                  </p>
+                  <p className="text-sm leading-5 text-muted-foreground">
+                    Upload and complete at least one video in Media Library to
+                    use it as a publishing source.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <PublishingToolbar
         searchQuery={searchQuery}
@@ -465,7 +523,35 @@ export default function PublishingPage() {
         }}
       />
 
-      {isLoading ? (
+      {loadError ? (
+        <div className="flex min-h-72 flex-col items-center justify-center gap-4 rounded-xl border border-destructive/20 bg-destructive/10 p-6 text-center">
+          <span className="inline-flex size-12 items-center justify-center rounded-2xl border border-destructive/20 bg-background/70 text-destructive">
+            <AlertCircle className="size-5" />
+          </span>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-destructive">
+              Could not load publishing workspace
+            </p>
+            <p className="max-w-md text-sm text-destructive/85">
+              {loadError instanceof Error
+                ? loadError.message
+                : "Refresh the data and try again."}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void publishTasksQuery.refetch()
+              void mediaQuery.refetch()
+              void accountsQuery.refetch()
+            }}
+          >
+            <RotateCcw className="size-4" />
+            Retry
+          </Button>
+        </div>
+      ) : isLoading ? (
         <div className="flex min-h-72 items-center justify-center rounded-xl border border-border/70 bg-card/95 text-sm text-muted-foreground">
           <LoaderCircle className="mr-2 size-4 animate-spin" />
           Loading publishing workspace...
@@ -482,7 +568,7 @@ export default function PublishingPage() {
         <section className="grid gap-4 lg:grid-cols-[minmax(24rem,0.95fr)_minmax(24rem,1.05fr)]">
           <div className="space-y-4">
             <PublishTaskList
-              tasks={paginatedTasks}
+              tasks={tasks}
               selectedTaskId={selectedTask?.id ?? selectedTaskId}
               onSelectTask={selectTask}
               onResetFilters={resetFilters}
@@ -490,7 +576,7 @@ export default function PublishingPage() {
             <DataPagination
               page={safeCurrentPage}
               pageSize={PUBLISHING_PAGE_SIZE}
-              totalItems={visibleTasks.length}
+              totalItems={totalItems}
               onPageChange={setCurrentPage}
             />
           </div>

@@ -34,6 +34,7 @@ export const createPublishTaskSchema = z
 export const listPublishTasksQuerySchema = z.strictObject({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(10),
+  search: z.string().trim().min(1).max(255).optional(),
   platform: publishTaskPlatformSchema.optional(),
   status: z.enum(PublishStatus).optional(),
   mediaId: z.uuid().optional(),

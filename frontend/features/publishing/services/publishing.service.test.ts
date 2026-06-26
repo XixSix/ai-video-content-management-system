@@ -74,7 +74,11 @@ describe("publishingService", () => {
 
   it("lists publish tasks with query filters", async () => {
     apiMock.onGet("/publish-tasks").reply((config) => {
-      expect(config.params).toMatchObject({ page: 1, platform: "YOUTUBE" })
+      expect(config.params).toMatchObject({
+        page: 1,
+        platform: "YOUTUBE",
+        search: "launch",
+      })
 
       return [
         200,
@@ -89,7 +93,11 @@ describe("publishingService", () => {
     })
 
     await expect(
-      publishingService.list({ page: 1, platform: "YOUTUBE" })
+      publishingService.list({
+        page: 1,
+        platform: "YOUTUBE",
+        search: "launch",
+      })
     ).resolves.toEqual({
       items: [publishTask()],
       meta: { total: 1, page: 1, limit: 50, totalPages: 1 },

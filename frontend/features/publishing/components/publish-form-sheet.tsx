@@ -81,7 +81,7 @@ function buildDefaultPlatformContent(): PublishPlatformContent {
   return {
     title: "",
     caption: "",
-    hashtags: "#aivideo #contentworkflow",
+    hashtags: "",
   }
 }
 
@@ -136,18 +136,15 @@ export function PublishFormSheet({
   onCreate,
   sourceOptions,
 }: PublishFormSheetProps) {
-  const initialSourceId = lockedSource?.id ?? sourceOptions[0]?.id ?? ""
-  const initialAccountId = accountOptions[0]?.id ?? ""
+  const initialSourceId = lockedSource?.id ?? ""
   const [selectedSourceId, setSelectedSourceId] = useState(initialSourceId)
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false)
-  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(
-    initialAccountId ? [initialAccountId] : []
-  )
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([])
   const [platformContent, setPlatformContent] = useState<
     Record<PublishPlatform, PublishPlatformContent>
   >(buildDefaultPlatformContentMap)
-  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(
-    new Date("2026-06-14T09:00:00.000Z")
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(() =>
+    new Date(Date.now() + 24 * 60 * 60 * 1000)
   )
   const [scheduledTime, setScheduledTime] = useState("09:00")
   const [formError, setFormError] = useState<string | null>(null)
@@ -158,18 +155,12 @@ export function PublishFormSheet({
 
   const selectedSource = useMemo(
     () =>
-      availableSourceOptions.find((source) => source.id === selectedSourceId) ??
-      availableSourceOptions[0],
+      availableSourceOptions.find((source) => source.id === selectedSourceId),
     [availableSourceOptions, selectedSourceId]
   )
   const effectiveSelectedAccountIds = useMemo(
-    () =>
-      selectedAccountIds.length > 0
-        ? selectedAccountIds
-        : initialAccountId
-          ? [initialAccountId]
-          : [],
-    [initialAccountId, selectedAccountIds]
+    () => selectedAccountIds,
+    [selectedAccountIds]
   )
   const selectedAccounts = useMemo(
     () =>
@@ -195,9 +186,9 @@ export function PublishFormSheet({
   )
 
   const resetForm = () => {
-    setSelectedSourceId(lockedSource?.id ?? sourceOptions[0]?.id ?? "")
+    setSelectedSourceId(lockedSource?.id ?? "")
     setIsLibraryPickerOpen(false)
-    setSelectedAccountIds(accountOptions[0] ? [accountOptions[0].id] : [])
+    setSelectedAccountIds([])
     setPlatformContent(buildDefaultPlatformContentMap())
     setScheduledDate(new Date(Date.now() + 24 * 60 * 60 * 1000))
     setScheduledTime("09:00")
@@ -352,7 +343,7 @@ export function PublishFormSheet({
                   size="sm"
                   className="h-auto px-0 text-xs"
                   onClick={() => {
-                    setSelectedSourceId(availableSourceOptions[0]?.id ?? "")
+                    setSelectedSourceId("")
                   }}
                   disabled={Boolean(lockedSource)}
                 >

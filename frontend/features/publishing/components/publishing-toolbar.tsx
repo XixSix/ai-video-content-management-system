@@ -75,7 +75,7 @@ export function PublishingToolbar({
           <Input
             value={searchQuery}
             onChange={(event) => onSearchQueryChange(event.target.value)}
-            placeholder="Search title, caption, source, or hashtags..."
+            placeholder="Search title, caption, source, or account..."
             className="h-10 rounded-xl pl-9"
           />
         </div>

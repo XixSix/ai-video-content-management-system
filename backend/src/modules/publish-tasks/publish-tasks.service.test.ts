@@ -490,6 +490,7 @@ describe('publish task service', () => {
       mediaId,
       shortClipId,
       platformAccountId,
+      search: 'launch',
       sortBy: 'scheduledAt',
       sortOrder: 'asc'
     })
@@ -501,7 +502,8 @@ describe('publish task service', () => {
         status: 'DRAFT',
         mediaId,
         shortClipId,
-        platformAccountId
+        platformAccountId,
+        search: 'launch'
       },
       5,
       5,
