@@ -26,6 +26,8 @@ class PublishTaskRow:
     caption: str | None
     description: str | None
     hashtags: Any
+    platform_post_id: str | None
+    platform_post_url: str | None
 
 
 @dataclass(frozen=True)
@@ -33,7 +35,11 @@ class PlatformAccountRow:
     id: UUID
     workspace_id: UUID
     platform: str
+    platform_user_id: str | None
     status: str
+    access_token_encrypted: str | None
+    refresh_token_encrypted: str | None
+    expires_at: datetime | None
 
 
 @dataclass(frozen=True)
@@ -42,6 +48,17 @@ class PublishAssetRow:
     s3_bucket: str
     s3_key: str
     asset_type: str
+
+
+@dataclass(frozen=True)
+class PublishSourceRow:
+    id: UUID
+    source_type: str
+    s3_bucket: str
+    s3_key: str
+    mime_type: str | None
+    file_size_bytes: int | None
+    filename: str
 
 
 @dataclass(frozen=True)
@@ -69,7 +86,9 @@ def find_publish_task(session: Session, publish_task_id: str) -> PublishTaskRow 
                   title,
                   caption,
                   description,
-                  hashtags
+                  hashtags,
+                  platform_post_id,
+                  platform_post_url
                 FROM publish_tasks
                 WHERE id = :publish_task_id
                 """
@@ -95,7 +114,11 @@ def find_platform_account(
                   id,
                   workspace_id,
                   platform::text AS platform,
-                  status::text AS status
+                  platform_user_id,
+                  status::text AS status,
+                  access_token_encrypted,
+                  refresh_token_encrypted,
+                  expires_at
                 FROM platform_accounts
                 WHERE id = :platform_account_id
                 """
@@ -113,7 +136,11 @@ def find_platform_account(
         id=UUID(str(row["id"])),
         workspace_id=UUID(str(row["workspace_id"])),
         platform=row["platform"],
+        platform_user_id=row["platform_user_id"],
         status=row["status"],
+        access_token_encrypted=row["access_token_encrypted"],
+        refresh_token_encrypted=row["refresh_token_encrypted"],
+        expires_at=row["expires_at"],
     )
 
 
@@ -158,14 +185,14 @@ def target_exists_for_publish_task(
     if task.media_id is not None:
         return _exists(
             session,
-            "SELECT 1 FROM media WHERE id = :id AND status <> 'DELETED'",
+            "SELECT 1 FROM media WHERE id = :id AND status = 'UPLOADED' AND type = 'VIDEO'",
             str(task.media_id),
         )
 
     if task.short_clip_id is not None:
         return _exists(
             session,
-            "SELECT 1 FROM short_clips WHERE id = :id AND status <> 'DELETED'",
+            "SELECT 1 FROM short_clips WHERE id = :id AND status = 'READY' AND video_path IS NOT NULL",
             str(task.short_clip_id),
         )
 
@@ -173,6 +200,124 @@ def target_exists_for_publish_task(
         return find_export_asset(session, export_asset_id) is not None
 
     return False
+
+
+def find_publish_source(
+    session: Session,
+    task: PublishTaskRow,
+    *,
+    export_asset_id: str | None,
+) -> PublishSourceRow | None:
+    if task.media_id is not None:
+        row = (
+            session.execute(
+                text(
+                    """
+                    SELECT
+                      id,
+                      'MEDIA' AS source_type,
+                      s3_bucket,
+                      s3_key,
+                      mime_type,
+                      file_size_bytes,
+                      original_filename AS filename
+                    FROM media
+                    WHERE id = :id
+                      AND status = 'UPLOADED'
+                      AND type = 'VIDEO'
+                    """
+                ),
+                {"id": str(task.media_id)},
+            )
+            .mappings()
+            .one_or_none()
+        )
+        return _publish_source_from_row(row) if row else None
+
+    if task.short_clip_id is not None:
+        row = (
+            session.execute(
+                text(
+                    """
+                    SELECT
+                      sc.id,
+                      'SHORT_CLIP' AS source_type,
+                      m.s3_bucket,
+                      sc.video_path AS s3_key,
+                      COALESCE(m.mime_type, 'video/mp4') AS mime_type,
+                      NULL AS file_size_bytes,
+                      COALESCE(sc.title, m.original_filename, sc.id::text) AS filename
+                    FROM short_clips sc
+                    JOIN media m ON m.id = sc.media_id
+                    WHERE sc.id = :id
+                      AND sc.status = 'READY'
+                      AND sc.video_path IS NOT NULL
+                    """
+                ),
+                {"id": str(task.short_clip_id)},
+            )
+            .mappings()
+            .one_or_none()
+        )
+        return _publish_source_from_row(row) if row else None
+
+    if task.project_id is not None and export_asset_id is not None:
+        row = (
+            session.execute(
+                text(
+                    """
+                    SELECT
+                      id,
+                      'PROJECT_EXPORT' AS source_type,
+                      s3_bucket,
+                      s3_key,
+                      mime_type,
+                      file_size_bytes,
+                      s3_key AS filename
+                    FROM generated_assets
+                    WHERE id = :id
+                      AND asset_type = 'EXPORT_VIDEO'
+                    """
+                ),
+                {"id": export_asset_id},
+            )
+            .mappings()
+            .one_or_none()
+        )
+        return _publish_source_from_row(row) if row else None
+
+    return None
+
+
+def update_platform_account_credentials(
+    session: Session,
+    platform_account_id: str,
+    *,
+    access_token_encrypted: str,
+    refresh_token_encrypted: str | None,
+    expires_at: datetime | None,
+) -> None:
+    session.execute(
+        text(
+            """
+            UPDATE platform_accounts
+            SET
+              access_token_encrypted = :access_token_encrypted,
+              refresh_token_encrypted = :refresh_token_encrypted,
+              expires_at = :expires_at,
+              status = 'CONNECTED',
+              updated_at = :now
+            WHERE id = :platform_account_id
+            """
+        ),
+        {
+            "platform_account_id": platform_account_id,
+            "access_token_encrypted": access_token_encrypted,
+            "refresh_token_encrypted": refresh_token_encrypted,
+            "expires_at": expires_at,
+            "now": datetime.now(UTC),
+        },
+    )
 
 
 def mark_publish_task_publishing(
@@ -429,4 +574,20 @@ def _publish_task_from_row(row: Any) -> PublishTaskRow:
         caption=row["caption"],
         description=row["description"],
         hashtags=row["hashtags"],
+        platform_post_id=row["platform_post_id"],
+        platform_post_url=row["platform_post_url"],
+    )
+
+
+def _publish_source_from_row(row: Any) -> PublishSourceRow:
+    return PublishSourceRow(
+        id=UUID(str(row["id"])),
+        source_type=row["source_type"],
+        s3_bucket=row["s3_bucket"],
+        s3_key=row["s3_key"],
+        mime_type=row["mime_type"],
+        file_size_bytes=int(row["file_size_bytes"])
+        if row["file_size_bytes"] is not None
+        else None,
+        filename=row["filename"],
     )

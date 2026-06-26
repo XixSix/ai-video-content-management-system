@@ -5,10 +5,10 @@ import {
   JobType,
   Prisma,
   PublishStatus,
+  ShortClipStatus,
   type Media,
   type GeneratedAsset,
   type ProcessingJob,
-  type PublishTask,
   type ShortClip
 } from '../../infrastructure/db/generated/prisma/client'
 import { EXPORT_RENDER_TASK_NAME, RENDER_EXPORTS_QUEUE_NAME } from '../render-exports/render-exports.types'
@@ -221,7 +221,7 @@ const startPublishTask = async (
 
 const startDirectPublishTask = async (
   userId: string,
-  task: PublishTask,
+  task: publishTasksRepo.PublishTaskRecord,
   publishContext: PublishContext,
   scheduledAt: Date | null
 ): Promise<PublishTaskJobResult> => {
@@ -283,7 +283,7 @@ const startDirectPublishTask = async (
 
 const startProjectPublishTask = async (
   userId: string,
-  task: PublishTask,
+  task: publishTasksRepo.PublishTaskRecord,
   publishContext: PublishContext,
   scheduledAt: Date | null
 ): Promise<PublishTaskJobResult> => {
@@ -380,7 +380,7 @@ const ensurePublishTarget = async (
   throw PublishTasksError.targetNotFound()
 }
 
-const getPublishContext = async (userId: string, task: PublishTask): Promise<PublishContext> => {
+const getPublishContext = async (userId: string, task: publishTasksRepo.PublishTaskRecord): Promise<PublishContext> => {
   const targetContext = await getPublishTaskTargetContext(userId, task)
 
   if (!task.platformAccountId) {
@@ -401,7 +401,7 @@ const getPublishContext = async (userId: string, task: PublishTask): Promise<Pub
 
 const getPublishTaskTargetContext = async (
   userId: string,
-  task: PublishTask
+  task: publishTasksRepo.PublishTaskRecord
 ): Promise<Omit<PublishContext, 'platformAccountId'>> => {
   if (task.mediaId) {
     const media = await getAccessiblePublishableMedia(userId, task.mediaId)
@@ -426,10 +426,13 @@ const getPublishTaskTargetContext = async (
   throw PublishTasksError.targetNotFound()
 }
 
-const getPublishTaskWorkspaceId = async (userId: string, task: PublishTask): Promise<string> =>
+const getPublishTaskWorkspaceId = async (userId: string, task: publishTasksRepo.PublishTaskRecord): Promise<string> =>
   (await getPublishTaskTargetContext(userId, task)).workspaceId
 
-const getOwnedPublishTask = async (userId: string, publishTaskId: string): Promise<PublishTask> => {
+const getOwnedPublishTask = async (
+  userId: string,
+  publishTaskId: string
+): Promise<publishTasksRepo.PublishTaskRecord> => {
   const task = await publishTasksRepo.findPublishTaskById(publishTaskId)
 
   if (!task) {
@@ -456,6 +459,14 @@ const getAccessiblePublishableMedia = async (userId: string, mediaId: string): P
     throw PublishTasksError.invalidTargetState('Deleted media cannot be published')
   }
 
+  if (media.status !== MediaStatus.UPLOADED) {
+    throw PublishTasksError.invalidTargetState(`Cannot publish media in status ${media.status}`)
+  }
+
+  if (media.type !== MediaType.VIDEO) {
+    throw PublishTasksError.invalidTargetState('Publishing requires video media')
+  }
+
   return media
 }
 
@@ -471,6 +482,14 @@ const getAccessiblePublishableShortClip = async (
 
   if (shortClip.status === 'DELETED') {
     throw PublishTasksError.invalidTargetState('Deleted short clip cannot be published')
+  }
+
+  if (shortClip.status !== ShortClipStatus.READY) {
+    throw PublishTasksError.invalidTargetState(`Cannot publish short clip in status ${shortClip.status}`)
+  }
+
+  if (!shortClip.videoPath) {
+    throw PublishTasksError.invalidTargetState('Short clip video output is required before publishing')
   }
 
   const media = await getAccessiblePublishableMedia(userId, shortClip.mediaId)

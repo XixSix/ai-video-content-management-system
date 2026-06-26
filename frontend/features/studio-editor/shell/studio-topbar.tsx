@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { toast } from "sonner"
 import {
   Check,
   CloudAlert,
@@ -19,6 +21,20 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useTheme } from "@/components/providers/theme-provider"
+import { jobService, isTerminalJob } from "@/features/jobs/job.service"
+import { PublishFormSheet } from "@/features/publishing/components/publish-form-sheet"
+import {
+  useCreatePublishTask,
+  usePublishNowTask,
+  useSchedulePublishTask,
+} from "@/features/publishing/hooks/use-publishing"
+import {
+  buildProjectPublishSource,
+  mapPlatformAccountToPublishOption,
+} from "@/features/publishing/publishing.mapper"
+import type { NewPublishPayload } from "@/features/publishing/publishing.types"
+import { buildScheduledIso } from "@/features/publishing/publishing.utils"
+import { usePlatformAccounts } from "@/features/social-accounts/hooks/use-platform-accounts"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,6 +108,13 @@ export function StudioTopbar({
   const { project } = useStudioProjectState()
   const { retry, saveNow, status } = useEditorSnapshotPersistence()
   const { projectId, workspaceId } = useEditorRouteParams()
+  const [isPublishSheetOpen, setIsPublishSheetOpen] = useState(false)
+  const [isPreparingPublish, setIsPreparingPublish] = useState(false)
+  const publishSubscriptionRef = useRef<{ close: () => void } | null>(null)
+  const accountsQuery = usePlatformAccounts(workspaceId)
+  const createPublishTask = useCreatePublishTask()
+  const publishNow = usePublishNowTask()
+  const schedulePublish = useSchedulePublishTask()
   const saveIndicator = {
     "view-only": {
       icon: Eye,
@@ -143,7 +166,172 @@ export function StudioTopbar({
       ? "Saving…"
       : renderExport.phase === "rendering"
         ? "Rendering…"
-        : "Export"
+      : "Export"
+  const accountOptions = useMemo(
+    () =>
+      (accountsQuery.data?.accounts ?? [])
+        .map(mapPlatformAccountToPublishOption)
+        .filter((account): account is NonNullable<typeof account> =>
+          Boolean(account)
+        ),
+    [accountsQuery.data?.accounts]
+  )
+  const lockedPublishSource = useMemo(
+    () =>
+      buildProjectPublishSource({
+        projectId,
+        title: projectName,
+        aspectRatio: project.media.aspectRatio,
+        duration: project.media.durationSeconds,
+      }),
+    [project.media.aspectRatio, project.media.durationSeconds, projectId, projectName]
+  )
+  const publishDisabled =
+    isPreparingPublish ||
+    createPublishTask.isPending ||
+    publishNow.isPending ||
+    schedulePublish.isPending ||
+    exportBlockedBySnapshot ||
+    !workspaceId ||
+    !projectId ||
+    accountOptions.length < 1
+
+  useEffect(
+    () => () => {
+      publishSubscriptionRef.current?.close()
+    },
+    []
+  )
+
+  const trackPublishJob = (jobId: string) => {
+    publishSubscriptionRef.current?.close()
+    let pollingStarted = false
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+    const pollJob = () => {
+      timeoutId = setTimeout(() => {
+        void jobService
+          .get(jobId)
+          .then(({ job }) => {
+            if (isTerminalJob(job)) {
+              publishSubscriptionRef.current?.close()
+              publishSubscriptionRef.current = null
+              toast[job.status === "COMPLETED" ? "success" : "error"](
+                job.status === "COMPLETED" ? "Publish completed" : "Publish failed",
+                {
+                  description: job.errorMessage ?? projectName,
+                }
+              )
+              return
+            }
+
+            pollJob()
+          })
+          .catch(() => {
+            publishSubscriptionRef.current?.close()
+            publishSubscriptionRef.current = null
+          })
+      }, 2500)
+    }
+
+    publishSubscriptionRef.current = jobService.subscribeToJobEvents({
+      jobId,
+      onError: () => {
+        if (pollingStarted) return
+        pollingStarted = true
+        publishSubscriptionRef.current = {
+          close: () => {
+            if (timeoutId) clearTimeout(timeoutId)
+          },
+        }
+        pollJob()
+      },
+      onJob: (job) => {
+        if (!isTerminalJob(job)) {
+          return
+        }
+
+        publishSubscriptionRef.current?.close()
+        publishSubscriptionRef.current = null
+        toast[job.status === "COMPLETED" ? "success" : "error"](
+          job.status === "COMPLETED" ? "Publish completed" : "Publish failed",
+          {
+            description: job.errorMessage ?? projectName,
+          }
+        )
+      },
+    })
+  }
+
+  const openPublishSheet = async () => {
+    if (publishDisabled) {
+      return
+    }
+
+    setIsPreparingPublish(true)
+    const saved = await saveNow()
+    setIsPreparingPublish(false)
+
+    if (!saved) {
+      toast.error("Publish blocked", {
+        description: "Resolve the current snapshot save state before publishing.",
+      })
+      return
+    }
+
+    setIsPublishSheetOpen(true)
+  }
+
+  const handleCreatePublish = async (payload: NewPublishPayload) => {
+    try {
+      for (const target of payload.targets) {
+        const createResponse = await createPublishTask.mutateAsync({
+          projectId,
+          platform: target.account.platform,
+          platformAccountId: target.account.id,
+          title: target.title || undefined,
+          caption: target.caption || undefined,
+          hashtags: target.hashtags,
+        })
+
+        if (payload.status === "PUBLISHING") {
+          const { job } = await publishNow.mutateAsync(
+            createResponse.publishTask.id
+          )
+          trackPublishJob(job.id)
+        }
+
+        if (payload.status === "SCHEDULED") {
+          const scheduledAt = buildScheduledIso(
+            payload.scheduledDate,
+            payload.scheduledTime
+          )
+
+          if (scheduledAt) {
+            const { job } = await schedulePublish.mutateAsync({
+              publishTaskId: createResponse.publishTask.id,
+              scheduledAt,
+            })
+            trackPublishJob(job.id)
+          }
+        }
+      }
+
+      toast.success(
+        payload.status === "DRAFT"
+          ? "Publish draft saved"
+          : payload.status === "SCHEDULED"
+            ? "Publish scheduled"
+            : "Publishing started",
+        { description: projectName }
+      )
+    } catch (error) {
+      toast.error("Could not start publishing", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+      })
+    }
+  }
 
   return (
     <header className="relative flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/88">
@@ -205,7 +393,15 @@ export function StudioTopbar({
         <Button variant="ghost" size="sm" className="hidden md:inline-flex">
           Share
         </Button>
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            void openPublishSheet()
+          }}
+          disabled={publishDisabled}
+        >
+          {isPreparingPublish ? <LoaderCircle className="animate-spin" /> : null}
           Publish
         </Button>
         <Button
@@ -221,6 +417,21 @@ export function StudioTopbar({
           {exportLabel}
         </Button>
       </div>
+      <PublishFormSheet
+        open={isPublishSheetOpen}
+        accountOptions={accountOptions}
+        sourceOptions={[lockedPublishSource]}
+        lockedSource={lockedPublishSource}
+        isSubmitting={
+          createPublishTask.isPending ||
+          publishNow.isPending ||
+          schedulePublish.isPending
+        }
+        onOpenChange={setIsPublishSheetOpen}
+        onCreate={(payload) => {
+          void handleCreatePublish(payload)
+        }}
+      />
     </header>
   )
 }

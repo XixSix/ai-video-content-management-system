@@ -1,10 +1,14 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { Link2, Plus } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { Link2, LoaderCircle, Plus } from "lucide-react"
 import { toast } from "sonner"
 
 import { DataPagination } from "@/components/shared/data-pagination"
+import { Button } from "@/components/ui/button"
+import { jobService, isTerminalJob } from "@/features/jobs/job.service"
+import { useMediaList } from "@/features/media-library/hooks/use-media-list"
 import { PublishCalendarView } from "@/features/publishing/components/publish-calendar-view"
 import { PublishFormSheet } from "@/features/publishing/components/publish-form-sheet"
 import {
@@ -18,9 +22,20 @@ import {
 } from "@/features/publishing/components/publish-task-detail"
 import { PublishingStatusStrip } from "@/features/publishing/components/publishing-status-strip"
 import { PublishingToolbar } from "@/features/publishing/components/publishing-toolbar"
-import { Button } from "@/components/ui/button"
-import { useSocialAccountsStore } from "@/features/social-accounts/social-accounts.store"
-import { publishTasksSeed } from "@/features/publishing/publishing.data"
+import {
+  useCancelPublishTask,
+  useCreatePublishTask,
+  usePublishNowTask,
+  usePublishTasks,
+  useSchedulePublishTask,
+  useUpdatePublishTask,
+} from "@/features/publishing/hooks/use-publishing"
+import { publishingQueryKeys } from "@/features/publishing/hooks/publishing-query-keys"
+import {
+  mapMediaToPublishSource,
+  mapPlatformAccountToPublishOption,
+  mapPublishTaskResponse,
+} from "@/features/publishing/publishing.mapper"
 import type {
   NewPublishPayload,
   PublishPlatformFilter,
@@ -36,43 +51,16 @@ import {
   getPublishStatusCounts,
   isFutureScheduledTime,
 } from "@/features/publishing/publishing.utils"
+import { usePlatformAccounts } from "@/features/social-accounts/hooks/use-platform-accounts"
+import { useSocialAccountsStore } from "@/features/social-accounts/social-accounts.store"
+import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 
 const PUBLISHING_PAGE_SIZE = 4
 
-function buildPublishTasks(payload: NewPublishPayload): PublishTask[] {
-  const now = new Date()
-  const scheduledAt =
-    payload.status === "DRAFT" || !payload.scheduledDate
-      ? null
-      : buildScheduledIso(payload.scheduledDate, payload.scheduledTime)
-
-  return payload.targets.map((target, index) => ({
-    id: `publish-${now.getTime()}-${index}`,
-    mediaId: payload.source.mediaId,
-    shortClipId: payload.source.shortClipId,
-    sourceType: payload.source.sourceType,
-    thumbnailUrl: payload.source.thumbnailUrl,
-    sourceTitle: payload.source.title,
-    sourceMeta: payload.source.meta,
-    aspectRatio: payload.source.aspectRatio,
-    durationLabel: payload.source.durationLabel,
-    platform: target.account.platform,
-    platformAccountName: target.account.accountName,
-    title: target.title || null,
-    caption: target.caption || null,
-    hashtags: target.hashtags,
-    status: payload.status,
-    progress: payload.status === "PUBLISHING" ? 18 : null,
-    scheduledAt,
-    publishedAt: null,
-    platformPostUrl: null,
-    errorMessage: null,
-    createdAt: now.toISOString(),
-  }))
-}
-
 export default function PublishingPage() {
-  const [tasks, setTasks] = useState<PublishTask[]>(publishTasksSeed)
+  const queryClient = useQueryClient()
+  const { selectedWorkspaceId } = useWorkspace()
+  const workspaceId = selectedWorkspaceId ?? ""
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<PublishStatusFilter>("ALL")
   const [platformFilter, setPlatformFilter] =
@@ -80,16 +68,65 @@ export default function PublishingPage() {
   const [sortKey, setSortKey] = useState<PublishSortKey>("newest")
   const [viewMode, setViewMode] = useState<PublishViewMode>("list")
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(
-    publishTasksSeed[0]?.id ?? null
-  )
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState(
-    new Date("2026-06-13T00:00:00.000Z")
-  )
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(new Date())
   const [isPublishSheetOpen, setIsPublishSheetOpen] = useState(false)
   const [detailMode, setDetailMode] = useState<PublishTaskDetailMode>("view")
+  const trackedJobsRef = useRef<Map<string, { close: () => void }>>(new Map())
   const setSocialAccountsOpen = useSocialAccountsStore(
     (state) => state.setManagerOpen
+  )
+
+  const publishTasksQuery = usePublishTasks({
+    page: 1,
+    limit: 50,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  })
+  const mediaQuery = useMediaList(workspaceId, {
+    page: 1,
+    limit: 25,
+    status: "UPLOADED",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  })
+  const accountsQuery = usePlatformAccounts(workspaceId)
+  const createTask = useCreatePublishTask()
+  const updateTask = useUpdatePublishTask()
+  const publishNow = usePublishNowTask()
+  const scheduleTask = useSchedulePublishTask()
+  const cancelTask = useCancelPublishTask()
+  const isMutating =
+    createTask.isPending ||
+    updateTask.isPending ||
+    publishNow.isPending ||
+    scheduleTask.isPending ||
+    cancelTask.isPending
+
+  const tasks = useMemo(
+    () =>
+      (publishTasksQuery.data?.items ?? []).map((task) =>
+        mapPublishTaskResponse(task)
+      ),
+    [publishTasksQuery.data?.items]
+  )
+  const sourceOptions = useMemo(
+    () =>
+      (mediaQuery.data?.items ?? [])
+        .map(mapMediaToPublishSource)
+        .filter((source): source is NonNullable<typeof source> =>
+          Boolean(source)
+        ),
+    [mediaQuery.data?.items]
+  )
+  const accountOptions = useMemo(
+    () =>
+      (accountsQuery.data?.accounts ?? [])
+        .map(mapPlatformAccountToPublishOption)
+        .filter((account): account is NonNullable<typeof account> =>
+          Boolean(account)
+        ),
+    [accountsQuery.data?.accounts]
   )
 
   const visibleTasks = useMemo(
@@ -102,7 +139,6 @@ export default function PublishingPage() {
       }),
     [platformFilter, searchQuery, sortKey, statusFilter, tasks]
   )
-
   const pageCount = Math.max(
     1,
     Math.ceil(visibleTasks.length / PUBLISHING_PAGE_SIZE)
@@ -117,14 +153,101 @@ export default function PublishingPage() {
     [safeCurrentPage, visibleTasks]
   )
   const selectedTask =
-    paginatedTasks.find((task) => task.id === selectedTaskId) ??
-    paginatedTasks[0] ??
+    visibleTasks.find((task) => task.id === selectedTaskId) ??
+    visibleTasks[0] ??
     null
-
   const statusCounts = useMemo(() => getPublishStatusCounts(tasks), [tasks])
   const publishedThisWeek = useMemo(
     () => getPublishedThisWeekCount(tasks),
     [tasks]
+  )
+
+  useEffect(() => {
+    const stopTracking = (jobId: string) => {
+      trackedJobsRef.current.get(jobId)?.close()
+      trackedJobsRef.current.delete(jobId)
+    }
+    const invalidatePublishing = () => {
+      void queryClient.invalidateQueries({ queryKey: publishingQueryKeys.all })
+    }
+    const pollJob = (jobId: string) => {
+      let cancelled = false
+      let timeoutId: ReturnType<typeof setTimeout> | null = null
+      const poll = () => {
+        timeoutId = setTimeout(() => {
+          void jobService
+            .get(jobId)
+            .then(({ job }) => {
+              if (cancelled) return
+
+              if (isTerminalJob(job)) {
+                stopTracking(jobId)
+                invalidatePublishing()
+                return
+              }
+
+              poll()
+            })
+            .catch(() => {
+              if (!cancelled) {
+                stopTracking(jobId)
+              }
+            })
+        }, 2500)
+      }
+
+      poll()
+
+      return {
+        close: () => {
+          cancelled = true
+          if (timeoutId) clearTimeout(timeoutId)
+        },
+      }
+    }
+
+    tasks
+      .filter((task) => task.status === "PUBLISHING" && task.jobId)
+      .forEach((task) => {
+        const jobId = task.jobId!
+
+        if (trackedJobsRef.current.has(jobId)) {
+          return
+        }
+
+        let pollingStarted = false
+        const subscription = jobService.subscribeToJobEvents({
+          jobId,
+          onError: () => {
+            if (pollingStarted) return
+            pollingStarted = true
+            trackedJobsRef.current.set(jobId, pollJob(jobId))
+          },
+          onJob: (job) => {
+            if (isTerminalJob(job)) {
+              stopTracking(jobId)
+              invalidatePublishing()
+            }
+          },
+        })
+        trackedJobsRef.current.set(jobId, subscription)
+      })
+
+    return () => {
+      for (const task of tasks) {
+        if (task.jobId && task.status !== "PUBLISHING") {
+          stopTracking(task.jobId)
+        }
+      }
+    }
+  }, [queryClient, tasks])
+
+  useEffect(
+    () => () => {
+      trackedJobsRef.current.forEach((subscription) => subscription.close())
+      trackedJobsRef.current.clear()
+    },
+    []
   )
 
   const resetFilters = () => {
@@ -140,152 +263,126 @@ export default function PublishingPage() {
     setDetailMode("view")
   }
 
-  const updateTask = (taskId: string, nextTask: Partial<PublishTask>) => {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === taskId
-          ? {
-              ...task,
-              ...nextTask,
-            }
-          : task
-      )
-    )
-  }
-
-  const handleTaskAction = (task: PublishTask, action: PublishTaskAction) => {
-    if (action === "view-platform" && task.platformPostUrl) {
-      window.open(task.platformPostUrl, "_blank", "noopener,noreferrer")
-      toast.info("Opening platform post", {
-        description: task.title ?? task.sourceTitle,
-      })
-      return
-    }
-
-    if (action === "cancel") {
-      updateTask(task.id, {
-        status: "DRAFT",
-        scheduledAt: null,
-        progress: null,
-      })
-      setSelectedTaskId(task.id)
-      setDetailMode("view")
-      toast.success("Publish cancelled", {
-        description: `${task.sourceTitle} moved back to drafts.`,
-      })
-      return
-    }
-
-    if (action === "retry") {
-      updateTask(task.id, {
-        status: "PUBLISHING",
-        progress: 24,
-        errorMessage: null,
-        scheduledAt: new Date().toISOString(),
-      })
-      setSelectedTaskId(task.id)
-      setDetailMode("view")
-      toast.loading("Retrying publish", {
-        description: task.title ?? task.sourceTitle,
-      })
-      return
-    }
-
-    if (action === "publish-now") {
-      updateTask(task.id, {
-        status: "PUBLISHING",
-        progress: 18,
-        scheduledAt: new Date().toISOString(),
-      })
-      setSelectedTaskId(task.id)
-      setDetailMode("view")
-      toast.loading("Publishing started", {
-        description: task.title ?? task.sourceTitle,
-      })
-      return
-    }
-
-    if (action === "schedule") {
-      if (!task.scheduledAt) {
-        setSelectedTaskId(task.id)
-        setDetailMode("edit")
-        toast.error("Schedule missing", {
-          description: "Choose a publish date and time before scheduling.",
-        })
+  const handleTaskAction = async (
+    task: PublishTask,
+    action: PublishTaskAction
+  ) => {
+    try {
+      if (action === "view-platform" && task.platformPostUrl) {
+        window.open(task.platformPostUrl, "_blank", "noopener,noreferrer")
         return
       }
 
-      if (!isFutureScheduledTime(task.scheduledAt)) {
-        setSelectedTaskId(task.id)
-        setDetailMode("edit")
-        toast.error("Schedule is in the past", {
-          description: "Choose a future publish date and time.",
-        })
+      if (action === "cancel") {
+        await cancelTask.mutateAsync(task.id)
+        toast.success("Publish canceled", { description: task.sourceTitle })
         return
       }
 
-      updateTask(task.id, {
-        status: "SCHEDULED",
-        progress: null,
-      })
-      setSelectedTaskId(task.id)
-      setDetailMode("view")
-      toast.success("Publish scheduled", {
-        description: task.title ?? task.sourceTitle,
-      })
-      return
-    }
+      if (action === "retry" || action === "publish-now") {
+        await publishNow.mutateAsync(task.id)
+        toast.loading("Publishing started", { description: task.sourceTitle })
+        return
+      }
 
-    setSelectedTaskId(task.id)
-    setDetailMode(action === "edit" ? "edit" : "view")
+      if (action === "schedule") {
+        if (!task.scheduledAt || !isFutureScheduledTime(task.scheduledAt)) {
+          setSelectedTaskId(task.id)
+          setDetailMode("edit")
+          toast.error("Choose a future schedule before publishing.")
+          return
+        }
+
+        await scheduleTask.mutateAsync({
+          publishTaskId: task.id,
+          scheduledAt: task.scheduledAt,
+        })
+        toast.success("Publish scheduled", { description: task.sourceTitle })
+        return
+      }
+
+      setSelectedTaskId(task.id)
+      setDetailMode(action === "edit" ? "edit" : "view")
+    } catch (error) {
+      toast.error("Publishing action failed", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+      })
+    }
   }
 
-  const handleSaveTaskContent = (
+  const handleSaveTaskContent = async (
     task: PublishTask,
     update: PublishTaskContentUpdate
   ) => {
-    updateTask(task.id, update)
-    setSelectedTaskId(task.id)
-    setDetailMode("view")
-    toast.success("Publish copy updated", {
-      description: task.sourceTitle,
-    })
+    try {
+      await updateTask.mutateAsync({
+        publishTaskId: task.id,
+        input: update,
+      })
+      setDetailMode("view")
+      toast.success("Publish copy updated", { description: task.sourceTitle })
+    } catch (error) {
+      toast.error("Could not update publish copy", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+      })
+    }
   }
 
-  const handleCreateTask = (payload: NewPublishPayload) => {
-    const nextTasks = buildPublishTasks(payload)
-    const firstTask = nextTasks[0]
+  const handleCreateTask = async (payload: NewPublishPayload) => {
+    const scheduledAt =
+      payload.status === "SCHEDULED"
+        ? buildScheduledIso(payload.scheduledDate, payload.scheduledTime)
+        : null
 
-    if (!firstTask) {
-      return
-    }
+    try {
+      const createdTasks = []
 
-    setTasks((currentTasks) => [...nextTasks, ...currentTasks])
-    setSelectedTaskId(firstTask.id)
-    setDetailMode("view")
+      for (const target of payload.targets) {
+        const createResponse = await createTask.mutateAsync({
+          mediaId: payload.source.mediaId ?? undefined,
+          projectId: payload.source.projectId ?? undefined,
+          shortClipId: payload.source.shortClipId ?? undefined,
+          platform: target.account.platform,
+          platformAccountId: target.account.id,
+          title: target.title || undefined,
+          caption: target.caption || undefined,
+          hashtags: target.hashtags,
+        })
+        createdTasks.push(createResponse.publishTask)
 
-    if (payload.status !== "DRAFT") {
-      setSelectedCalendarDate(payload.scheduledDate ?? new Date())
-    }
+        if (payload.status === "PUBLISHING") {
+          await publishNow.mutateAsync(createResponse.publishTask.id)
+        }
 
-    if (payload.status === "DRAFT") {
-      toast.success("Draft saved", {
-        description: `${payload.source.title} for ${nextTasks.length} account${nextTasks.length > 1 ? "s" : ""}.`,
+        if (payload.status === "SCHEDULED" && scheduledAt) {
+          await scheduleTask.mutateAsync({
+            publishTaskId: createResponse.publishTask.id,
+            scheduledAt,
+          })
+        }
+      }
+
+      setSelectedTaskId(createdTasks[0]?.id ?? null)
+
+      if (payload.status === "DRAFT") {
+        toast.success("Draft saved", { description: payload.source.title })
+      } else if (payload.status === "SCHEDULED") {
+        toast.success("Publish scheduled", { description: payload.source.title })
+      } else {
+        toast.loading("Publishing started", { description: payload.source.title })
+      }
+    } catch (error) {
+      toast.error("Could not create publish task", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
       })
-      return
     }
-
-    if (payload.status === "SCHEDULED") {
-      toast.success("Publish scheduled", {
-        description: `${payload.source.title} for ${nextTasks.length} account${nextTasks.length > 1 ? "s" : ""}.`,
-      })
-      return
-    }
-
-    toast.loading("Publishing started", {
-      description: `${payload.source.title} for ${nextTasks.length} account${nextTasks.length > 1 ? "s" : ""}.`,
-    })
   }
+
+  const isLoading =
+    publishTasksQuery.isLoading || mediaQuery.isLoading || accountsQuery.isLoading
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 py-6 lg:gap-8">
@@ -306,9 +403,8 @@ export default function PublishingPage() {
                 Publishing
               </h1>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
-                Prepare drafts, schedule platform-ready clips, follow publishing
-                progress, and recover failed posts without turning the workspace
-                into an analytics dashboard.
+                Prepare drafts, schedule connected YouTube and Facebook Page
+                posts, follow publishing progress, and recover failed uploads.
               </p>
             </div>
           </div>
@@ -327,6 +423,7 @@ export default function PublishingPage() {
               type="button"
               size="lg"
               onClick={() => setIsPublishSheetOpen(true)}
+              disabled={accountOptions.length < 1 || sourceOptions.length < 1}
             >
               <Plus className="size-4" />
               New publish
@@ -368,7 +465,12 @@ export default function PublishingPage() {
         }}
       />
 
-      {viewMode === "calendar" ? (
+      {isLoading ? (
+        <div className="flex min-h-72 items-center justify-center rounded-xl border border-border/70 bg-card/95 text-sm text-muted-foreground">
+          <LoaderCircle className="mr-2 size-4 animate-spin" />
+          Loading publishing workspace...
+        </div>
+      ) : viewMode === "calendar" ? (
         <PublishCalendarView
           tasks={tasks}
           selectedDate={selectedCalendarDate}
@@ -398,13 +500,17 @@ export default function PublishingPage() {
               <PublishTaskDetail
                 task={selectedTask}
                 mode={detailMode}
-                onTaskAction={handleTaskAction}
+                onTaskAction={(task, action) => {
+                  void handleTaskAction(task, action)
+                }}
                 onEditRequest={(task) => {
                   setSelectedTaskId(task.id)
                   setDetailMode("edit")
                 }}
                 onCancelEdit={() => setDetailMode("view")}
-                onSaveContent={handleSaveTaskContent}
+                onSaveContent={(task, update) => {
+                  void handleSaveTaskContent(task, update)
+                }}
                 onInvalidSchedule={() => {
                   toast.error("Schedule is in the past", {
                     description: "Choose a future publish date and time.",
@@ -418,8 +524,13 @@ export default function PublishingPage() {
 
       <PublishFormSheet
         open={isPublishSheetOpen}
+        accountOptions={accountOptions}
+        sourceOptions={sourceOptions}
+        isSubmitting={isMutating}
         onOpenChange={setIsPublishSheetOpen}
-        onCreate={handleCreateTask}
+        onCreate={(payload) => {
+          void handleCreateTask(payload)
+        }}
       />
     </div>
   )

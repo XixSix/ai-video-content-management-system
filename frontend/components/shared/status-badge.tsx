@@ -11,6 +11,7 @@ type StatusValue =
   | "SCHEDULED"
   | "PUBLISHING"
   | "PUBLISHED"
+  | "CANCELED"
   | "DELETED"
 
 const statusConfig: Record<
@@ -59,6 +60,10 @@ const statusConfig: Record<
   PUBLISHED: {
     label: "Published",
     variant: "success",
+  },
+  CANCELED: {
+    label: "Canceled",
+    variant: "neutral",
   },
   DELETED: {
     label: "Deleted",

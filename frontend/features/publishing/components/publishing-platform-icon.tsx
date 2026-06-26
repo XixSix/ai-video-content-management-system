@@ -4,9 +4,7 @@ import type { PublishPlatform } from "../publishing.types"
 
 const socialPlatformMap: Record<PublishPlatform, SocialPlatform> = {
   YOUTUBE: "youtube",
-  TIKTOK: "tiktok",
   FACEBOOK: "facebook",
-  INSTAGRAM: "instagram",
 }
 
 type PublishingPlatformIconProps = {

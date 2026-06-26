@@ -67,7 +67,11 @@ function PublishTaskCard({
           <div className="absolute inset-0 flex flex-col justify-between p-3">
             <div className="flex items-start justify-between gap-3">
               <Badge variant="neutral">
-                {task.sourceType === "SHORT_CLIP" ? "SHORT CLIP" : "MEDIA"}
+                {task.sourceType === "SHORT_CLIP"
+                  ? "SHORT CLIP"
+                  : task.sourceType === "PROJECT"
+                    ? "PROJECT"
+                    : "MEDIA"}
               </Badge>
             </div>
 

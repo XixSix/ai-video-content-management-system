@@ -4,8 +4,9 @@ export type PublishTaskStatus =
   | "PUBLISHING"
   | "PUBLISHED"
   | "FAILED"
+  | "CANCELED"
 
-export type PublishPlatform = "YOUTUBE" | "TIKTOK" | "FACEBOOK" | "INSTAGRAM"
+export type PublishPlatform = "YOUTUBE" | "FACEBOOK"
 
 export type PublishViewMode = "list" | "calendar"
 
@@ -15,11 +16,12 @@ export type PublishPlatformFilter = "ALL" | PublishPlatform
 
 export type PublishSortKey = "newest" | "scheduledSoon" | "recentlyPublished"
 
-export type PublishSourceType = "MEDIA" | "SHORT_CLIP"
+export type PublishSourceType = "MEDIA" | "PROJECT" | "SHORT_CLIP"
 
 export type PublishTask = {
   id: string
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
   sourceType: PublishSourceType
   thumbnailUrl: string | null
@@ -28,6 +30,7 @@ export type PublishTask = {
   aspectRatio: "16:9" | "9:16" | "1:1"
   durationLabel: string
   platform: PublishPlatform
+  jobId: string | null
   platformAccountName: string
   title: string | null
   caption: string | null
@@ -45,6 +48,7 @@ export type PublishSourceOption = {
   id: string
   sourceType: PublishSourceType
   mediaId: string | null
+  projectId: string | null
   shortClipId: string | null
   title: string
   meta: string
@@ -57,6 +61,7 @@ export type PublishAccountOption = {
   id: string
   platform: PublishPlatform
   accountName: string
+  avatarUrl?: string | null
 }
 
 export type PublishStatusCount = {

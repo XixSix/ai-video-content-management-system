@@ -11,7 +11,13 @@ from app.schemas.jobs.publish_message import (
     PublishJobMessage,
     PublishJobResultMessage,
 )
-from app.services.mock_publish_provider import mock_publish_provider
+from app.services.publish_provider import (
+    PublishProviderInput,
+    RetryablePublishProviderError,
+    TerminalPublishProviderError,
+    ensure_fresh_youtube_account,
+    get_publish_provider,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -78,17 +84,31 @@ def process_publish_job(message: PublishJobMessage) -> dict[str, Any]:
             return _skipped_result(message, JobStatus.FAILED)
 
         _guard_publish_task(message, task)
-        _guard_platform_account(session, message, task)
+        account = _guard_platform_account(session, message, task)
 
-        if not publish_repository.target_exists_for_publish_task(
+        if task.platform_post_id and task.platform_post_url:
+            output = {
+                "publishTaskId": str(message.publish_task_id),
+                "platform": message.platform,
+                "platformPostId": task.platform_post_id,
+                "platformPostUrl": task.platform_post_url,
+                "idempotentSkip": True,
+            }
+            jobs_repository.mark_job_completed(session, job_id, output=output)
+            return _result_message(message, status=JobStatus.COMPLETED, skipped=True)
+
+        source = publish_repository.find_publish_source(
             session,
             task,
             export_asset_id=str(message.export_asset_id)
             if message.export_asset_id
             else None,
-        ):
+        )
+
+        if source is None:
             raise TerminalPublishJobError("Publish target was not found")
 
+        account = ensure_fresh_youtube_account(session, account)
         publish_repository.mark_publish_task_publishing(
             session,
             str(message.publish_task_id),
@@ -102,10 +122,15 @@ def process_publish_job(message: PublishJobMessage) -> dict[str, Any]:
             current_step="Publishing to platform",
         )
 
-    result = mock_publish_provider.publish(
-        platform=message.platform,
-        publish_task_id=message.publish_task_id,
-    )
+    try:
+        result = get_publish_provider(message.platform).publish(
+            PublishProviderInput(task=task, account=account, source=source)
+        )
+    except RetryablePublishProviderError as error:
+        raise error
+    except TerminalPublishProviderError as error:
+        raise TerminalPublishJobError(str(error)) from error
+
     output = {
         "publishTaskId": str(message.publish_task_id),
         "platform": message.platform,
@@ -253,7 +278,7 @@ def _guard_platform_account(
     session: Any,
     message: PublishJobMessage,
     task: publish_repository.PublishTaskRow,
-) -> None:
+) -> publish_repository.PlatformAccountRow:
     account = publish_repository.find_platform_account(
         session,
         str(message.platform_account_id),
@@ -264,6 +289,8 @@ def _guard_platform_account(
 
     if account.platform != task.platform or account.status != "CONNECTED":
         raise TerminalPublishJobError("Platform account cannot publish this task")
+
+    return account
 
 
 def _publish_task_id_from_job(job: ProcessingJobRow | None) -> str | None:

@@ -104,6 +104,26 @@ class _StorageSettings:
     )
 
 
+class _PlatformPublishSettings:
+    platform_token_encryption_key: str = Field(alias="PLATFORM_TOKEN_ENCRYPTION_KEY")
+    youtube_client_id: str = Field(alias="YOUTUBE_CLIENT_ID")
+    youtube_client_secret: str = Field(alias="YOUTUBE_CLIENT_SECRET")
+    youtube_default_privacy_status: str = Field(
+        default="unlisted",
+        alias="YOUTUBE_DEFAULT_PRIVACY_STATUS",
+    )
+    platform_token_refresh_window_seconds: PositiveInt = Field(
+        default=300,
+        alias="PLATFORM_TOKEN_REFRESH_WINDOW_SECONDS",
+    )
+    facebook_app_id: str = Field(alias="FACEBOOK_APP_ID")
+    facebook_app_secret: str = Field(alias="FACEBOOK_APP_SECRET")
+    facebook_graph_api_version: str = Field(
+        default="v25.0",
+        alias="FACEBOOK_GRAPH_API_VERSION",
+    )
+
+
 class _RendererSettings:
     renderer_dir: Path = Field(
         default=WORKER_DIR.parent / "renderer",
@@ -172,6 +192,7 @@ class Settings(
     _FfmpegSettings,
     _AiServiceGrpcSettings,
     _LoggingSettings,
+    _PlatformPublishSettings,
     _RendererSettings,
     _StorageSettings,
     BaseSettings,

@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarClock, CheckCircle2, FilePenLine, Radio } from "lucide-react"
+import { AlertCircle, CalendarClock, CheckCircle2, CircleSlash2, FilePenLine, Radio } from "lucide-react"
 
 import type { PublishStatusCount } from "../publishing.types"
 
@@ -12,6 +12,7 @@ const iconMap = {
   SCHEDULED: CalendarClock,
   PUBLISHING: Radio,
   FAILED: AlertCircle,
+  CANCELED: CircleSlash2,
   PUBLISHED: CheckCircle2,
 } as const
 

@@ -7,7 +7,6 @@ import type {
   ProcessingJob,
   Prisma,
   PublishStatus,
-  PublishTask,
   ShortClip
 } from '../../infrastructure/db/generated/prisma/client'
 import type { PublishTaskSortField, SortOrder } from './publish-tasks.types'
@@ -31,6 +30,26 @@ const publishProjectArgs = {
 
 export type PublishProjectRecord = Prisma.ProjectGetPayload<typeof publishProjectArgs>
 
+const publishTaskArgs = {
+  include: {
+    media: true,
+    project: {
+      include: {
+        sourceMedia: true,
+        thumbnailMedia: true
+      }
+    },
+    shortClip: {
+      include: {
+        media: true
+      }
+    },
+    platformAccount: true
+  }
+} satisfies Prisma.PublishTaskDefaultArgs
+
+export type PublishTaskRecord = Prisma.PublishTaskGetPayload<typeof publishTaskArgs>
+
 const buildPublishTaskWhere = (filters: ListPublishTasksFilters): Prisma.PublishTaskWhereInput => ({
   userId: filters.userId,
   ...(filters.platform ? { platform: filters.platform } : {}),
@@ -41,8 +60,8 @@ const buildPublishTaskWhere = (filters: ListPublishTasksFilters): Prisma.Publish
   ...(filters.platformAccountId ? { platformAccountId: filters.platformAccountId } : {})
 })
 
-export const createPublishTask = async (data: Prisma.PublishTaskUncheckedCreateInput): Promise<PublishTask> =>
-  prisma.publishTask.create({ data })
+export const createPublishTask = async (data: Prisma.PublishTaskUncheckedCreateInput): Promise<PublishTaskRecord> =>
+  prisma.publishTask.create({ data, ...publishTaskArgs })
 
 export const findPublishTasksByUserId = async (
   filters: ListPublishTasksFilters,
@@ -50,12 +69,13 @@ export const findPublishTasksByUserId = async (
   take: number,
   sortBy: PublishTaskSortField,
   sortOrder: SortOrder
-): Promise<[PublishTask[], number]> => {
+): Promise<[PublishTaskRecord[], number]> => {
   const where = buildPublishTaskWhere(filters)
 
   return Promise.all([
     prisma.publishTask.findMany({
       where,
+      ...publishTaskArgs,
       skip,
       take,
       orderBy: [{ [sortBy]: sortOrder }, { createdAt: 'desc' }]
@@ -64,18 +84,20 @@ export const findPublishTasksByUserId = async (
   ])
 }
 
-export const findPublishTaskById = async (id: string): Promise<PublishTask | null> =>
+export const findPublishTaskById = async (id: string): Promise<PublishTaskRecord | null> =>
   prisma.publishTask.findUnique({
-    where: { id }
+    where: { id },
+    ...publishTaskArgs
   })
 
 export const updatePublishTask = async (
   id: string,
   data: Prisma.PublishTaskUncheckedUpdateInput
-): Promise<PublishTask> =>
+): Promise<PublishTaskRecord> =>
   prisma.publishTask.update({
     where: { id },
-    data
+    data,
+    ...publishTaskArgs
   })
 
 export const createProcessingJob = async (data: Prisma.ProcessingJobUncheckedCreateInput): Promise<ProcessingJob> =>

@@ -1,7 +1,6 @@
 "use client"
 
-import type { ChangeEvent } from "react"
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 import {
   CalendarClock,
   AudioLines,
@@ -10,7 +9,6 @@ import {
   Hash,
   Library,
   Send,
-  UploadCloud,
   X,
 } from "lucide-react"
 
@@ -31,13 +29,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import {
-  publishAccountOptions,
-  publishPlatformLabels,
-  publishSourceOptions,
-} from "../publishing.data"
+import { publishPlatformLabels } from "../publishing.data"
 import type {
   NewPublishPayload,
+  PublishAccountOption,
   PublishPlatform,
   PublishPlatformContent,
   PublishSourceOption,
@@ -50,6 +45,10 @@ import { PublishingPlatformIcon } from "./publishing-platform-icon"
 
 type PublishFormSheetProps = {
   open: boolean
+  accountOptions: PublishAccountOption[]
+  sourceOptions: PublishSourceOption[]
+  isSubmitting?: boolean
+  lockedSource?: PublishSourceOption | null
   onOpenChange: (open: boolean) => void
   onCreate: (payload: NewPublishPayload) => void
 }
@@ -60,22 +59,6 @@ function parseHashtags(value: string) {
     .map((item) => item.trim())
     .filter(Boolean)
     .map((item) => (item.startsWith("#") ? item : `#${item}`))
-}
-
-function buildUploadedPublishSource(file: File): PublishSourceOption {
-  const isVertical = file.name.toLowerCase().includes("short")
-
-  return {
-    id: `uploaded-source-${Date.now()}`,
-    sourceType: "MEDIA",
-    mediaId: `uploaded-media-${Date.now()}`,
-    shortClipId: null,
-    title: file.name.replace(/\.[^/.]+$/, ""),
-    meta: "Uploaded from New publish",
-    thumbnailUrl: null,
-    aspectRatio: isVertical ? "9:16" : "16:9",
-    durationLabel: isVertical ? "0:30" : "Pending",
-  }
 }
 
 function getSourceMeta(source: PublishSourceOption) {
@@ -105,9 +88,7 @@ function buildDefaultPlatformContent(): PublishPlatformContent {
 function buildDefaultPlatformContentMap(): Record<PublishPlatform, PublishPlatformContent> {
   return {
     YOUTUBE: buildDefaultPlatformContent(),
-    TIKTOK: buildDefaultPlatformContent(),
     FACEBOOK: buildDefaultPlatformContent(),
-    INSTAGRAM: buildDefaultPlatformContent(),
   }
 }
 
@@ -147,20 +128,20 @@ function SourceOptionRow({
 }
 
 export function PublishFormSheet({
+  accountOptions,
+  isSubmitting = false,
+  lockedSource = null,
   open,
   onOpenChange,
   onCreate,
+  sourceOptions,
 }: PublishFormSheetProps) {
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [selectedSourceId, setSelectedSourceId] = useState(
-    publishSourceOptions[0]?.id ?? ""
-  )
-  const [uploadedSource, setUploadedSource] = useState<PublishSourceOption | null>(
-    null
-  )
+  const initialSourceId = lockedSource?.id ?? sourceOptions[0]?.id ?? ""
+  const initialAccountId = accountOptions[0]?.id ?? ""
+  const [selectedSourceId, setSelectedSourceId] = useState(initialSourceId)
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false)
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(
-    publishAccountOptions[0] ? [publishAccountOptions[0].id] : []
+    initialAccountId ? [initialAccountId] : []
   )
   const [platformContent, setPlatformContent] = useState<
     Record<PublishPlatform, PublishPlatformContent>
@@ -170,30 +151,39 @@ export function PublishFormSheet({
   )
   const [scheduledTime, setScheduledTime] = useState("09:00")
   const [formError, setFormError] = useState<string | null>(null)
-  const sourceOptions = useMemo(
-    () => (uploadedSource ? [uploadedSource, ...publishSourceOptions] : publishSourceOptions),
-    [uploadedSource]
+  const availableSourceOptions = useMemo(
+    () => (lockedSource ? [lockedSource] : sourceOptions),
+    [lockedSource, sourceOptions]
   )
 
   const selectedSource = useMemo(
     () =>
-      sourceOptions.find((source) => source.id === selectedSourceId) ??
-      sourceOptions[0],
-    [selectedSourceId, sourceOptions]
+      availableSourceOptions.find((source) => source.id === selectedSourceId) ??
+      availableSourceOptions[0],
+    [availableSourceOptions, selectedSourceId]
+  )
+  const effectiveSelectedAccountIds = useMemo(
+    () =>
+      selectedAccountIds.length > 0
+        ? selectedAccountIds
+        : initialAccountId
+          ? [initialAccountId]
+          : [],
+    [initialAccountId, selectedAccountIds]
   )
   const selectedAccounts = useMemo(
     () =>
-      publishAccountOptions.filter((account) =>
-        selectedAccountIds.includes(account.id)
+      accountOptions.filter((account) =>
+        effectiveSelectedAccountIds.includes(account.id)
       ),
-    [selectedAccountIds]
+    [accountOptions, effectiveSelectedAccountIds]
   )
   const platformOptions = useMemo(
     () =>
       Array.from(
-        new Set(publishAccountOptions.map((account) => account.platform))
+        new Set(accountOptions.map((account) => account.platform))
       ) as PublishPlatform[],
-    []
+    [accountOptions]
   )
   const selectedPlatforms = useMemo(
     () => new Set(selectedAccounts.map((account) => account.platform)),
@@ -205,24 +195,23 @@ export function PublishFormSheet({
   )
 
   const resetForm = () => {
-    setSelectedSourceId(publishSourceOptions[0]?.id ?? "")
-    setUploadedSource(null)
+    setSelectedSourceId(lockedSource?.id ?? sourceOptions[0]?.id ?? "")
     setIsLibraryPickerOpen(false)
-    setSelectedAccountIds(publishAccountOptions[0] ? [publishAccountOptions[0].id] : [])
+    setSelectedAccountIds(accountOptions[0] ? [accountOptions[0].id] : [])
     setPlatformContent(buildDefaultPlatformContentMap())
-    setScheduledDate(new Date("2026-06-14T09:00:00.000Z"))
+    setScheduledDate(new Date(Date.now() + 24 * 60 * 60 * 1000))
     setScheduledTime("09:00")
     setFormError(null)
   }
 
   const togglePlatform = (platform: PublishPlatform) => {
-    const platformAccountIds = publishAccountOptions
+    const platformAccountIds = accountOptions
       .filter((account) => account.platform === platform)
       .map((account) => account.id)
 
     setSelectedAccountIds((currentIds) => {
       const hasPlatformSelected = platformAccountIds.some((id) =>
-        currentIds.includes(id)
+        effectiveSelectedAccountIds.includes(id)
       )
 
       if (hasPlatformSelected) {
@@ -256,35 +245,20 @@ export function PublishFormSheet({
     }))
   }
 
-  const handleUploadSelection = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-
-    if (!file) {
-      return
-    }
-
-    const nextSource = buildUploadedPublishSource(file)
-    setUploadedSource(nextSource)
-    setSelectedSourceId(nextSource.id)
-    setIsLibraryPickerOpen(false)
-    setFormError(null)
-    event.target.value = ""
-  }
-
   const submit = (status: NewPublishPayload["status"]) => {
     if (!selectedSource || selectedAccounts.length < 1) {
       setFormError("Choose a source and at least one platform account.")
       return
     }
 
-    if (status !== "DRAFT" && (!scheduledDate || !scheduledTime)) {
-      setFormError("Choose a date and time before scheduling or publishing.")
+    if (status === "SCHEDULED" && (!scheduledDate || !scheduledTime)) {
+      setFormError("Choose a date and time before scheduling.")
       return
     }
 
     const scheduledAt = buildScheduledIso(scheduledDate, scheduledTime)
 
-    if (status !== "DRAFT" && !isFutureScheduledTime(scheduledAt)) {
+    if (status === "SCHEDULED" && !isFutureScheduledTime(scheduledAt)) {
       setFormError("Choose a future date and time before scheduling.")
       return
     }
@@ -344,39 +318,30 @@ export function PublishFormSheet({
             </div>
 
             <input
-              ref={fileInputRef}
               type="file"
               accept="video/*,audio/*"
               className="sr-only"
-              onChange={handleUploadSelection}
+              disabled
             />
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Button
-                type="button"
-                size="lg"
-                className="h-12 justify-center"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <UploadCloud className="size-4" />
-                Upload
-              </Button>
+            <div className="grid gap-3 sm:grid-cols-1">
               <Button
                 type="button"
                 size="lg"
                 variant="outline"
                 className="h-12 justify-center"
                 onClick={() => setIsLibraryPickerOpen((currentValue) => !currentValue)}
+                disabled={Boolean(lockedSource)}
               >
                 <Library className="size-4" />
-                Import from Media Library
+                {lockedSource ? "Studio project selected" : "Import from Media Library"}
               </Button>
             </div>
 
             {selectedSource ? (
               <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-background px-4 py-3">
                 <div className="flex min-w-0 items-center gap-2">
-                  <UploadCloud className="size-4 shrink-0 text-muted-foreground" />
+                  <Library className="size-4 shrink-0 text-muted-foreground" />
                   <span className="truncate text-sm text-foreground-subtle">
                     {selectedSource.title}
                   </span>
@@ -387,12 +352,9 @@ export function PublishFormSheet({
                   size="sm"
                   className="h-auto px-0 text-xs"
                   onClick={() => {
-                    if (selectedSource.id === uploadedSource?.id) {
-                      setUploadedSource(null)
-                    }
-
-                    setSelectedSourceId(publishSourceOptions[0]?.id ?? "")
+                    setSelectedSourceId(availableSourceOptions[0]?.id ?? "")
                   }}
+                  disabled={Boolean(lockedSource)}
                 >
                   Remove
                 </Button>
@@ -423,7 +385,7 @@ export function PublishFormSheet({
                 </div>
 
                 <div className="grid max-h-72 gap-2 overflow-y-auto pr-1">
-                  {sourceOptions.map((source) => {
+                  {availableSourceOptions.map((source) => {
                     const isSelected = source.id === selectedSourceId
 
                     return (
@@ -455,7 +417,7 @@ export function PublishFormSheet({
             <div className="space-y-2">
               {platformOptions.map((platform) => {
                 const isSelected = selectedPlatforms.has(platform)
-                const platformAccounts = publishAccountOptions.filter(
+                const platformAccounts = accountOptions.filter(
                   (account) => account.platform === platform
                 )
 
@@ -678,6 +640,7 @@ export function PublishFormSheet({
               type="button"
               variant="outline"
               onClick={() => submit("DRAFT")}
+              disabled={isSubmitting}
             >
               Save draft
             </Button>
@@ -685,11 +648,16 @@ export function PublishFormSheet({
               type="button"
               variant="secondary"
               onClick={() => submit("SCHEDULED")}
+              disabled={isSubmitting}
             >
               <CalendarClock className="size-4" />
               Schedule
             </Button>
-            <Button type="button" onClick={() => submit("PUBLISHING")}>
+            <Button
+              type="button"
+              onClick={() => submit("PUBLISHING")}
+              disabled={isSubmitting}
+            >
               <Send className="size-4" />
               Publish now
             </Button>

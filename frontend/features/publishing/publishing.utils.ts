@@ -56,9 +56,7 @@ export function formatDateOnly(value: Date) {
 export function formatPlatform(platform: PublishPlatform) {
   const labels: Record<PublishPlatform, string> = {
     YOUTUBE: "YouTube",
-    TIKTOK: "TikTok",
     FACEBOOK: "Facebook",
-    INSTAGRAM: "Instagram",
   }
 
   return labels[platform]
@@ -87,6 +85,7 @@ export function formatStatus(status: PublishTaskStatus) {
     PUBLISHING: "Publishing",
     PUBLISHED: "Published",
     FAILED: "Failed",
+    CANCELED: "Canceled",
   }
 
   return labels[status]
@@ -155,6 +154,7 @@ export function getPublishStatusCounts(tasks: PublishTask[]): PublishStatusCount
     "SCHEDULED",
     "PUBLISHING",
     "FAILED",
+    "CANCELED",
     "PUBLISHED",
   ]
 
@@ -166,9 +166,11 @@ export function getPublishStatusCounts(tasks: PublishTask[]): PublishStatusCount
 }
 
 export function getPublishedThisWeekCount(tasks: PublishTask[]) {
-  const now = new Date("2026-06-13T00:00:00.000Z")
+  const now = new Date()
   const weekStart = new Date(now)
   weekStart.setDate(now.getDate() - 6)
+  const weekEnd = new Date(now)
+  weekEnd.setHours(23, 59, 59, 999)
 
   return tasks.filter((task) => {
     if (!task.publishedAt) {
@@ -176,7 +178,7 @@ export function getPublishedThisWeekCount(tasks: PublishTask[]) {
     }
 
     const publishedAt = new Date(task.publishedAt)
-    return publishedAt >= weekStart && publishedAt <= new Date("2026-06-13T23:59:59.999Z")
+    return publishedAt >= weekStart && publishedAt <= weekEnd
   }).length
 }
 

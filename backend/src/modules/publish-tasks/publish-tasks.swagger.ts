@@ -74,6 +74,49 @@
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *         source:
+ *           type: object
+ *           nullable: true
+ *           properties:
+ *             type:
+ *               type: string
+ *               enum: [MEDIA, PROJECT, SHORT_CLIP]
+ *             id:
+ *               type: string
+ *               format: uuid
+ *             title:
+ *               type: string
+ *             thumbnailUrl:
+ *               type: string
+ *               nullable: true
+ *             duration:
+ *               type: number
+ *               nullable: true
+ *             aspectRatio:
+ *               type: string
+ *               nullable: true
+ *             mediaType:
+ *               type: string
+ *               nullable: true
+ *         platformAccount:
+ *           type: object
+ *           nullable: true
+ *           properties:
+ *             id:
+ *               type: string
+ *               format: uuid
+ *             platform:
+ *               type: string
+ *               enum: [YOUTUBE, FACEBOOK, TIKTOK]
+ *             accountName:
+ *               type: string
+ *               nullable: true
+ *             avatarUrl:
+ *               type: string
+ *               nullable: true
+ *             status:
+ *               type: string
+ *               enum: [CONNECTED, EXPIRED, REVOKED]
  *     CreatePublishTaskRequest:
  *       type: object
  *       required: [platform, platformAccountId]

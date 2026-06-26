@@ -1,4 +1,10 @@
-import type { Platform, Prisma, PublishStatus, PublishTask } from '../../infrastructure/db/generated/prisma/client'
+import type {
+  MediaType,
+  Platform,
+  PlatformAccountStatus,
+  Prisma,
+  PublishStatus
+} from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
 
 export const PUBLISH_QUEUE_NAME = 'publish_queue'
@@ -26,6 +32,28 @@ export interface PublishTaskData {
   errorMessage: string | null
   createdAt: Date
   updatedAt: Date
+  source: PublishTaskSourceData | null
+  platformAccount: PublishTaskPlatformAccountData | null
+}
+
+export type PublishTaskSourceType = 'MEDIA' | 'PROJECT' | 'SHORT_CLIP'
+
+export interface PublishTaskSourceData {
+  type: PublishTaskSourceType
+  id: string
+  title: string
+  thumbnailUrl: string | null
+  duration: number | null
+  aspectRatio: string | null
+  mediaType: MediaType | null
+}
+
+export interface PublishTaskPlatformAccountData {
+  id: string
+  platform: Platform
+  accountName: string | null
+  avatarUrl: string | null
+  status: PlatformAccountStatus
 }
 
 export interface PaginatedResult<TItem> {
@@ -41,6 +69,5 @@ export interface PublishTaskJobResult {
   job: JobResponseData
 }
 
-export type PublishTaskRecord = PublishTask
 export type PublishTaskSortField = 'createdAt' | 'scheduledAt' | 'publishedAt'
 export type SortOrder = 'asc' | 'desc'

@@ -4,11 +4,15 @@ from uuid import UUID
 
 import pytest
 
-from app.db.publish_repository import PlatformAccountRow, PublishTaskRow
+from app.db.publish_repository import (
+    PlatformAccountRow,
+    PublishSourceRow,
+    PublishTaskRow,
+)
 from app.handlers import publish_handler
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.publish_message import PublishJobMessage
-from app.services.mock_publish_provider import MockPublishResult
+from app.services.publish_provider import PublishProviderResult
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 PUBLISH_TASK_ID = UUID("00000000-0000-4000-8000-000000000002")
@@ -82,6 +86,8 @@ def _task(status: str = "DRAFT") -> PublishTaskRow:
         caption="Caption",
         description=None,
         hashtags=["#video"],
+        platform_post_id=None,
+        platform_post_url=None,
     )
 
 
@@ -90,8 +96,32 @@ def _account() -> PlatformAccountRow:
         id=PLATFORM_ACCOUNT_ID,
         workspace_id=WORKSPACE_ID,
         platform="FACEBOOK",
+        platform_user_id="facebook-page-id",
         status="CONNECTED",
+        access_token_encrypted="encrypted-token",
+        refresh_token_encrypted=None,
+        expires_at=None,
     )
+
+
+def _source() -> PublishSourceRow:
+    return PublishSourceRow(
+        id=MEDIA_ID,
+        source_type="MEDIA",
+        s3_bucket="vidpilot-media",
+        s3_key="media/video.mp4",
+        mime_type="video/mp4",
+        file_size_bytes=1024,
+        filename="video.mp4",
+    )
+
+
+class _Provider:
+    def publish(self, payload: object) -> PublishProviderResult:
+        return PublishProviderResult(
+            platform_post_id="mock-facebook-post",
+            platform_post_url="https://mock.publish.local/facebook/post",
+        )
 
 
 def _patch_publish_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
@@ -142,8 +172,8 @@ def _patch_publish_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, objec
     )
     monkeypatch.setattr(
         publish_handler.publish_repository,
-        "target_exists_for_publish_task",
-        lambda session, task, *, export_asset_id: True,
+        "find_publish_source",
+        lambda session, task, *, export_asset_id: _source(),
     )
     monkeypatch.setattr(
         publish_handler.publish_repository,
@@ -160,12 +190,9 @@ def _patch_publish_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, objec
         ),
     )
     monkeypatch.setattr(
-        publish_handler.mock_publish_provider,
-        "publish",
-        lambda *, platform, publish_task_id: MockPublishResult(
-            platform_post_id="mock-facebook-post",
-            platform_post_url="https://mock.publish.local/facebook/post",
-        ),
+        publish_handler,
+        "get_publish_provider",
+        lambda platform: _Provider(),
     )
     return calls
 

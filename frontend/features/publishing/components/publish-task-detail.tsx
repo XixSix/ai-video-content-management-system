@@ -253,7 +253,10 @@ export function PublishTaskDetail({
   onSaveContent,
   onInvalidSchedule,
 }: PublishTaskDetailProps) {
-  const isEditable = task?.status === "DRAFT" || task?.status === "SCHEDULED"
+  const isEditable =
+    task?.status === "DRAFT" ||
+    task?.status === "SCHEDULED" ||
+    task?.status === "FAILED"
   const isEditing = mode === "edit" && isEditable
 
   if (!task) {
@@ -284,7 +287,13 @@ export function PublishTaskDetail({
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={task.status} />
-              <Badge variant="neutral">{task.sourceType === "SHORT_CLIP" ? "Short clip" : "Source media"}</Badge>
+              <Badge variant="neutral">
+                {task.sourceType === "SHORT_CLIP"
+                  ? "Short clip"
+                  : task.sourceType === "PROJECT"
+                    ? "Studio project"
+                    : "Source media"}
+              </Badge>
             </div>
             <CardTitle className="line-clamp-2 text-base">
               {task.title ?? task.sourceTitle}
@@ -407,9 +416,15 @@ export function PublishTaskDetail({
             </>
           ) : null}
           {task.status === "FAILED" ? (
-            <Button variant="secondary" onClick={() => onTaskAction(task, "retry")}>
-              Retry publish
-            </Button>
+            <>
+              <Button variant="outline" onClick={() => onEditRequest?.(task)}>
+                <Pencil className="size-4" />
+                Edit
+              </Button>
+              <Button variant="secondary" onClick={() => onTaskAction(task, "retry")}>
+                Retry publish
+              </Button>
+            </>
           ) : null}
           {task.status === "PUBLISHED" && task.platformPostUrl ? (
             <Button
