@@ -149,6 +149,9 @@ enum AssetType {
   EXPORT_VIDEO
   EXPORT_AUDIO
   WAVEFORM_PEAKS
+  SHORT_CLIP_VIDEO
+  SHORT_CLIP_THUMBNAIL
+  SHORT_CLIP_SUBTITLE
 }
 
 enum Platform {
@@ -194,6 +197,7 @@ model User {
   workspaceMemberships         WorkspaceMember[]
   projects                     Project[]
   processingJobs               ProcessingJob[]
+  clipCandidates               ClipCandidate[]
   shortClips                   ShortClip[]
   generatedAssets              GeneratedAsset[]
   connectedPlatformAccounts    PlatformAccount[]     @relation("PlatformAccountConnectedBy")
@@ -547,7 +551,6 @@ model Transcript {
   words           TranscriptWord[]
   videoChapters   VideoChapter[]
   clipCandidates  ClipCandidate[]
-  shortClips      ShortClip[]
   generatedAssets GeneratedAsset[]
   editDraft       TranscriptEditDraft?
 
@@ -683,7 +686,6 @@ model VideoChapter {
   project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   clipCandidates  ClipCandidate[]
-  shortClips      ShortClip[]
   generatedAssets GeneratedAsset[]
 
   @@unique([transcriptId, chapterIndex])
@@ -698,6 +700,7 @@ model VideoChapter {
 model ClipCandidate {
   id           String  @id @default(uuid()) @db.Uuid
   mediaId      String  @map("media_id") @db.Uuid
+  userId       String  @map("user_id") @db.Uuid
   transcriptId String  @map("transcript_id") @db.Uuid
   chapterId    String? @map("chapter_id") @db.Uuid
   jobId        String? @map("job_id") @db.Uuid
@@ -709,74 +712,44 @@ model ClipCandidate {
 
   transcriptVersion Int @map("transcript_version")
 
-  text      String? @db.Text
-  cleanText String? @map("clean_text") @db.Text
+  title  String? @db.VarChar(255)
+  reason String? @db.Text
+  score  Float?
 
-  hookScore          Float? @map("hook_score")
-  questionScore      Float? @map("question_score")
-  keywordScore       Float? @map("keyword_score")
-  durationScore      Float? @map("duration_score")
-  speechDensityScore Float? @map("speech_density_score")
-  saliencyScore      Float? @map("saliency_score")
-  completenessScore  Float? @map("completeness_score")
-  emotionScore       Float? @map("emotion_score")
-  finalScore         Float? @map("final_score")
-
-  llmScore  Float?  @map("llm_score")
-  llmReason String? @map("llm_reason") @db.Text
-
-  dedupGroupId String? @map("dedup_group_id") @db.VarChar(100)
-  metadata     Json?
+  text     String? @db.Text
+  metadata Json?
 
   status ClipCandidateStatus @default(CANDIDATE)
 
   createdAt DateTime @default(now()) @map("created_at")
 
   media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   transcript Transcript     @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
   chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
   job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
   project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
-  shortClips ShortClip[]
+  shortClip ShortClip?
 
+  @@index([userId])
   @@index([mediaId])
   @@index([transcriptId])
   @@index([chapterId])
   @@index([jobId])
   @@index([projectId])
   @@index([status])
-  @@index([finalScore])
+  @@index([score])
   @@index([startTime, endTime])
   @@map("clip_candidates")
 }
 
 model ShortClip {
-  id           String  @id @default(uuid()) @db.Uuid
-  mediaId      String  @map("media_id") @db.Uuid
-  userId       String  @map("user_id") @db.Uuid
-  transcriptId String? @map("transcript_id") @db.Uuid
-  chapterId    String? @map("chapter_id") @db.Uuid
-  candidateId  String? @map("candidate_id") @db.Uuid
-  projectId    String? @map("project_id") @db.Uuid
-
-  title       String? @db.VarChar(255)
-  caption     String? @db.Text
-  description String? @db.Text
-  hashtags    Json?
-
-  startTime Float @map("start_time")
-  endTime   Float @map("end_time")
-  duration  Float
-
-  transcriptVersion Int? @map("transcript_version")
-
-  score  Float?
-  reason String? @db.Text
-
-  videoPath     String? @map("video_path") @db.Text
-  thumbnailPath String? @map("thumbnail_path") @db.Text
-  subtitlePath  String? @map("subtitle_path") @db.Text
+  id          String  @id @default(uuid()) @db.Uuid
+  mediaId     String  @map("media_id") @db.Uuid
+  userId      String  @map("user_id") @db.Uuid
+  candidateId String  @map("candidate_id") @db.Uuid
+  projectId   String? @map("project_id") @db.Uuid
 
   aspectRatio String?         @map("aspect_ratio") @db.VarChar(20)
   status      ShortClipStatus @default(PENDING)
@@ -784,21 +757,17 @@ model ShortClip {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  media      Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transcript Transcript?    @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
-  chapter    VideoChapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
-  candidate  ClipCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
-  project    Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  media     Media         @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  candidate ClipCandidate @relation(fields: [candidateId], references: [id], onDelete: Restrict)
+  project   Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   publishTasks    PublishTask[]
   generatedAssets GeneratedAsset[]
 
   @@index([mediaId])
   @@index([userId])
-  @@index([transcriptId])
-  @@index([chapterId])
-  @@index([candidateId])
+  @@unique([candidateId])
   @@index([projectId])
   @@index([status])
   @@map("short_clips")
