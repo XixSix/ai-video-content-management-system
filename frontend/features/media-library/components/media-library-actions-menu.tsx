@@ -44,11 +44,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import type { MediaLibraryItem } from "../media-library.types"
+import type { MediaLibraryItem } from "../types/media-library.types"
 import {
   formatFileSize,
   formatFullDateTime,
-} from "../media-library.utils"
+} from "../utils/media-library.utils"
 
 type MediaLibraryActionsMenuProps = {
   item: MediaLibraryItem

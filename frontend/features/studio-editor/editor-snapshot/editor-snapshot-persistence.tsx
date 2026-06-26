@@ -162,8 +162,9 @@ export function EditorSnapshotPersistenceProvider({
 }) {
   const store = useStudioEditorStoreApi()
   const project = useStore(store, (state) => state.project)
+  const mutedTrackIds = useStore(store, (state) => state.mutedTrackIds)
   const normalizedInitialDocument = useMemo(
-    () => serializeEditorDocument(project),
+    () => serializeEditorDocument(project, { mutedTrackIds }),
     // The store is created from the initial project once per route key.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -302,7 +303,7 @@ export function EditorSnapshotPersistenceProvider({
   }, [saveLatest])
 
   useEffect(() => {
-    const document = serializeEditorDocument(project)
+    const document = serializeEditorDocument(project, { mutedTrackIds })
     const fingerprint = getEditorDocumentFingerprint(document)
 
     latestDocumentRef.current = document
@@ -331,7 +332,7 @@ export function EditorSnapshotPersistenceProvider({
       () => void saveLatestRef.current(),
       AUTOSAVE_DELAY_MS
     )
-  }, [canEdit, clearTimer, project, status, updateStatus])
+  }, [canEdit, clearTimer, mutedTrackIds, project, status, updateStatus])
 
   useEffect(() => {
     mountedRef.current = true
@@ -412,7 +413,10 @@ export function EditorSnapshotPersistenceProvider({
       const latest = await reloadLatest()
       const state = store.getState()
       const nextProject = hydrateEditorDocument(state.project, latest.document)
-      const normalizedDocument = serializeEditorDocument(nextProject)
+      const nextMutedTrackIds = latest.document.settings.mutedTrackIds
+      const normalizedDocument = serializeEditorDocument(nextProject, {
+        mutedTrackIds: nextMutedTrackIds,
+      })
       const fingerprint = getEditorDocumentFingerprint(normalizedDocument)
 
       store.setState({
@@ -420,6 +424,7 @@ export function EditorSnapshotPersistenceProvider({
         historyFuture: [],
         historyPast: [],
         isPlaying: false,
+        mutedTrackIds: nextMutedTrackIds,
         project: nextProject,
         selectedItemId: nextProject.sourceMedia.id,
       })

@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import type { MediaLibraryItem } from "../media-library.types"
+import type { MediaLibraryItem } from "../types/media-library.types"
 
 type MediaLibraryOutputChipsProps = {
   item: MediaLibraryItem

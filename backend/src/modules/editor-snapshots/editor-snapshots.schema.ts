@@ -35,9 +35,9 @@ const textLayerSchema = z.strictObject({
   content: z.string().max(10_000)
 })
 
-const imageLayerSchema = z.strictObject({
+const mediaOverlayLayerSchema = z.strictObject({
   ...layerBaseShape,
-  kind: z.literal('image'),
+  kind: z.literal('media_overlay'),
   mediaId: z.uuid()
 })
 
@@ -46,7 +46,11 @@ const captionsLayerSchema = z.strictObject({
   kind: z.literal('captions')
 })
 
-export const editorLayerSchema = z.discriminatedUnion('kind', [textLayerSchema, imageLayerSchema, captionsLayerSchema])
+export const editorLayerSchema = z.discriminatedUnion('kind', [
+  textLayerSchema,
+  mediaOverlayLayerSchema,
+  captionsLayerSchema
+])
 
 export const editorTimelineSegmentSchema = z
   .strictObject({
@@ -136,10 +140,10 @@ export const editorDocumentSchema = z
               message: 'Segment layerId must reference an existing layer',
               path: [...segmentPath, 'layerId']
             })
-          } else if (track.id === 'TEXT' && layerKind === 'image') {
+          } else if (track.id === 'TEXT' && layerKind === 'media_overlay') {
             context.addIssue({
               code: 'custom',
-              message: 'TEXT tracks cannot reference image layers',
+              message: 'TEXT tracks cannot reference media overlay layers',
               path: [...segmentPath, 'layerId']
             })
           }

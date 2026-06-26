@@ -29,7 +29,7 @@ export function TextInspector({
   const backgroundColor = layer.backgroundColor ?? "#101010"
   const backgroundEnabled = layer.backgroundEnabled === true
   const backgroundRadius = layer.backgroundRadius ?? 0
-  const boxWidth = layer.boxWidth ?? 46
+  const widthPercent = layer.widthPercent ?? layer.boxWidth ?? 46
   const textColor = layer.textColor ?? "#ffffff"
 
   const updateStyle = (style: TextLayerStyleUpdate) => {
@@ -205,11 +205,11 @@ export function TextInspector({
             label="Width"
             min={18}
             max={80}
-            value={boxWidth}
+            value={widthPercent}
             suffix="%"
             onChange={(value) =>
               updateStyle({
-                boxWidth: value,
+                widthPercent: value,
               })
             }
           />

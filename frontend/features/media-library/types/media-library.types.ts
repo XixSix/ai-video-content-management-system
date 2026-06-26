@@ -44,7 +44,6 @@ export type MediaLibraryItem = {
   uploadProgress?: number
   uploadError?: string
   uploadInterrupted?: boolean
-  isDemo?: boolean
 }
 
 export type FilterChipOption<TValue extends string> = {

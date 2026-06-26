@@ -116,19 +116,29 @@ describe("Studio editor permissions", () => {
       .toBe(true)
   })
 
-  it("mutes overlay media by default and toggles the track mute state", () => {
+  it("keeps overlay media audible by default and toggles the track mute state", () => {
     const store = createStudioEditorStore(
       cloneProject(studioEditorProject),
       true
     )
 
-    expect(store.getState().mutedTrackIds).toContain("OVERLAY_MEDIA")
-
-    store.getState().toggleTrackMute("OVERLAY_MEDIA")
     expect(store.getState().mutedTrackIds).not.toContain("OVERLAY_MEDIA")
 
     store.getState().toggleTrackMute("OVERLAY_MEDIA")
     expect(store.getState().mutedTrackIds).toContain("OVERLAY_MEDIA")
+
+    store.getState().toggleTrackMute("OVERLAY_MEDIA")
+    expect(store.getState().mutedTrackIds).not.toContain("OVERLAY_MEDIA")
+  })
+
+  it("restores muted tracks from the persisted editor snapshot", () => {
+    const store = createStudioEditorStore(
+      cloneProject(studioEditorProject),
+      true,
+      ["SOURCE", "AUDIO"]
+    )
+
+    expect(store.getState().mutedTrackIds).toEqual(["SOURCE", "AUDIO"])
   })
 
   it("keeps playback available while blocking composition edits in view-only mode", () => {
@@ -182,6 +192,58 @@ describe("Studio editor permissions", () => {
       heightPercent: 20,
     })
     expect(store.getState().historyPast).toHaveLength(1)
+  })
+
+  it("records timeline resize history once when requested", () => {
+    const store = createStudioEditorStore(
+      cloneProject(studioEditorProject),
+      true
+    )
+    const segment = store
+      .getState()
+      .project.timelineTracks.find((track) => track.id === "TEXT")!
+      .segments[0]
+
+    store.getState().updateTimelineSegmentTiming(
+      segment.id,
+      {
+        durationSeconds: 4,
+        startTime: 1,
+      },
+      {
+        recordHistory: true,
+      }
+    )
+    store.getState().updateTimelineSegmentTiming(
+      segment.id,
+      {
+        durationSeconds: 5,
+        startTime: 1,
+      },
+      {
+        recordHistory: false,
+      }
+    )
+
+    expect(store.getState().historyPast).toHaveLength(1)
+  })
+
+  it("adds repeated text layers after the occupied block at the playhead", () => {
+    const project = cloneProject(studioEditorProject)
+    project.timelineTracks = project.timelineTracks.map((track) =>
+      track.id === "TEXT" ? { ...track, segments: [] } : track
+    )
+    const store = createStudioEditorStore(project, true)
+
+    store.getState().addTextLayerFromPreset("hook-title")
+    store.getState().addTextLayerFromPreset("hook-title")
+    store.getState().addTextLayerFromPreset("hook-title")
+
+    const textSegments = store
+      .getState()
+      .project.timelineTracks.find((track) => track.id === "TEXT")!.segments
+
+    expect(textSegments.map((segment) => segment.startTime)).toEqual([0, 5, 10])
   })
 
   it("updates overlay media segment geometry independently from media selection", () => {

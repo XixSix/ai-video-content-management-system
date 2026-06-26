@@ -392,7 +392,7 @@ export function buildRenderDocumentFromStudioProject(
           mediaType: media.type,
           ...timing,
           fit: "contain" as const,
-          muted: true,
+          muted: mutedTrackIds.includes("OVERLAY_MEDIA"),
           ...geometry,
           style: {},
         },
@@ -438,6 +438,9 @@ export function buildRenderDocumentFromStudioProject(
           text: layer.content ?? layer.label,
           ...timing,
           ...geometry,
+          animationName: layer.animationName ?? "none",
+          animationBy: layer.animationBy ?? "text",
+          animationDuration: layer.animationDuration ?? 0.2,
           style: getTextLayerStyle(layer),
         }
       })

@@ -35,6 +35,9 @@ export function useSegmentResize({
     timing: {
       durationSeconds: number
       startTime: number
+    },
+    options?: {
+      recordHistory?: boolean
     }
   ) => void
 }) {
@@ -72,6 +75,7 @@ export function useSegmentResize({
       timelineDurationSeconds,
       trackId,
     })
+    let hasRecordedHistory = false
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
       const pointerTime = getTimelineTime(moveEvent.clientX)
@@ -89,10 +93,17 @@ export function useSegmentResize({
           Math.max(minStartTime, pointerTime)
         )
 
-        updateTimelineSegmentTiming(segment.id, {
-          durationSeconds: initialEndTime - nextStartTime,
-          startTime: nextStartTime,
-        })
+        updateTimelineSegmentTiming(
+          segment.id,
+          {
+            durationSeconds: initialEndTime - nextStartTime,
+            startTime: nextStartTime,
+          },
+          {
+            recordHistory: !hasRecordedHistory,
+          }
+        )
+        hasRecordedHistory = true
         return
       }
 
@@ -101,10 +112,17 @@ export function useSegmentResize({
         Math.min(maxEndTime, pointerTime)
       )
 
-      updateTimelineSegmentTiming(segment.id, {
-        durationSeconds: nextEndTime - initialStartTime,
-        startTime: initialStartTime,
-      })
+      updateTimelineSegmentTiming(
+        segment.id,
+        {
+          durationSeconds: nextEndTime - initialStartTime,
+          startTime: initialStartTime,
+        },
+        {
+          recordHistory: !hasRecordedHistory,
+        }
+      )
+      hasRecordedHistory = true
     }
 
     const handlePointerUp = () => {

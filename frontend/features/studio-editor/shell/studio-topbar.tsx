@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import {
-  Beaker,
   Check,
   CloudAlert,
   CloudUpload,
@@ -169,11 +168,6 @@ export function StudioTopbar({
         >
           <Redo2 />
         </Button>
-        <Separator orientation="vertical" className="hidden h-5 sm:block" />
-        <div className="hidden items-center text-sm text-muted-foreground sm:flex">
-          <Beaker className="mr-1 size-4 text-amber-500" />
-          <span>Demo editing canvas</span>
-        </div>
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 flex justify-center px-40">
@@ -204,9 +198,6 @@ export function StudioTopbar({
             className={status === "saving" ? "size-3 animate-spin" : "size-3"}
           />
           {saveIndicator.label}
-        </Badge>
-        <Badge variant="warning" className="hidden lg:inline-flex">
-          Demo
         </Badge>
         <Button variant="ghost" size="icon-sm" aria-label="Comments">
           <MessageSquareText />

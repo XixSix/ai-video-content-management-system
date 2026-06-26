@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import type { MediaLibraryViewMode } from "../media-library.types"
+import type { MediaLibraryViewMode } from "../types/media-library.types"
 
 type MediaLibraryLoadingProps = {
   viewMode: MediaLibraryViewMode

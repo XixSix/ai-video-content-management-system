@@ -52,7 +52,7 @@ import type {
   MediaDetailResponseData,
   MediaLibraryItem,
   MediaLibraryTab,
-} from "../media-library.types"
+} from "../types/media-library.types"
 
 type MediaLibraryPreviewDialogProps = {
   item: MediaLibraryItem | null

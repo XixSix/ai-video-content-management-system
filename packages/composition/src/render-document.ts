@@ -40,6 +40,26 @@ const captionPositionedLayerSchema = layerBaseSchema.extend({
   heightPercent: z.number().min(1).max(100).default(15),
 });
 
+const textAnimationNameSchema = z
+  .enum([
+    "none",
+    "fadeIn",
+    "blurIn",
+    "blurInUp",
+    "blurInDown",
+    "slideUp",
+    "slideDown",
+    "slideLeft",
+    "slideRight",
+    "scaleUp",
+    "scaleDown",
+  ])
+  .default("none");
+
+const textAnimationBySchema = z
+  .enum(["text", "word", "character", "line"])
+  .default("text");
+
 export const renderDocumentSchema = z.object({
   version: z.literal(1),
   width: z.number().int().positive(),
@@ -77,6 +97,9 @@ export const renderDocumentSchema = z.object({
   textLayers: z.array(
     textPositionedLayerSchema.extend({
       text: z.string(),
+      animationName: textAnimationNameSchema,
+      animationBy: textAnimationBySchema,
+      animationDuration: z.number().positive().default(0.2),
       style: styleSchema,
     }),
   ),

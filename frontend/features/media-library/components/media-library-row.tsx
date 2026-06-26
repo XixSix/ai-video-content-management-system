@@ -11,12 +11,12 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import type { MediaLibraryItem } from "../media-library.types"
+import type { MediaLibraryItem } from "../types/media-library.types"
 import {
   formatDuration,
   formatFileSize,
   formatShortDate,
-} from "../media-library.utils"
+} from "../utils/media-library.utils"
 import { MediaLibraryActionsMenu } from "./media-library-actions-menu"
 
 type MediaLibraryRowProps = {

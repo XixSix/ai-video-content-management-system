@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMediaList } from "@/features/media-library/hooks/use-media-list"
-import type { MediaLibraryItem } from "@/features/media-library/media-library.types"
+import type { MediaLibraryItem } from "@/features/media-library/types/media-library.types"
 import { cn } from "@/lib/utils"
 
 export type ProjectCreateMode = "blank" | "from-media"

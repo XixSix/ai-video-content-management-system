@@ -45,6 +45,9 @@ describe("buildRenderDocumentFromStudioProject", () => {
       yPercent: textLayer.yPercent,
       widthPercent: textLayer.widthPercent,
       heightPercent: textLayer.heightPercent,
+      animationName: textLayer.animationName,
+      animationBy: textLayer.animationBy,
+      animationDuration: textLayer.animationDuration,
     })
   })
 
@@ -184,6 +187,7 @@ describe("buildRenderDocumentFromStudioProject", () => {
         [overlayVideo.id]: "https://cdn.example.com/overlay-video.mp4",
         [overlayImage.id]: "https://cdn.example.com/overlay-image.png",
       },
+      mutedTrackIds: ["OVERLAY_MEDIA"],
     })
 
     expect(document.overlayMediaLayers).toHaveLength(2)

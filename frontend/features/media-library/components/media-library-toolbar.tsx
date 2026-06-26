@@ -21,7 +21,7 @@ import type {
   MediaLibrarySortKey,
   MediaLibraryViewMode,
   SortOption,
-} from "../media-library.types"
+} from "../types/media-library.types"
 
 type MediaLibraryToolbarProps = {
   searchQuery: string

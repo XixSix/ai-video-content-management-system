@@ -81,7 +81,7 @@ export function getLayerCanvasGeometry(
   const defaults = getDefaultCanvasGeometry(
     layer.kind === "captions"
       ? "captions"
-      : layer.kind === "image"
+      : layer.kind === "media_overlay"
         ? "overlay"
         : "text"
   )

@@ -16,7 +16,6 @@ import type { StudioCanvasLayer } from "@/features/studio-editor/studio.types"
 import { cn } from "@/lib/utils"
 
 import { EditorOverlayLayerList } from "./components/editor-overlay-layer-list"
-import { CanvasFallbackArtwork } from "./components/fallback-artwork"
 import { usePreviewSize } from "./hooks/use-preview-size"
 import type { ActiveCompositionSegment } from "./lib/composition"
 import { resolveCompositionFrame } from "./lib/composition"
@@ -93,8 +92,6 @@ export function StudioCanvas() {
               width: previewSize?.width ?? "100%",
             }}
           >
-            <CanvasFallbackArtwork />
-
             <StudioRemotionPlayerPreview
               currentTime={currentTime}
               isPlaying={isPlaying}
