@@ -94,6 +94,9 @@ class TranscriptionServicer(transcription_pb2_grpc.TranscriptionServiceServicer)
                 "local_path must point to a file",
             )
 
+        if media_path.stat().st_size <= 0:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "local_path is empty")
+
         if not filename:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, "filename is required")
 

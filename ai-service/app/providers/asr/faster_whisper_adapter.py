@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from collections.abc import Sequence
 from threading import Lock
 from typing import Any
+
+import numpy as np
 
 from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
 
@@ -47,11 +50,34 @@ class FasterWhisperAsr:
         local_path: Path,
         language: str | None,
     ) -> TranscriptResult:
+        return self._transcribe_input(
+            audio_input=str(local_path),
+            language=language,
+        )
+
+    def transcribe_audio(
+        self,
+        *,
+        samples: Sequence[float],
+        sample_rate: int,
+        language: str | None,
+    ) -> TranscriptResult:
+        if sample_rate != 16_000:
+            raise ValueError("faster-whisper audio samples must be 16000 Hz")
+
+        return self._transcribe_input(
+            audio_input=np.asarray(samples, dtype=np.float32),
+            language=language,
+        )
+
+    def _transcribe_input(
+        self, *, audio_input: Any, language: str | None
+    ) -> TranscriptResult:
         model = self._load_model()
         selected_language = _selected_language(language, self._default_language)
         requested_language = _language_for_faster_whisper(selected_language)
         segments, info = model.transcribe(
-            str(local_path),
+            audio_input,
             language=requested_language,
             vad_filter=False,
         )

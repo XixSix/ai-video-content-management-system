@@ -1,4 +1,5 @@
-from pathlib import Path
+from app.provider_contracts.audio_decoder import AudioWaveform
+from app.provider_contracts.diarization import OfflineDiarizationAnalysis
 
 
 class NoopDiarization:
@@ -6,5 +7,12 @@ class NoopDiarization:
     def model_name(self) -> str:
         return ""
 
-    def diarize(self, local_path: Path) -> Path:
-        return local_path
+    def warm_up(self) -> None:
+        return None
+
+    def analyze_offline_audio(
+        self,
+        audio: AudioWaveform,
+    ) -> OfflineDiarizationAnalysis:
+        _ = audio
+        return OfflineDiarizationAnalysis(speech_regions=[], turns=[])

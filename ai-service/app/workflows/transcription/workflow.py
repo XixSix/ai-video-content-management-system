@@ -1,5 +1,6 @@
 from app.provider_contracts.asr import AsrPort
-from app.provider_contracts.audio_normalizer import AudioNormalizerPort
+from app.provider_contracts.audio_decoder import AudioDecoderPort
+from app.provider_contracts.audio_preprocessing import AudioPreprocessorPort
 from app.provider_contracts.diarization import DiarizationPort
 from app.provider_contracts.source_separation import SourceSeparationPort
 from app.provider_contracts.vad import VadPort
@@ -13,34 +14,41 @@ from app.workflows.transcription.pipeline import (
     ASR_STRATEGY_VAD_CHUNKED,
     run_transcription_pipeline,
 )
+from app.workflows.transcription.config import TranscriptionPipelineConfig
 
 
 class TranscriptionWorkflow:
     def __init__(
         self,
         *,
-        normalizer: AudioNormalizerPort,
+        audio_decoder: AudioDecoderPort,
+        audio_preprocessor: AudioPreprocessorPort,
         source_separator: SourceSeparationPort,
         vad: VadPort,
         diarizer: DiarizationPort,
         asr: AsrPort,
+        config: TranscriptionPipelineConfig,
     ) -> None:
-        self._normalizer = normalizer
+        self._audio_decoder = audio_decoder
+        self._audio_preprocessor = audio_preprocessor
         self._source_separator = source_separator
         self._vad = vad
         self._diarizer = diarizer
         self._asr = asr
+        self._config = config
 
     def execute(self, request: TranscriptionRequest) -> TranscriptResult:
         asr_strategy = self._get_asr_strategy(request)
         result = run_transcription_pipeline(
             asr_strategy=asr_strategy,
             request=request,
-            normalizer=self._normalizer,
+            audio_decoder=self._audio_decoder,
+            audio_preprocessor=self._audio_preprocessor,
             source_separator=self._source_separator,
             vad=self._vad,
             diarizer=self._diarizer,
             asr=self._asr,
+            config=self._config,
         )
         self._validate_result(result)
         return result

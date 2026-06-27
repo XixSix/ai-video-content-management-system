@@ -1,12 +1,14 @@
 from collections.abc import Callable
 
 from app.provider_contracts.asr import AsrPort
-from app.provider_contracts.audio_normalizer import AudioNormalizerPort
+from app.provider_contracts.audio_decoder import AudioDecoderPort
+from app.provider_contracts.audio_preprocessing import AudioPreprocessorPort
 from app.provider_contracts.diarization import DiarizationPort
 from app.provider_contracts.source_separation import SourceSeparationPort
 from app.provider_contracts.vad import VadPort
 from app.schemas.transcript import TranscriptResult
 from app.schemas.transcription_request import TranscriptionRequest
+from app.workflows.transcription.config import TranscriptionPipelineConfig
 from app.workflows.transcription.errors import UnsupportedAsrStrategyError
 from app.workflows.transcription.pipelines.diarized_turns import (
     run_diarized_turns_pipeline as _run_diarized_turns_pipeline,
@@ -35,18 +37,22 @@ def run_transcription_pipeline(
     *,
     asr_strategy: str,
     request: TranscriptionRequest,
-    normalizer: AudioNormalizerPort,
+    audio_decoder: AudioDecoderPort,
+    audio_preprocessor: AudioPreprocessorPort,
     source_separator: SourceSeparationPort,
     vad: VadPort,
     diarizer: DiarizationPort,
     asr: AsrPort,
+    config: TranscriptionPipelineConfig,
 ) -> TranscriptResult:
     pipeline = select_transcription_pipeline(asr_strategy)
     return pipeline(
         request=request,
-        normalizer=normalizer,
+        audio_decoder=audio_decoder,
+        audio_preprocessor=audio_preprocessor,
         source_separator=source_separator,
         vad=vad,
         diarizer=diarizer,
         asr=asr,
+        config=config,
     )

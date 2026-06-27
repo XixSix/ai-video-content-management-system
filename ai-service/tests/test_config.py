@@ -8,6 +8,42 @@ def test_settings_use_chaptering_defaults() -> None:
     settings = Settings(_env_file=None)
 
     assert settings.chaptering_target_unit_duration_seconds == 12
+    assert settings.diarization_provider == "noop"
+    assert settings.pyannote_auth_token == ""
+    assert (
+        settings.pyannote_diarization_model
+        == "pyannote/speaker-diarization-community-1"
+    )
+    assert settings.diarization_device == "cpu"
+    assert settings.source_separation_provider == "noop"
+    assert settings.demucs_model == "htdemucs"
+    assert settings.demucs_device == "cpu"
+    assert str(settings.demucs_output_dir) == "/tmp/vid-pilot-demucs"
+    assert settings.demucs_jobs == 1
+    assert settings.demucs_shifts == 0
+    assert settings.demucs_overlap == 0.25
+    assert settings.audio_decoder_provider == "noop"
+    assert settings.audio_min_sample_rate == 8_000
+    assert settings.audio_max_sample_rate == 192_000
+    assert settings.audio_supported_channels == (1, 2)
+    assert settings.audio_target_sample_rate == 16_000
+    assert settings.audio_target_loudness == -16.0
+    assert settings.audio_min_loudness == -70.0
+    assert settings.audio_min_normalize_seconds == 0.4
+    assert settings.audio_peak_ceiling == 0.98
+    assert settings.vad_provider == "noop"
+    assert settings.vad_sample_rate == 16_000
+    assert settings.vad_threshold == 0.5
+    assert settings.vad_min_speech_duration_ms == 250
+    assert settings.vad_min_silence_duration_ms == 100
+    assert settings.vad_speech_pad_ms == 30
+    assert settings.vad_use_onnx is False
+    assert settings.vad_min_total_speech_ms == 250
+    assert settings.vad_min_speech_ratio == 0
+    assert settings.offline_asr_pad_seconds == 0.25
+    assert settings.offline_asr_merge_gap_seconds == 0.6
+    assert settings.offline_asr_max_window_seconds == 30
+    assert settings.offline_asr_min_window_seconds == 1.2
     assert settings.chaptering_max_unit_duration_seconds == 20
     assert settings.chaptering_target_unit_words == 40
     assert settings.chaptering_max_unit_words == 80
@@ -34,6 +70,41 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("ASR_CPU_THREADS", "2")
     monkeypatch.setenv("ASR_NUM_WORKERS", "1")
     monkeypatch.setenv("ASR_LOCAL_FILES_ONLY", "true")
+    monkeypatch.setenv("DIARIZATION_PROVIDER", "pyannote")
+    monkeypatch.setenv("PYANNOTE_AUTH_TOKEN", "hf_token")
+    monkeypatch.setenv("PYANNOTE_DIARIZATION_MODEL", "pyannote/custom")
+    monkeypatch.setenv("DIARIZATION_DEVICE", "cuda")
+    monkeypatch.setenv("SOURCE_SEPARATION_PROVIDER", "demucs")
+    monkeypatch.setenv("DEMUCS_MODEL", "htdemucs_ft")
+    monkeypatch.setenv("DEMUCS_DEVICE", "cuda")
+    monkeypatch.setenv("DEMUCS_OUTPUT_DIR", "/tmp/custom-demucs")
+    monkeypatch.setenv("DEMUCS_JOBS", "2")
+    monkeypatch.setenv("DEMUCS_SHIFTS", "1")
+    monkeypatch.setenv("DEMUCS_OVERLAP", "0.4")
+    monkeypatch.setenv("AUDIO_DECODER_PROVIDER", "torchaudio")
+    monkeypatch.setenv("AUDIO_MIN_SAMPLE_RATE", "4000")
+    monkeypatch.setenv("AUDIO_MAX_SAMPLE_RATE", "96000")
+    monkeypatch.setenv("AUDIO_SUPPORTED_CHANNELS", "[1,2,4]")
+    monkeypatch.setenv("AUDIO_TARGET_SAMPLE_RATE", "16000")
+    monkeypatch.setenv("AUDIO_TARGET_LOUDNESS", "-18")
+    monkeypatch.setenv("AUDIO_MIN_LOUDNESS", "-80")
+    monkeypatch.setenv("AUDIO_MIN_NORMALIZE_SECONDS", "0.5")
+    monkeypatch.setenv("AUDIO_PEAK_CEILING", "0.95")
+    monkeypatch.setenv("AUDIO_WAV_PCM_SAMPLE_WIDTH_BYTES", "2")
+    monkeypatch.setenv("AUDIO_ENABLE_LOUDNESS_NORMALIZATION", "false")
+    monkeypatch.setenv("VAD_PROVIDER", "silero")
+    monkeypatch.setenv("VAD_SAMPLE_RATE", "16000")
+    monkeypatch.setenv("VAD_THRESHOLD", "0.6")
+    monkeypatch.setenv("VAD_MIN_SPEECH_DURATION_MS", "200")
+    monkeypatch.setenv("VAD_MIN_SILENCE_DURATION_MS", "300")
+    monkeypatch.setenv("VAD_SPEECH_PAD_MS", "50")
+    monkeypatch.setenv("VAD_USE_ONNX", "true")
+    monkeypatch.setenv("VAD_MIN_TOTAL_SPEECH_MS", "500")
+    monkeypatch.setenv("VAD_MIN_SPEECH_RATIO", "0.05")
+    monkeypatch.setenv("OFFLINE_ASR_PAD_SECONDS", "0.2")
+    monkeypatch.setenv("OFFLINE_ASR_MERGE_GAP_SECONDS", "0.4")
+    monkeypatch.setenv("OFFLINE_ASR_MAX_WINDOW_SECONDS", "20")
+    monkeypatch.setenv("OFFLINE_ASR_MIN_WINDOW_SECONDS", "1.5")
     monkeypatch.setenv("CHAPTERING_STRATEGY", "word")
     monkeypatch.setenv("CHAPTERING_MODEL_NAME", "chaptering-v1")
     monkeypatch.setenv("CHAPTERING_TARGET_UNIT_DURATION_SECONDS", "18")
@@ -81,6 +152,41 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.asr_cpu_threads == 2
     assert settings.asr_num_workers == 1
     assert settings.asr_local_files_only is True
+    assert settings.diarization_provider == "pyannote"
+    assert settings.pyannote_auth_token == "hf_token"
+    assert settings.pyannote_diarization_model == "pyannote/custom"
+    assert settings.diarization_device == "cuda"
+    assert settings.source_separation_provider == "demucs"
+    assert settings.demucs_model == "htdemucs_ft"
+    assert settings.demucs_device == "cuda"
+    assert str(settings.demucs_output_dir) == "/tmp/custom-demucs"
+    assert settings.demucs_jobs == 2
+    assert settings.demucs_shifts == 1
+    assert settings.demucs_overlap == 0.4
+    assert settings.audio_decoder_provider == "torchaudio"
+    assert settings.audio_min_sample_rate == 4000
+    assert settings.audio_max_sample_rate == 96000
+    assert settings.audio_supported_channels == (1, 2, 4)
+    assert settings.audio_target_sample_rate == 16000
+    assert settings.audio_target_loudness == -18
+    assert settings.audio_min_loudness == -80
+    assert settings.audio_min_normalize_seconds == 0.5
+    assert settings.audio_peak_ceiling == 0.95
+    assert settings.audio_wav_pcm_sample_width_bytes == 2
+    assert settings.audio_enable_loudness_normalization is False
+    assert settings.vad_provider == "silero"
+    assert settings.vad_sample_rate == 16000
+    assert settings.vad_threshold == 0.6
+    assert settings.vad_min_speech_duration_ms == 200
+    assert settings.vad_min_silence_duration_ms == 300
+    assert settings.vad_speech_pad_ms == 50
+    assert settings.vad_use_onnx is True
+    assert settings.vad_min_total_speech_ms == 500
+    assert settings.vad_min_speech_ratio == 0.05
+    assert settings.offline_asr_pad_seconds == 0.2
+    assert settings.offline_asr_merge_gap_seconds == 0.4
+    assert settings.offline_asr_max_window_seconds == 20
+    assert settings.offline_asr_min_window_seconds == 1.5
     assert settings.chaptering_strategy == "word"
     assert settings.chaptering_model_name == "chaptering-v1"
     assert settings.chaptering_target_unit_duration_seconds == 18

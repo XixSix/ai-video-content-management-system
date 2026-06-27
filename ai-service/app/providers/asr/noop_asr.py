@@ -1,4 +1,5 @@
 from pathlib import Path
+from collections.abc import Sequence
 
 from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
 
@@ -20,10 +21,29 @@ class NoopAsr:
         local_path: Path,
         language: str | None,
     ) -> TranscriptResult:
+        return self._build_result(
+            label=local_path.name,
+            language=language,
+        )
+
+    def transcribe_audio(
+        self,
+        *,
+        samples: Sequence[float],
+        sample_rate: int,
+        language: str | None,
+    ) -> TranscriptResult:
+        _ = sample_rate
+        return self._build_result(
+            label=f"{len(samples)} samples",
+            language=language,
+        )
+
+    def _build_result(self, *, label: str, language: str | None) -> TranscriptResult:
         selected_language = (
             self._default_language if language in {None, ""} else language
         )
-        text = f"Noop transcript placeholder for {local_path.name}."
+        text = f"Noop transcript placeholder for {label}."
 
         return TranscriptResult(
             language=selected_language,

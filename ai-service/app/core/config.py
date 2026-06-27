@@ -37,6 +37,140 @@ class Settings(BaseSettings):
         alias="ASR_MODEL_STORAGE_PATH",
     )
     asr_local_files_only: bool = Field(default=False, alias="ASR_LOCAL_FILES_ONLY")
+    diarization_provider: Literal["noop", "pyannote"] = Field(
+        default="noop",
+        alias="DIARIZATION_PROVIDER",
+    )
+    pyannote_auth_token: str = Field(default="", alias="PYANNOTE_AUTH_TOKEN")
+    pyannote_diarization_model: str = Field(
+        default="pyannote/speaker-diarization-community-1",
+        alias="PYANNOTE_DIARIZATION_MODEL",
+    )
+    diarization_device: str = Field(default="cpu", alias="DIARIZATION_DEVICE")
+    source_separation_provider: Literal["noop", "demucs"] = Field(
+        default="noop",
+        alias="SOURCE_SEPARATION_PROVIDER",
+    )
+    demucs_model: str = Field(default="htdemucs", alias="DEMUCS_MODEL")
+    demucs_device: str = Field(default="cpu", alias="DEMUCS_DEVICE")
+    demucs_output_dir: Path = Field(
+        default=Path("/tmp/vid-pilot-demucs"),
+        alias="DEMUCS_OUTPUT_DIR",
+    )
+    demucs_jobs: PositiveInt = Field(default=1, alias="DEMUCS_JOBS")
+    demucs_shifts: int = Field(default=0, ge=0, alias="DEMUCS_SHIFTS")
+    demucs_overlap: float = Field(
+        default=0.25,
+        ge=0.0,
+        le=1.0,
+        alias="DEMUCS_OVERLAP",
+    )
+    audio_decoder_provider: Literal["noop", "torchaudio"] = Field(
+        default="noop",
+        alias="AUDIO_DECODER_PROVIDER",
+    )
+    audio_min_sample_rate: PositiveInt = Field(
+        default=8_000,
+        alias="AUDIO_MIN_SAMPLE_RATE",
+    )
+    audio_max_sample_rate: PositiveInt = Field(
+        default=192_000,
+        alias="AUDIO_MAX_SAMPLE_RATE",
+    )
+    audio_supported_channels: tuple[int, ...] = Field(
+        default=(1, 2),
+        alias="AUDIO_SUPPORTED_CHANNELS",
+    )
+    audio_target_sample_rate: PositiveInt = Field(
+        default=16_000,
+        alias="AUDIO_TARGET_SAMPLE_RATE",
+    )
+    audio_target_loudness: float = Field(
+        default=-16.0,
+        alias="AUDIO_TARGET_LOUDNESS",
+    )
+    audio_min_loudness: float = Field(
+        default=-70.0,
+        alias="AUDIO_MIN_LOUDNESS",
+    )
+    audio_min_normalize_seconds: PositiveFloat = Field(
+        default=0.4,
+        alias="AUDIO_MIN_NORMALIZE_SECONDS",
+    )
+    audio_peak_ceiling: float = Field(
+        default=0.98,
+        gt=0.0,
+        le=1.0,
+        alias="AUDIO_PEAK_CEILING",
+    )
+    audio_wav_pcm_sample_width_bytes: PositiveInt = Field(
+        default=2,
+        alias="AUDIO_WAV_PCM_SAMPLE_WIDTH_BYTES",
+    )
+    audio_enable_loudness_normalization: bool = Field(
+        default=True,
+        alias="AUDIO_ENABLE_LOUDNESS_NORMALIZATION",
+    )
+    vad_provider: Literal["noop", "silero"] = Field(
+        default="noop",
+        alias="VAD_PROVIDER",
+    )
+    vad_sample_rate: PositiveInt = Field(
+        default=16_000,
+        alias="VAD_SAMPLE_RATE",
+    )
+    vad_threshold: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        alias="VAD_THRESHOLD",
+    )
+    vad_min_speech_duration_ms: PositiveInt = Field(
+        default=250,
+        alias="VAD_MIN_SPEECH_DURATION_MS",
+    )
+    vad_min_silence_duration_ms: PositiveInt = Field(
+        default=100,
+        alias="VAD_MIN_SILENCE_DURATION_MS",
+    )
+    vad_speech_pad_ms: int = Field(
+        default=30,
+        ge=0,
+        alias="VAD_SPEECH_PAD_MS",
+    )
+    vad_use_onnx: bool = Field(
+        default=False,
+        alias="VAD_USE_ONNX",
+    )
+    vad_min_total_speech_ms: float = Field(
+        default=250.0,
+        ge=0.0,
+        alias="VAD_MIN_TOTAL_SPEECH_MS",
+    )
+    vad_min_speech_ratio: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
+        alias="VAD_MIN_SPEECH_RATIO",
+    )
+    offline_asr_pad_seconds: float = Field(
+        default=0.25,
+        ge=0.0,
+        alias="OFFLINE_ASR_PAD_SECONDS",
+    )
+    offline_asr_merge_gap_seconds: float = Field(
+        default=0.6,
+        ge=0.0,
+        alias="OFFLINE_ASR_MERGE_GAP_SECONDS",
+    )
+    offline_asr_max_window_seconds: PositiveFloat = Field(
+        default=30.0,
+        alias="OFFLINE_ASR_MAX_WINDOW_SECONDS",
+    )
+    offline_asr_min_window_seconds: PositiveFloat = Field(
+        default=1.2,
+        alias="OFFLINE_ASR_MIN_WINDOW_SECONDS",
+    )
     chaptering_strategy: Literal["segment", "word"] = Field(
         default="segment",
         alias="CHAPTERING_STRATEGY",
@@ -188,6 +322,20 @@ class Settings(BaseSettings):
     def empty_model_storage_path_as_none(cls, value: object) -> object:
         if value == "":
             return None
+
+        return value
+
+    @field_validator("audio_supported_channels", mode="before")
+    @classmethod
+    def parse_audio_supported_channels(cls, value: object) -> object:
+        if value == "":
+            return (1, 2)
+
+        if isinstance(value, str):
+            return tuple(int(part.strip()) for part in value.split(",") if part.strip())
+
+        if isinstance(value, list):
+            return tuple(value)
 
         return value
 

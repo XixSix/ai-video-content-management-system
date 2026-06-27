@@ -1,4 +1,5 @@
-from pathlib import Path
+from app.provider_contracts.audio_decoder import AudioWaveform
+from app.provider_contracts.vad import SpeechRegion
 
 
 class NoopVad:
@@ -9,5 +10,8 @@ class NoopVad:
     def warm_up(self) -> None:
         return None
 
-    def apply(self, local_path: Path) -> Path:
-        return local_path
+    def has_speech(self, audio: AudioWaveform) -> bool:
+        return False
+
+    def detect_speech_regions(self, audio: AudioWaveform) -> list[SpeechRegion]:
+        return []

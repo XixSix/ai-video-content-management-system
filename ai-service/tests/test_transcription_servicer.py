@@ -1,10 +1,13 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import grpc
 import pytest
+import torch
 
 from app.core.config import Settings
 from app.grpc.transcription_servicer import TranscriptionServicer
+from app.providers.audio import torchaudio_decoder
 from app.runtime.container import build_transcription_workflow
 from transcription.v1 import transcription_pb2
 
@@ -36,16 +39,38 @@ def _request(audio_path: Path) -> transcription_pb2.TranscribeRequest:
     )
 
 
-def test_transcribe_returns_noop_response(tmp_path: Path) -> None:
+def test_transcribe_returns_noop_response(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     audio_path = tmp_path / "audio.wav"
     audio_path.write_bytes(b"wav")
+    monkeypatch.setattr(
+        torchaudio_decoder.torchaudio,
+        "info",
+        lambda path: SimpleNamespace(
+            sample_rate=16_000,
+            num_channels=1,
+            num_frames=2,
+        ),
+        raising=False,
+    )
+    monkeypatch.setattr(
+        torchaudio_decoder.torchaudio,
+        "load",
+        lambda path: (torch.tensor([[0.0, 0.1]], dtype=torch.float32), 16_000),
+    )
 
     workflow = build_transcription_workflow(
-        Settings(asr_provider="noop", asr_language="en")
+        Settings(
+            asr_provider="noop",
+            asr_language="en",
+            audio_decoder_provider="torchaudio",
+        )
     )
-    response = TranscriptionServicer(workflow).Transcribe(
-        _request(audio_path), FakeContext()
-    )
+    request = _request(audio_path)
+    request.options.enable_vad = False
+    response = TranscriptionServicer(workflow).Transcribe(request, FakeContext())
 
     assert response.request_id == "job-1"
     assert response.language == "en"
@@ -140,5 +165,15 @@ def test_transcribe_rejects_directory_local_path(tmp_path: Path) -> None:
 
     with pytest.raises(AbortError) as error:
         TranscriptionServicer().Transcribe(request, FakeContext())
+
+    assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT
+
+
+def test_transcribe_rejects_empty_local_path(tmp_path: Path) -> None:
+    audio_path = tmp_path / "audio.wav"
+    audio_path.write_bytes(b"")
+
+    with pytest.raises(AbortError) as error:
+        TranscriptionServicer().Transcribe(_request(audio_path), FakeContext())
 
     assert error.value.code == grpc.StatusCode.INVALID_ARGUMENT

@@ -5,15 +5,22 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "demucs>=4.0.1",
     "faster-whisper>=1.2.1",
     "grpcio>=1.80.0",
     "grpcio-tools>=1.80.0",
     "nltk>=3.9.4",
     "numpy>=2.4.6",
+    "pyannote-audio>=4.0.5",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.1",
+    "pyloudnorm>=0.2.0",
     "pytest>=9.0.3",
     "ruff>=0.15.14",
+    "silero-vad>=6.2.1",
+    "torch>=2.12.1",
+    "torchaudio>=2.11.0",
+    "torchcodec>=0.14.0",
 ]
 
 [project.scripts]
