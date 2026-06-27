@@ -133,7 +133,11 @@ export function MediaLibraryCard({
             {showActions ? (
               <MediaLibraryActionsMenu
                 item={item}
-                onRename={(title) => onRename?.(item.id, title)}
+                onRename={
+                  item.libraryGroup === "ORIGINAL"
+                    ? (title) => onRename?.(item.id, title)
+                    : undefined
+                }
                 onDelete={() => onDelete?.(item)}
               />
             ) : null}
@@ -187,7 +191,11 @@ export function MediaLibraryCard({
           {showActions ? (
             <MediaLibraryActionsMenu
               item={item}
-              onRename={(title) => onRename?.(item.id, title)}
+              onRename={
+                item.libraryGroup === "ORIGINAL"
+                  ? (title) => onRename?.(item.id, title)
+                  : undefined
+              }
               onDelete={() => onDelete?.(item)}
               onDownload={() => onDownload?.(item)}
               onRetry={() => onRetry?.(item)}

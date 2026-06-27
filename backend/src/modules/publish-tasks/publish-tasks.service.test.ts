@@ -28,7 +28,8 @@ const findPublishTasksByUserIdMock =
 const findPublishTaskByIdMock = jest.fn<(id: string) => Promise<PublishTask | null>>()
 const updatePublishTaskMock = jest.fn<(id: string, data: unknown) => Promise<PublishTask>>()
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
-const findShortClipByIdMock = jest.fn<(id: string) => Promise<ShortClip | null>>()
+const findShortClipByIdMock =
+  jest.fn<(id: string) => Promise<(ShortClip & { generatedAssets: GeneratedAsset[] }) | null>>()
 const findProjectByIdMock = jest.fn<(id: string) => Promise<unknown | null>>()
 const findFreshProjectExportAssetMock = jest.fn<() => Promise<GeneratedAsset | null>>()
 const isDeletedProjectMock = jest.fn<(status: string) => boolean>()
@@ -113,30 +114,40 @@ const createMedia = (overrides: Partial<Media> = {}): Media => ({
   ...overrides
 })
 
-const createShortClip = (overrides: Partial<ShortClip> = {}): ShortClip => ({
+const createShortClip = (
+  overrides: Partial<ShortClip> & { generatedAssets?: GeneratedAsset[] } = {}
+): ShortClip & { generatedAssets: GeneratedAsset[] } => ({
   id: shortClipId,
   mediaId,
   userId,
-  transcriptId: null,
-  chapterId: null,
-  candidateId: null,
-  title: 'Short clip',
-  caption: 'Short clip caption',
-  description: null,
-  hashtags: ['#clip'],
-  startTime: 10,
-  endTime: 45,
-  duration: 35,
-  transcriptVersion: 1,
-  score: 0.8,
-  reason: null,
-  videoPath: 'clips/media/clip.mp4',
-  thumbnailPath: null,
-  subtitlePath: null,
+  candidateId: '00000000-0000-4000-8000-000000000099',
+  projectId: null,
   aspectRatio: '9:16',
   status: 'READY',
   createdAt: now,
   updatedAt: now,
+  generatedAssets: [
+    {
+      id: '00000000-0000-4000-8000-000000000098',
+      userId,
+      mediaId,
+      projectId: null,
+      transcriptId: null,
+      chapterId: null,
+      shortClipId,
+      jobId: null,
+      assetType: 'SHORT_CLIP_VIDEO',
+      transcriptVersion: 1,
+      s3Bucket: 'vidpilot-media',
+      s3Key: 'clips/media/clip.mp4',
+      s3Region: 'us-east-1',
+      s3Etag: null,
+      mimeType: 'video/mp4',
+      fileSizeBytes: BigInt(2048),
+      metadata: null,
+      createdAt: now
+    }
+  ],
   ...overrides
 })
 

@@ -72,7 +72,14 @@ describe('publish tasks repository', () => {
         {
           shortClip: {
             is: {
-              title: { contains: 'launch', mode: 'insensitive' }
+              candidate: {
+                is: {
+                  OR: [
+                    { title: { contains: 'launch', mode: 'insensitive' } },
+                    { text: { contains: 'launch', mode: 'insensitive' } }
+                  ]
+                }
+              }
             }
           }
         },

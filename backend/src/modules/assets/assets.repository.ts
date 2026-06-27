@@ -9,6 +9,7 @@ export interface ListAssetsFilters {
   projectId?: string
   transcriptId?: string
   chapterId?: string
+  shortClipId?: string
 }
 
 const buildAssetWhere = (filters: ListAssetsFilters): Prisma.GeneratedAssetWhereInput => ({
@@ -17,7 +18,8 @@ const buildAssetWhere = (filters: ListAssetsFilters): Prisma.GeneratedAssetWhere
   ...(filters.mediaId ? { mediaId: filters.mediaId } : {}),
   ...(filters.projectId ? { projectId: filters.projectId } : {}),
   ...(filters.transcriptId ? { transcriptId: filters.transcriptId } : {}),
-  ...(filters.chapterId ? { chapterId: filters.chapterId } : {})
+  ...(filters.chapterId ? { chapterId: filters.chapterId } : {}),
+  ...(filters.shortClipId ? { shortClipId: filters.shortClipId } : {})
 })
 
 export const findAssetsByUserId = async (

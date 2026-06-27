@@ -3,6 +3,9 @@
 import { useRef, type ChangeEvent } from "react";
 import { toast } from "sonner";
 
+import { assetService } from "@/features/assets/asset.service";
+import { useDeleteGeneratedAsset } from "@/features/assets/use-assets";
+
 import type { MediaLibraryItem } from "../types/media-library.types";
 import { mediaService } from "../services/media.service";
 import { useDeleteMedia, useRenameMedia } from "./use-media-mutations";
@@ -31,6 +34,7 @@ export function useMediaLibraryActions({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const renameMutation = useRenameMedia(workspaceId);
   const deleteMutation = useDeleteMedia(workspaceId);
+  const deleteAssetMutation = useDeleteGeneratedAsset();
 
   const handleOpenUpload = () => {
     fileInputRef.current?.click();
@@ -73,6 +77,19 @@ export function useMediaLibraryActions({
       return;
     }
 
+    if (item.libraryGroup === "EDITOR_OUTPUT") {
+      deleteAssetMutation.mutate(item.generatedAssetId ?? item.id, {
+        onSuccess: () =>
+          toast.success("Output deleted", { description: item.title }),
+        onError: (error) =>
+          toast.error("Unable to delete output", {
+            description:
+              error instanceof Error ? error.message : "Please try again.",
+          }),
+      });
+      return;
+    }
+
     deleteMutation.mutate(item.id, {
       onSuccess: () =>
         toast.success("Media deleted", { description: item.title }),
@@ -86,7 +103,10 @@ export function useMediaLibraryActions({
 
   const downloadMediaItem = async (item: MediaLibraryItem) => {
     try {
-      const { url } = await mediaService.getDownloadUrl(workspaceId, item.id);
+      const { url } =
+        item.libraryGroup === "EDITOR_OUTPUT"
+          ? await assetService.getDownloadUrl(item.generatedAssetId ?? item.id)
+          : await mediaService.getDownloadUrl(workspaceId, item.id);
       openAssetUrl(url, item.originalFilename);
     } catch (error) {
       toast.error("Unable to prepare download", {

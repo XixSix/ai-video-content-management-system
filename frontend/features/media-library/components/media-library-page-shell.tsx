@@ -181,7 +181,7 @@ function MediaLibraryControls({
             </p>
           </div>
           <span className="rounded-full border border-amber-500/30 bg-background/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700 dark:text-amber-300">
-            Empty
+            Live
           </span>
         </div>
       ) : null}
@@ -462,13 +462,15 @@ export function MediaLibraryPageShell({
           preview.item ? () => onDownloadItem(preview.item!) : undefined
         }
         onCreateClips={
-          preview.item?.type === "VIDEO"
+          preview.item?.libraryGroup === "ORIGINAL" && preview.item.type === "VIDEO"
             ? () => onCreateClips(preview.item!)
             : undefined
         }
         onNextItem={onNextPreviewItem}
         onOpenEditor={
-          preview.item ? () => onOpenEditor(preview.item!) : undefined
+          preview.item?.libraryGroup === "ORIGINAL"
+            ? () => onOpenEditor(preview.item!)
+            : undefined
         }
         onOpenChange={onPreviewOpenChange}
         onPreviousItem={onPreviousPreviewItem}

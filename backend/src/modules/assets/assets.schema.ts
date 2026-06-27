@@ -13,6 +13,7 @@ export const listAssetsQuerySchema = z.strictObject({
   projectId: z.uuid().optional(),
   transcriptId: z.uuid().optional(),
   chapterId: z.uuid().optional(),
+  shortClipId: z.uuid().optional(),
   sortBy: z.enum(['createdAt', 'assetType']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 })

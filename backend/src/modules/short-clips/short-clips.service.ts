@@ -1,4 +1,4 @@
-import type { Media, ShortClip } from '../../infrastructure/db/generated/prisma/client'
+import type { Media } from '../../infrastructure/db/generated/prisma/client'
 import { JobStatus, JobType, MediaStatus, MediaType } from '../../infrastructure/db/generated/prisma/client'
 import { config } from '../../config'
 import * as storageService from '../../infrastructure/s3/uploader'
@@ -6,15 +6,18 @@ import { MediaError } from '../media/media.error'
 import { toClipCandidateData, toJobResponseData, toShortClipData } from './short-clips.mapper'
 import * as shortClipsQueue from './short-clips.queue'
 import * as shortClipsRepo from './short-clips.repository'
-import type { ListClipCandidatesQuery, ListShortClipsQuery } from './short-clips.schema'
+import type { GenerateShortClipsBody, ListClipCandidatesQuery, ListShortClipsQuery } from './short-clips.schema'
 import { ShortClipsError } from './short-clips.error'
 import type {
   ClipCandidateData,
   CreateShortClipDownloadUrlResult,
   GenerateShortClipsInput,
   GenerateShortClipsServiceResult,
+  NormalizedShortClipJobInput,
   PaginatedResult,
-  ShortClipData
+  ShortClipData,
+  ShortClipGenerationPreferences,
+  ShortClipRecord
 } from './short-clips.types'
 
 export const generateShortClips = async (input: GenerateShortClipsInput): Promise<GenerateShortClipsServiceResult> => {
@@ -37,7 +40,9 @@ export const generateShortClips = async (input: GenerateShortClipsInput): Promis
     }
   }
 
-  const transcript = await shortClipsRepo.findLatestTranscriptByMediaIdAndUserId(media.id, input.userId)
+  const transcript = input.preferences.transcriptId
+    ? await shortClipsRepo.findTranscriptByIdAndMediaIdAndUserId(input.preferences.transcriptId, media.id, input.userId)
+    : await shortClipsRepo.findLatestTranscriptByMediaIdAndUserId(media.id, input.userId)
 
   if (!transcript) {
     throw ShortClipsError.noTranscript()
@@ -49,16 +54,15 @@ export const generateShortClips = async (input: GenerateShortClipsInput): Promis
     throw ShortClipsError.noTranscriptSegments()
   }
 
+  const jobInput = normalizeShortClipJobInput(input.preferences, transcript.id, transcript.version)
+
   const job = await shortClipsRepo.createProcessingJob({
     mediaId: media.id,
     userId: input.userId,
     jobType: JobType.GENERATE_SHORT_CLIPS,
     status: JobStatus.PENDING,
     progress: 0,
-    input: {
-      transcriptId: transcript.id,
-      transcriptVersion: transcript.version
-    }
+    input: jobInput
   })
 
   try {
@@ -67,7 +71,8 @@ export const generateShortClips = async (input: GenerateShortClipsInput): Promis
       mediaId: media.id,
       userId: input.userId,
       transcriptId: transcript.id,
-      transcriptVersion: transcript.version
+      transcriptVersion: transcript.version,
+      preferences: jobInput
     })
   } catch {
     await shortClipsRepo.updateProcessingJob(job.id, {
@@ -211,12 +216,14 @@ export const createShortClipDownloadUrl = async (
     throw ShortClipsError.shortClipNotReady()
   }
 
-  if (!clip.videoPath) {
+  const videoAsset = await shortClipsRepo.findLatestShortClipVideoAsset(clip.id, userId)
+
+  if (!videoAsset) {
     throw ShortClipsError.shortClipVideoNotFound()
   }
 
   try {
-    const url = await storageService.createPresignedGetUrl(config.s3.bucket, clip.videoPath)
+    const url = await storageService.createPresignedGetUrl(videoAsset.s3Bucket ?? config.s3.bucket, videoAsset.s3Key)
 
     return {
       url,
@@ -245,7 +252,7 @@ const getOwnedMedia = async (userId: string, mediaId: string): Promise<Media> =>
   return media
 }
 
-const getOwnedShortClip = async (userId: string, shortClipId: string): Promise<ShortClip> => {
+const getOwnedShortClip = async (userId: string, shortClipId: string): Promise<ShortClipRecord> => {
   const clip = await shortClipsRepo.findShortClipById(shortClipId)
 
   if (!clip) {
@@ -257,4 +264,51 @@ const getOwnedShortClip = async (userId: string, shortClipId: string): Promise<S
   }
 
   return clip
+}
+
+const normalizeShortClipJobInput = (
+  preferences: ShortClipGenerationPreferences | GenerateShortClipsBody,
+  transcriptId: string,
+  transcriptVersion: number
+): NormalizedShortClipJobInput => {
+  const durationDefaults = durationRangeForClipLength(preferences.clipLength)
+  const minDuration = preferences.minDuration ?? durationDefaults.minDuration
+  const maxDuration = preferences.maxDuration ?? durationDefaults.maxDuration
+  const normalizedMinDuration = Math.min(minDuration, maxDuration)
+  const normalizedMaxDuration = Math.max(minDuration, maxDuration)
+
+  return {
+    transcriptId,
+    transcriptVersion,
+    clipCount: preferences.clipCount,
+    clipLength: preferences.clipLength,
+    minDuration: normalizedMinDuration,
+    maxDuration: normalizedMaxDuration,
+    aspectRatio: preferences.aspectRatio,
+    language: preferences.language,
+    genre: preferences.genre,
+    clipModel: preferences.clipModel,
+    autoHook: preferences.autoHook,
+    prompt: preferences.prompt,
+    captionPresetId: preferences.captionPresetId,
+    burnSubtitle: preferences.burnSubtitle
+  }
+}
+
+const durationRangeForClipLength = (
+  clipLength: ShortClipGenerationPreferences['clipLength']
+): Pick<NormalizedShortClipJobInput, 'minDuration' | 'maxDuration'> => {
+  if (clipLength === '15_30') {
+    return { minDuration: 15, maxDuration: 30 }
+  }
+
+  if (clipLength === '30_60') {
+    return { minDuration: 30, maxDuration: 60 }
+  }
+
+  if (clipLength === '60_90') {
+    return { minDuration: 60, maxDuration: 90 }
+  }
+
+  return { minDuration: 20, maxDuration: 60 }
 }

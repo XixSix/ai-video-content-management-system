@@ -7,6 +7,9 @@ export type GeneratedAssetType =
   | "EXPORT_VIDEO"
   | "EXPORT_AUDIO"
   | "WAVEFORM_PEAKS"
+  | "SHORT_CLIP_VIDEO"
+  | "SHORT_CLIP_THUMBNAIL"
+  | "SHORT_CLIP_SUBTITLE"
 
 export type GeneratedAssetData = {
   id: string
@@ -14,6 +17,7 @@ export type GeneratedAssetData = {
   projectId: string | null
   transcriptId: string | null
   chapterId: string | null
+  shortClipId: string | null
   assetType: GeneratedAssetType
   transcriptVersion: number | null
   mimeType: string | null
@@ -30,6 +34,7 @@ export type GeneratedAssetListQuery = {
   projectId?: string
   transcriptId?: string
   chapterId?: string
+  shortClipId?: string
   sortBy?: "createdAt" | "assetType"
   sortOrder?: "asc" | "desc"
 }
@@ -42,4 +47,9 @@ export type GeneratedAssetListResponse = {
     limit: number
     totalPages: number
   }
+}
+
+export type GeneratedAssetDownloadUrlResponse = {
+  url: string
+  expiresInSeconds: number
 }

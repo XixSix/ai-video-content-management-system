@@ -5,6 +5,7 @@ import type { ApiSuccess } from "@/lib/api/api.types"
 import type {
   ClipCandidateData,
   ClipCandidateListQuery,
+  GenerateShortClipsPreferences,
   GenerateShortClipsResponse,
   PaginatedApiResponse,
   ShortClipData,
@@ -12,11 +13,14 @@ import type {
 } from "./short-clips.types"
 
 export const shortClipsService = {
-  generate(mediaId: string): Promise<GenerateShortClipsResponse> {
+  generate(
+    mediaId: string,
+    preferences: GenerateShortClipsPreferences
+  ): Promise<GenerateShortClipsResponse> {
     return unwrapApiResponse(
       authenticatedApiClient.post<ApiSuccess<GenerateShortClipsResponse>>(
         `/media/${mediaId}/short-clips/generate`,
-        {}
+        preferences
       )
     )
   },

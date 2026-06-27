@@ -26,7 +26,8 @@ export const generate: ParamsBodyRequestHandler<MediaShortClipParams, GenerateSh
   try {
     const result: GenerateShortClipsServiceResult = await shortClipsService.generateShortClips({
       userId: req.user!.id,
-      mediaId: req.params.mediaId
+      mediaId: req.params.mediaId,
+      preferences: req.body
     })
     const response: GenerateShortClipsResult = { job: result.job }
 

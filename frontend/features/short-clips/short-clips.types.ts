@@ -6,29 +6,31 @@ export type ShortClipStatus = "PENDING" | "RENDERING" | "READY" | "FAILED" | "DE
 export type ClipCandidateData = {
   id: string
   mediaId: string
+  userId: string
   transcriptId: string
   chapterId: string | null
   jobId: string | null
+  projectId: string | null
   startTime: number
   endTime: number
   duration: number
   transcriptVersion: number
+  title: string | null
+  reason: string | null
+  score: number | null
   text: string | null
-  cleanText: string | null
-  hookScore: number | null
-  questionScore: number | null
-  keywordScore: number | null
-  durationScore: number | null
-  speechDensityScore: number | null
-  saliencyScore: number | null
-  completenessScore: number | null
-  emotionScore: number | null
-  finalScore: number | null
-  llmScore: number | null
-  llmReason: string | null
-  dedupGroupId: string | null
   metadata: Record<string, unknown> | null
   status: ClipCandidateStatus
+  createdAt: string
+}
+
+export type ShortClipAssetData = {
+  id: string
+  assetType: string
+  transcriptVersion: number | null
+  mimeType: string | null
+  fileSizeBytes: string | null
+  metadata: Record<string, unknown> | null
   createdAt: string
 }
 
@@ -36,26 +38,30 @@ export type ShortClipData = {
   id: string
   mediaId: string
   userId: string
-  transcriptId: string | null
-  chapterId: string | null
   candidateId: string | null
-  title: string | null
-  caption: string | null
-  description: string | null
-  hashtags: unknown
-  startTime: number
-  endTime: number
-  duration: number
-  transcriptVersion: number | null
-  score: number | null
-  reason: string | null
-  videoPath: string | null
-  thumbnailPath: string | null
-  subtitlePath: string | null
+  projectId: string | null
   aspectRatio: string | null
   status: ShortClipStatus
+  candidate: ClipCandidateData | null
+  assets: ShortClipAssetData[]
   createdAt: string
   updatedAt: string
+}
+
+export type GenerateShortClipsPreferences = {
+  clipCount?: number
+  clipLength?: "AUTO" | "15_30" | "30_60" | "60_90"
+  minDuration?: number
+  maxDuration?: number
+  aspectRatio?: "9:16" | "1:1" | "16:9"
+  language?: "AUTO" | "ENGLISH" | "VIETNAMESE"
+  genre?: "AUTO" | "PODCAST" | "INTERVIEW" | "TUTORIAL" | "WEBINAR"
+  clipModel?: "AUTO" | "BALANCED" | "VIRAL_HOOKS"
+  autoHook?: boolean
+  prompt?: string
+  captionPresetId?: string
+  burnSubtitle?: boolean
+  transcriptId?: string
 }
 
 export type GenerateShortClipsResponse = {
@@ -69,7 +75,7 @@ export type ClipCandidateListQuery = {
   transcriptId?: string
   chapterId?: string
   jobId?: string
-  sortBy?: "finalScore" | "createdAt" | "startTime" | "duration"
+  sortBy?: "score" | "createdAt" | "startTime" | "duration"
   sortOrder?: "asc" | "desc"
 }
 
@@ -77,7 +83,7 @@ export type ShortClipListQuery = {
   page?: number
   limit?: number
   status?: ShortClipStatus
-  sortBy?: "createdAt" | "startTime" | "duration" | "score"
+  sortBy?: "createdAt" | "updatedAt" | "status"
   sortOrder?: "asc" | "desc"
 }
 

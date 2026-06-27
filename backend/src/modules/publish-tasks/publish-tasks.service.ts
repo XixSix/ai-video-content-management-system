@@ -8,8 +8,7 @@ import {
   ShortClipStatus,
   type Media,
   type GeneratedAsset,
-  type ProcessingJob,
-  type ShortClip
+  type ProcessingJob
 } from '../../infrastructure/db/generated/prisma/client'
 import { EXPORT_RENDER_TASK_NAME, RENDER_EXPORTS_QUEUE_NAME } from '../render-exports/render-exports.types'
 import * as renderExportsQueue from '../render-exports/render-exports.queue'
@@ -474,7 +473,7 @@ const getAccessiblePublishableMedia = async (userId: string, mediaId: string): P
 const getAccessiblePublishableShortClip = async (
   userId: string,
   shortClipId: string
-): Promise<{ shortClip: ShortClip; media: Media }> => {
+): Promise<{ shortClip: publishTasksRepo.PublishShortClipRecord; media: Media }> => {
   const shortClip = await publishTasksRepo.findShortClipById(shortClipId)
 
   if (!shortClip) {
@@ -489,7 +488,7 @@ const getAccessiblePublishableShortClip = async (
     throw PublishTasksError.invalidTargetState(`Cannot publish short clip in status ${shortClip.status}`)
   }
 
-  if (!shortClip.videoPath) {
+  if (shortClip.generatedAssets.length < 1) {
     throw PublishTasksError.invalidTargetState('Short clip video output is required before publishing')
   }
 

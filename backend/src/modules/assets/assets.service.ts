@@ -25,7 +25,8 @@ export const listAssets = async (
       mediaId: query.mediaId,
       projectId: query.projectId,
       transcriptId: query.transcriptId,
-      chapterId: query.chapterId
+      chapterId: query.chapterId,
+      shortClipId: query.shortClipId
     },
     skip,
     limit,

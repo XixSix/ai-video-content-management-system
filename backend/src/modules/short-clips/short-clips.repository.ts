@@ -2,15 +2,21 @@ import { prisma } from '../../infrastructure/db/prisma'
 import type {
   ClipCandidate,
   ClipCandidateStatus,
+  GeneratedAsset,
   Media,
   Prisma,
   ProcessingJob,
-  ShortClip,
   ShortClipStatus,
   Transcript
 } from '../../infrastructure/db/generated/prisma/client'
-import { JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
-import type { ClipCandidateSortField, ShortClipSortField, SortOrder } from './short-clips.types'
+import { AssetType, JobStatus, JobType } from '../../infrastructure/db/generated/prisma/client'
+import type {
+  ClipCandidateRecord,
+  ClipCandidateSortField,
+  ShortClipRecord,
+  ShortClipSortField,
+  SortOrder
+} from './short-clips.types'
 
 export interface ListClipCandidatesFilters {
   mediaId: string
@@ -45,6 +51,21 @@ export const findLatestTranscriptByMediaIdAndUserId = async (
     },
     orderBy: {
       createdAt: 'desc'
+    }
+  })
+
+export const findTranscriptByIdAndMediaIdAndUserId = async (
+  transcriptId: string,
+  mediaId: string,
+  userId: string
+): Promise<Transcript | null> =>
+  prisma.transcript.findFirst({
+    where: {
+      id: transcriptId,
+      mediaId,
+      media: {
+        userId
+      }
     }
   })
 
@@ -99,7 +120,7 @@ export const findClipCandidatesByMediaIdAndUserId = async (
   take: number,
   sortBy: ClipCandidateSortField,
   sortOrder: SortOrder
-): Promise<[ClipCandidate[], number]> => {
+): Promise<[ClipCandidateRecord[], number]> => {
   const where = buildClipCandidateWhere(filters)
 
   return Promise.all([
@@ -130,7 +151,7 @@ export const findShortClipsByMediaIdAndUserId = async (
   take: number,
   sortBy: ShortClipSortField,
   sortOrder: SortOrder
-): Promise<[ShortClip[], number]> => {
+): Promise<[ShortClipRecord[], number]> => {
   const where = buildShortClipWhere(filters)
 
   return Promise.all([
@@ -138,13 +159,44 @@ export const findShortClipsByMediaIdAndUserId = async (
       where,
       skip,
       take,
-      orderBy: [{ [sortBy]: sortOrder }, { createdAt: 'desc' }]
+      orderBy: [{ [sortBy]: sortOrder }, { createdAt: 'desc' }],
+      include: {
+        candidate: true,
+        generatedAssets: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      }
     }),
     prisma.shortClip.count({ where })
   ])
 }
 
-export const findShortClipById = async (id: string): Promise<ShortClip | null> =>
+export const findShortClipById = async (id: string): Promise<ShortClipRecord | null> =>
   prisma.shortClip.findUnique({
-    where: { id }
+    where: { id },
+    include: {
+      candidate: true,
+      generatedAssets: {
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }
+    }
+  })
+
+export const findLatestShortClipVideoAsset = async (
+  shortClipId: string,
+  userId: string
+): Promise<GeneratedAsset | null> =>
+  prisma.generatedAsset.findFirst({
+    where: {
+      shortClipId,
+      userId,
+      assetType: AssetType.SHORT_CLIP_VIDEO
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
   })

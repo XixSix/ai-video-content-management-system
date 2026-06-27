@@ -8,6 +8,14 @@
  *         id:
  *           type: string
  *           format: uuid
+ *         mediaId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *         projectId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
  *         transcriptId:
  *           type: string
  *           format: uuid
@@ -16,9 +24,13 @@
  *           type: string
  *           format: uuid
  *           nullable: true
+ *         shortClipId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
  *         assetType:
  *           type: string
- *           enum: [SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
+ *           enum: [THUMBNAIL, THUMBNAIL_SPRITE, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO, EXPORT_VIDEO, EXPORT_AUDIO, WAVEFORM_PEAKS, SHORT_CLIP_VIDEO, SHORT_CLIP_THUMBNAIL, SHORT_CLIP_SUBTITLE]
  *         transcriptVersion:
  *           type: integer
  *           nullable: true
@@ -69,7 +81,17 @@
  *         name: assetType
  *         schema:
  *           type: string
- *           enum: [SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO]
+ *           enum: [THUMBNAIL, THUMBNAIL_SPRITE, SUBTITLE_SRT, SUBTITLE_VTT, BURNED_SUBTITLE_VIDEO, EXPORT_VIDEO, EXPORT_AUDIO, WAVEFORM_PEAKS, SHORT_CLIP_VIDEO, SHORT_CLIP_THUMBNAIL, SHORT_CLIP_SUBTITLE]
+ *       - in: query
+ *         name: mediaId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: projectId
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: query
  *         name: transcriptId
  *         schema:
@@ -77,6 +99,11 @@
  *           format: uuid
  *       - in: query
  *         name: chapterId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: shortClipId
  *         schema:
  *           type: string
  *           format: uuid

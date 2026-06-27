@@ -1,4 +1,7 @@
-import type { GeneratedAssetData } from "@/features/assets/asset.types";
+import type {
+  GeneratedAssetData,
+  GeneratedAssetType,
+} from "@/features/assets/asset.types";
 
 import type {
   MediaListItemResponseData,
@@ -8,11 +11,26 @@ import type {
 import { getMediaListThumbnailUrl } from "../lib/media-previews";
 
 function formatAssetTitle(asset: GeneratedAssetData) {
+  const metadataTitle =
+    typeof asset.metadata?.title === "string"
+      ? asset.metadata.title
+      : typeof asset.metadata?.filename === "string"
+        ? asset.metadata.filename
+        : null;
+
+  if (metadataTitle) {
+    return metadataTitle;
+  }
+
   return asset.assetType
     .toLowerCase()
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+export function isEditorOutputAssetType(assetType: GeneratedAssetType) {
+  return !assetType.startsWith("SHORT_CLIP_");
 }
 
 function getAssetMediaType(asset: GeneratedAssetData): MediaAssetType {
@@ -76,6 +94,8 @@ export function mapGeneratedAssetToLibraryItem(
 
   return {
     id: asset.id,
+    generatedAssetId: asset.id,
+    generatedAssetType: asset.assetType,
     title,
     originalFilename: title,
     assetUrl: null,

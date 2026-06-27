@@ -1,7 +1,6 @@
 "use client"
 
-import type { ChangeEvent } from "react"
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
@@ -12,13 +11,8 @@ import {
   CheckCircle2,
   CircleDashed,
   Clapperboard,
-  Copy,
-  Download,
-  Filter,
-  Mic2,
   Plus,
   Play,
-  Scissors,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -47,12 +41,10 @@ import { Input } from "@/components/ui/input"
 import {
   defaultLongToShortSettings,
   longToShortCaptionPresets,
-  longToShortCandidatesBySourceId,
   longToShortClipLengthOptions,
   longToShortClipModelOptions,
   longToShortGenreOptions,
   longToShortSpeechLanguageOptions,
-  longToShortSources,
 } from "@/features/long-to-short/long-to-short.data"
 import type {
   LongToShortCaptionPreset,
@@ -63,19 +55,26 @@ import type {
 import { jobService, isTerminalJob } from "@/features/jobs/job.service"
 import type { ProcessingJobData } from "@/features/jobs/job.types"
 import { useMediaDetail } from "@/features/media-library/hooks/use-media-detail"
+import { useMediaList } from "@/features/media-library/hooks/use-media-list"
 import { getMediaPreviewThumbnailUrl } from "@/features/media-library/lib/media-previews"
-import type { MediaDetailResponseData } from "@/features/media-library/types/media-library.types"
-import type { ClipCandidateData } from "@/features/short-clips/short-clips.types"
+import type {
+  MediaDetailResponseData,
+  MediaLibraryItem,
+} from "@/features/media-library/types/media-library.types"
+import type {
+  ClipCandidateData,
+  GenerateShortClipsPreferences,
+  ShortClipData,
+} from "@/features/short-clips/short-clips.types"
 import {
   useClipCandidates,
   useGenerateShortClips,
+  useShortClipDownloadUrls,
   useShortClips,
 } from "@/features/short-clips/use-short-clips"
 import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 import { cn } from "@/lib/utils"
 
-type PresetTab = "QUICK_PRESETS" | "MY_TEMPLATES"
-type UploadState = "IDLE" | "UPLOADING"
 type RunState = "IDLE" | "GENERATING" | "COMPLETED"
 type WorkspaceView = "SETUP" | "RESULTS"
 type LongToShortNotification = {
@@ -100,22 +99,6 @@ function formatSecondsAsClock(totalSeconds: number) {
   }
 
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
-}
-
-function getCandidateStatusBadge(status: LongToShortCandidate["status"]) {
-  if (status === "SELECTED") {
-    return { label: "Selected", variant: "success" as const }
-  }
-
-  if (status === "NEEDS_REVIEW") {
-    return { label: "Needs review", variant: "warning" as const }
-  }
-
-  if (status === "REJECTED") {
-    return { label: "Skipped", variant: "neutral" as const }
-  }
-
-  return { label: "Recommended", variant: "info" as const }
 }
 
 function getPlatformLabel(platform: LongToShortCandidate["platform"]) {
@@ -182,32 +165,6 @@ function getPresetToneClasses(tone: LongToShortCaptionPreset["tone"]) {
   }
 }
 
-function buildMockUploadSource(fileName: string, type: LongToShortSource["type"]) {
-  const slug = fileName
-    .toLowerCase()
-    .replace(/\.[^/.]+$/, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-
-  const durationSeconds = type === "VIDEO" ? 452 : 618
-
-  return {
-    id: `source_upload_${Date.now()}`,
-    projectSlug: slug || `uploaded-${Date.now()}`,
-    title: fileName.replace(/\.[^/.]+$/, ""),
-    sourceFileName: fileName,
-    assetUrl: null,
-    thumbnailUrl: null,
-    type,
-    durationSeconds,
-    durationLabel: formatSecondsAsClock(durationSeconds),
-    resolutionLabel: type === "VIDEO" ? "1080p" : "Audio only",
-    transcriptStatus: "READY" as const,
-    chapterStatus: "READY" as const,
-    status: "READY" as const,
-  }
-}
-
 function buildMediaSource(media: MediaDetailResponseData): LongToShortSource {
   const durationSeconds = media.duration ?? 0
   const title = media.title ?? media.originalFilename
@@ -234,24 +191,58 @@ function buildMediaSource(media: MediaDetailResponseData): LongToShortSource {
   }
 }
 
-function mapClipCandidate(candidate: ClipCandidateData): LongToShortCandidate {
+function buildMediaLibrarySource(item: MediaLibraryItem): LongToShortSource {
+  const durationSeconds = item.duration ?? 0
+
+  return {
+    id: item.id,
+    projectSlug: item.id,
+    title: item.title,
+    sourceFileName: item.originalFilename,
+    assetUrl: item.assetUrl,
+    thumbnailUrl: item.thumbnailUrl,
+    type: item.type === "AUDIO" ? "AUDIO" : "VIDEO",
+    durationSeconds,
+    durationLabel: formatSecondsAsClock(durationSeconds),
+    resolutionLabel:
+      item.width && item.height
+        ? `${item.width} x ${item.height}`
+        : item.type === "AUDIO"
+          ? "Audio only"
+          : "Source video",
+    transcriptStatus: "READY",
+    chapterStatus: "READY",
+    status: item.status === "UPLOADED" ? "READY" : "PROCESSING",
+  }
+}
+
+function getShortClipVideoAssetId(shortClip: ShortClipData | undefined) {
+  return shortClip?.assets.find((asset) => asset.assetType === "SHORT_CLIP_VIDEO")?.id
+}
+
+function mapClipCandidate(
+  candidate: ClipCandidateData,
+  shortClip: ShortClipData | undefined,
+  assetUrl: string | null
+): LongToShortCandidate {
+  const fallbackTitle =
+    candidate.text?.split(/\s+/).slice(0, 8).join(" ") || "Generated clip candidate"
+
   return {
     id: candidate.id,
     sourceId: candidate.mediaId,
+    shortClipId: shortClip?.id,
+    generatedAssetId: getShortClipVideoAssetId(shortClip),
+    assetUrl,
     sourceChapterLabel: candidate.chapterId ? "Generated chapter" : undefined,
-    title: candidate.cleanText?.slice(0, 64) || "Generated clip candidate",
-    caption: candidate.text ?? candidate.cleanText ?? "",
+    title: candidate.title ?? fallbackTitle,
+    caption: candidate.text ?? "",
     thumbnailUrl: null,
     startTime: candidate.startTime,
     endTime: candidate.endTime,
     duration: candidate.duration,
-    transcript: candidate.text ?? candidate.cleanText ?? "",
-    reviewNotes: [
-      candidate.llmReason,
-      typeof candidate.finalScore === "number"
-        ? `Score ${(candidate.finalScore * 100).toFixed(0)}`
-        : null,
-    ].filter((note): note is string => Boolean(note)),
+    transcript: candidate.text ?? "",
+    reviewNotes: [candidate.reason].filter((note): note is string => Boolean(note)),
     status:
       candidate.status === "SELECTED"
         ? "SELECTED"
@@ -262,6 +253,24 @@ function mapClipCandidate(candidate: ClipCandidateData): LongToShortCandidate {
     platform: "TIKTOK",
     burnSubtitles: true,
     transcriptVersionLabel: `Transcript v${candidate.transcriptVersion}`,
+    shortClipStatus: shortClip?.status,
+  }
+}
+
+function buildGenerationPreferences(
+  settings: LongToShortSettings
+): GenerateShortClipsPreferences {
+  return {
+    clipCount: 3,
+    clipLength: settings.clipLength,
+    aspectRatio: settings.aspectRatio,
+    language: settings.speechLanguage,
+    genre: settings.genre,
+    clipModel: settings.clipModel,
+    autoHook: settings.autoHook,
+    prompt: settings.prompt,
+    captionPresetId: settings.captionPresetId,
+    burnSubtitle: settings.captionPresetId !== "no-caption",
   }
 }
 
@@ -474,10 +483,12 @@ function CandidatePreviewMedia({
   preset: LongToShortCaptionPreset
   source: LongToShortSource
 }) {
-  if (source.assetUrl && source.type === "VIDEO") {
+  const mediaUrl = candidate.assetUrl ?? source.assetUrl
+
+  if (mediaUrl && source.type === "VIDEO") {
     return (
       <video
-        src={source.assetUrl}
+        src={mediaUrl}
         poster={candidate.thumbnailUrl ?? source.thumbnailUrl ?? undefined}
         controls
         playsInline
@@ -493,7 +504,7 @@ function CandidatePreviewMedia({
     )
   }
 
-  if (source.assetUrl && source.type === "AUDIO") {
+  if (mediaUrl && source.type === "AUDIO") {
     return (
       <div className="mx-auto flex w-full max-w-[30rem] flex-col items-center justify-center gap-5 rounded-xl border border-white/12 bg-zinc-950/78 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
         <div className="space-y-1 text-center">
@@ -503,7 +514,7 @@ function CandidatePreviewMedia({
           </p>
         </div>
         <audio
-          src={source.assetUrl}
+          src={mediaUrl}
           controls
           preload="metadata"
           className="w-full"
@@ -537,25 +548,14 @@ export function LongToShortWorkspace({
   const router = useRouter()
   const { selectedWorkspaceId } = useWorkspace()
   const workspaceId = selectedWorkspaceId ?? ""
-  const srtInputId = useId()
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const srtInputRef = useRef<HTMLInputElement | null>(null)
 
-  const [sources, setSources] = useState(longToShortSources)
+  const [sources, setSources] = useState<LongToShortSource[]>([])
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null)
   const [settings, setSettings] = useState<LongToShortSettings>(defaultLongToShortSettings)
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false)
-  const [uploadState, setUploadState] = useState<UploadState>("IDLE")
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [pendingSource, setPendingSource] = useState<LongToShortSource | null>(null)
-  const [srtFileName, setSrtFileName] = useState<string | null>(null)
-  const [presetTab, setPresetTab] = useState<PresetTab>("QUICK_PRESETS")
   const [runState, setRunState] = useState<RunState>("IDLE")
   const [workspaceView, setWorkspaceView] = useState<WorkspaceView>("SETUP")
   const [notification, setNotification] = useState<LongToShortNotification | null>(null)
-  const [candidatesBySource, setCandidatesBySource] = useState(
-    longToShortCandidatesBySourceId
-  )
   const [generationJob, setGenerationJob] = useState<ProcessingJobData | null>(null)
   const [hydratedSourceMediaId, setHydratedSourceMediaId] = useState<string | null>(null)
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
@@ -564,30 +564,60 @@ export function LongToShortWorkspace({
     enabled: open && Boolean(sourceMediaId),
     pollUntilReady: true,
   })
+  const mediaListQuery = useMediaList(workspaceId, {
+    page: 1,
+    limit: 50,
+    status: "UPLOADED",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  })
   const generateShortClips = useGenerateShortClips()
   const apiCandidateQuery = useClipCandidates(
     selectedSourceId,
-    { page: 1, limit: 50, sortBy: "finalScore", sortOrder: "desc" },
-    Boolean(selectedSourceId) && selectedSourceId === sourceMediaId
+    { page: 1, limit: 50, sortBy: "score", sortOrder: "desc" },
+    Boolean(selectedSourceId)
   )
   const apiShortClipsQuery = useShortClips(
     selectedSourceId,
     { page: 1, limit: 50, sortBy: "createdAt", sortOrder: "desc" },
-    Boolean(selectedSourceId) && selectedSourceId === sourceMediaId
+    Boolean(selectedSourceId)
+  )
+  const shortClipDownloadUrls = useShortClipDownloadUrls(
+    apiShortClipsQuery.data?.items ?? [],
+    Boolean(selectedSourceId)
   )
 
+  const mediaLibrarySources =
+    mediaListQuery.data?.items
+      .filter((item) => item.libraryGroup === "ORIGINAL")
+      .filter((item) => item.type === "VIDEO" || item.type === "AUDIO")
+      .map(buildMediaLibrarySource) ?? []
+  const sourceOptions = [
+    ...sources,
+    ...mediaLibrarySources.filter(
+      (source) => !sources.some((existingSource) => existingSource.id === source.id)
+    ),
+  ]
   const selectedSource =
-    sources.find((source) => source.id === selectedSourceId) ?? null
+    sourceOptions.find((source) => source.id === selectedSourceId) ?? null
   const selectedPreset =
     longToShortCaptionPresets.find((preset) => preset.id === settings.captionPresetId) ??
     longToShortCaptionPresets[0]
-  const apiCandidates = apiCandidateQuery.data?.items.map(mapClipCandidate) ?? []
+  const shortClipsByCandidateId = new Map(
+    apiShortClipsQuery.data?.items
+      .filter((clip) => clip.candidateId)
+      .map((clip) => [clip.candidateId!, clip]) ?? []
+  )
   const sourceCandidates =
-    selectedSource && selectedSource.id === sourceMediaId
-      ? apiCandidates
-      : selectedSource
-        ? candidatesBySource[selectedSource.id] ?? []
-        : []
+    apiCandidateQuery.data?.items.map((candidate) => {
+      const shortClip = shortClipsByCandidateId.get(candidate.id)
+
+      return mapClipCandidate(
+        candidate,
+        shortClip,
+        shortClip?.id ? shortClipDownloadUrls[shortClip.id] ?? null : null
+      )
+    }) ?? []
   const filteredCandidates = sourceCandidates.filter((candidate) => {
     const query = candidateSearch.trim().toLowerCase()
 
@@ -617,9 +647,6 @@ export function LongToShortWorkspace({
       processingStartTime: 0,
       processingEndTime: source.durationSeconds,
     }))
-    setUploadState("IDLE")
-    setUploadProgress(0)
-    setPendingSource(null)
     setIsLibraryPickerOpen(false)
     setWorkspaceView("SETUP")
     setRunState("IDLE")
@@ -641,49 +668,6 @@ export function LongToShortWorkspace({
 
     return () => window.clearTimeout(timeoutId)
   }, [hydratedSourceMediaId, open, sourceMediaQuery.data?.media])
-
-  useEffect(() => {
-    if (uploadState !== "UPLOADING" || !pendingSource) {
-      return
-    }
-
-    const intervalId = window.setInterval(() => {
-      setUploadProgress((currentProgress) => {
-        const nextProgress = Math.min(100, currentProgress + 12)
-
-        if (nextProgress >= 100) {
-          window.clearInterval(intervalId)
-          finalizePendingSource(pendingSource)
-        }
-
-        return nextProgress
-      })
-    }, 180)
-
-    return () => {
-      window.clearInterval(intervalId)
-    }
-  }, [pendingSource, uploadState])
-
-  useEffect(() => {
-    if (runState !== "GENERATING" || generationJob) {
-      return
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setRunState("COMPLETED")
-      setNotification({
-        id: `clips-ready-${Date.now()}`,
-        status: "SUCCESS",
-        title: "Clips are ready",
-        description: "Open the generated long-to-short candidates for review.",
-      })
-    }, 2800)
-
-    return () => {
-      window.clearTimeout(timeoutId)
-    }
-  }, [generationJob, runState])
 
   useEffect(() => {
     if (!generationJob || isTerminalJob(generationJob)) {
@@ -733,35 +717,8 @@ export function LongToShortWorkspace({
     setIsLibraryPickerOpen(false)
   }
 
-  const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-
-    if (!file) {
-      return
-    }
-
-    const type = file.type.startsWith("audio/") ? "AUDIO" : "VIDEO"
-
-    setPendingSource(buildMockUploadSource(file.name, type))
-    setUploadState("UPLOADING")
-    setUploadProgress(8)
-    event.target.value = ""
-  }
-
-  const handleSrtSelection = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-
-    if (!file) {
-      return
-    }
-
-    setSrtFileName(file.name)
-    event.target.value = ""
-  }
-
   const handleRemoveSource = () => {
     setSelectedSourceId(null)
-    setSrtFileName(null)
     setRunState("IDLE")
     setWorkspaceView("SETUP")
     setSelectedCandidateId(null)
@@ -784,23 +741,24 @@ export function LongToShortWorkspace({
       description: `${selectedSource.sourceFileName} is processing in the background.`,
     })
 
-    if (selectedSource.id === sourceMediaId) {
-      try {
-        const result = await generateShortClips.mutateAsync(selectedSource.id)
-        setGenerationJob(result.job)
-      } catch (error) {
-        setRunState("IDLE")
-        setNotification({
-          id: `clips-failed-${Date.now()}`,
-          status: "PROCESSING",
-          title: "Unable to start clip generation",
-          description:
-            error instanceof Error
-              ? error.message
-              : "Please check the media transcript and try again.",
-        })
-        return
-      }
+    try {
+      const result = await generateShortClips.mutateAsync({
+        mediaId: selectedSource.id,
+        preferences: buildGenerationPreferences(settings),
+      })
+      setGenerationJob(result.job)
+    } catch (error) {
+      setRunState("IDLE")
+      setNotification({
+        id: `clips-failed-${Date.now()}`,
+        status: "PROCESSING",
+        title: "Unable to start clip generation",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please check the media transcript and try again.",
+      })
+      return
     }
 
     onOpenChange?.(false)
@@ -817,24 +775,6 @@ export function LongToShortWorkspace({
     router.push(`/media-library?tab=long-to-short&source=${selectedSource.id}`)
   }
 
-  const selectCandidate = (candidateId: string) => {
-    if (!selectedSource) {
-      return
-    }
-
-    setCandidatesBySource((currentCandidates) => ({
-      ...currentCandidates,
-      [selectedSource.id]: (currentCandidates[selectedSource.id] ?? []).map((candidate) =>
-        candidate.id === candidateId
-          ? {
-              ...candidate,
-              status: "SELECTED",
-            }
-          : candidate
-      ),
-    }))
-  }
-
   const movePreviewSelection = (direction: "previous" | "next") => {
     if (sourceCandidates.length < 1 || selectedCandidateIndex < 0) {
       return
@@ -849,11 +789,6 @@ export function LongToShortWorkspace({
   }
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
-    if (uploadState === "UPLOADING") {
-      onOpenChange?.(true)
-      return
-    }
-
     onOpenChange?.(nextOpen)
     if (!nextOpen) {
       setIsLibraryPickerOpen(false)
@@ -871,7 +806,7 @@ export function LongToShortWorkspace({
               ? "sm:!max-w-[96rem]"
               : "sm:!max-w-[44rem] md:!max-w-[52rem]"
           )}
-          showCloseButton={uploadState !== "UPLOADING"}
+          showCloseButton
         >
           {!selectedSource ? (
             <>
@@ -921,76 +856,30 @@ export function LongToShortWorkspace({
               </div>
             </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="video/*,audio/*"
-              className="sr-only"
-              onChange={handleFileSelection}
-            />
-
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Button
                 type="button"
                 size="lg"
                 className="h-12 w-full min-w-0 justify-center gap-2 px-5 text-[15px]"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadState === "UPLOADING"}
+                onClick={() => setIsLibraryPickerOpen(true)}
               >
-                <UploadCloud className="size-4" />
-                Upload source file
+                <Sparkles className="size-4" />
+                Choose from Media Library
               </Button>
               <Button
                 type="button"
                 size="lg"
                 variant="outline"
                 className="h-12 w-full min-w-0 justify-center gap-2 px-5 text-[15px]"
-                onClick={() => setIsLibraryPickerOpen(true)}
-                disabled={uploadState === "UPLOADING"}
+                onClick={() => {
+                  onOpenChange?.(false)
+                  router.push("/media-library")
+                }}
               >
-                <Sparkles className="size-4" />
-                Choose from Media Library
+                <UploadCloud className="size-4" />
+                Upload media
               </Button>
             </div>
-
-            {uploadState === "UPLOADING" && pendingSource ? (
-              <div className="rounded-xl border border-border bg-background/90 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {pendingSource.sourceFileName}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Uploading {uploadProgress.toFixed(0)}%
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setPendingSource(null)
-                      setUploadState("IDLE")
-                      setUploadProgress(0)
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-sky-500 transition-[width]"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-
-                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                  <CircleDashed className="size-3.5 animate-spin" />
-                  <span>{Math.max(1, Math.ceil((100 - uploadProgress) / 10))} seconds left</span>
-                </div>
-              </div>
-            ) : null}
           </div>
 
           {isLibraryPickerOpen ? (
@@ -1018,7 +907,31 @@ export function LongToShortWorkspace({
                 </div>
 
                 <div className="grid gap-3">
-                  {sources.map((source) => {
+                  {mediaListQuery.isLoading ? (
+                    <div className="rounded-xl border border-dashed border-border bg-background/60 px-4 py-8 text-center text-sm text-muted-foreground">
+                      Loading media library...
+                    </div>
+                  ) : sourceOptions.length < 1 ? (
+                    <div className="rounded-xl border border-dashed border-border bg-background/60 px-4 py-8 text-center">
+                      <p className="text-sm font-medium text-foreground">
+                        No uploaded media yet
+                      </p>
+                      <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted-foreground">
+                        Upload a video or audio file in Media Library, then come
+                        back to generate short clips.
+                      </p>
+                      <Button
+                        type="button"
+                        className="mt-4"
+                        onClick={() => {
+                          onOpenChange?.(false)
+                          router.push("/media-library")
+                        }}
+                      >
+                        Open Media Library
+                      </Button>
+                    </div>
+                  ) : sourceOptions.map((source) => {
                     const SourceIcon =
                       source.type === "VIDEO" ? Clapperboard : AudioLines
 
@@ -1120,21 +1033,7 @@ export function LongToShortWorkspace({
               }
             />
 
-            <input
-              id={srtInputId}
-              ref={srtInputRef}
-              type="file"
-              accept=".srt,.vtt"
-              className="sr-only"
-              onChange={handleSrtSelection}
-            />
-            <button
-              type="button"
-              className="font-medium underline underline-offset-2 hover:text-foreground"
-              onClick={() => srtInputRef.current?.click()}
-            >
-              {srtFileName ? srtFileName : "Upload SRT (optional)"}
-            </button>
+            <span>Captions follow the selected preset</span>
           </div>
 
           <PreviewMock
@@ -1161,23 +1060,6 @@ export function LongToShortWorkspace({
                 )}
               >
                 AI clipping
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setSettings((currentSettings) => ({
-                    ...currentSettings,
-                    mode: "MANUAL_MOMENTS",
-                  }))
-                }
-                className={cn(
-                  "border-b-2 px-3 py-3 text-sm font-semibold transition",
-                  settings.mode === "MANUAL_MOMENTS"
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Don&apos;t clip
               </button>
             </div>
 
@@ -1298,93 +1180,64 @@ export function LongToShortWorkspace({
 
           <section className="rounded-xl border border-border/70 bg-card shadow-[var(--shadow-card)]">
             <div className="flex border-b border-border/70 px-3">
-              <button
-                type="button"
-                onClick={() => setPresetTab("QUICK_PRESETS")}
-                className={cn(
-                  "border-b-2 px-3 py-3 text-sm font-semibold transition",
-                  presetTab === "QUICK_PRESETS"
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Quick presets
-              </button>
-              <button
-                type="button"
-                onClick={() => setPresetTab("MY_TEMPLATES")}
-                className={cn(
-                  "border-b-2 px-3 py-3 text-sm font-semibold transition",
-                  presetTab === "MY_TEMPLATES"
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                My templates
-              </button>
+              <div className="border-b-2 border-foreground px-3 py-3 text-sm font-semibold text-foreground">
+                Caption presets
+              </div>
             </div>
 
             <div className="space-y-4 px-4 py-4">
-              {presetTab === "QUICK_PRESETS" ? (
-                <>
-                  <p className="text-xs text-muted-foreground">Caption</p>
-                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-                    {longToShortCaptionPresets.map((preset) => {
-                      const isActive = settings.captionPresetId === preset.id
-                      const tone = getPresetToneClasses(preset.tone)
+              <p className="text-xs text-muted-foreground">Caption</p>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+                {longToShortCaptionPresets.map((preset) => {
+                  const isActive = settings.captionPresetId === preset.id
+                  const tone = getPresetToneClasses(preset.tone)
 
-                      return (
-                        <button
-                          key={preset.id}
-                          type="button"
-                          onClick={() =>
-                            setSettings((currentSettings) => ({
-                              ...currentSettings,
-                              captionPresetId: preset.id,
-                            }))
-                          }
-                          className="min-w-0 text-center"
-                        >
-                          <div
-                            className={cn(
-                              "relative flex aspect-[1.35] items-center justify-center rounded-lg border transition",
-                              tone.frame,
-                              isActive
-                                ? "border-foreground shadow-[0_0_0_1px_var(--foreground)]"
-                                : "border-border hover:border-foreground/30"
-                            )}
-                          >
-                            {preset.isNew ? (
-                              <Badge variant="warning" className="absolute right-1 top-1 px-1 text-[9px]">
-                                New
-                              </Badge>
-                            ) : null}
-                            {preset.isNoCaption ? (
-                              <Ban className="size-6 text-muted-foreground" />
-                            ) : (
-                              <div className="scale-75 text-center">
-                                <p className={cn("text-sm font-semibold leading-tight", tone.primary)}>
-                                  {preset.samplePrimary}
-                                </p>
-                                <p className={cn("text-sm font-semibold leading-tight", tone.secondary)}>
-                                  {preset.sampleSecondary}
-                                </p>
-                              </div>
-                            )}
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() =>
+                        setSettings((currentSettings) => ({
+                          ...currentSettings,
+                          captionPresetId: preset.id,
+                        }))
+                      }
+                      className="min-w-0 text-center"
+                    >
+                      <div
+                        className={cn(
+                          "relative flex aspect-[1.35] items-center justify-center rounded-lg border transition",
+                          tone.frame,
+                          isActive
+                            ? "border-foreground shadow-[0_0_0_1px_var(--foreground)]"
+                            : "border-border hover:border-foreground/30"
+                        )}
+                      >
+                        {preset.isNew ? (
+                          <Badge variant="warning" className="absolute right-1 top-1 px-1 text-[9px]">
+                            New
+                          </Badge>
+                        ) : null}
+                        {preset.isNoCaption ? (
+                          <Ban className="size-6 text-muted-foreground" />
+                        ) : (
+                          <div className="scale-75 text-center">
+                            <p className={cn("text-sm font-semibold leading-tight", tone.primary)}>
+                              {preset.samplePrimary}
+                            </p>
+                            <p className={cn("text-sm font-semibold leading-tight", tone.secondary)}>
+                              {preset.sampleSecondary}
+                            </p>
                           </div>
-                          <p className="mt-1 truncate text-[10px] text-muted-foreground">
-                            {preset.label}
-                          </p>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </>
-              ) : (
-                <div className="rounded-lg border border-dashed border-border bg-background/70 px-4 py-8 text-sm text-muted-foreground">
-                  Saved templates will live here once user presets are wired.
-                </div>
-              )}
+                        )}
+                      </div>
+                      <p className="mt-1 truncate text-[10px] text-muted-foreground">
+                        {preset.label}
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
 
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>Choose aspect ratio</span>
@@ -1414,11 +1267,6 @@ export function LongToShortWorkspace({
             </div>
           </section>
 
-          <div className="flex justify-center pt-2">
-            <Button type="button" variant="outline">
-              Save settings above as default
-            </Button>
-          </div>
         </div>
       ) : null}
 
@@ -1448,21 +1296,6 @@ export function LongToShortWorkspace({
                     placeholder="Find keywords or moments..."
                   />
                 </label>
-
-                <div className="flex shrink-0 items-center gap-2">
-                  <Button type="button" variant="outline" size="sm">
-                    <CheckCircle2 className="size-4" />
-                    Select
-                  </Button>
-                  <Button type="button" variant="outline" size="sm">
-                    <Filter className="size-4" />
-                    Filter
-                  </Button>
-                  <Button type="button" variant="outline" size="sm">
-                    <UploadCloud className="size-4" />
-                    Export
-                  </Button>
-                </div>
               </div>
             </div>
 
@@ -1562,32 +1395,17 @@ export function LongToShortWorkspace({
                             <span>{getPlatformLabel(candidate.platform)}</span>
                           </div>
 
-                          <div className="grid grid-cols-4 gap-2">
+                          <div className="grid grid-cols-1 gap-2">
                             <Button
                               type="button"
                               variant="outline"
-                              size="icon-sm"
+                              size="sm"
+                              className="justify-center"
                               onClick={() => setSelectedCandidateId(candidate.id)}
                             >
                               <span className="sr-only">Preview candidate</span>
                               <Play className="size-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon-sm"
-                              onClick={() => selectCandidate(candidate.id)}
-                            >
-                              <span className="sr-only">Select candidate</span>
-                              <CheckCircle2 className="size-4" />
-                            </Button>
-                            <Button type="button" variant="outline" size="icon-sm">
-                              <span className="sr-only">Download placeholder</span>
-                              <Download className="size-4" />
-                            </Button>
-                            <Button type="button" variant="outline" size="icon-sm">
-                              <span className="sr-only">Trim candidate</span>
-                              <Scissors className="size-4" />
+                              Preview
                             </Button>
                           </div>
                         </div>
@@ -1637,7 +1455,7 @@ export function LongToShortWorkspace({
               </Button>
             </div>
 
-            <div className="m-auto grid w-full gap-4 lg:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_11rem] lg:items-start">
+            <div className="m-auto grid w-full gap-4 lg:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)] lg:items-start">
               <div className="flex justify-center">
                 <CandidatePreviewMedia
                   aspectRatio={settings.aspectRatio}
@@ -1649,7 +1467,7 @@ export function LongToShortWorkspace({
               </div>
 
               <section className="rounded-xl border border-white/12 bg-zinc-950/78 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-                <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="border-b border-white/10 pb-4">
                   <div>
                     <p className="text-sm text-white/55">
                       #{selectedCandidateIndex + 1} · {selectedSource.sourceFileName}
@@ -1658,9 +1476,6 @@ export function LongToShortWorkspace({
                       {selectedCandidate.title}
                     </h2>
                   </div>
-                  <Badge variant={getCandidateStatusBadge(selectedCandidate.status).variant}>
-                    {getCandidateStatusBadge(selectedCandidate.status).label}
-                  </Badge>
                 </div>
 
                 <div className="mt-4 space-y-5">
@@ -1708,72 +1523,6 @@ export function LongToShortWorkspace({
                 </div>
               </section>
 
-              <aside className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                <Button
-                  type="button"
-                  className="justify-start bg-white text-zinc-950 hover:bg-white/90"
-                  onClick={() => selectCandidate(selectedCandidate.id)}
-                >
-                  <CheckCircle2 className="size-4" />
-                  {selectedCandidate.status === "SELECTED" ? "Open draft" : "Select clip"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <Scissors className="size-4" />
-                  Edit clip
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <WandSparkles className="size-4" />
-                  AI hook
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <Mic2 className="size-4" />
-                  Enhance speech
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <Clapperboard className="size-4" />
-                  Add B-Roll
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <Copy className="size-4" />
-                  Duplicate
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <Download className="size-4" />
-                  Download
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="justify-start border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
-                  <UploadCloud className="size-4" />
-                  Publish
-                </Button>
-              </aside>
             </div>
           </div>
         </div>

@@ -54,9 +54,9 @@ const toSourceData = (task: PublishTaskRecord): PublishTaskSourceData | null => 
     return {
       type: 'SHORT_CLIP',
       id: task.shortClip.id,
-      title: task.shortClip.title ?? task.shortClip.media.title ?? task.shortClip.media.originalFilename,
+      title: task.shortClip.candidate?.title ?? task.shortClip.media.title ?? task.shortClip.media.originalFilename,
       thumbnailUrl: null,
-      duration: task.shortClip.duration,
+      duration: task.shortClip.candidate?.duration ?? null,
       aspectRatio: task.shortClip.aspectRatio,
       mediaType: task.shortClip.media.type
     }

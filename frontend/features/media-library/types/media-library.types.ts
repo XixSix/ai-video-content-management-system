@@ -18,6 +18,8 @@ export type MediaTypeFilter = "ALL" | MediaAssetType
 
 export type MediaLibraryItem = {
   id: string
+  generatedAssetId?: string
+  generatedAssetType?: string
   title: string
   originalFilename: string
   assetUrl: string | null

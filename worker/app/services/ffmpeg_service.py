@@ -258,6 +258,46 @@ class FFmpegService:
         _validate_non_empty_output(output_path)
         return output_path
 
+    def render_short_clip(
+        self,
+        media_path: Path,
+        output_path: Path,
+        *,
+        start_time: float,
+        duration: float,
+        aspect_ratio: str,
+        subtitle_path: Path | None = None,
+    ) -> Path:
+        """Cut a source video into a rendered short clip with MVP crop settings."""
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        filters = [_video_filter_for_aspect_ratio(aspect_ratio)]
+
+        if subtitle_path is not None:
+            filters.append(f"subtitles={_escape_filter_path(subtitle_path)}")
+
+        command = [
+            self.ffmpeg_binary,
+            "-y",
+            "-ss",
+            f"{max(0.0, start_time):.6f}",
+            "-i",
+            str(media_path),
+            "-t",
+            f"{max(0.1, duration):.6f}",
+            "-vf",
+            ",".join(filters),
+            "-c:v",
+            "libx264",
+            "-c:a",
+            "aac",
+            "-movflags",
+            "+faststart",
+            str(output_path),
+        ]
+        self._run(command)
+        _validate_non_empty_output(output_path)
+        return output_path
+
     def probe_audio(self, audio_path: Path) -> AudioMetadata:
         """Read the first audio stream metadata with ffprobe."""
         command = [
@@ -448,6 +488,20 @@ def validate_audio_sanity(
 
 def _command_name(command: list[str]) -> str:
     return Path(command[0]).name if command else "unknown"
+
+
+def _video_filter_for_aspect_ratio(aspect_ratio: str) -> str:
+    if aspect_ratio == "16:9":
+        return "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080"
+
+    if aspect_ratio == "1:1":
+        return "scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080"
+
+    return "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"
+
+
+def _escape_filter_path(path: Path) -> str:
+    return str(path).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
 
 
 def _validate_non_empty_output(output_path: Path) -> None:

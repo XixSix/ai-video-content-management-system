@@ -42,6 +42,14 @@ class _CeleryAppSettings:
         default="media_preview_task",
         alias="MEDIA_PREVIEW_TASK_NAME",
     )
+    short_clip_queue_name: str = Field(
+        default="short_clip_queue",
+        alias="SHORT_CLIP_QUEUE_NAME",
+    )
+    short_clip_task_name: str = Field(
+        default="short_clip_task",
+        alias="SHORT_CLIP_TASK_NAME",
+    )
     render_exports_queue_name: str = Field(
         default="render_exports_queue",
         alias="RENDER_EXPORTS_QUEUE_NAME",

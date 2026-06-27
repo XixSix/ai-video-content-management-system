@@ -6,6 +6,7 @@ export interface AssetResponseData {
   projectId: string | null
   transcriptId: string | null
   chapterId: string | null
+  shortClipId: string | null
   assetType: AssetType
   transcriptVersion: number | null
   mimeType: string | null

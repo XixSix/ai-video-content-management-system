@@ -1,4 +1,11 @@
-import type { ClipCandidateStatus, Prisma, ShortClipStatus } from '../../infrastructure/db/generated/prisma/client'
+import type {
+  ClipCandidate,
+  ClipCandidateStatus,
+  GeneratedAsset,
+  Prisma,
+  ShortClip,
+  ShortClipStatus
+} from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
 
 export const SHORT_CLIPS_QUEUE_NAME = 'short_clip_queue'
@@ -8,6 +15,30 @@ export const SHORT_CLIPS_CELERY_TASK_NAME = 'short_clip_task'
 export type GenerateShortClipsInput = {
   mediaId: string
   userId: string
+  preferences: ShortClipGenerationPreferences
+}
+
+export type ShortClipGenerationPreferences = {
+  transcriptId?: string
+  clipCount: number
+  clipLength: 'AUTO' | '15_30' | '30_60' | '60_90'
+  minDuration?: number
+  maxDuration?: number
+  aspectRatio: '9:16' | '1:1' | '16:9'
+  language: 'AUTO' | 'ENGLISH' | 'VIETNAMESE'
+  genre: 'AUTO' | 'PODCAST' | 'INTERVIEW' | 'TUTORIAL' | 'WEBINAR'
+  clipModel: 'AUTO' | 'BALANCED' | 'VIRAL_HOOKS'
+  autoHook: boolean
+  prompt: string
+  captionPresetId: string
+  burnSubtitle: boolean
+}
+
+export type NormalizedShortClipJobInput = Omit<ShortClipGenerationPreferences, 'transcriptId'> & {
+  transcriptId: string
+  transcriptVersion: number
+  minDuration: number
+  maxDuration: number
 }
 
 export type GenerateShortClipsResult = {
@@ -26,29 +57,31 @@ export interface CreateShortClipDownloadUrlResult {
 export interface ClipCandidateData {
   id: string
   mediaId: string
+  userId: string
   transcriptId: string
   chapterId: string | null
   jobId: string | null
+  projectId: string | null
   startTime: number
   endTime: number
   duration: number
   transcriptVersion: number
+  title: string | null
+  reason: string | null
+  score: number | null
   text: string | null
-  cleanText: string | null
-  hookScore: number | null
-  questionScore: number | null
-  keywordScore: number | null
-  durationScore: number | null
-  speechDensityScore: number | null
-  saliencyScore: number | null
-  completenessScore: number | null
-  emotionScore: number | null
-  finalScore: number | null
-  llmScore: number | null
-  llmReason: string | null
-  dedupGroupId: string | null
   metadata: Prisma.JsonValue | null
   status: ClipCandidateStatus
+  createdAt: Date
+}
+
+export interface ShortClipAssetData {
+  id: string
+  assetType: string
+  transcriptVersion: number | null
+  mimeType: string | null
+  fileSizeBytes: string | null
+  metadata: Prisma.JsonValue | null
   createdAt: Date
 }
 
@@ -56,24 +89,12 @@ export interface ShortClipData {
   id: string
   mediaId: string
   userId: string
-  transcriptId: string | null
-  chapterId: string | null
   candidateId: string | null
-  title: string | null
-  caption: string | null
-  description: string | null
-  hashtags: Prisma.JsonValue | null
-  startTime: number
-  endTime: number
-  duration: number
-  transcriptVersion: number | null
-  score: number | null
-  reason: string | null
-  videoPath: string | null
-  thumbnailPath: string | null
-  subtitlePath: string | null
+  projectId: string | null
   aspectRatio: string | null
   status: ShortClipStatus
+  candidate: ClipCandidateData | null
+  assets: ShortClipAssetData[]
   createdAt: Date
   updatedAt: Date
 }
@@ -86,6 +107,12 @@ export interface PaginatedResult<TItem> {
   totalPages: number
 }
 
-export type ClipCandidateSortField = 'finalScore' | 'createdAt' | 'startTime' | 'duration'
-export type ShortClipSortField = 'createdAt' | 'startTime' | 'duration' | 'score'
+export type ClipCandidateRecord = ClipCandidate
+export type ShortClipRecord = ShortClip & {
+  candidate: ClipCandidate | null
+  generatedAssets: GeneratedAsset[]
+}
+
+export type ClipCandidateSortField = 'score' | 'createdAt' | 'startTime' | 'duration'
+export type ShortClipSortField = 'createdAt' | 'updatedAt' | 'status'
 export type SortOrder = 'asc' | 'desc'

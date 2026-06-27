@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
 import {
   useEffect,
@@ -10,23 +9,19 @@ import {
 } from "react"
 import {
   Clapperboard,
-  Copy,
   Download,
-  Edit3,
   AlertCircle,
   Loader2,
   Maximize2,
   MoreHorizontal,
   Play,
   Pause,
-  Send,
   Share2,
   SkipBack,
   SkipForward,
   Sparkles,
   Volume2,
   VolumeX,
-  Wand2,
   X,
 } from "lucide-react"
 
@@ -240,11 +235,11 @@ function CandidateNativeAssetPreview({
   candidate: LongToShortCandidate
   item: MediaLibraryItem
 }) {
-  if (!item.assetUrl) {
+  const mediaUrl = candidate.assetUrl ?? null
+
+  if (!mediaUrl) {
     return null
   }
-
-  const mediaUrl = item.assetUrl
 
   if (item.type === "VIDEO") {
     const isVertical =
@@ -497,7 +492,9 @@ function MediaPlayerPanel({
   const playerPanelRef = useRef<HTMLElement | null>(null)
   const hasNativeAssetPreview = Boolean(item.assetUrl) && !candidate
   const hasCandidateNativeAssetPreview =
-    Boolean(item.assetUrl) && Boolean(candidate) && (item.type === "VIDEO" || item.type === "AUDIO")
+    Boolean(candidate?.assetUrl) &&
+    Boolean(candidate) &&
+    (item.type === "VIDEO" || item.type === "AUDIO")
 
   const toggleFullscreen = () => {
     const panel = playerPanelRef.current
@@ -669,12 +666,7 @@ function ActionRail({
 }) {
   const actions = isLongToShort
     ? [
-        { label: "Edit clip", icon: Edit3, href: "/studio" },
-        { label: "Publish", icon: Send },
         { label: "Download", icon: Download },
-        { label: "Enhance", icon: Wand2 },
-        { label: "Duplicate", icon: Copy },
-        { label: "More", icon: MoreHorizontal },
       ]
     : [
         { label: "Open Editor", icon: Clapperboard },
@@ -699,8 +691,7 @@ function ActionRail({
               variant="outline"
               size="icon-lg"
               className="rounded-xl"
-              asChild={Boolean(action.href)}
-              disabled={!action.href && isDisabled}
+              disabled={isDisabled}
               onClick={
                 action.label === "Download"
                   ? onDownload
@@ -711,17 +702,8 @@ function ActionRail({
                       : undefined
               }
             >
-              {action.href ? (
-                <Link href={action.href}>
-                  <Icon className="size-4" />
-                  <span className="sr-only">{action.label}</span>
-                </Link>
-              ) : (
-                <>
-                  <Icon className="size-4" />
-                  <span className="sr-only">{action.label}</span>
-                </>
-              )}
+              <Icon className="size-4" />
+              <span className="sr-only">{action.label}</span>
             </Button>
           )
 
@@ -849,6 +831,18 @@ export function MediaLibraryPreviewDialog({
     ? candidates.findIndex((candidate) => candidate.id === selectedCandidate.id)
     : -1
   const isLongToShortPreview = activeTab === "LONG_TO_SHORT" && candidates.length > 0
+  const downloadSelectedCandidate = () => {
+    if (!selectedCandidate?.assetUrl) {
+      return
+    }
+
+    const anchor = document.createElement("a")
+    anchor.href = selectedCandidate.assetUrl
+    anchor.target = "_blank"
+    anchor.rel = "noreferrer"
+    anchor.download = `${selectedCandidate.title}.mp4`
+    anchor.click()
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -901,7 +895,13 @@ export function MediaLibraryPreviewDialog({
           <ActionRail
             isLongToShort={isLongToShortPreview}
             onCreateClips={onCreateClips}
-            onDownload={onDownload}
+            onDownload={
+              isLongToShortPreview
+                ? selectedCandidate?.assetUrl
+                  ? downloadSelectedCandidate
+                  : undefined
+                : onDownload
+            }
             onOpenEditor={onOpenEditor}
           />
           {isLongToShortPreview ? (

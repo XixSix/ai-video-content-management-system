@@ -1,6 +1,6 @@
 import type { ClipCandidate, ProcessingJob, ShortClip } from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
-import type { ClipCandidateData, ShortClipData } from './short-clips.types'
+import type { ClipCandidateData, ShortClipAssetData, ShortClipData, ShortClipRecord } from './short-clips.types'
 
 export const toJobResponseData = (job: ProcessingJob): JobResponseData => ({
   id: job.id,
@@ -20,54 +20,44 @@ export const toJobResponseData = (job: ProcessingJob): JobResponseData => ({
 export const toClipCandidateData = (candidate: ClipCandidate): ClipCandidateData => ({
   id: candidate.id,
   mediaId: candidate.mediaId,
+  userId: candidate.userId,
   transcriptId: candidate.transcriptId,
   chapterId: candidate.chapterId,
   jobId: candidate.jobId,
+  projectId: candidate.projectId,
   startTime: candidate.startTime,
   endTime: candidate.endTime,
   duration: candidate.duration,
   transcriptVersion: candidate.transcriptVersion,
+  title: candidate.title,
+  reason: candidate.reason,
+  score: candidate.score,
   text: candidate.text,
-  cleanText: candidate.cleanText,
-  hookScore: candidate.hookScore,
-  questionScore: candidate.questionScore,
-  keywordScore: candidate.keywordScore,
-  durationScore: candidate.durationScore,
-  speechDensityScore: candidate.speechDensityScore,
-  saliencyScore: candidate.saliencyScore,
-  completenessScore: candidate.completenessScore,
-  emotionScore: candidate.emotionScore,
-  finalScore: candidate.finalScore,
-  llmScore: candidate.llmScore,
-  llmReason: candidate.llmReason,
-  dedupGroupId: candidate.dedupGroupId,
   metadata: candidate.metadata,
   status: candidate.status,
   createdAt: candidate.createdAt
 })
 
-export const toShortClipData = (clip: ShortClip): ShortClipData => ({
+const toShortClipAssetData = (asset: ShortClipRecord['generatedAssets'][number]): ShortClipAssetData => ({
+  id: asset.id,
+  assetType: asset.assetType,
+  transcriptVersion: asset.transcriptVersion,
+  mimeType: asset.mimeType,
+  fileSizeBytes: asset.fileSizeBytes?.toString() ?? null,
+  metadata: asset.metadata,
+  createdAt: asset.createdAt
+})
+
+export const toShortClipData = (clip: ShortClipRecord | ShortClip): ShortClipData => ({
   id: clip.id,
   mediaId: clip.mediaId,
   userId: clip.userId,
-  transcriptId: clip.transcriptId,
-  chapterId: clip.chapterId,
   candidateId: clip.candidateId,
-  title: clip.title,
-  caption: clip.caption,
-  description: clip.description,
-  hashtags: clip.hashtags,
-  startTime: clip.startTime,
-  endTime: clip.endTime,
-  duration: clip.duration,
-  transcriptVersion: clip.transcriptVersion,
-  score: clip.score,
-  reason: clip.reason,
-  videoPath: clip.videoPath,
-  thumbnailPath: clip.thumbnailPath,
-  subtitlePath: clip.subtitlePath,
+  projectId: clip.projectId,
   aspectRatio: clip.aspectRatio,
   status: clip.status,
+  candidate: 'candidate' in clip && clip.candidate ? toClipCandidateData(clip.candidate) : null,
+  assets: 'generatedAssets' in clip ? clip.generatedAssets.map(toShortClipAssetData) : [],
   createdAt: clip.createdAt,
   updatedAt: clip.updatedAt
 })

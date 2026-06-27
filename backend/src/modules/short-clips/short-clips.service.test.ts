@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import type {
   ClipCandidate,
+  GeneratedAsset,
   Media,
   ProcessingJob,
   ShortClip,
@@ -10,6 +11,8 @@ import type {
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
 const findLatestTranscriptByMediaIdAndUserIdMock =
   jest.fn<(mediaId: string, userId: string) => Promise<Transcript | null>>()
+const findTranscriptByIdAndMediaIdAndUserIdMock =
+  jest.fn<(transcriptId: string, mediaId: string, userId: string) => Promise<Transcript | null>>()
 const countTranscriptSegmentsByTranscriptIdMock = jest.fn<(transcriptId: string) => Promise<number>>()
 const findActiveShortClipJobByMediaIdAndUserIdMock =
   jest.fn<(mediaId: string, userId: string) => Promise<ProcessingJob | null>>()
@@ -31,12 +34,15 @@ const findShortClipsByMediaIdAndUserIdMock =
     (filters: unknown, skip: number, take: number, sortBy: string, sortOrder: string) => Promise<[ShortClip[], number]>
   >()
 const findShortClipByIdMock = jest.fn<(id: string) => Promise<ShortClip | null>>()
+const findLatestShortClipVideoAssetMock =
+  jest.fn<(shortClipId: string, userId: string) => Promise<GeneratedAsset | null>>()
 type PublishShortClipJobMockInput = {
   jobId: string
   mediaId: string
   userId: string
   transcriptId: string
   transcriptVersion: number
+  preferences: unknown
 }
 const publishShortClipJobMock = jest.fn<(message: PublishShortClipJobMockInput) => Promise<void>>()
 const createPresignedGetUrlMock = jest.fn<(bucket: string, key: string) => Promise<string>>()
@@ -48,7 +54,9 @@ jest.unstable_mockModule('./short-clips.repository', () => ({
   findClipCandidateById: findClipCandidateByIdMock,
   findClipCandidatesByMediaIdAndUserId: findClipCandidatesByMediaIdAndUserIdMock,
   findLatestTranscriptByMediaIdAndUserId: findLatestTranscriptByMediaIdAndUserIdMock,
+  findTranscriptByIdAndMediaIdAndUserId: findTranscriptByIdAndMediaIdAndUserIdMock,
   findMediaById: findMediaByIdMock,
+  findLatestShortClipVideoAsset: findLatestShortClipVideoAssetMock,
   findShortClipById: findShortClipByIdMock,
   findShortClipsByMediaIdAndUserId: findShortClipsByMediaIdAndUserIdMock,
   updateProcessingJob: updateProcessingJobMock
@@ -73,7 +81,27 @@ const transcriptId = '00000000-0000-4000-8000-000000000004'
 const candidateId = '00000000-0000-4000-8000-000000000005'
 const chapterId = '00000000-0000-4000-8000-000000000006'
 const shortClipId = '00000000-0000-4000-8000-000000000007'
+const assetId = '00000000-0000-4000-8000-000000000008'
 const now = new Date('2026-05-24T10:00:00.000Z')
+
+const defaultPreferences = {
+  clipCount: 3,
+  clipLength: 'AUTO' as const,
+  aspectRatio: '9:16' as const,
+  language: 'AUTO' as const,
+  genre: 'AUTO' as const,
+  clipModel: 'AUTO' as const,
+  autoHook: true,
+  prompt: '',
+  captionPresetId: 'karaoke',
+  burnSubtitle: true
+}
+
+const generateInput = () => ({
+  mediaId,
+  userId,
+  preferences: defaultPreferences
+})
 
 const createMedia = (overrides: Partial<Media> = {}): Media => ({
   id: mediaId,
@@ -140,57 +168,64 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
 const createCandidate = (overrides: Partial<ClipCandidate> = {}): ClipCandidate => ({
   id: candidateId,
   mediaId,
+  userId,
   transcriptId,
   chapterId,
   jobId,
+  projectId: null,
   startTime: 10,
   endTime: 45,
   duration: 35,
   transcriptVersion: 2,
+  title: 'Strong short clip',
+  reason: 'Useful segment.',
+  score: 0.82,
   text: 'A good candidate.',
-  cleanText: 'a good candidate',
-  hookScore: 0.9,
-  questionScore: 0.1,
-  keywordScore: 0.5,
-  durationScore: 0.8,
-  speechDensityScore: 0.7,
-  saliencyScore: 0.6,
-  completenessScore: 0.75,
-  emotionScore: null,
-  finalScore: 0.82,
-  llmScore: 0.88,
-  llmReason: 'Useful segment.',
-  dedupGroupId: 'dedup-1',
   metadata: { sourceSegmentIds: ['segment-1'] },
   status: 'CANDIDATE',
   createdAt: now,
   ...overrides
 })
 
-const createShortClip = (overrides: Partial<ShortClip> = {}): ShortClip => ({
+const createAsset = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset => ({
+  id: assetId,
+  userId,
+  mediaId,
+  projectId: null,
+  transcriptId,
+  chapterId,
+  shortClipId,
+  jobId,
+  assetType: 'SHORT_CLIP_VIDEO',
+  transcriptVersion: 2,
+  s3Bucket: 'vidpilot-media',
+  s3Key: 'clips/media/clip.mp4',
+  s3Region: 'us-east-1',
+  s3Etag: null,
+  mimeType: 'video/mp4',
+  fileSizeBytes: BigInt(2048),
+  metadata: { aspectRatio: '9:16' },
+  createdAt: now,
+  ...overrides
+})
+
+const createShortClip = (
+  overrides: Partial<ShortClip> & {
+    candidate?: ClipCandidate | null
+    generatedAssets?: GeneratedAsset[]
+  } = {}
+): ShortClip & { candidate: ClipCandidate | null; generatedAssets: GeneratedAsset[] } => ({
   id: shortClipId,
   mediaId,
   userId,
-  transcriptId,
-  chapterId,
   candidateId,
-  title: 'Strong short clip',
-  caption: 'A strong short clip caption.',
-  description: null,
-  hashtags: ['#shorts'],
-  startTime: 10,
-  endTime: 45,
-  duration: 35,
-  transcriptVersion: 2,
-  score: 0.82,
-  reason: 'Strong hook and complete context.',
-  videoPath: 'clips/media/clip.mp4',
-  thumbnailPath: null,
-  subtitlePath: null,
+  projectId: null,
   aspectRatio: '9:16',
   status: 'READY',
   createdAt: now,
   updatedAt: now,
+  candidate: overrides.candidate === undefined ? createCandidate() : overrides.candidate,
+  generatedAssets: overrides.generatedAssets ?? [createAsset()],
   ...overrides
 })
 
@@ -198,6 +233,7 @@ describe('short clips service', () => {
   beforeEach(() => {
     findMediaByIdMock.mockReset()
     findLatestTranscriptByMediaIdAndUserIdMock.mockReset()
+    findTranscriptByIdAndMediaIdAndUserIdMock.mockReset()
     countTranscriptSegmentsByTranscriptIdMock.mockReset()
     findActiveShortClipJobByMediaIdAndUserIdMock.mockReset()
     createProcessingJobMock.mockReset()
@@ -206,6 +242,7 @@ describe('short clips service', () => {
     findClipCandidateByIdMock.mockReset()
     findShortClipsByMediaIdAndUserIdMock.mockReset()
     findShortClipByIdMock.mockReset()
+    findLatestShortClipVideoAssetMock.mockReset()
     publishShortClipJobMock.mockReset()
     createPresignedGetUrlMock.mockReset()
   })
@@ -218,7 +255,7 @@ describe('short clips service', () => {
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     publishShortClipJobMock.mockResolvedValue()
 
-    const result = await shortClipsService.generateShortClips({ mediaId, userId })
+    const result = await shortClipsService.generateShortClips(generateInput())
 
     expect(findLatestTranscriptByMediaIdAndUserIdMock).toHaveBeenCalledWith(mediaId, userId)
     expect(countTranscriptSegmentsByTranscriptIdMock).toHaveBeenCalledWith(transcriptId)
@@ -230,7 +267,19 @@ describe('short clips service', () => {
         status: 'PENDING',
         input: {
           transcriptId,
-          transcriptVersion: 2
+          transcriptVersion: 2,
+          clipCount: 3,
+          clipLength: 'AUTO',
+          minDuration: 20,
+          maxDuration: 60,
+          aspectRatio: '9:16',
+          language: 'AUTO',
+          genre: 'AUTO',
+          clipModel: 'AUTO',
+          autoHook: true,
+          prompt: '',
+          captionPresetId: 'karaoke',
+          burnSubtitle: true
         }
       })
     )
@@ -239,7 +288,15 @@ describe('short clips service', () => {
       mediaId,
       userId,
       transcriptId,
-      transcriptVersion: 2
+      transcriptVersion: 2,
+      preferences: expect.objectContaining({
+        transcriptId,
+        transcriptVersion: 2,
+        clipCount: 3,
+        minDuration: 20,
+        maxDuration: 60,
+        aspectRatio: '9:16'
+      })
     })
     expect(result).toMatchObject({
       wasCreated: true,
@@ -256,7 +313,7 @@ describe('short clips service', () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
     findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(createProcessingJob({ status: 'QUEUED' }))
 
-    const result = await shortClipsService.generateShortClips({ mediaId, userId })
+    const result = await shortClipsService.generateShortClips(generateInput())
 
     expect(findLatestTranscriptByMediaIdAndUserIdMock).not.toHaveBeenCalled()
     expect(countTranscriptSegmentsByTranscriptIdMock).not.toHaveBeenCalled()
@@ -276,7 +333,7 @@ describe('short clips service', () => {
     findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(null)
 
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 409,
       code: 'SHORT_CLIPS_TRANSCRIPT_NOT_FOUND'
     })
@@ -289,7 +346,7 @@ describe('short clips service', () => {
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     countTranscriptSegmentsByTranscriptIdMock.mockResolvedValue(0)
 
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 409,
       code: 'SHORT_CLIPS_TRANSCRIPT_SEGMENTS_NOT_FOUND'
     })
@@ -298,25 +355,25 @@ describe('short clips service', () => {
 
   it('rejects missing, forbidden, non-video, and not-uploaded media', async () => {
     findMediaByIdMock.mockResolvedValueOnce(null)
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 404,
       code: 'MEDIA_NOT_FOUND'
     })
 
     findMediaByIdMock.mockResolvedValueOnce(createMedia({ userId: otherUserId }))
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 403,
       code: 'FORBIDDEN'
     })
 
     findMediaByIdMock.mockResolvedValueOnce(createMedia({ type: 'IMAGE', mimeType: 'image/png' }))
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 409,
       code: 'INVALID_MEDIA_STATE'
     })
 
     findMediaByIdMock.mockResolvedValueOnce(createMedia({ status: 'UPLOADING' }))
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 409,
       code: 'INVALID_MEDIA_STATE'
     })
@@ -331,7 +388,7 @@ describe('short clips service', () => {
     updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
     publishShortClipJobMock.mockRejectedValue(new Error('RabbitMQ unavailable'))
 
-    await expect(shortClipsService.generateShortClips({ mediaId, userId })).rejects.toMatchObject({
+    await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 502,
       code: 'SHORT_CLIPS_QUEUE_PUBLISH_FAILED'
     })
@@ -381,7 +438,7 @@ describe('short clips service', () => {
           id: candidateId,
           mediaId,
           transcriptId,
-          finalScore: 0.82
+          score: 0.82
         })
       ],
       total: 1,
@@ -428,7 +485,7 @@ describe('short clips service', () => {
       page: 2,
       limit: 5,
       status: 'READY',
-      sortBy: 'score',
+      sortBy: 'updatedAt',
       sortOrder: 'asc'
     })
 
@@ -440,7 +497,7 @@ describe('short clips service', () => {
       },
       5,
       5,
-      'score',
+      'updatedAt',
       'asc'
     )
     expect(result).toEqual({
@@ -553,8 +610,9 @@ describe('short clips service', () => {
     })
   })
 
-  it('creates a download URL for ready short clips with a video path', async () => {
+  it('creates a download URL for ready short clips with a video asset', async () => {
     findShortClipByIdMock.mockResolvedValue(createShortClip())
+    findLatestShortClipVideoAssetMock.mockResolvedValue(createAsset())
     createPresignedGetUrlMock.mockResolvedValue(
       'http://localhost:9000/vidpilot-media/clips/media/clip.mp4?signature=test'
     )
@@ -587,7 +645,8 @@ describe('short clips service', () => {
       code: 'SHORT_CLIP_NOT_READY'
     })
 
-    findShortClipByIdMock.mockResolvedValueOnce(createShortClip({ videoPath: null }))
+    findShortClipByIdMock.mockResolvedValueOnce(createShortClip())
+    findLatestShortClipVideoAssetMock.mockResolvedValueOnce(null)
     await expect(shortClipsService.createShortClipDownloadUrl(userId, shortClipId)).rejects.toMatchObject({
       statusCode: 404,
       code: 'SHORT_CLIP_VIDEO_NOT_FOUND'
@@ -596,6 +655,7 @@ describe('short clips service', () => {
 
   it('wraps storage errors when creating a download URL', async () => {
     findShortClipByIdMock.mockResolvedValue(createShortClip())
+    findLatestShortClipVideoAssetMock.mockResolvedValue(createAsset())
     createPresignedGetUrlMock.mockRejectedValue(new Error('S3 unavailable'))
 
     await expect(shortClipsService.createShortClipDownloadUrl(userId, shortClipId)).rejects.toMatchObject({

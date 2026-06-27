@@ -37,6 +37,7 @@ describe("media library mapper", () => {
       projectId: "project-id",
       transcriptId: null,
       chapterId: null,
+      shortClipId: null,
       assetType: "EXPORT_VIDEO",
       transcriptVersion: null,
       mimeType: "video/mp4",
@@ -46,6 +47,7 @@ describe("media library mapper", () => {
     })
 
     expect(item.libraryGroup).toBe("EDITOR_OUTPUT")
+    expect(item.generatedAssetId).toBe("asset-id")
     expect(item.status).toBe("UPLOADED")
     expect(item.type).toBe("VIDEO")
   })

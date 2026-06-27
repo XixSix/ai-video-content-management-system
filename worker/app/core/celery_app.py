@@ -11,6 +11,7 @@ celery_app = Celery(
         "app.consumers.transcript_consumer",
         "app.consumers.chaptering_consumer",
         "app.consumers.media_preview_consumer",
+        "app.consumers.short_clip_consumer",
         "app.consumers.render_export_consumer",
         "app.consumers.publish_consumer",
     ],
@@ -31,6 +32,11 @@ celery_app.conf.update(
         Queue(
             settings.media_previews_queue_name,
             routing_key=settings.media_previews_queue_name,
+            durable=True,
+        ),
+        Queue(
+            settings.short_clip_queue_name,
+            routing_key=settings.short_clip_queue_name,
             durable=True,
         ),
         Queue(
@@ -58,6 +64,10 @@ celery_app.conf.update(
         settings.media_preview_task_name: {
             "queue": settings.media_previews_queue_name,
             "routing_key": settings.media_previews_queue_name,
+        },
+        settings.short_clip_task_name: {
+            "queue": settings.short_clip_queue_name,
+            "routing_key": settings.short_clip_queue_name,
         },
         settings.render_export_task_name: {
             "queue": settings.render_exports_queue_name,

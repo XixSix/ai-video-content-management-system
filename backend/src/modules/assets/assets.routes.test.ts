@@ -26,6 +26,7 @@ const transcriptId = '00000000-0000-4000-8000-000000000003'
 const chapterId = '00000000-0000-4000-8000-000000000004'
 const mediaId = '00000000-0000-4000-8000-000000000005'
 const projectId = '00000000-0000-4000-8000-000000000006'
+const shortClipId = '00000000-0000-4000-8000-000000000007'
 const now = new Date('2026-06-07T10:00:00.000Z')
 
 const authenticatedUser: AuthenticatedUser = {
@@ -41,6 +42,7 @@ const createAsset = (): AssetResponseData => ({
   projectId,
   transcriptId,
   chapterId: null,
+  shortClipId: null,
   assetType: 'SUBTITLE_SRT',
   transcriptVersion: 2,
   mimeType: 'application/x-subrip',
@@ -97,6 +99,7 @@ describe('asset routes', () => {
         projectId,
         transcriptId,
         chapterId,
+        shortClipId,
         page: '1',
         limit: '10'
       })
@@ -126,6 +129,7 @@ describe('asset routes', () => {
       projectId,
       transcriptId,
       chapterId,
+      shortClipId,
       page: 1,
       limit: 10,
       sortBy: 'createdAt',

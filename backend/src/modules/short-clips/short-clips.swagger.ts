@@ -33,56 +33,17 @@
  *           format: float
  *         transcriptVersion:
  *           type: integer
+ *         title:
+ *           type: string
+ *           nullable: true
+ *         reason:
+ *           type: string
+ *           nullable: true
+ *         score:
+ *           type: number
+ *           format: float
+ *           nullable: true
  *         text:
- *           type: string
- *           nullable: true
- *         cleanText:
- *           type: string
- *           nullable: true
- *         hookScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         questionScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         keywordScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         durationScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         speechDensityScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         saliencyScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         completenessScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         emotionScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         finalScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         llmScore:
- *           type: number
- *           format: float
- *           nullable: true
- *         llmReason:
- *           type: string
- *           nullable: true
- *         dedupGroupId:
  *           type: string
  *           nullable: true
  *         metadata:
@@ -107,59 +68,13 @@
  *         userId:
  *           type: string
  *           format: uuid
- *         transcriptId:
- *           type: string
- *           format: uuid
- *           nullable: true
- *         chapterId:
- *           type: string
- *           format: uuid
- *           nullable: true
  *         candidateId:
  *           type: string
  *           format: uuid
  *           nullable: true
- *         title:
+ *         projectId:
  *           type: string
- *           nullable: true
- *         caption:
- *           type: string
- *           nullable: true
- *         description:
- *           type: string
- *           nullable: true
- *         hashtags:
- *           type: array
- *           nullable: true
- *           items:
- *             type: string
- *         startTime:
- *           type: number
- *           format: float
- *         endTime:
- *           type: number
- *           format: float
- *         duration:
- *           type: number
- *           format: float
- *         transcriptVersion:
- *           type: integer
- *           nullable: true
- *         score:
- *           type: number
- *           format: float
- *           nullable: true
- *         reason:
- *           type: string
- *           nullable: true
- *         videoPath:
- *           type: string
- *           nullable: true
- *         thumbnailPath:
- *           type: string
- *           nullable: true
- *         subtitlePath:
- *           type: string
+ *           format: uuid
  *           nullable: true
  *         aspectRatio:
  *           type: string
@@ -167,10 +82,43 @@
  *         status:
  *           type: string
  *           enum: [PENDING, RENDERING, READY, FAILED, DELETED]
+ *         candidate:
+ *           allOf:
+ *             - $ref: '#/components/schemas/ClipCandidate'
+ *           nullable: true
+ *         assets:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ShortClipAsset'
  *         createdAt:
  *           type: string
  *           format: date-time
  *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *     ShortClipAsset:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         assetType:
+ *           type: string
+ *           enum: [SHORT_CLIP_VIDEO, SHORT_CLIP_THUMBNAIL, SHORT_CLIP_SUBTITLE]
+ *         transcriptVersion:
+ *           type: integer
+ *           nullable: true
+ *         mimeType:
+ *           type: string
+ *           nullable: true
+ *         fileSizeBytes:
+ *           type: string
+ *           nullable: true
+ *         metadata:
+ *           type: object
+ *           nullable: true
+ *           additionalProperties: true
+ *         createdAt:
  *           type: string
  *           format: date-time
  *     PaginatedMeta:
@@ -215,6 +163,58 @@
  *         schema:
  *           type: string
  *           format: uuid
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               clipCount:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 10
+ *                 default: 3
+ *               clipLength:
+ *                 type: string
+ *                 enum: [AUTO, 15_30, 30_60, 60_90]
+ *                 default: AUTO
+ *               minDuration:
+ *                 type: number
+ *                 nullable: true
+ *               maxDuration:
+ *                 type: number
+ *                 nullable: true
+ *               aspectRatio:
+ *                 type: string
+ *                 enum: ['9:16', '1:1', '16:9']
+ *                 default: '9:16'
+ *               language:
+ *                 type: string
+ *                 enum: [AUTO, ENGLISH, VIETNAMESE]
+ *                 default: AUTO
+ *               genre:
+ *                 type: string
+ *                 enum: [AUTO, PODCAST, INTERVIEW, TUTORIAL, WEBINAR]
+ *                 default: AUTO
+ *               clipModel:
+ *                 type: string
+ *                 enum: [AUTO, BALANCED, VIRAL_HOOKS]
+ *                 default: AUTO
+ *               autoHook:
+ *                 type: boolean
+ *                 default: true
+ *               prompt:
+ *                 type: string
+ *               captionPresetId:
+ *                 type: string
+ *                 default: karaoke
+ *               burnSubtitle:
+ *                 type: boolean
+ *                 default: true
+ *               transcriptId:
+ *                 type: string
+ *                 format: uuid
  *     responses:
  *       201:
  *         description: Short clip generation job created
@@ -319,8 +319,8 @@
  *         name: sortBy
  *         schema:
  *           type: string
- *           enum: [finalScore, createdAt, startTime, duration]
- *           default: finalScore
+ *           enum: [score, createdAt, startTime, duration]
+ *           default: score
  *       - in: query
  *         name: sortOrder
  *         schema:
@@ -463,7 +463,7 @@
  *         name: sortBy
  *         schema:
  *           type: string
- *           enum: [createdAt, startTime, duration, score]
+ *           enum: [createdAt, updatedAt, status]
  *           default: createdAt
  *       - in: query
  *         name: sortOrder

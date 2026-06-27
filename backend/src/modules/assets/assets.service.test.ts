@@ -37,6 +37,7 @@ const transcriptId = '00000000-0000-4000-8000-000000000004'
 const chapterId = '00000000-0000-4000-8000-000000000005'
 const mediaId = '00000000-0000-4000-8000-000000000006'
 const projectId = '00000000-0000-4000-8000-000000000007'
+const shortClipId = '00000000-0000-4000-8000-000000000008'
 const now = new Date('2026-06-07T10:00:00.000Z')
 
 const createAsset = (overrides: Partial<GeneratedAsset> = {}): GeneratedAsset => ({
@@ -81,6 +82,7 @@ describe('assets service', () => {
       projectId,
       transcriptId,
       chapterId,
+      shortClipId,
       sortBy: 'assetType',
       sortOrder: 'asc'
     })
@@ -92,7 +94,8 @@ describe('assets service', () => {
         mediaId,
         projectId,
         transcriptId,
-        chapterId
+        chapterId,
+        shortClipId
       },
       10,
       10,
@@ -107,6 +110,7 @@ describe('assets service', () => {
           projectId,
           transcriptId,
           chapterId: null,
+          shortClipId: null,
           assetType: 'SUBTITLE_SRT',
           transcriptVersion: 2,
           mimeType: 'application/x-subrip',

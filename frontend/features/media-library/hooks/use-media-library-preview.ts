@@ -2,32 +2,49 @@
 
 import { useState } from "react";
 
+import { useGeneratedAssetDownloadUrl } from "@/features/assets/use-assets";
 import type { LongToShortCandidate } from "@/features/long-to-short/long-to-short.types";
-import type { ClipCandidateData } from "@/features/short-clips/short-clips.types";
-import { useClipCandidates } from "@/features/short-clips/use-short-clips";
+import type {
+  ClipCandidateData,
+  ShortClipData,
+} from "@/features/short-clips/short-clips.types";
+import {
+  useClipCandidates,
+  useShortClipDownloadUrls,
+  useShortClips,
+} from "@/features/short-clips/use-short-clips";
 
 import type { MediaLibraryItem, MediaLibraryTab } from "../types/media-library.types";
 import { useMediaDetail } from "./use-media-detail";
 import { useMediaPreviewUrl } from "./use-media-mutations";
 
-function mapClipCandidate(candidate: ClipCandidateData): LongToShortCandidate {
+function getShortClipVideoAssetId(shortClip: ShortClipData | undefined) {
+  return shortClip?.assets.find((asset) => asset.assetType === "SHORT_CLIP_VIDEO")?.id;
+}
+
+function mapClipCandidate(
+  candidate: ClipCandidateData,
+  shortClip: ShortClipData | undefined,
+  assetUrl: string | null,
+): LongToShortCandidate {
+  const fallbackTitle =
+    candidate.text?.split(/\s+/).slice(0, 8).join(" ") || "Generated clip candidate";
+
   return {
     id: candidate.id,
     sourceId: candidate.mediaId,
+    shortClipId: shortClip?.id,
+    generatedAssetId: getShortClipVideoAssetId(shortClip),
+    assetUrl,
     sourceChapterLabel: candidate.chapterId ? "Generated chapter" : undefined,
-    title: candidate.cleanText?.slice(0, 64) || "Generated clip candidate",
-    caption: candidate.text ?? candidate.cleanText ?? "",
+    title: candidate.title ?? fallbackTitle,
+    caption: candidate.text ?? "",
     thumbnailUrl: null,
     startTime: candidate.startTime,
     endTime: candidate.endTime,
     duration: candidate.duration,
-    transcript: candidate.text ?? candidate.cleanText ?? "",
-    reviewNotes: [
-      candidate.llmReason,
-      typeof candidate.finalScore === "number"
-        ? `Score ${(candidate.finalScore * 100).toFixed(0)}`
-        : null,
-    ].filter((note): note is string => Boolean(note)),
+    transcript: candidate.text ?? "",
+    reviewNotes: [candidate.reason].filter((note): note is string => Boolean(note)),
     status:
       candidate.status === "SELECTED"
         ? "SELECTED"
@@ -38,6 +55,7 @@ function mapClipCandidate(candidate: ClipCandidateData): LongToShortCandidate {
     platform: "TIKTOK",
     burnSubtitles: true,
     transcriptVersionLabel: `Transcript v${candidate.transcriptVersion}`,
+    shortClipStatus: shortClip?.status,
   };
 }
 
@@ -97,27 +115,59 @@ export function useMediaLibraryPreview({
     previewItemIndex < navigablePreviewItems.length - 1;
   const clipCandidatesQuery = useClipCandidates(
     selectedLongToShortSourceId,
-    { page: 1, limit: 50, sortBy: "finalScore", sortOrder: "desc" },
+    { page: 1, limit: 50, sortBy: "score", sortOrder: "desc" },
+    activeTab === "LONG_TO_SHORT" && Boolean(selectedLongToShortSourceId),
+  );
+  const shortClipsQuery = useShortClips(
+    selectedLongToShortSourceId,
+    { page: 1, limit: 50, sortBy: "createdAt", sortOrder: "desc" },
+    activeTab === "LONG_TO_SHORT" && Boolean(selectedLongToShortSourceId),
+  );
+  const shortClipsByCandidateId = new Map(
+    shortClipsQuery.data?.items
+      .filter((clip) => clip.candidateId)
+      .map((clip) => [clip.candidateId!, clip]) ?? [],
+  );
+  const shortClipDownloadUrls = useShortClipDownloadUrls(
+    shortClipsQuery.data?.items ?? [],
     activeTab === "LONG_TO_SHORT" && Boolean(selectedLongToShortSourceId),
   );
   const previewCandidates: LongToShortCandidate[] =
-    clipCandidatesQuery.data?.items.map(mapClipCandidate) ?? [];
+    clipCandidatesQuery.data?.items.map((candidate) => {
+      const shortClip = shortClipsByCandidateId.get(candidate.id);
+
+      return mapClipCandidate(
+        candidate,
+        shortClip,
+        shortClip?.id ? shortClipDownloadUrls[shortClip.id] ?? null : null,
+      );
+    }) ?? [];
+  const shouldLoadOriginalPreview =
+    previewItem?.libraryGroup === "ORIGINAL" && previewItem.status === "UPLOADED";
   const previewUrlQuery = useMediaPreviewUrl(
     workspaceId,
-    previewItem ? previewItem.id : null,
-    previewItem?.status === "UPLOADED",
+    shouldLoadOriginalPreview && previewItem ? previewItem.id : null,
+    shouldLoadOriginalPreview,
+  );
+  const assetDownloadUrlQuery = useGeneratedAssetDownloadUrl(
+    previewItem?.libraryGroup === "EDITOR_OUTPUT"
+      ? previewItem.generatedAssetId ?? previewItem.id
+      : null,
+    previewItem?.libraryGroup === "EDITOR_OUTPUT" && previewItem.status === "UPLOADED",
   );
   const previewDetailQuery = useMediaDetail(
     workspaceId,
-    previewItem ? previewItem.id : null,
+    shouldLoadOriginalPreview && previewItem ? previewItem.id : null,
     {
-      enabled: previewItem?.status === "UPLOADED",
+      enabled: shouldLoadOriginalPreview,
       pollUntilReady: true,
     },
   );
   const resolvedPreviewItem =
     previewItem && previewUrlQuery.data?.url
       ? { ...previewItem, assetUrl: previewUrlQuery.data.url }
+      : previewItem && assetDownloadUrlQuery.data?.url
+        ? { ...previewItem, assetUrl: assetDownloadUrlQuery.data.url }
       : previewItem;
 
   const openMediaPreview = (item: MediaLibraryItem) => {
@@ -190,11 +240,19 @@ export function useMediaLibraryPreview({
           ? previewUrlQuery.error instanceof Error
             ? previewUrlQuery.error.message
             : "Unable to create a preview URL."
+          : previewItem && assetDownloadUrlQuery.isError
+            ? assetDownloadUrlQuery.error instanceof Error
+              ? assetDownloadUrlQuery.error.message
+              : "Unable to create an output preview URL."
           : null,
       hasNextItem: hasNextPreviewItem,
       hasPreviousItem: hasPreviousPreviewItem,
       item: resolvedPreviewItem,
-      loading: Boolean(previewItem) && previewUrlQuery.isLoading,
+      loading:
+        Boolean(previewItem) &&
+        (previewUrlQuery.isLoading ||
+          assetDownloadUrlQuery.isLoading ||
+          previewDetailQuery.isLoading),
       open: Boolean(previewItem),
     },
     onNextPreviewItem: openNextPreviewItem,

@@ -6,7 +6,10 @@ import type {
 } from "../types/media-library.types";
 import { getMediaItemsForTab } from "../utils/media-library.utils";
 import { useGeneratedAssets } from "@/features/assets/use-assets";
-import { mapGeneratedAssetToLibraryItem } from "../utils/media-library.mapper";
+import {
+  isEditorOutputAssetType,
+  mapGeneratedAssetToLibraryItem,
+} from "../utils/media-library.mapper";
 import { useMediaList } from "./use-media-list";
 import { useMediaUploadQueue } from "./use-media-upload-queue";
 
@@ -61,7 +64,9 @@ export function useMediaLibraryItems({
   const realItems = [
     ...uploadQueue.items,
     ...(mediaQuery.data?.items ?? []),
-    ...(assetsQuery.data?.items.map(mapGeneratedAssetToLibraryItem) ?? []),
+    ...(assetsQuery.data?.items
+      .filter((asset) => isEditorOutputAssetType(asset.assetType))
+      .map(mapGeneratedAssetToLibraryItem) ?? []),
   ];
   const items = getMediaItemsForTab(realItems, activeTab);
 

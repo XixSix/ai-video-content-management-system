@@ -12,6 +12,7 @@ const iconMap = {
   SCHEDULED: CalendarClock,
   PUBLISHING: Radio,
   FAILED: AlertCircle,
+  CANCELED: AlertCircle,
   PUBLISHED: CheckCircle2,
 } as const
 

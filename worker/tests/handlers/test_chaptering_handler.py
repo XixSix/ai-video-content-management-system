@@ -204,7 +204,7 @@ def test_process_chaptering_job_happy_path_returns_contract(
     monkeypatch.setattr(
         chaptering_handler.jobs_repository,
         "mark_job_queued_from_pending",
-        lambda session, job_id: _job(JobStatus.QUEUED),
+        lambda session, job_id, **kwargs: _job(JobStatus.QUEUED),
     )
     monkeypatch.setattr(
         chaptering_handler.chaptering_repository,
@@ -321,7 +321,7 @@ def test_process_chaptering_job_rejects_missing_transcript(
     monkeypatch.setattr(
         chaptering_handler.jobs_repository,
         "mark_job_queued_from_pending",
-        lambda session, job_id: _job(JobStatus.QUEUED),
+        lambda session, job_id, **kwargs: _job(JobStatus.QUEUED),
     )
     monkeypatch.setattr(
         chaptering_handler.chaptering_repository,

@@ -60,6 +60,9 @@ export type LongToShortCaptionPreset = {
 export type LongToShortCandidate = {
   id: string
   sourceId: string
+  shortClipId?: string
+  generatedAssetId?: string
+  assetUrl?: string | null
   sourceChapterLabel?: string
   title: string
   caption: string
@@ -74,6 +77,7 @@ export type LongToShortCandidate = {
   platform: LongToShortPlatform
   burnSubtitles: boolean
   transcriptVersionLabel: string
+  shortClipStatus?: "PENDING" | "RENDERING" | "READY" | "FAILED" | "DELETED"
   isOutdated?: boolean
 }
 

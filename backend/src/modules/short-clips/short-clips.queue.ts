@@ -1,5 +1,10 @@
 import * as rabbitPublisher from '../../infrastructure/rabbitmq/publisher'
-import { SHORT_CLIPS_CELERY_TASK_NAME, SHORT_CLIPS_QUEUE_NAME, SHORT_CLIPS_TASK_NAME } from './short-clips.types'
+import {
+  SHORT_CLIPS_CELERY_TASK_NAME,
+  SHORT_CLIPS_QUEUE_NAME,
+  SHORT_CLIPS_TASK_NAME,
+  type NormalizedShortClipJobInput
+} from './short-clips.types'
 
 export interface ShortClipJobMessage {
   jobId: string
@@ -7,6 +12,7 @@ export interface ShortClipJobMessage {
   userId: string
   transcriptId: string
   transcriptVersion: number
+  preferences: NormalizedShortClipJobInput
   taskName: typeof SHORT_CLIPS_TASK_NAME
 }
 

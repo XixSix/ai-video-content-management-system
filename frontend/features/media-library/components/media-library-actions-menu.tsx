@@ -71,6 +71,7 @@ export function MediaLibraryActionsMenu({
   const [isPropertiesOpen, setIsPropertiesOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [titleDraft, setTitleDraft] = useState(item.title)
+  const itemLabel = item.libraryGroup === "EDITOR_OUTPUT" ? "output" : "media"
 
   const openRenameDialog = (event: Event) => {
     event.preventDefault()
@@ -110,7 +111,7 @@ export function MediaLibraryActionsMenu({
               Retry upload
             </DropdownMenuItem>
           ) : null}
-          {item.status !== "UPLOADING" && item.status !== "FAILED" ? (
+          {item.status !== "UPLOADING" && item.status !== "FAILED" && onRename ? (
             <DropdownMenuItem onSelect={openRenameDialog}>
               <PencilLine className="size-4" />
               Rename
@@ -186,12 +187,14 @@ export function MediaLibraryActionsMenu({
             <DialogTitle>
               {item.status === "UPLOADING" && !item.uploadInterrupted
                 ? "Cancel this upload?"
-                : "Delete this media?"}
+                : `Delete this ${itemLabel}?`}
             </DialogTitle>
             <DialogDescription>
               {item.status === "UPLOADING" && !item.uploadInterrupted
                 ? "The current transfer will stop and its temporary storage object will be cleaned up."
-                : "This removes the source file from Media Library and cannot be undone."}
+                : item.libraryGroup === "EDITOR_OUTPUT"
+                  ? "This removes the generated asset from storage and cannot be undone."
+                  : "This removes the source file from Media Library and cannot be undone."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -210,7 +213,7 @@ export function MediaLibraryActionsMenu({
             >
               {item.status === "UPLOADING" && !item.uploadInterrupted
                 ? "Cancel upload"
-                : "Delete media"}
+                : `Delete ${itemLabel}`}
             </Button>
           </DialogFooter>
         </DialogContent>

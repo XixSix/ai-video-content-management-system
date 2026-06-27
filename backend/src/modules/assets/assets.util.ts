@@ -6,6 +6,7 @@ export const toAssetResponseData = (asset: GeneratedAssetRecord): AssetResponseD
   projectId: asset.projectId,
   transcriptId: asset.transcriptId,
   chapterId: asset.chapterId,
+  shortClipId: asset.shortClipId,
   assetType: asset.assetType,
   transcriptVersion: asset.transcriptVersion,
   mimeType: asset.mimeType,

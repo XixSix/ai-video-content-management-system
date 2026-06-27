@@ -6,8 +6,7 @@ import type {
   Platform,
   ProcessingJob,
   Prisma,
-  PublishStatus,
-  ShortClip
+  PublishStatus
 } from '../../infrastructure/db/generated/prisma/client'
 import type { PublishTaskSortField, SortOrder } from './publish-tasks.types'
 
@@ -42,7 +41,8 @@ const publishTaskArgs = {
     },
     shortClip: {
       include: {
-        media: true
+        media: true,
+        candidate: true
       }
     },
     platformAccount: true
@@ -50,6 +50,23 @@ const publishTaskArgs = {
 } satisfies Prisma.PublishTaskDefaultArgs
 
 export type PublishTaskRecord = Prisma.PublishTaskGetPayload<typeof publishTaskArgs>
+
+const publishShortClipArgs = {
+  include: {
+    media: true,
+    generatedAssets: {
+      where: {
+        assetType: AssetType.SHORT_CLIP_VIDEO
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 1
+    }
+  }
+} satisfies Prisma.ShortClipDefaultArgs
+
+export type PublishShortClipRecord = Prisma.ShortClipGetPayload<typeof publishShortClipArgs>
 
 const buildPublishTaskWhere = (filters: ListPublishTasksFilters): Prisma.PublishTaskWhereInput => ({
   userId: filters.userId,
@@ -85,7 +102,14 @@ const buildPublishTaskWhere = (filters: ListPublishTasksFilters): Prisma.Publish
           {
             shortClip: {
               is: {
-                title: { contains: filters.search, mode: 'insensitive' }
+                candidate: {
+                  is: {
+                    OR: [
+                      { title: { contains: filters.search, mode: 'insensitive' } },
+                      { text: { contains: filters.search, mode: 'insensitive' } }
+                    ]
+                  }
+                }
               }
             }
           },
@@ -163,9 +187,10 @@ export const findMediaById = async (id: string): Promise<Media | null> =>
     where: { id }
   })
 
-export const findShortClipById = async (id: string): Promise<ShortClip | null> =>
+export const findShortClipById = async (id: string): Promise<PublishShortClipRecord | null> =>
   prisma.shortClip.findUnique({
-    where: { id }
+    where: { id },
+    ...publishShortClipArgs
   })
 
 export const findProjectById = async (id: string): Promise<PublishProjectRecord | null> =>

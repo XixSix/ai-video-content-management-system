@@ -17,7 +17,23 @@ describe('short clips queue', () => {
       mediaId: '00000000-0000-4000-8000-000000000002',
       userId: '00000000-0000-4000-8000-000000000003',
       transcriptId: '00000000-0000-4000-8000-000000000004',
-      transcriptVersion: 2
+      transcriptVersion: 2,
+      preferences: {
+        transcriptId: '00000000-0000-4000-8000-000000000004',
+        transcriptVersion: 2,
+        clipCount: 3,
+        clipLength: 'AUTO',
+        minDuration: 20,
+        maxDuration: 60,
+        aspectRatio: '9:16',
+        language: 'AUTO',
+        genre: 'AUTO',
+        clipModel: 'AUTO',
+        autoHook: true,
+        prompt: '',
+        captionPresetId: 'karaoke',
+        burnSubtitle: true
+      }
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
@@ -30,6 +46,22 @@ describe('short clips queue', () => {
         userId: '00000000-0000-4000-8000-000000000003',
         transcriptId: '00000000-0000-4000-8000-000000000004',
         transcriptVersion: 2,
+        preferences: {
+          transcriptId: '00000000-0000-4000-8000-000000000004',
+          transcriptVersion: 2,
+          clipCount: 3,
+          clipLength: 'AUTO',
+          minDuration: 20,
+          maxDuration: 60,
+          aspectRatio: '9:16',
+          language: 'AUTO',
+          genre: 'AUTO',
+          clipModel: 'AUTO',
+          autoHook: true,
+          prompt: '',
+          captionPresetId: 'karaoke',
+          burnSubtitle: true
+        },
         taskName: 'generate_short_clips'
       }
     })

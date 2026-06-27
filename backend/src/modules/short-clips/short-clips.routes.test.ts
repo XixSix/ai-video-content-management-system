@@ -76,27 +76,19 @@ const createJobResult = (wasCreated = true): GenerateShortClipsServiceResult => 
 const createCandidate = (): ClipCandidateData => ({
   id: candidateId,
   mediaId,
+  userId: authenticatedUser.id,
   transcriptId,
   chapterId,
   jobId,
+  projectId: null,
   startTime: 12.5,
   endTime: 52.5,
   duration: 40,
   transcriptVersion: 2,
+  title: 'Strong short clip',
+  reason: 'Strong standalone segment.',
+  score: 0.82,
   text: 'This clip has a strong hook.',
-  cleanText: 'this clip has a strong hook',
-  hookScore: 0.9,
-  questionScore: 0.2,
-  keywordScore: 0.7,
-  durationScore: 0.8,
-  speechDensityScore: 0.6,
-  saliencyScore: 0.85,
-  completenessScore: 0.75,
-  emotionScore: null,
-  finalScore: 0.82,
-  llmScore: 0.88,
-  llmReason: 'Strong standalone segment.',
-  dedupGroupId: 'dedup-1',
   metadata: { sourceSegmentIds: ['segment-1'] },
   status: 'CANDIDATE',
   createdAt: now
@@ -106,27 +98,27 @@ const createShortClip = (): ShortClipData => ({
   id: shortClipId,
   mediaId,
   userId: authenticatedUser.id,
-  transcriptId,
-  chapterId,
   candidateId,
-  title: 'Strong short clip',
-  caption: 'A strong short clip caption.',
-  description: null,
-  hashtags: ['#shorts'],
-  startTime: 12.5,
-  endTime: 52.5,
-  duration: 40,
-  transcriptVersion: 2,
-  score: 0.82,
-  reason: 'Strong hook and complete context.',
-  videoPath: 'clips/media/clip.mp4',
-  thumbnailPath: null,
-  subtitlePath: null,
+  projectId: null,
   aspectRatio: '9:16',
   status: 'READY',
+  candidate: createCandidate(),
+  assets: [
+    {
+      id: '00000000-0000-4000-8000-000000000007',
+      assetType: 'SHORT_CLIP_VIDEO',
+      transcriptVersion: 2,
+      mimeType: 'video/mp4',
+      fileSizeBytes: '2048',
+      metadata: { aspectRatio: '9:16' },
+      createdAt: now
+    }
+  ],
   createdAt: now,
   updatedAt: now
 })
+
+const serializeForResponse = <TValue>(value: TValue): TValue => JSON.parse(JSON.stringify(value)) as TValue
 
 describe('short clip routes', () => {
   beforeEach(() => {
@@ -219,7 +211,57 @@ describe('short clip routes', () => {
     })
     expect(generateShortClipsMock).toHaveBeenCalledWith({
       userId: authenticatedUser.id,
-      mediaId
+      mediaId,
+      preferences: {
+        clipCount: 3,
+        clipLength: 'AUTO',
+        aspectRatio: '9:16',
+        language: 'AUTO',
+        genre: 'AUTO',
+        clipModel: 'AUTO',
+        autoHook: true,
+        prompt: '',
+        captionPresetId: 'karaoke',
+        burnSubtitle: true
+      }
+    })
+  })
+
+  it('passes short clip generation preferences to the service', async () => {
+    const response = await request(app)
+      .post(`/api/v1/media/${mediaId}/short-clips/generate`)
+      .set('Authorization', 'Bearer access-token')
+      .send({
+        clipCount: 5,
+        clipLength: '30_60',
+        aspectRatio: '1:1',
+        language: 'VIETNAMESE',
+        genre: 'TUTORIAL',
+        clipModel: 'VIRAL_HOOKS',
+        autoHook: false,
+        prompt: 'Find the strongest teaching moments',
+        captionPresetId: 'no-caption',
+        burnSubtitle: false,
+        transcriptId
+      })
+
+    expect(response.status).toBe(201)
+    expect(generateShortClipsMock).toHaveBeenCalledWith({
+      userId: authenticatedUser.id,
+      mediaId,
+      preferences: {
+        clipCount: 5,
+        clipLength: '30_60',
+        aspectRatio: '1:1',
+        language: 'VIETNAMESE',
+        genre: 'TUTORIAL',
+        clipModel: 'VIRAL_HOOKS',
+        autoHook: false,
+        prompt: 'Find the strongest teaching moments',
+        captionPresetId: 'no-caption',
+        burnSubtitle: false,
+        transcriptId
+      }
     })
   })
 
@@ -305,7 +347,7 @@ describe('short clip routes', () => {
         page: 2,
         limit: 5,
         status: 'READY',
-        sortBy: 'score',
+        sortBy: 'updatedAt',
         sortOrder: 'asc'
       })
       .set('Authorization', 'Bearer access-token')
@@ -314,13 +356,7 @@ describe('short clip routes', () => {
     expect(response.body).toEqual({
       success: true,
       data: {
-        items: [
-          {
-            ...createShortClip(),
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString()
-          }
-        ],
+        items: [serializeForResponse(createShortClip())],
         meta: {
           total: 1,
           page: 1,
@@ -333,7 +369,7 @@ describe('short clip routes', () => {
       page: 2,
       limit: 5,
       status: 'READY',
-      sortBy: 'score',
+      sortBy: 'updatedAt',
       sortOrder: 'asc'
     })
   })
@@ -347,11 +383,7 @@ describe('short clip routes', () => {
     expect(response.body).toEqual({
       success: true,
       data: {
-        shortClip: {
-          ...createShortClip(),
-          createdAt: now.toISOString(),
-          updatedAt: now.toISOString()
-        }
+        shortClip: serializeForResponse(createShortClip())
       }
     })
     expect(getShortClipMock).toHaveBeenCalledWith(authenticatedUser.id, shortClipId)

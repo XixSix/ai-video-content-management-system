@@ -12,13 +12,28 @@ describe("short clips service", () => {
   beforeEach(() => apiMock.reset())
   afterAll(() => apiMock.restore())
 
-  it("starts generation with an empty body", async () => {
-    apiMock.onPost(`/media/${mediaId}/short-clips/generate`, {}).reply(201, {
-      success: true,
-      data: { job: { id: "job-id" } },
-    })
+  it("starts generation with preferences", async () => {
+    const preferences = {
+      clipCount: 3,
+      clipLength: "AUTO" as const,
+      aspectRatio: "9:16" as const,
+      language: "AUTO" as const,
+      genre: "AUTO" as const,
+      clipModel: "AUTO" as const,
+      autoHook: true,
+      prompt: "",
+      captionPresetId: "karaoke",
+      burnSubtitle: true,
+    }
 
-    await expect(shortClipsService.generate(mediaId)).resolves.toEqual({
+    apiMock
+      .onPost(`/media/${mediaId}/short-clips/generate`, preferences)
+      .reply(201, {
+        success: true,
+        data: { job: { id: "job-id" } },
+      })
+
+    await expect(shortClipsService.generate(mediaId, preferences)).resolves.toEqual({
       job: { id: "job-id" },
     })
   })

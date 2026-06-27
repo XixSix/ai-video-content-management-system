@@ -192,7 +192,14 @@ def target_exists_for_publish_task(
     if task.short_clip_id is not None:
         return _exists(
             session,
-            "SELECT 1 FROM short_clips WHERE id = :id AND status = 'READY' AND video_path IS NOT NULL",
+            """
+            SELECT 1
+            FROM short_clips sc
+            JOIN generated_assets ga ON ga.short_clip_id = sc.id
+            WHERE sc.id = :id
+              AND sc.status = 'READY'
+              AND ga.asset_type = 'SHORT_CLIP_VIDEO'
+            """,
             str(task.short_clip_id),
         )
 
@@ -242,16 +249,20 @@ def find_publish_source(
                     SELECT
                       sc.id,
                       'SHORT_CLIP' AS source_type,
-                      m.s3_bucket,
-                      sc.video_path AS s3_key,
-                      COALESCE(m.mime_type, 'video/mp4') AS mime_type,
-                      NULL AS file_size_bytes,
-                      COALESCE(sc.title, m.original_filename, sc.id::text) AS filename
+                      ga.s3_bucket,
+                      ga.s3_key,
+                      COALESCE(ga.mime_type, 'video/mp4') AS mime_type,
+                      ga.file_size_bytes,
+                      COALESCE(cc.title, m.original_filename, sc.id::text) AS filename
                     FROM short_clips sc
                     JOIN media m ON m.id = sc.media_id
+                    JOIN clip_candidates cc ON cc.id = sc.candidate_id
+                    JOIN generated_assets ga ON ga.short_clip_id = sc.id
                     WHERE sc.id = :id
                       AND sc.status = 'READY'
-                      AND sc.video_path IS NOT NULL
+                      AND ga.asset_type = 'SHORT_CLIP_VIDEO'
+                    ORDER BY ga.created_at DESC
+                    LIMIT 1
                     """
                 ),
                 {"id": str(task.short_clip_id)},
