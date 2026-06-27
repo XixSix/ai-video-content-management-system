@@ -58,6 +58,8 @@ def test_faster_whisper_adapter_maps_segments(
     assert model_calls[1]["audio"] == str(audio_path)
     assert model_calls[1]["kwargs"]["language"] is None
     assert model_calls[1]["kwargs"]["vad_filter"] is False
+    assert model_calls[1]["kwargs"]["word_timestamps"] is False
+    assert result.segments[0].words == []
 
 
 def test_faster_whisper_adapter_uses_default_language(
@@ -140,3 +142,67 @@ def test_faster_whisper_adapter_transcribes_audio_samples(
     assert model_calls[0]["audio"].tolist() == pytest.approx([0.1, 0.2])
     assert model_calls[0]["kwargs"]["language"] == "en"
     assert model_calls[0]["kwargs"]["vad_filter"] is False
+
+
+def test_faster_whisper_adapter_maps_optional_word_timestamps(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    model_calls: list[dict] = []
+
+    class FakeWhisperModel:
+        def __init__(self, *args, **kwargs) -> None:
+            return None
+
+        def transcribe(self, audio, **kwargs):
+            model_calls.append({"audio": audio, "kwargs": kwargs})
+            segments = [
+                SimpleNamespace(
+                    start=0.0,
+                    end=1.0,
+                    text=" hello world ",
+                    words=[
+                        SimpleNamespace(
+                            start=0.1,
+                            end=0.4,
+                            word=" hello",
+                            probability=0.91,
+                        ),
+                        SimpleNamespace(
+                            start=0.5,
+                            end=0.9,
+                            word=" world",
+                            probability=0.87,
+                        ),
+                    ],
+                )
+            ]
+            return iter(segments), SimpleNamespace(language="en")
+
+    fake_module = ModuleType("faster_whisper")
+    fake_module.WhisperModel = FakeWhisperModel
+    monkeypatch.setitem(__import__("sys").modules, "faster_whisper", fake_module)
+
+    asr = FasterWhisperAsr(
+        default_language="en",
+        model_size="small",
+        device="cpu",
+        compute_type="int8",
+        cpu_threads=2,
+        num_workers=1,
+        download_root=tmp_path / "models",
+        local_files_only=True,
+    )
+
+    result = asr.transcribe_audio(
+        samples=(0.1, 0.2),
+        sample_rate=16_000,
+        language="en",
+        enable_word_timestamps=True,
+    )
+
+    assert model_calls[0]["kwargs"]["word_timestamps"] is True
+    assert [word.text for word in result.segments[0].words] == ["hello", "world"]
+    assert result.segments[0].words[0].word_id == "word-000001"
+    assert result.segments[0].words[0].start_seconds == 0.1
+    assert result.segments[0].words[0].confidence == pytest.approx(0.91)

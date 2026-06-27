@@ -179,6 +179,38 @@ class Settings(BaseSettings):
         default="segment-chaptering-v1",
         alias="CHAPTERING_MODEL_NAME",
     )
+    chaptering_embedding_provider: Literal["noop", "sentence-transformers"] = Field(
+        default="noop",
+        alias="CHAPTERING_EMBEDDING_PROVIDER",
+    )
+    chaptering_embedding_model_name: str = Field(
+        default="Qwen/Qwen3-Embedding-0.6B",
+        min_length=1,
+        alias="CHAPTERING_EMBEDDING_MODEL_NAME",
+    )
+    chaptering_embedding_device: str = Field(
+        default="cpu",
+        min_length=1,
+        alias="CHAPTERING_EMBEDDING_DEVICE",
+    )
+    chaptering_embedding_batch_size: PositiveInt = Field(
+        default=8,
+        alias="CHAPTERING_EMBEDDING_BATCH_SIZE",
+    )
+    chaptering_embedding_max_sequence_length: int = Field(
+        default=2048,
+        ge=1,
+        le=32_768,
+        alias="CHAPTERING_EMBEDDING_MAX_SEQUENCE_LENGTH",
+    )
+    chaptering_embedding_cache_path: Path | None = Field(
+        default=None,
+        alias="CHAPTERING_EMBEDDING_CACHE_PATH",
+    )
+    chaptering_embedding_local_files_only: bool = Field(
+        default=False,
+        alias="CHAPTERING_EMBEDDING_LOCAL_FILES_ONLY",
+    )
     chaptering_target_unit_duration_seconds: PositiveFloat = Field(
         default=12.0,
         alias="CHAPTERING_TARGET_UNIT_DURATION_SECONDS",
@@ -317,9 +349,13 @@ class Settings(BaseSettings):
     def bind_address(self) -> str:
         return f"{self.ai_service_host}:{self.ai_service_port}"
 
-    @field_validator("asr_model_storage_path", mode="before")
+    @field_validator(
+        "asr_model_storage_path",
+        "chaptering_embedding_cache_path",
+        mode="before",
+    )
     @classmethod
-    def empty_model_storage_path_as_none(cls, value: object) -> object:
+    def empty_optional_path_as_none(cls, value: object) -> object:
         if value == "":
             return None
 

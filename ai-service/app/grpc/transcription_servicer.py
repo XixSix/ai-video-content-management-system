@@ -62,6 +62,7 @@ class TranscriptionServicer(transcription_pb2_grpc.TranscriptionServiceServicer)
                 enable_vad=request.options.enable_vad,
                 enable_diarization=request.options.enable_diarization,
                 enable_source_separation=request.options.enable_source_separation,
+                enable_word_timestamps=request.options.enable_word_timestamps,
             ),
         )
 
@@ -143,6 +144,16 @@ class TranscriptionServicer(transcription_pb2_grpc.TranscriptionServiceServicer)
                     start_seconds=segment.start_seconds,
                     end_seconds=segment.end_seconds,
                     text=segment.text,
+                    words=[
+                        transcription_pb2.TranscriptWord(
+                            word_id=word.word_id,
+                            start_seconds=word.start_seconds,
+                            end_seconds=word.end_seconds,
+                            text=word.text,
+                            confidence=word.confidence or 0.0,
+                        )
+                        for word in segment.words
+                    ],
                 )
                 for segment in result.segments
             ],

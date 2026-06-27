@@ -5,7 +5,11 @@ import pytest
 from app.provider_contracts.audio_decoder import AudioWaveform
 from app.provider_contracts.diarization import DiarizedTurn, OfflineDiarizationAnalysis
 from app.provider_contracts.vad import SpeechRegion
-from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
+from app.schemas.transcript import (
+    TranscriptResult,
+    TranscriptSegmentResult,
+    TranscriptWordResult,
+)
 from app.schemas.transcription_request import (
     TranscriptionOptionsInput,
     TranscriptionRequest,
@@ -18,10 +22,14 @@ from app.workflows.transcription.pipeline import (
     run_transcription_pipeline,
     select_transcription_pipeline,
 )
+from app.workflows.transcription.planning import OfflineAsrWindow
 from app.workflows.transcription.pipelines.diarized_turns import (
     run_diarized_turns_pipeline,
 )
-from app.workflows.transcription.pipelines.vad_chunked import run_vad_chunked_pipeline
+from app.workflows.transcription.pipelines.vad_chunked import (
+    run_vad_chunked_pipeline,
+    transcribe_asr_windows,
+)
 
 
 def test_selects_diarized_turns_pipeline() -> None:
@@ -190,6 +198,25 @@ def test_diarized_turns_pipeline_falls_back_to_vad_chunked_when_no_windows(
     assert result.full_text == "placeholder:4 samples placeholder:2 samples"
 
 
+def test_transcribe_asr_windows_restores_word_timestamps() -> None:
+    calls: list[str] = []
+
+    result = transcribe_asr_windows(
+        asr=_RecordingAsr(calls),
+        windows=[OfflineAsrWindow(start_sample=2_000, end_sample=2_004)],
+        samples=tuple(0.0 for _ in range(2_004)),
+        sample_rate=1_000,
+        language="en",
+        enable_word_timestamps=True,
+    )
+
+    word = result.segments[0].words[0]
+    assert word.word_id == "word-000001"
+    assert word.start_seconds == 2.1
+    assert word.end_seconds == 2.5
+    assert word.confidence == 0.9
+
+
 def _request(
     local_path: Path,
     *,
@@ -349,7 +376,9 @@ class _RecordingAsr:
         *,
         local_path: Path,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
+        _ = enable_word_timestamps
         self._calls.append("asr")
         return TranscriptResult(
             language=language or "en",
@@ -371,6 +400,7 @@ class _RecordingAsr:
         samples: tuple[float, ...],
         sample_rate: int,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
         _ = sample_rate
         self._calls.append(f"asr_audio:{len(samples)}")
@@ -384,6 +414,19 @@ class _RecordingAsr:
                     start_seconds=0.0,
                     end_seconds=1.0,
                     text=text,
+                    words=(
+                        [
+                            TranscriptWordResult(
+                                word_id="word-000001",
+                                start_seconds=0.1,
+                                end_seconds=0.5,
+                                text="placeholder",
+                                confidence=0.9,
+                            )
+                        ]
+                        if enable_word_timestamps
+                        else []
+                    ),
                 )
             ],
             asr_model=self.model_name,

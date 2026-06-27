@@ -1,6 +1,11 @@
 from pathlib import Path
+from typing import Any
 
+import pytest
+
+import app.runtime.container as runtime_container
 from app.core.config import Settings
+from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.diarization.pyannote_community import PyannoteCommunityDiarization
 from app.providers.source_separation.demucs import DemucsSourceSeparator
@@ -51,3 +56,50 @@ def test_build_diarizer_uses_pyannote_from_settings() -> None:
 
     assert isinstance(diarizer, PyannoteCommunityDiarization)
     assert diarizer.model_name == "pyannote/custom"
+
+
+def test_build_chaptering_embedding_provider_uses_noop_by_default() -> None:
+    provider = runtime_container.build_chaptering_embedding_provider(
+        Settings(_env_file=None)
+    )
+
+    assert isinstance(provider, NoopTextEmbeddingProvider)
+
+
+def test_build_chaptering_embedding_provider_forwards_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, Any] = {}
+    sentinel = NoopTextEmbeddingProvider()
+
+    def build_provider(**kwargs: Any) -> NoopTextEmbeddingProvider:
+        captured.update(kwargs)
+        return sentinel
+
+    monkeypatch.setattr(
+        runtime_container,
+        "SentenceTransformerTextEmbeddingProvider",
+        build_provider,
+    )
+    settings = Settings(
+        _env_file=None,
+        CHAPTERING_EMBEDDING_PROVIDER="sentence-transformers",
+        CHAPTERING_EMBEDDING_MODEL_NAME="Qwen/custom-embedding",
+        CHAPTERING_EMBEDDING_DEVICE="cuda",
+        CHAPTERING_EMBEDDING_BATCH_SIZE=16,
+        CHAPTERING_EMBEDDING_MAX_SEQUENCE_LENGTH=4096,
+        CHAPTERING_EMBEDDING_CACHE_PATH=Path("/tmp/qwen-cache"),
+        CHAPTERING_EMBEDDING_LOCAL_FILES_ONLY=True,
+    )
+
+    provider = runtime_container.build_chaptering_embedding_provider(settings)
+
+    assert provider is sentinel
+    assert captured == {
+        "model_name": "Qwen/custom-embedding",
+        "device": "cuda",
+        "batch_size": 16,
+        "max_sequence_length": 4096,
+        "cache_path": Path("/tmp/qwen-cache"),
+        "local_files_only": True,
+    }

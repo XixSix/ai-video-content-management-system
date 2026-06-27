@@ -163,7 +163,9 @@ class _RecordingAsr:
         *,
         local_path: Path,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
+        _ = enable_word_timestamps
         self._calls.append("asr")
         return TranscriptResult(
             language=language or "en",
@@ -185,8 +187,9 @@ class _RecordingAsr:
         samples: tuple[float, ...],
         sample_rate: int,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
-        _ = samples, sample_rate
+        _ = samples, sample_rate, enable_word_timestamps
         self._calls.append("asr_audio")
         return TranscriptResult(
             language=language or "en",

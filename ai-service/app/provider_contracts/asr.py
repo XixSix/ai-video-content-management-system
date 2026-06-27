@@ -18,6 +18,7 @@ class AsrPort(Protocol):
         *,
         local_path: Path,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult: ...
 
     def transcribe_audio(
@@ -26,4 +27,5 @@ class AsrPort(Protocol):
         samples: Sequence[float],
         sample_rate: int,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult: ...

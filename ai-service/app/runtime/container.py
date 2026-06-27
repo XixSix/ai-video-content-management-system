@@ -15,6 +15,9 @@ from app.providers.audio.noop_decoder import NoopAudioDecoder
 from app.providers.audio.audio_preprocessing import AudioPreprocessor
 from app.providers.audio.torchaudio_decoder import TorchaudioAudioDecoder
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.sentence_transformer_embedding import (
+    SentenceTransformerTextEmbeddingProvider,
+)
 from app.providers.chaptering.noop_boundary_evaluation import (
     NoopChapterBoundaryEvaluationProvider,
 )
@@ -75,7 +78,16 @@ def build_short_clip_workflow(
 
 
 def build_chaptering_embedding_provider(settings: Settings) -> TextEmbeddingPort:
-    _ = settings
+    if settings.chaptering_embedding_provider == "sentence-transformers":
+        return SentenceTransformerTextEmbeddingProvider(
+            model_name=settings.chaptering_embedding_model_name,
+            device=settings.chaptering_embedding_device,
+            batch_size=settings.chaptering_embedding_batch_size,
+            max_sequence_length=(settings.chaptering_embedding_max_sequence_length),
+            cache_path=settings.chaptering_embedding_cache_path,
+            local_files_only=settings.chaptering_embedding_local_files_only,
+        )
+
     return NoopTextEmbeddingProvider()
 
 
