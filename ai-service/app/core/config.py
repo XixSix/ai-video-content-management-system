@@ -179,6 +179,51 @@ class Settings(BaseSettings):
         default="segment-chaptering-v1",
         alias="CHAPTERING_MODEL_NAME",
     )
+    chaptering_boundary_evaluation_provider: Literal[
+        "noop",
+        "openai-compatible",
+    ] = Field(
+        default="noop",
+        alias="CHAPTERING_BOUNDARY_EVALUATION_PROVIDER",
+    )
+    chaptering_title_provider: Literal["noop", "openai-compatible"] = Field(
+        default="noop",
+        alias="CHAPTERING_TITLE_PROVIDER",
+    )
+    short_clip_candidate_provider: Literal[
+        "noop",
+        "openai-compatible",
+    ] = Field(
+        default="noop",
+        alias="SHORT_CLIP_CANDIDATE_PROVIDER",
+    )
+    short_clip_model_name: str = Field(
+        default="noop-short-clip-v1",
+        min_length=1,
+        alias="SHORT_CLIP_MODEL_NAME",
+    )
+    llm_base_url: str = Field(
+        default="http://localhost:8000/v1",
+        min_length=1,
+        alias="LLM_BASE_URL",
+    )
+    llm_api_key: str = Field(default="", alias="LLM_API_KEY")
+    llm_model_name: str = Field(
+        default="Qwen/Qwen3-8B",
+        min_length=1,
+        alias="LLM_MODEL_NAME",
+    )
+    llm_timeout_seconds: PositiveFloat = Field(
+        default=30.0,
+        alias="LLM_TIMEOUT_SECONDS",
+    )
+    llm_temperature: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=2.0,
+        alias="LLM_TEMPERATURE",
+    )
+    llm_max_tokens: PositiveInt = Field(default=1024, alias="LLM_MAX_TOKENS")
     chaptering_embedding_provider: Literal["noop", "sentence-transformers"] = Field(
         default="noop",
         alias="CHAPTERING_EMBEDDING_PROVIDER",

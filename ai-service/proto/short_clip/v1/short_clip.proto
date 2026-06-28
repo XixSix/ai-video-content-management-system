@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package short_clip.v1;
+
+service ShortClipService {
+  rpc GenerateClipCandidates(GenerateClipCandidatesRequest) returns (GenerateClipCandidatesResponse);
+}
+
+message GenerateClipCandidatesRequest {
+  string request_id = 1;
+  string transcript_id = 2;
+  int32 transcript_version = 3;
+  string language = 4;
+  double media_duration_seconds = 5;
+  repeated TranscriptSegment segments = 6;
+  repeated ChapterContext chapters = 7;
+  ShortClipPreferences preferences = 8;
+}
+
+message ShortClipPreferences {
+  int32 clip_count = 1;
+  string clip_length = 2;
+  double min_duration_seconds = 3;
+  double max_duration_seconds = 4;
+  string aspect_ratio = 5;
+  string language = 6;
+  string genre = 7;
+  string clip_model = 8;
+  bool auto_hook = 9;
+  string prompt = 10;
+  string caption_preset_id = 11;
+  bool burn_subtitle = 12;
+}
+
+message TranscriptSegment {
+  string segment_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string text = 4;
+}
+
+message ChapterContext {
+  string chapter_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string title = 4;
+  string summary = 5;
+}
+
+message GenerateClipCandidatesResponse {
+  string request_id = 1;
+  string language = 2;
+  string model = 3;
+  ShortClipSource source = 4;
+  repeated ClipCandidate candidates = 5;
+}
+
+enum ShortClipSource {
+  SHORT_CLIP_SOURCE_UNSPECIFIED = 0;
+  SHORT_CLIP_SOURCE_NOOP = 1;
+  SHORT_CLIP_SOURCE_LLM = 2;
+}
+
+message ClipCandidate {
+  string start_segment_id = 1;
+  string end_segment_id = 2;
+  repeated string source_segment_ids = 3;
+  double start_seconds = 4;
+  double end_seconds = 5;
+  double duration_seconds = 6;
+  string title = 7;
+  string reason = 8;
+  double score = 9;
+  string text = 10;
+}

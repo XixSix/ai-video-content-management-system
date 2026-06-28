@@ -6,8 +6,18 @@ import pytest
 import app.runtime.container as runtime_container
 from app.core.config import Settings
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.openai_compatible_boundary_evaluation import (
+    OpenAICompatibleChapterBoundaryEvaluationProvider,
+)
+from app.providers.chaptering.openai_compatible_title import (
+    OpenAICompatibleChapterTitleProvider,
+)
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.diarization.pyannote_community import PyannoteCommunityDiarization
+from app.providers.short_clip.openai_compatible_candidate import (
+    OpenAICompatibleShortClipCandidateProvider,
+)
+from app.providers.short_clip.noop_candidate import NoopShortClipCandidateProvider
 from app.providers.source_separation.demucs import DemucsSourceSeparator
 from app.providers.source_separation.noop_demucs import NoopDemucsSourceSeparator
 from app.runtime.container import _build_diarizer, _build_source_separator
@@ -103,3 +113,64 @@ def test_build_chaptering_embedding_provider_forwards_settings(
         "cache_path": Path("/tmp/qwen-cache"),
         "local_files_only": True,
     }
+
+
+def test_build_short_clip_candidate_provider_uses_noop() -> None:
+    provider = runtime_container.build_short_clip_candidate_provider(
+        Settings(_env_file=None, SHORT_CLIP_MODEL_NAME="short-clip-test")
+    )
+
+    assert isinstance(provider, NoopShortClipCandidateProvider)
+    assert provider.model_name == "short-clip-test"
+
+
+def test_build_short_clip_candidate_provider_uses_openai_compatible() -> None:
+    provider = runtime_container.build_short_clip_candidate_provider(
+        Settings(
+            _env_file=None,
+            SHORT_CLIP_CANDIDATE_PROVIDER="openai-compatible",
+        ),
+        llm_client=_FakeChatClient(),
+    )
+
+    assert isinstance(provider, OpenAICompatibleShortClipCandidateProvider)
+    assert provider.model_name == "fake-llm"
+
+
+def test_build_chaptering_llm_providers_use_openai_compatible() -> None:
+    settings = Settings(
+        _env_file=None,
+        CHAPTERING_BOUNDARY_EVALUATION_PROVIDER="openai-compatible",
+        CHAPTERING_TITLE_PROVIDER="openai-compatible",
+    )
+    llm_client = _FakeChatClient()
+
+    boundary_provider = runtime_container.build_chaptering_boundary_evaluation_provider(
+        settings,
+        llm_client=llm_client,
+    )
+    title_provider = runtime_container.build_chaptering_title_provider(
+        settings,
+        llm_client=llm_client,
+    )
+
+    assert isinstance(
+        boundary_provider,
+        OpenAICompatibleChapterBoundaryEvaluationProvider,
+    )
+    assert isinstance(title_provider, OpenAICompatibleChapterTitleProvider)
+
+
+class _FakeChatClient:
+    @property
+    def model_name(self) -> str:
+        return "fake-llm"
+
+    def complete_json(
+        self,
+        *,
+        system_prompt: str,
+        user_payload: dict[str, Any],
+    ) -> object:
+        _ = system_prompt, user_payload
+        return {}

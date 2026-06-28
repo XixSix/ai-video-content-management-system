@@ -9,6 +9,7 @@ dependencies = [
     "faster-whisper>=1.2.1",
     "grpcio>=1.80.0",
     "grpcio-tools>=1.80.0",
+    "httpx>=0.28.1",
     "nltk>=3.9.4",
     "numpy>=2.4.6",
     "pyannote-audio>=4.0.5",
