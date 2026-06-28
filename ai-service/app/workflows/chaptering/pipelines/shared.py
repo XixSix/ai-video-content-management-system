@@ -15,7 +15,11 @@ from app.workflows.chaptering.scores.gap_scoring import (
     gap_scores_to_candidates,
     score_unit_gaps,
 )
-from app.workflows.chaptering.schemas import ChapterUnit, ChapteringPipelineConfig
+from app.workflows.chaptering.schemas import (
+    ChapterGapScore,
+    ChapterUnit,
+    ChapteringPipelineConfig,
+)
 from app.workflows.chaptering.selection import select_boundaries_from_candidates
 from app.workflows.chaptering.semantic import score_context_windows
 from app.workflows.chaptering.scores.valleys import detect_valley_candidates
@@ -71,7 +75,11 @@ def run_units_pipeline(
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
         config=config.valley,
     )
-    candidate_gap_scores = valley_gap_scores or gap_scores
+    candidate_gap_scores = (
+        _merge_valley_gap_scores(gap_scores, valley_gap_scores)
+        if valley_gap_scores
+        else gap_scores
+    )
     scored_candidates = gap_scores_to_candidates(candidate_gap_scores)
     review_candidates = prepare_boundary_candidates_for_review(
         scored_candidates,
@@ -124,3 +132,21 @@ def run_units_pipeline(
         source="LLM" if llm_applied or titles_applied else "RULE_BASED",
         chapters=chapters,
     )
+
+
+def _merge_valley_gap_scores(
+    gap_scores: list[ChapterGapScore],
+    valley_gap_scores: list[ChapterGapScore],
+) -> list[ChapterGapScore]:
+    """Return all gap scores with valley metadata attached where available.
+
+    Valley detection should highlight strong topic-shift candidates, but it
+    must not remove timeline coverage. Boundary selection can only choose from
+    retained candidate times, so replacing the full gap list with sparse
+    valleys can leave no legal candidate inside max chapter duration.
+    """
+    valleys_by_time = {gap_score.time: gap_score for gap_score in valley_gap_scores}
+    return [
+        valleys_by_time.get(gap_score.time, gap_score)
+        for gap_score in gap_scores
+    ]
