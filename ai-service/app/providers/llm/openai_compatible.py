@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any
 
 import httpx
@@ -63,6 +64,7 @@ class OpenAICompatibleChatClient:
             ],
             "temperature": self._temperature,
             "max_tokens": self._max_tokens,
+            "response_format": {"type": "json_object"},
         }
         headers = {"Content-Type": "application/json"}
         if self._api_key:
@@ -83,12 +85,7 @@ class OpenAICompatibleChatClient:
             ) from exc
 
         content = _extract_message_content(response_payload)
-        try:
-            return json.loads(content)
-        except json.JSONDecodeError as exc:
-            raise OpenAICompatibleChatClientError(
-                "OpenAI-compatible chat response was not valid JSON"
-            ) from exc
+        return _parse_json_content(content)
 
 
 def _extract_message_content(response_payload: Any) -> str:
@@ -106,3 +103,39 @@ def _extract_message_content(response_payload: Any) -> str:
         )
 
     return content.strip()
+
+
+def _parse_json_content(content: str) -> Any:
+    """Parse JSON content, tolerating common markdown wrappers."""
+    candidates = [
+        content,
+        _strip_markdown_json_fence(content),
+        _extract_json_object(content),
+    ]
+
+    for candidate in candidates:
+        if not candidate:
+            continue
+
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+
+    raise OpenAICompatibleChatClientError(
+        "OpenAI-compatible chat response was not valid JSON"
+    )
+
+
+def _strip_markdown_json_fence(content: str) -> str | None:
+    match = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", content, flags=re.DOTALL)
+    return match.group(1).strip() if match else None
+
+
+def _extract_json_object(content: str) -> str | None:
+    start = content.find("{")
+    end = content.rfind("}")
+    if start < 0 or end <= start:
+        return None
+
+    return content[start : end + 1].strip()
