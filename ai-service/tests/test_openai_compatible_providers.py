@@ -75,6 +75,28 @@ def test_title_provider_maps_json_response() -> None:
     assert client.user_payload["task"] == "chapter_title_generation"
 
 
+def test_title_provider_truncates_overlong_title_and_summary() -> None:
+    client = _FakeChatClient(
+        {
+            "chapters": [
+                {
+                    "chapter_index": 0,
+                    "title": "A" * 120,
+                    "summary": "B" * 320,
+                }
+            ]
+        }
+    )
+    provider = OpenAICompatibleChapterTitleProvider(chat_client=client)
+
+    titles = provider.generate_titles([_title_input()])
+
+    assert len(titles[0].title) == 80
+    assert titles[0].title.endswith("...")
+    assert len(titles[0].summary or "") == 240
+    assert (titles[0].summary or "").endswith("...")
+
+
 def test_short_clip_provider_maps_json_response() -> None:
     client = _FakeChatClient(
         {

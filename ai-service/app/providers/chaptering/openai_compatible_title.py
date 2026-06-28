@@ -3,6 +3,9 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from app.provider_contracts.llm import JsonChatClientPort
 from app.workflows.chaptering.schemas import ChapterTitleInput, ChapterTitleResult
 
+TITLE_MAX_LENGTH = 80
+SUMMARY_MAX_LENGTH = 240
+
 
 class OpenAICompatibleChapterTitleProvider:
     def __init__(self, *, chat_client: JsonChatClientPort) -> None:
@@ -30,8 +33,12 @@ class OpenAICompatibleChapterTitleProvider:
         return [
             ChapterTitleResult(
                 chapter_index=item.chapter_index,
-                title=item.title.strip(),
-                summary=item.summary.strip() if item.summary else None,
+                title=_truncate_text(item.title.strip(), TITLE_MAX_LENGTH),
+                summary=(
+                    _truncate_text(item.summary.strip(), SUMMARY_MAX_LENGTH)
+                    if item.summary
+                    else None
+                ),
             )
             for item in parsed.chapters
         ]
@@ -41,8 +48,8 @@ class _TitleItem(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     chapter_index: int
-    title: str = Field(min_length=1, max_length=80)
-    summary: str | None = Field(default=None, max_length=240)
+    title: str = Field(min_length=1)
+    summary: str | None = None
 
 
 class _TitleResponse(BaseModel):
@@ -59,6 +66,13 @@ def _title_input_payload(item: ChapterTitleInput) -> dict[str, object]:
         "language": item.language,
         "text": item.text,
     }
+
+
+def _truncate_text(text: str, max_length: int) -> str:
+    if len(text) <= max_length:
+        return text
+
+    return f"{text[: max_length - 3].rstrip()}..."
 
 
 _TITLE_SYSTEM_PROMPT = """
