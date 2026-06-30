@@ -9,6 +9,11 @@ from app.core.config import Settings
 from app.grpc.transcription_servicer import TranscriptionServicer
 from app.providers.audio import torchaudio_decoder
 from app.runtime.container import build_transcription_workflow
+from app.schemas.transcript import (
+    TranscriptResult,
+    TranscriptSegmentResult,
+    TranscriptWordResult,
+)
 from transcription.v1 import transcription_pb2
 
 
@@ -78,6 +83,59 @@ def test_transcribe_returns_noop_response(
     assert response.full_text
     assert len(response.segments) == 1
     assert response.segments[0].start_seconds == 0.0
+
+
+def test_transcription_option_defaults_word_timestamps_to_false(
+    tmp_path: Path,
+) -> None:
+    request = _request(tmp_path / "audio.wav")
+
+    mapped = TranscriptionServicer()._map_request(request)
+
+    assert mapped.options.enable_word_timestamps is False
+
+
+def test_maps_enabled_word_timestamp_option(tmp_path: Path) -> None:
+    request = _request(tmp_path / "audio.wav")
+    request.options.enable_word_timestamps = True
+
+    mapped = TranscriptionServicer()._map_request(request)
+
+    assert mapped.options.enable_word_timestamps is True
+
+
+def test_maps_word_timestamps_to_grpc_response() -> None:
+    result = TranscriptResult(
+        language="en",
+        full_text="hello",
+        segments=[
+            TranscriptSegmentResult(
+                segment_id="seg-0001",
+                start_seconds=1.0,
+                end_seconds=2.0,
+                text="hello",
+                words=[
+                    TranscriptWordResult(
+                        word_id="word-000001",
+                        start_seconds=1.1,
+                        end_seconds=1.5,
+                        text="hello",
+                        confidence=0.92,
+                    )
+                ],
+            )
+        ],
+        asr_model="small",
+    )
+
+    response = TranscriptionServicer()._map_response(
+        request_id="job-1",
+        result=result,
+    )
+
+    assert response.segments[0].words[0].word_id == "word-000001"
+    assert response.segments[0].words[0].start_seconds == 1.1
+    assert response.segments[0].words[0].confidence == pytest.approx(0.92)
 
 
 @pytest.mark.parametrize(

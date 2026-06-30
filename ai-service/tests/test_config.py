@@ -44,6 +44,23 @@ def test_settings_use_chaptering_defaults() -> None:
     assert settings.offline_asr_merge_gap_seconds == 0.6
     assert settings.offline_asr_max_window_seconds == 30
     assert settings.offline_asr_min_window_seconds == 1.2
+    assert settings.chaptering_embedding_provider == "noop"
+    assert settings.chaptering_embedding_model_name == "Qwen/Qwen3-Embedding-0.6B"
+    assert settings.chaptering_embedding_device == "cpu"
+    assert settings.chaptering_embedding_batch_size == 8
+    assert settings.chaptering_embedding_max_sequence_length == 2048
+    assert settings.chaptering_embedding_cache_path is None
+    assert settings.chaptering_embedding_local_files_only is False
+    assert settings.chaptering_boundary_evaluation_provider == "noop"
+    assert settings.chaptering_title_provider == "noop"
+    assert settings.short_clip_candidate_provider == "noop"
+    assert settings.short_clip_model_name == "noop-short-clip-v1"
+    assert settings.llm_base_url == "http://localhost:8000/v1"
+    assert settings.llm_api_key == ""
+    assert settings.llm_model_name == "Qwen/Qwen3-8B"
+    assert settings.llm_timeout_seconds == 30
+    assert settings.llm_temperature == 0
+    assert settings.llm_max_tokens == 1024
     assert settings.chaptering_max_unit_duration_seconds == 20
     assert settings.chaptering_target_unit_words == 40
     assert settings.chaptering_max_unit_words == 80
@@ -107,6 +124,26 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("OFFLINE_ASR_MIN_WINDOW_SECONDS", "1.5")
     monkeypatch.setenv("CHAPTERING_STRATEGY", "word")
     monkeypatch.setenv("CHAPTERING_MODEL_NAME", "chaptering-v1")
+    monkeypatch.setenv(
+        "CHAPTERING_BOUNDARY_EVALUATION_PROVIDER",
+        "openai-compatible",
+    )
+    monkeypatch.setenv("CHAPTERING_TITLE_PROVIDER", "openai-compatible")
+    monkeypatch.setenv("SHORT_CLIP_CANDIDATE_PROVIDER", "openai-compatible")
+    monkeypatch.setenv("SHORT_CLIP_MODEL_NAME", "short-clip-custom")
+    monkeypatch.setenv("LLM_BASE_URL", "https://llm.example.test/v1")
+    monkeypatch.setenv("LLM_API_KEY", "local-token")
+    monkeypatch.setenv("LLM_MODEL_NAME", "Qwen/custom")
+    monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "45")
+    monkeypatch.setenv("LLM_TEMPERATURE", "0.2")
+    monkeypatch.setenv("LLM_MAX_TOKENS", "2048")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_PROVIDER", "sentence-transformers")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_MODEL_NAME", "Qwen/custom-embedding")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_DEVICE", "cuda")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_BATCH_SIZE", "16")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_MAX_SEQUENCE_LENGTH", "4096")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_CACHE_PATH", "/tmp/qwen-cache")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_LOCAL_FILES_ONLY", "true")
     monkeypatch.setenv("CHAPTERING_TARGET_UNIT_DURATION_SECONDS", "18")
     monkeypatch.setenv("CHAPTERING_MAX_UNIT_DURATION_SECONDS", "25")
     monkeypatch.setenv("CHAPTERING_TARGET_UNIT_WORDS", "70")
@@ -189,6 +226,23 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.offline_asr_min_window_seconds == 1.5
     assert settings.chaptering_strategy == "word"
     assert settings.chaptering_model_name == "chaptering-v1"
+    assert settings.chaptering_boundary_evaluation_provider == "openai-compatible"
+    assert settings.chaptering_title_provider == "openai-compatible"
+    assert settings.short_clip_candidate_provider == "openai-compatible"
+    assert settings.short_clip_model_name == "short-clip-custom"
+    assert settings.llm_base_url == "https://llm.example.test/v1"
+    assert settings.llm_api_key == "local-token"
+    assert settings.llm_model_name == "Qwen/custom"
+    assert settings.llm_timeout_seconds == 45
+    assert settings.llm_temperature == 0.2
+    assert settings.llm_max_tokens == 2048
+    assert settings.chaptering_embedding_provider == "sentence-transformers"
+    assert settings.chaptering_embedding_model_name == "Qwen/custom-embedding"
+    assert settings.chaptering_embedding_device == "cuda"
+    assert settings.chaptering_embedding_batch_size == 16
+    assert settings.chaptering_embedding_max_sequence_length == 4096
+    assert str(settings.chaptering_embedding_cache_path) == "/tmp/qwen-cache"
+    assert settings.chaptering_embedding_local_files_only is True
     assert settings.chaptering_target_unit_duration_seconds == 18
     assert settings.chaptering_max_unit_duration_seconds == 25
     assert settings.chaptering_target_unit_words == 70
@@ -232,7 +286,27 @@ def test_settings_treat_empty_model_storage_path_as_none(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("ASR_MODEL_STORAGE_PATH", "")
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_CACHE_PATH", "")
 
     settings = Settings(_env_file=None)
 
     assert settings.asr_model_storage_path is None
+    assert settings.chaptering_embedding_cache_path is None
+
+
+def test_settings_reject_invalid_embedding_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CHAPTERING_EMBEDDING_PROVIDER", "unknown")
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
+
+
+def test_settings_reject_invalid_llm_provider_switches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SHORT_CLIP_CANDIDATE_PROVIDER", "unknown")
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)

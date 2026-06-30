@@ -102,6 +102,7 @@ def run_diarized_turns_pipeline(
         samples=audio.samples,
         sample_rate=audio.sample_rate,
         language=request.options.language,
+        enable_word_timestamps=request.options.enable_word_timestamps,
     ).model_copy(update={"diarization_model": diarizer.model_name})
 
     if source_separation_model:

@@ -8,7 +8,11 @@ from typing import Any
 
 import numpy as np
 
-from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
+from app.schemas.transcript import (
+    TranscriptResult,
+    TranscriptSegmentResult,
+    TranscriptWordResult,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +53,12 @@ class FasterWhisperAsr:
         *,
         local_path: Path,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
         return self._transcribe_input(
             audio_input=str(local_path),
             language=language,
+            enable_word_timestamps=enable_word_timestamps,
         )
 
     def transcribe_audio(
@@ -61,6 +67,7 @@ class FasterWhisperAsr:
         samples: Sequence[float],
         sample_rate: int,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
         if sample_rate != 16_000:
             raise ValueError("faster-whisper audio samples must be 16000 Hz")
@@ -68,10 +75,15 @@ class FasterWhisperAsr:
         return self._transcribe_input(
             audio_input=np.asarray(samples, dtype=np.float32),
             language=language,
+            enable_word_timestamps=enable_word_timestamps,
         )
 
     def _transcribe_input(
-        self, *, audio_input: Any, language: str | None
+        self,
+        *,
+        audio_input: Any,
+        language: str | None,
+        enable_word_timestamps: bool,
     ) -> TranscriptResult:
         model = self._load_model()
         selected_language = _selected_language(language, self._default_language)
@@ -80,17 +92,47 @@ class FasterWhisperAsr:
             audio_input,
             language=requested_language,
             vad_filter=False,
+            word_timestamps=enable_word_timestamps,
         )
-        segment_results = [
-            TranscriptSegmentResult(
-                segment_id=f"seg-{index:04d}",
-                start_seconds=float(segment.start),
-                end_seconds=float(segment.end),
-                text=segment.text.strip(),
+        segment_results: list[TranscriptSegmentResult] = []
+        word_index = 0
+        for segment in segments:
+            segment_text = segment.text.strip()
+            if not segment_text:
+                continue
+
+            words: list[TranscriptWordResult] = []
+            if enable_word_timestamps:
+                for word in getattr(segment, "words", None) or ():
+                    word_text = str(getattr(word, "word", "")).strip()
+                    start = getattr(word, "start", None)
+                    end = getattr(word, "end", None)
+                    if not word_text or start is None or end is None:
+                        continue
+
+                    word_index += 1
+                    probability = getattr(word, "probability", None)
+                    words.append(
+                        TranscriptWordResult(
+                            word_id=f"word-{word_index:06d}",
+                            start_seconds=float(start),
+                            end_seconds=float(end),
+                            text=word_text,
+                            confidence=(
+                                float(probability) if probability is not None else None
+                            ),
+                        )
+                    )
+
+            segment_results.append(
+                TranscriptSegmentResult(
+                    segment_id=f"seg-{len(segment_results) + 1:04d}",
+                    start_seconds=float(segment.start),
+                    end_seconds=float(segment.end),
+                    text=segment_text,
+                    words=words,
+                )
             )
-            for index, segment in enumerate(segments, start=1)
-            if segment.text.strip()
-        ]
         full_text = " ".join(segment.text for segment in segment_results)
         detected_language = (
             getattr(info, "language", None)
@@ -140,7 +182,7 @@ def _selected_language(language: str | None, default_language: str) -> str:
     if language in {None, ""}:
         return default_language
 
-    return language
+    return language  # type: ignore
 
 
 def _language_for_faster_whisper(language: str) -> str | None:

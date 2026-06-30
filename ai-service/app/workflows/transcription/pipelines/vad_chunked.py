@@ -4,7 +4,11 @@ from app.provider_contracts.audio_preprocessing import AudioPreprocessorPort
 from app.provider_contracts.diarization import DiarizationPort
 from app.provider_contracts.source_separation import SourceSeparationPort
 from app.provider_contracts.vad import VadPort
-from app.schemas.transcript import TranscriptResult, TranscriptSegmentResult
+from app.schemas.transcript import (
+    TranscriptResult,
+    TranscriptSegmentResult,
+    TranscriptWordResult,
+)
 from app.schemas.transcription_request import TranscriptionRequest
 from app.workflows.transcription.config import TranscriptionPipelineConfig
 from app.workflows.transcription.errors import InvalidTranscriptResultError
@@ -67,6 +71,7 @@ def run_vad_chunked_pipeline(
         samples=audio.samples,
         sample_rate=audio.sample_rate,
         language=request.options.language,
+        enable_word_timestamps=request.options.enable_word_timestamps,
     )
     if source_separation_model:
         return result.model_copy(
@@ -83,17 +88,20 @@ def transcribe_asr_windows(
     samples: tuple[float, ...],
     sample_rate: int,
     language: str | None,
+    enable_word_timestamps: bool = False,
 ) -> TranscriptResult:
     segments: list[TranscriptSegmentResult] = []
     full_text_parts: list[str] = []
     detected_language = language or ""
     asr_model = asr.model_name
+    word_index = 0
 
     for window in windows:
         window_result = asr.transcribe_audio(
             samples=samples[window.start_sample : window.end_sample],
             sample_rate=sample_rate,
             language=language,
+            enable_word_timestamps=enable_word_timestamps,
         )
         if not detected_language:
             detected_language = window_result.language
@@ -104,12 +112,26 @@ def transcribe_asr_windows(
 
         offset_seconds = window.start_sample / sample_rate
         for segment in window_result.segments:
+            words: list[TranscriptWordResult] = []
+            for word in segment.words:
+                word_index += 1
+                words.append(
+                    TranscriptWordResult(
+                        word_id=f"word-{word_index:06d}",
+                        start_seconds=word.start_seconds + offset_seconds,
+                        end_seconds=word.end_seconds + offset_seconds,
+                        text=word.text,
+                        confidence=word.confidence,
+                    )
+                )
+
             segments.append(
                 TranscriptSegmentResult(
                     segment_id=f"seg-{len(segments) + 1:04d}",
                     start_seconds=segment.start_seconds + offset_seconds,
                     end_seconds=segment.end_seconds + offset_seconds,
                     text=segment.text,
+                    words=words,
                 )
             )
 

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$transcription/v1/transcription.proto\x12\x10transcription.v1\"\x9c\x01\n\x11TranscribeRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x12\n\nlocal_path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x04 \x01(\t\x12\x37\n\x07options\x18\x05 \x01(\x0b\x32&.transcription.v1.TranscriptionOptions\"z\n\x14TranscriptionOptions\x12\x10\n\x08language\x18\x01 \x01(\t\x12\x12\n\nenable_vad\x18\x02 \x01(\x08\x12\x1a\n\x12\x65nable_diarization\x18\x03 \x01(\x08\x12 \n\x18\x65nable_source_separation\x18\x04 \x01(\x08\"\xd3\x01\n\x12TranscribeResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tfull_text\x18\x02 \x01(\t\x12\x35\n\x08segments\x18\x03 \x03(\x0b\x32#.transcription.v1.TranscriptSegment\x12\x10\n\x08language\x18\x04 \x01(\t\x12\x11\n\tasr_model\x18\x05 \x01(\t\x12\x19\n\x11\x64iarization_model\x18\x06 \x01(\t\x12\x1f\n\x17source_separation_model\x18\x07 \x01(\t\"a\n\x11TranscriptSegment\x12\x12\n\nsegment_id\x18\x01 \x01(\t\x12\x15\n\rstart_seconds\x18\x02 \x01(\x01\x12\x13\n\x0b\x65nd_seconds\x18\x03 \x01(\x01\x12\x0c\n\x04text\x18\x04 \x01(\t2o\n\x14TranscriptionService\x12W\n\nTranscribe\x12#.transcription.v1.TranscribeRequest\x1a$.transcription.v1.TranscribeResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$transcription/v1/transcription.proto\x12\x10transcription.v1\"\x9c\x01\n\x11TranscribeRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x12\n\nlocal_path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x04 \x01(\t\x12\x37\n\x07options\x18\x05 \x01(\x0b\x32&.transcription.v1.TranscriptionOptions\"\x9a\x01\n\x14TranscriptionOptions\x12\x10\n\x08language\x18\x01 \x01(\t\x12\x12\n\nenable_vad\x18\x02 \x01(\x08\x12\x1a\n\x12\x65nable_diarization\x18\x03 \x01(\x08\x12 \n\x18\x65nable_source_separation\x18\x04 \x01(\x08\x12\x1e\n\x16\x65nable_word_timestamps\x18\x05 \x01(\x08\"\xd3\x01\n\x12TranscribeResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tfull_text\x18\x02 \x01(\t\x12\x35\n\x08segments\x18\x03 \x03(\x0b\x32#.transcription.v1.TranscriptSegment\x12\x10\n\x08language\x18\x04 \x01(\t\x12\x11\n\tasr_model\x18\x05 \x01(\t\x12\x19\n\x11\x64iarization_model\x18\x06 \x01(\t\x12\x1f\n\x17source_separation_model\x18\x07 \x01(\t\"\x92\x01\n\x11TranscriptSegment\x12\x12\n\nsegment_id\x18\x01 \x01(\t\x12\x15\n\rstart_seconds\x18\x02 \x01(\x01\x12\x13\n\x0b\x65nd_seconds\x18\x03 \x01(\x01\x12\x0c\n\x04text\x18\x04 \x01(\t\x12/\n\x05words\x18\x05 \x03(\x0b\x32 .transcription.v1.TranscriptWord\"o\n\x0eTranscriptWord\x12\x0f\n\x07word_id\x18\x01 \x01(\t\x12\x15\n\rstart_seconds\x18\x02 \x01(\x01\x12\x13\n\x0b\x65nd_seconds\x18\x03 \x01(\x01\x12\x0c\n\x04text\x18\x04 \x01(\t\x12\x12\n\nconfidence\x18\x05 \x01(\x02\x32o\n\x14TranscriptionService\x12W\n\nTranscribe\x12#.transcription.v1.TranscribeRequest\x1a$.transcription.v1.TranscribeResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,12 +33,14 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_TRANSCRIBEREQUEST']._serialized_start=59
   _globals['_TRANSCRIBEREQUEST']._serialized_end=215
-  _globals['_TRANSCRIPTIONOPTIONS']._serialized_start=217
-  _globals['_TRANSCRIPTIONOPTIONS']._serialized_end=339
-  _globals['_TRANSCRIBERESPONSE']._serialized_start=342
-  _globals['_TRANSCRIBERESPONSE']._serialized_end=553
-  _globals['_TRANSCRIPTSEGMENT']._serialized_start=555
-  _globals['_TRANSCRIPTSEGMENT']._serialized_end=652
-  _globals['_TRANSCRIPTIONSERVICE']._serialized_start=654
-  _globals['_TRANSCRIPTIONSERVICE']._serialized_end=765
+  _globals['_TRANSCRIPTIONOPTIONS']._serialized_start=218
+  _globals['_TRANSCRIPTIONOPTIONS']._serialized_end=372
+  _globals['_TRANSCRIBERESPONSE']._serialized_start=375
+  _globals['_TRANSCRIBERESPONSE']._serialized_end=586
+  _globals['_TRANSCRIPTSEGMENT']._serialized_start=589
+  _globals['_TRANSCRIPTSEGMENT']._serialized_end=735
+  _globals['_TRANSCRIPTWORD']._serialized_start=737
+  _globals['_TRANSCRIPTWORD']._serialized_end=848
+  _globals['_TRANSCRIPTIONSERVICE']._serialized_start=850
+  _globals['_TRANSCRIPTIONSERVICE']._serialized_end=961
 # @@protoc_insertion_point(module_scope)

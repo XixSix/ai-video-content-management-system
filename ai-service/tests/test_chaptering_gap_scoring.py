@@ -612,7 +612,6 @@ def _pipeline_request(
 class _SequencedSemanticShiftEmbeddingProvider:
     def __init__(self, *, shift_by_call: list[float]) -> None:
         self._shift_by_call = shift_by_call
-        self._calls = 0
 
     @property
     def model_name(self) -> str:
@@ -623,12 +622,15 @@ class _SequencedSemanticShiftEmbeddingProvider:
         return 2
 
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        shift = self._shift_by_call[self._calls]
-        self._calls += 1
-        if shift >= 1.0:
-            return [[1.0, 0.0], [0.0, 1.0]]
+        assert len(texts) == len(self._shift_by_call) * 2
+        embeddings: list[list[float]] = []
+        for shift in self._shift_by_call:
+            if shift >= 1.0:
+                embeddings.extend([[1.0, 0.0], [0.0, 1.0]])
+            else:
+                embeddings.extend([[1.0, 0.0], [1.0, 0.0]])
 
-        return [[1.0, 0.0], [1.0, 0.0]]
+        return embeddings
 
 
 class _FakeBoundaryEvaluationProvider:

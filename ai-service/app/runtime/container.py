@@ -15,16 +15,31 @@ from app.providers.audio.noop_decoder import NoopAudioDecoder
 from app.providers.audio.audio_preprocessing import AudioPreprocessor
 from app.providers.audio.torchaudio_decoder import TorchaudioAudioDecoder
 from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.chaptering.sentence_transformer_embedding import (
+    SentenceTransformerTextEmbeddingProvider,
+)
 from app.providers.chaptering.noop_boundary_evaluation import (
     NoopChapterBoundaryEvaluationProvider,
 )
 from app.providers.chaptering.noop_title import NoopChapterTitleProvider
+from app.providers.chaptering.openai_compatible_boundary_evaluation import (
+    OpenAICompatibleChapterBoundaryEvaluationProvider,
+)
+from app.providers.chaptering.openai_compatible_title import (
+    OpenAICompatibleChapterTitleProvider,
+)
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.diarization.pyannote_community import PyannoteCommunityDiarization
+from app.providers.llm.openai_compatible import OpenAICompatibleChatClient
+from app.providers.short_clip.openai_compatible_candidate import (
+    OpenAICompatibleShortClipCandidateProvider,
+)
+from app.providers.short_clip.noop_candidate import NoopShortClipCandidateProvider
 from app.providers.source_separation.demucs import DemucsSourceSeparator
 from app.providers.source_separation.noop_demucs import NoopDemucsSourceSeparator
 from app.providers.vad.noop_vad import NoopVad
 from app.providers.vad.silero_vad import SileroVad
+from app.workflows.short_clip.workflow import ShortClipWorkflow
 from app.workflows.chaptering.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
@@ -57,38 +72,118 @@ def build_chaptering_workflow(
     settings: Settings | None = None,
 ) -> ChapteringWorkflow:
     settings = settings or get_settings()
+    llm_client = build_llm_chat_client(settings) if _chaptering_uses_llm(settings) else None
 
     return ChapteringWorkflow(
         embedding=build_chaptering_embedding_provider(settings),
-        boundary_evaluator=build_chaptering_boundary_evaluation_provider(settings),
-        title_provider=build_chaptering_title_provider(settings),
+        boundary_evaluator=build_chaptering_boundary_evaluation_provider(
+            settings,
+            llm_client=llm_client,
+        ),
+        title_provider=build_chaptering_title_provider(
+            settings,
+            llm_client=llm_client,
+        ),
         config=_build_chaptering_pipeline_config(settings),
     )
 
 
 def build_short_clip_workflow(
     settings: Settings | None = None,
-) -> object:
+) -> ShortClipWorkflow:
     settings = settings or get_settings()
-    _ = settings
-    raise NotImplementedError("short clip workflow is not wired in ai-service yet")
+    llm_client = (
+        build_llm_chat_client(settings)
+        if settings.short_clip_candidate_provider == "openai-compatible"
+        else None
+    )
+
+    return ShortClipWorkflow(
+        candidate_provider=build_short_clip_candidate_provider(
+            settings,
+            llm_client=llm_client,
+        ),
+        fallback_candidate_provider=(
+            NoopShortClipCandidateProvider(
+                model_name=settings.short_clip_model_name,
+            )
+            if settings.short_clip_candidate_provider == "openai-compatible"
+            else None
+        ),
+    )
+
+
+def build_short_clip_candidate_provider(
+    settings: Settings,
+    *,
+    llm_client: OpenAICompatibleChatClient | None = None,
+) -> NoopShortClipCandidateProvider | OpenAICompatibleShortClipCandidateProvider:
+    if settings.short_clip_candidate_provider == "openai-compatible":
+        return OpenAICompatibleShortClipCandidateProvider(
+            chat_client=llm_client or build_llm_chat_client(settings),
+        )
+
+    return NoopShortClipCandidateProvider(
+        model_name=settings.short_clip_model_name,
+    )
+
+
+def build_llm_chat_client(settings: Settings) -> OpenAICompatibleChatClient:
+    return OpenAICompatibleChatClient(
+        base_url=settings.llm_base_url,
+        api_key=settings.llm_api_key,
+        model_name=settings.llm_model_name,
+        timeout_seconds=settings.llm_timeout_seconds,
+        temperature=settings.llm_temperature,
+        max_tokens=settings.llm_max_tokens,
+    )
 
 
 def build_chaptering_embedding_provider(settings: Settings) -> TextEmbeddingPort:
-    _ = settings
+    if settings.chaptering_embedding_provider == "sentence-transformers":
+        return SentenceTransformerTextEmbeddingProvider(
+            model_name=settings.chaptering_embedding_model_name,
+            device=settings.chaptering_embedding_device,
+            batch_size=settings.chaptering_embedding_batch_size,
+            max_sequence_length=(settings.chaptering_embedding_max_sequence_length),
+            cache_path=settings.chaptering_embedding_cache_path,
+            local_files_only=settings.chaptering_embedding_local_files_only,
+        )
+
     return NoopTextEmbeddingProvider()
 
 
 def build_chaptering_boundary_evaluation_provider(
     settings: Settings,
+    *,
+    llm_client: OpenAICompatibleChatClient | None = None,
 ) -> ChapterBoundaryEvaluationPort:
-    _ = settings
+    if settings.chaptering_boundary_evaluation_provider == "openai-compatible":
+        return OpenAICompatibleChapterBoundaryEvaluationProvider(
+            chat_client=llm_client or build_llm_chat_client(settings),
+        )
+
     return NoopChapterBoundaryEvaluationProvider()
 
 
-def build_chaptering_title_provider(settings: Settings) -> ChapterTitleProviderPort:
-    _ = settings
+def build_chaptering_title_provider(
+    settings: Settings,
+    *,
+    llm_client: OpenAICompatibleChatClient | None = None,
+) -> ChapterTitleProviderPort:
+    if settings.chaptering_title_provider == "openai-compatible":
+        return OpenAICompatibleChapterTitleProvider(
+            chat_client=llm_client or build_llm_chat_client(settings),
+        )
+
     return NoopChapterTitleProvider()
+
+
+def _chaptering_uses_llm(settings: Settings) -> bool:
+    return (
+        settings.chaptering_boundary_evaluation_provider == "openai-compatible"
+        or settings.chaptering_title_provider == "openai-compatible"
+    )
 
 
 def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineConfig:

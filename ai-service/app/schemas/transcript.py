@@ -1,4 +1,14 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class TranscriptWordResult(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    word_id: str
+    start_seconds: float
+    end_seconds: float
+    text: str
+    confidence: float | None = None
 
 
 class TranscriptSegmentResult(BaseModel):
@@ -8,6 +18,7 @@ class TranscriptSegmentResult(BaseModel):
     start_seconds: float
     end_seconds: float
     text: str
+    words: list[TranscriptWordResult] = Field(default_factory=list)
 
 
 class TranscriptResult(BaseModel):

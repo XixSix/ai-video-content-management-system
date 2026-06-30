@@ -20,7 +20,9 @@ class NoopAsr:
         *,
         local_path: Path,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
+        _ = enable_word_timestamps
         return self._build_result(
             label=local_path.name,
             language=language,
@@ -32,8 +34,9 @@ class NoopAsr:
         samples: Sequence[float],
         sample_rate: int,
         language: str | None,
+        enable_word_timestamps: bool = False,
     ) -> TranscriptResult:
-        _ = sample_rate
+        _ = sample_rate, enable_word_timestamps
         return self._build_result(
             label=f"{len(samples)} samples",
             language=language,

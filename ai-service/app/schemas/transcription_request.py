@@ -10,6 +10,7 @@ class TranscriptionOptionsInput(BaseModel):
     enable_vad: bool = False
     enable_diarization: bool = False
     enable_source_separation: bool = False
+    enable_word_timestamps: bool = False
 
 
 class TranscriptionRequest(BaseModel):

@@ -19,6 +19,7 @@ message TranscriptionOptions {
   bool enable_vad = 2;
   bool enable_diarization = 3;
   bool enable_source_separation = 4;
+  bool enable_word_timestamps = 5;
 }
 
 message TranscribeResponse {
@@ -36,4 +37,13 @@ message TranscriptSegment {
   double start_seconds = 2;
   double end_seconds = 3;
   string text = 4;
+  repeated TranscriptWord words = 5;
+}
+
+message TranscriptWord {
+  string word_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string text = 4;
+  float confidence = 5;
 }

@@ -179,6 +179,83 @@ class Settings(BaseSettings):
         default="segment-chaptering-v1",
         alias="CHAPTERING_MODEL_NAME",
     )
+    chaptering_boundary_evaluation_provider: Literal[
+        "noop",
+        "openai-compatible",
+    ] = Field(
+        default="noop",
+        alias="CHAPTERING_BOUNDARY_EVALUATION_PROVIDER",
+    )
+    chaptering_title_provider: Literal["noop", "openai-compatible"] = Field(
+        default="noop",
+        alias="CHAPTERING_TITLE_PROVIDER",
+    )
+    short_clip_candidate_provider: Literal[
+        "noop",
+        "openai-compatible",
+    ] = Field(
+        default="noop",
+        alias="SHORT_CLIP_CANDIDATE_PROVIDER",
+    )
+    short_clip_model_name: str = Field(
+        default="noop-short-clip-v1",
+        min_length=1,
+        alias="SHORT_CLIP_MODEL_NAME",
+    )
+    llm_base_url: str = Field(
+        default="http://localhost:8000/v1",
+        min_length=1,
+        alias="LLM_BASE_URL",
+    )
+    llm_api_key: str = Field(default="", alias="LLM_API_KEY")
+    llm_model_name: str = Field(
+        default="Qwen/Qwen3-8B",
+        min_length=1,
+        alias="LLM_MODEL_NAME",
+    )
+    llm_timeout_seconds: PositiveFloat = Field(
+        default=30.0,
+        alias="LLM_TIMEOUT_SECONDS",
+    )
+    llm_temperature: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=2.0,
+        alias="LLM_TEMPERATURE",
+    )
+    llm_max_tokens: PositiveInt = Field(default=1024, alias="LLM_MAX_TOKENS")
+    chaptering_embedding_provider: Literal["noop", "sentence-transformers"] = Field(
+        default="noop",
+        alias="CHAPTERING_EMBEDDING_PROVIDER",
+    )
+    chaptering_embedding_model_name: str = Field(
+        default="Qwen/Qwen3-Embedding-0.6B",
+        min_length=1,
+        alias="CHAPTERING_EMBEDDING_MODEL_NAME",
+    )
+    chaptering_embedding_device: str = Field(
+        default="cpu",
+        min_length=1,
+        alias="CHAPTERING_EMBEDDING_DEVICE",
+    )
+    chaptering_embedding_batch_size: PositiveInt = Field(
+        default=8,
+        alias="CHAPTERING_EMBEDDING_BATCH_SIZE",
+    )
+    chaptering_embedding_max_sequence_length: int = Field(
+        default=2048,
+        ge=1,
+        le=32_768,
+        alias="CHAPTERING_EMBEDDING_MAX_SEQUENCE_LENGTH",
+    )
+    chaptering_embedding_cache_path: Path | None = Field(
+        default=None,
+        alias="CHAPTERING_EMBEDDING_CACHE_PATH",
+    )
+    chaptering_embedding_local_files_only: bool = Field(
+        default=False,
+        alias="CHAPTERING_EMBEDDING_LOCAL_FILES_ONLY",
+    )
     chaptering_target_unit_duration_seconds: PositiveFloat = Field(
         default=12.0,
         alias="CHAPTERING_TARGET_UNIT_DURATION_SECONDS",
@@ -317,9 +394,13 @@ class Settings(BaseSettings):
     def bind_address(self) -> str:
         return f"{self.ai_service_host}:{self.ai_service_port}"
 
-    @field_validator("asr_model_storage_path", mode="before")
+    @field_validator(
+        "asr_model_storage_path",
+        "chaptering_embedding_cache_path",
+        mode="before",
+    )
     @classmethod
-    def empty_model_storage_path_as_none(cls, value: object) -> object:
+    def empty_optional_path_as_none(cls, value: object) -> object:
         if value == "":
             return None
 
