@@ -1,5 +1,4 @@
-import { Video } from "@remotion/media";
-import { AbsoluteFill, Sequence } from "remotion";
+import { AbsoluteFill, Sequence, Video } from "remotion";
 
 import { AudioLayer } from "./layers/AudioLayer";
 import { CaptionLayer } from "./layers/CaptionLayer";
@@ -18,10 +17,10 @@ export const StudioPreviewComposition: React.FC<RenderDocument> = (document) => 
           <Video
             src={document.sourceVideo.src}
             muted={document.sourceVideo.muted}
-            objectFit={document.sourceVideo.fit}
             style={{
               width: "100%",
               height: "100%",
+              objectFit: document.sourceVideo.fit,
             }}
           />
         </Sequence>

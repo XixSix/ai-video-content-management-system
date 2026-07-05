@@ -1,6 +1,11 @@
 from uuid import UUID
 
-from app.db import chaptering_repository, jobs_repository, transcript_repository
+from app.db import (
+    chaptering_repository,
+    jobs_repository,
+    short_clip_repository,
+    transcript_repository,
+)
 from app.schemas.chaptering.result import ChapterBoundaryScore, ChapterCandidate
 from app.schemas.db.processsing_job import JobStatus
 from app.services.placeholder_transcription_service import (
@@ -43,8 +48,10 @@ class FakeSession:
     ) -> None:
         self.rows = rows
         self.params: list[dict[str, object]] = []
+        self.statements: list[object] = []
 
     def execute(self, statement: object, params: dict[str, object]) -> FakeResult:
+        self.statements.append(statement)
         self.params.append(params)
 
         if self.rows:
@@ -54,10 +61,14 @@ class FakeSession:
 
 
 def _result() -> PlaceholderTranscriptResult:
+    return _result_with_model("worker-placeholder-transcriber-v1")
+
+
+def _result_with_model(model: str) -> PlaceholderTranscriptResult:
     return PlaceholderTranscriptResult(
         language="en",
         source="IMPORTED",
-        model="worker-placeholder-transcriber-v1",
+        model=model,
         full_text="Hello world",
         word_count=2,
         segments=[
@@ -89,6 +100,21 @@ def test_save_transcript_inserts_transcript_and_segments() -> None:
     assert session.params[3]["segment_index"] == 1
 
 
+def test_save_transcript_maps_whisper_model_to_database_enum_values() -> None:
+    session = FakeSession(rows=[None])
+
+    transcript_repository.save_transcript(
+        session,
+        job_id=JOB_ID,
+        media_id=MEDIA_ID,
+        result=_result_with_model("faster-whisper-small"),
+    )
+
+    insert_params = session.params[1]
+    assert insert_params["asr_model"] == "FASTER-WHISPER"
+    assert insert_params["model_size"] == "small"
+
+
 def test_save_transcript_returns_existing_summary_without_duplicate_insert() -> None:
     existing_row = {
         "id": "00000000-0000-4000-8000-000000000003",
@@ -112,6 +138,58 @@ def test_save_transcript_returns_existing_summary_without_duplicate_insert() -> 
     assert len(session.params) == 1
 
 
+def test_chaptering_loads_transcript_segments_in_timeline_order() -> None:
+    transcript_row = {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "media_id": MEDIA_ID,
+        "language": "en",
+        "version": 1,
+        "media_duration": 120.0,
+    }
+    session = FakeSession(rows=[transcript_row, []])
+
+    chaptering_repository.load_transcript_for_chaptering(
+        session,
+        transcript_id="00000000-0000-4000-8000-000000000004",
+        media_id=MEDIA_ID,
+    )
+
+    assert "ORDER BY start_time ASC, end_time ASC, segment_index ASC" in str(
+        session.statements[1]
+    )
+
+
+def test_short_clip_source_loads_transcript_segments_in_timeline_order() -> None:
+    source_row = {
+        "media_id": MEDIA_ID,
+        "user_id": "00000000-0000-4000-8000-000000000003",
+        "workspace_id": "00000000-0000-4000-8000-000000000004",
+        "media_type": "VIDEO",
+        "s3_bucket": "vidpilot-media",
+        "s3_key": "uploads/source.mp4",
+        "s3_region": None,
+        "media_duration": 120.0,
+        "width": 1920,
+        "height": 1080,
+        "mime_type": "video/mp4",
+        "transcript_id": "00000000-0000-4000-8000-000000000005",
+        "language": "en",
+        "transcript_version": 1,
+        "project_id": None,
+    }
+    session = FakeSession(rows=[source_row, [], []])
+
+    short_clip_repository.load_short_clip_source(
+        session,
+        media_id=MEDIA_ID,
+        transcript_id="00000000-0000-4000-8000-000000000004",
+    )
+
+    assert "ORDER BY start_time ASC, end_time ASC, segment_index ASC" in str(
+        session.statements[1]
+    )
+
+
 def test_increment_attempt_count_releases_job_for_retry() -> None:
     session = FakeSession(rows=[])
 
@@ -132,9 +210,8 @@ def test_save_chapters_persists_boundary_scores() -> None:
         "start_time": 0.0,
         "end_time": 120.0,
         "title": "Introduction",
-        "summary": "Chapter summary.",
         "transcript_version": 2,
-        "source": "RULE_BASED",
+        "source": "SEGMENTS",
         "score": 0.91,
         "boundary_score": 0.91,
         "pause_score": 0.2,
@@ -178,5 +255,7 @@ def test_save_chapters_persists_boundary_scores() -> None:
     assert insert_params["discourse_marker_score"] == 1.0
     assert insert_params["semantic_shift_score"] == 0.0
     assert insert_params["duration_score"] == 0.8
+    assert insert_params["source"] == "SEGMENTS"
+    assert "summary" not in insert_params
     assert summary.model == "ai-service-chaptering-v1"
     assert summary.chapters[0].score == 0.91

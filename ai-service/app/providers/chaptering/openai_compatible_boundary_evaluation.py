@@ -25,6 +25,17 @@ class OpenAICompatibleChapterBoundaryEvaluationProvider:
             system_prompt=_BOUNDARY_SYSTEM_PROMPT,
             user_payload={
                 "task": "chapter_boundary_evaluation",
+                "required_response_schema": {
+                    "evaluations": [
+                        {
+                            "candidate_time": "number from candidates",
+                            "is_chapter_boundary": "boolean",
+                            "confidence": "number 0..1",
+                            "transition_intent": "one allowed intent",
+                            "reason": "short string",
+                        }
+                    ]
+                },
                 "allowed_transition_intents": [
                     "CONTINUE_TOPIC",
                     "DEVELOP_SUBTOPIC",
@@ -38,10 +49,7 @@ class OpenAICompatibleChapterBoundaryEvaluationProvider:
                 "candidates": [_boundary_input_payload(item) for item in inputs],
             },
         )
-        try:
-            parsed = _BoundaryResponse.model_validate(response)
-        except ValidationError as exc:
-            raise ValueError("Invalid boundary evaluation LLM response") from exc
+        parsed = _parse_boundary_response(response)
 
         return [
             BoundaryEvaluation(
@@ -71,6 +79,27 @@ class _BoundaryResponse(BaseModel):
     evaluations: list[_BoundaryItem] = Field(default_factory=list)
 
 
+def _parse_boundary_response(response: object) -> _BoundaryResponse:
+    try:
+        return _BoundaryResponse.model_validate(response)
+    except ValidationError as exc:
+        if isinstance(response, list):
+            return _BoundaryResponse.model_validate({"evaluations": response})
+
+        if isinstance(response, dict):
+            nested = response.get("data") or response.get("result")
+            if isinstance(nested, dict) and "evaluations" in nested:
+                return _BoundaryResponse.model_validate(nested)
+
+            if {"candidate_time", "is_chapter_boundary"}.issubset(response):
+                return _BoundaryResponse.model_validate({"evaluations": [response]})
+
+            if "evaluations" not in response:
+                return _BoundaryResponse(evaluations=[])
+
+        raise ValueError("Invalid boundary evaluation LLM response") from exc
+
+
 def _boundary_input_payload(item: BoundaryEvaluationInput) -> dict[str, object]:
     return {
         "candidate_time": item.candidate_time,
@@ -92,9 +121,12 @@ _BOUNDARY_SYSTEM_PROMPT = """
 You evaluate candidate chapter boundaries for long-form transcript content.
 Return only valid JSON with this exact shape:
 {"evaluations":[{"candidate_time":number,"is_chapter_boundary":boolean,"confidence":number,"transition_intent":string,"reason":string}]}
+Do not return any other top-level keys.
+Do not return keys named version, data, label, title, description, or keywords.
 Rules:
 - Evaluate only candidate_time values provided in the user payload.
 - Do not invent timestamps.
+- If no candidate is a good boundary, return {"evaluations":[]}.
 - confidence must be between 0 and 1.
 - transition_intent must be one of the allowed_transition_intents.
 - Keep reason concise.

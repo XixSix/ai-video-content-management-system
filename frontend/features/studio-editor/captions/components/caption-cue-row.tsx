@@ -7,6 +7,16 @@ import { cn } from "@/lib/utils"
 import type { StudioCaptionCue } from "../../studio.types"
 import { CaptionWordEditor } from "./caption-word-editor"
 
+function getSpeakerInitials(label: string) {
+  const speakerNumber = label.match(/speaker\s*(\d+)/i)?.[1]
+
+  if (speakerNumber) {
+    return `S${speakerNumber}`
+  }
+
+  return label.trim().charAt(0).toUpperCase() || "S"
+}
+
 export function CaptionCueRow({
   activeCueRef,
   cue,
@@ -53,26 +63,29 @@ export function CaptionCueRow({
           : "hover:border-foreground/15 hover:bg-surface-muted/35"
       )}
     >
-      <div className="grid grid-cols-[auto_1px_minmax(0,1fr)] gap-3">
-        <div className="flex min-w-[116px] items-center gap-2 self-start rounded-md border border-border bg-muted/45 px-2 py-1.5">
+      <div className="grid grid-cols-[7.75rem_minmax(0,1fr)] gap-3">
+        <div className="flex min-w-0 items-center gap-2 self-start rounded-md border border-border bg-muted/45 px-2 py-1.5">
           <Avatar size="sm">
-            <AvatarFallback>
-              {cue.speakerLabel.replace("Speaker ", "S")}
+            <AvatarFallback className="text-[10px] font-semibold">
+              {getSpeakerInitials(cue.speakerLabel)}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-[12px] font-semibold text-foreground">
+            <p
+              title={cue.speakerLabel}
+              className="truncate text-[12px] font-semibold text-foreground"
+            >
               {cue.speakerLabel}
             </p>
           </div>
         </div>
 
-        <div className="w-px self-stretch bg-border/80" />
-
         <div className="min-w-0">
-          <div className="flex items-center justify-between gap-3">
-            <p className="font-mono text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-mono text-[11px] font-medium text-muted-foreground">
               {formatCaptionTimestamp(cue.startTime)}
+              <span className="mx-1.5 text-muted-foreground/60">-</span>
+              {formatCaptionTimestamp(cue.endTime)}
             </p>
             {cue.wordGroups.some((group) => group.isEdited) ? (
               <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
@@ -97,10 +110,6 @@ export function CaptionCueRow({
               />
             ))}
           </div>
-
-          <p className="mt-2 font-mono text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">
-            {formatCaptionTimestamp(cue.endTime)}
-          </p>
         </div>
       </div>
     </div>

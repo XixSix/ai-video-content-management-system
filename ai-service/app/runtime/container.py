@@ -72,7 +72,9 @@ def build_chaptering_workflow(
     settings: Settings | None = None,
 ) -> ChapteringWorkflow:
     settings = settings or get_settings()
-    llm_client = build_llm_chat_client(settings) if _chaptering_uses_llm(settings) else None
+    llm_client = (
+        build_llm_chat_client(settings) if _chaptering_uses_llm(settings) else None
+    )
 
     return ChapteringWorkflow(
         embedding=build_chaptering_embedding_provider(settings),

@@ -115,9 +115,6 @@ def test_completed_output_shape_has_no_mock_field() -> None:
         },
         "options": {
             "language": "en",
-            "generateSrt": True,
-            "generateVtt": True,
-            "burnTranscript": False,
             "useVad": True,
             "sourceSeparation": False,
             "useDiarization": False,

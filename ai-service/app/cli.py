@@ -80,7 +80,9 @@ def chaptering_analyze_units() -> None:
     args = parser.parse_args()
 
     if args.output_dir and args.split == "all":
-        raise SystemExit("--output-dir can only be used with --split dev or --split holdout.")
+        raise SystemExit(
+            "--output-dir can only be used with --split dev or --split holdout."
+        )
 
     units_dir = args.units_dir or _default_units_dir(args.run_name)
     splits = ("dev", "holdout") if args.split == "all" else (args.split,)

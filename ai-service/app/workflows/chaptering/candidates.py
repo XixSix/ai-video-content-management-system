@@ -136,7 +136,6 @@ def _score_candidate(
     cheap_score = (
         config.discourse_marker_weight * discourse_marker_score
         + config.pause_weight * pause_score
-        + config.lexical_shift_weight * lexical_shift_score
         + config.boundary_quality_weight * boundary_quality_score
         + config.duration_sanity_weight * duration_sanity_score
     )

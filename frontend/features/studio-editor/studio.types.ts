@@ -260,6 +260,7 @@ export type StudioCaptionWordGroup = {
   confidence: number
   isEdited: boolean
   isOmitted: boolean
+  isSynthetic?: boolean
 }
 
 export type StudioCaptionCue = {
@@ -315,10 +316,7 @@ export type StudioChapter = {
 
 export type StudioClipCandidateStatus = "CANDIDATE" | "SELECTED" | "REJECTED"
 export type StudioAspectRatio = "9:16" | "1:1" | "4:5" | "16:9"
-export type StudioClipPlatform =
-  | "TIKTOK"
-  | "YOUTUBE_SHORTS"
-  | "INSTAGRAM_REELS"
+export type StudioClipPlatform = "YOUTUBE_SHORTS" | "FACEBOOK_REELS"
 export type StudioShortClipStatus = "DRAFT" | "READY" | "FAILED"
 
 export type StudioClipCandidate = {

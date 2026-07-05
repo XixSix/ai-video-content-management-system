@@ -1,4 +1,3 @@
-import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
@@ -50,7 +49,7 @@ def find_transcript_by_job_id(
               t.job_id,
               t.language,
               t.source::text AS source,
-              t.model,
+              NULLIF(CONCAT_WS(':', t.asr_model::text, t.model_size::text), '') AS model,
               t.full_text,
               COALESCE(t.word_count, 0) AS word_count,
               COUNT(ts.id)::int AS segment_count
@@ -87,19 +86,6 @@ def save_transcript(
 
     now = datetime.now(UTC)
     transcript_id = str(uuid4())
-    content = {
-        "segments": [
-            {
-                "startTime": segment.start_time,
-                "endTime": segment.end_time,
-                "text": segment.text,
-                "confidence": segment.confidence,
-                "speakerLabel": segment.speaker_label,
-            }
-            for segment in result.segments
-        ],
-    }
-
     session.execute(
         text(
             """
@@ -109,9 +95,9 @@ def save_transcript(
               job_id,
               language,
               source,
-              model,
+              asr_model,
+              model_size,
               full_text,
-              content,
               word_count,
               full_text_updated_at,
               created_at,
@@ -123,9 +109,9 @@ def save_transcript(
               :job_id,
               :language,
               CAST(:source AS "TranscriptSource"),
-              :model,
+              CAST(:asr_model AS "AsrModel"),
+              CAST(:model_size AS "ModelSize"),
               :full_text,
-              CAST(:content AS jsonb),
               :word_count,
               :now,
               :now,
@@ -139,9 +125,9 @@ def save_transcript(
             "job_id": job_id,
             "language": result.language,
             "source": result.source,
-            "model": result.model,
+            "asr_model": _asr_model_from_model_name(result.model),
+            "model_size": _model_size_from_model_name(result.model),
             "full_text": result.full_text,
-            "content": json.dumps(content),
             "word_count": result.word_count,
             "now": now,
         },
@@ -220,3 +206,50 @@ def _summary_from_row(row: RowMapping) -> PersistedTranscriptSummary:
         segment_count=row["segment_count"],
         word_count=row["word_count"],
     )
+
+
+def _asr_model_from_model_name(model: str | None) -> str | None:
+    """Map a provider model name into the current database ASR enum."""
+    normalized = (model or "").lower()
+
+    if "whisper" in normalized:
+        return "FASTER-WHISPER"
+
+    return None
+
+
+def _model_size_from_model_name(model: str | None) -> str | None:
+    """Map a provider model name into the current database model size enum."""
+    normalized = (model or "").lower()
+
+    if "large-v3-turbo" in normalized:
+        return "large-v3-turbo"
+
+    if "large-v3" in normalized:
+        return "large-v3"
+
+    if "medium.en" in normalized:
+        return "medium.en"
+
+    if "medium" in normalized:
+        return "medium"
+
+    if "small.en" in normalized:
+        return "small.en"
+
+    if "small" in normalized:
+        return "small"
+
+    if "base.en" in normalized:
+        return "base.en"
+
+    if "base" in normalized:
+        return "base"
+
+    if "tiny.en" in normalized:
+        return "tiny.en"
+
+    if "tiny" in normalized:
+        return "tiny"
+
+    return None

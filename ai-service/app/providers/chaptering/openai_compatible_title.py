@@ -22,13 +22,19 @@ class OpenAICompatibleChapterTitleProvider:
             system_prompt=_TITLE_SYSTEM_PROMPT,
             user_payload={
                 "task": "chapter_title_generation",
+                "required_response_schema": {
+                    "chapters": [
+                        {
+                            "chapter_index": "integer from chapters",
+                            "title": "short string",
+                            "summary": "one sentence or null",
+                        }
+                    ]
+                },
                 "chapters": [_title_input_payload(item) for item in inputs],
             },
         )
-        try:
-            parsed = _TitleResponse.model_validate(response)
-        except ValidationError as exc:
-            raise ValueError("Invalid chapter title LLM response") from exc
+        parsed = _parse_title_response(response, inputs)
 
         return [
             ChapterTitleResult(
@@ -58,6 +64,44 @@ class _TitleResponse(BaseModel):
     chapters: list[_TitleItem] = Field(default_factory=list)
 
 
+def _parse_title_response(
+    response: object,
+    inputs: list[ChapterTitleInput],
+) -> _TitleResponse:
+    try:
+        return _TitleResponse.model_validate(response)
+    except ValidationError as exc:
+        if isinstance(response, list):
+            return _TitleResponse.model_validate({"chapters": response})
+
+        if isinstance(response, dict):
+            nested = response.get("data") or response.get("result")
+            if isinstance(nested, dict):
+                return _parse_title_response(nested, inputs)
+
+            if {"chapter_index", "title"}.issubset(response):
+                return _TitleResponse.model_validate({"chapters": [response]})
+
+            title = response.get("title")
+            if isinstance(title, str) and title.strip() and inputs:
+                summary = response.get("summary") or response.get("description")
+                return _TitleResponse.model_validate(
+                    {
+                        "chapters": [
+                            {
+                                "chapter_index": inputs[0].chapter_index,
+                                "title": title,
+                                "summary": summary
+                                if isinstance(summary, str)
+                                else None,
+                            }
+                        ]
+                    }
+                )
+
+        raise ValueError("Invalid chapter title LLM response") from exc
+
+
 def _title_input_payload(item: ChapterTitleInput) -> dict[str, object]:
     return {
         "chapter_index": item.chapter_index,
@@ -80,6 +124,8 @@ _TITLE_SYSTEM_PROMPT = """
 You write concise chapter labels for transcript chapters.
 Return only valid JSON with this exact shape:
 {"chapters":[{"chapter_index":integer,"title":string,"summary":string|null}]}
+Do not return any other top-level keys.
+Do not return top-level title, description, keywords, version, data, or label.
 Rules:
 - Use only chapter_index values provided in the user payload.
 - Do not invent timestamps or chapter indexes.

@@ -9,6 +9,10 @@ from app.workflows.chaptering.schemas import (
 
 LLM_ALGORITHM_WEIGHT = 0.70
 LLM_CONFIDENCE_WEIGHT = 0.30
+SEMANTIC_VALLEY_WEIGHT = 0.70
+LEXICAL_SHIFT_WEIGHT = 0.30
+CANDIDATE_SEMANTIC_WEIGHT = 0.70
+CANDIDATE_GAP_WEIGHT = 0.30
 
 
 def prepare_boundary_candidates_for_review(
@@ -43,16 +47,22 @@ def prepare_boundary_candidates_for_review(
 
 
 def _score_candidate(candidate: ChapterCandidate) -> ChapterCandidate:
+    semantic_score = _semantic_score(candidate)
     candidate_score = (
-        candidate.valley_depth_score
-        + 0.10 * candidate.discourse_marker_score
-        + 0.05 * candidate.pause_score
-        - 0.10 * (1.0 - candidate.boundary_quality_score)
+        CANDIDATE_SEMANTIC_WEIGHT * semantic_score
+        + CANDIDATE_GAP_WEIGHT * candidate.cheap_score
     )
 
     return replace(
         candidate,
         candidate_score=round(clamp_score(candidate_score), 4),
+    )
+
+
+def _semantic_score(candidate: ChapterCandidate) -> float:
+    return clamp_score(
+        SEMANTIC_VALLEY_WEIGHT * candidate.semantic_valley_depth_score
+        + LEXICAL_SHIFT_WEIGHT * candidate.lexical_shift_score
     )
 
 

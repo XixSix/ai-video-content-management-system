@@ -18,7 +18,7 @@ describe('platform account utilities', () => {
 
   it('builds frontend redirect URLs', () => {
     expect(buildPlatformOauthRedirectUrl('YOUTUBE', 'failed', 'PLATFORM_OAUTH_STATE_INVALID')).toBe(
-      'http://localhost:5173/settings/integrations?platform=YOUTUBE&status=failed&code=PLATFORM_OAUTH_STATE_INVALID'
+      'http://localhost:5173/social-accounts/callback?platform=YOUTUBE&status=failed&code=PLATFORM_OAUTH_STATE_INVALID'
     )
   })
 

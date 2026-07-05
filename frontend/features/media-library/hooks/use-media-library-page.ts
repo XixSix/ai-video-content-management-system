@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store";
@@ -15,6 +16,7 @@ import { useMediaLibraryItems } from "./use-media-library-items";
 import { useMediaLibraryPreview } from "./use-media-library-preview";
 import { useMediaLibraryResults } from "./use-media-library-results";
 import { useMediaLibraryUrlState } from "./use-media-library-url-state";
+import { useMediaPreviewUrls } from "./use-media-mutations";
 
 export function useMediaLibraryPage(): MediaLibraryPageShellProps {
   const router = useRouter();
@@ -39,6 +41,47 @@ export function useMediaLibraryPage(): MediaLibraryPageShellProps {
     sortKey: filters.sortKey,
     typeFilter: filters.typeFilter,
   });
+  const imagePreviewMediaIds = useMemo(
+    () =>
+      results.paginatedItems
+        .filter(
+          (item) =>
+            item.libraryGroup === "ORIGINAL" &&
+            item.type === "IMAGE" &&
+            !item.thumbnailUrl &&
+            !item.assetUrl &&
+            item.status === "UPLOADED",
+        )
+        .map((item) => item.id),
+    [results.paginatedItems],
+  );
+  const imagePreviewUrlQueries = useMediaPreviewUrls(
+    workspaceId,
+    imagePreviewMediaIds,
+    imagePreviewMediaIds.length > 0,
+  );
+  const imagePreviewUrlsById = useMemo(() => {
+    const urls = new Map<string, string>();
+
+    imagePreviewMediaIds.forEach((mediaId, index) => {
+      const url = imagePreviewUrlQueries[index]?.data?.url;
+
+      if (url) {
+        urls.set(mediaId, url);
+      }
+    });
+
+    return urls;
+  }, [imagePreviewMediaIds, imagePreviewUrlQueries]);
+  const paginatedItems = useMemo(
+    () =>
+      results.paginatedItems.map((item) => {
+        const previewUrl = imagePreviewUrlsById.get(item.id);
+
+        return previewUrl ? { ...item, assetUrl: previewUrl } : item;
+      }),
+    [imagePreviewUrlsById, results.paginatedItems],
+  );
   const actions = useMediaLibraryActions({
     uploadQueue: library.uploadQueue,
     workspaceId,
@@ -95,7 +138,7 @@ export function useMediaLibraryPage(): MediaLibraryPageShellProps {
     itemsCount: library.items.length,
     lastUpdatedLabel: results.lastUpdatedLabel,
     pageSize: results.pageSize,
-    paginatedItems: results.paginatedItems,
+    paginatedItems,
     preview: preview.preview,
     searchQuery: filters.searchQuery,
     shouldShowEmptyState: results.shouldShowEmptyState,

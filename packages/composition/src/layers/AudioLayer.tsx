@@ -1,4 +1,4 @@
-import { Audio } from "@remotion/media";
+import { Audio } from "remotion";
 
 import type { RenderAudioLayer } from "../render-document";
 

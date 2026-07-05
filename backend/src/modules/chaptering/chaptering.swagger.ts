@@ -7,21 +7,21 @@
  *       properties:
  *         minChapterDuration:
  *           type: number
- *           minimum: 15
+ *           minimum: 30
  *           maximum: 600
- *           default: 60
+ *           default: 180
  *           description: Minimum chapter duration in seconds.
  *         targetChapterDuration:
  *           type: number
  *           minimum: 30
  *           maximum: 1800
- *           default: 180
+ *           default: 300
  *           description: Preferred chapter duration in seconds.
  *         maxChapters:
  *           type: integer
- *           minimum: 1
- *           maximum: 50
- *           default: 12
+ *           minimum: 3
+ *           maximum: 20
+ *           default: 5
  *           description: Maximum number of chapters to generate.
  *         useLlm:
  *           type: boolean
@@ -29,7 +29,7 @@
  *           description: Whether the worker should use LLM-assisted segmentation and labeling.
  *         useEmbeddings:
  *           type: boolean
- *           default: true
+ *           default: false
  *           description: Whether the worker should use embedding-based boundary candidates.
  *     VideoChapter:
  *       type: object

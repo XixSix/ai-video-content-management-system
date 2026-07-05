@@ -77,6 +77,7 @@ def process_chaptering_job(message: ChapteringJobMessage) -> dict[str, Any]:
 
     _mark_processing_started(job_id)
 
+    # TODO: Seperate to handlers
     output = _generate_chapters_with_ai_service(message, options=options)
 
     _mark_completed(job_id, output)
@@ -115,7 +116,7 @@ def _generate_chapters_with_ai_service(
     )
 
     with get_db_session() as session:
-        persisted = chaptering_repository.save_chapters(
+        chapters = chaptering_repository.save_chapters(
             session,
             job_id=job_id,
             media_id=str(message.media_id),
@@ -126,17 +127,7 @@ def _generate_chapters_with_ai_service(
             model=result.model,
         )
 
-    logger.info(
-        "Persisted ai-service chaptering result job_id=%s transcript_id=%s "
-        "transcript_version=%s chapter_count=%s model=%s",
-        job_id,
-        persisted.transcript_id,
-        persisted.transcript_version,
-        len(persisted.chapters),
-        persisted.model,
-    )
-
-    return _completed_output(persisted, options=options)
+    return _completed_output(chapters, options=options)
 
 
 def _load_transcript(message: ChapteringJobMessage) -> ChapteringTranscript:

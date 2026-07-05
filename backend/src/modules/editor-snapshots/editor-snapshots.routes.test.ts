@@ -32,7 +32,8 @@ const now = new Date('2026-06-20T10:00:00.000Z')
 const document = {
   schemaVersion: 1,
   settings: {
-    aspectRatio: '9:16'
+    aspectRatio: '9:16',
+    mutedTrackIds: []
   },
   layers: [],
   timelineTracks: []

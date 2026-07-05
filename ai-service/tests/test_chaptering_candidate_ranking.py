@@ -13,7 +13,7 @@ def test_high_score_candidates_are_retained_even_when_not_evenly_spaced() -> Non
         _candidate(10, lexical=0.1),
         _candidate(20, lexical=0.1),
         _candidate(30, lexical=0.1),
-        _candidate(50, valley=1.0, lexical=1.0),
+        _candidate(50, semantic_valley=1.0, lexical=1.0),
         _candidate(70, lexical=0.1),
         _candidate(90, lexical=0.1),
     ]
@@ -50,11 +50,11 @@ def test_ranking_preserves_broad_timeline_coverage() -> None:
     assert 60 in times
 
 
-def test_raw_semantic_and_lexical_shift_do_not_increase_candidate_score() -> None:
+def test_candidate_score_increases_with_lexical_shift() -> None:
     prepared = prepare_boundary_candidates_for_review(
         [
-            _candidate(10, valley=0.4),
-            _candidate(20, valley=0.4, lexical=1.0, semantic_shift=1.0),
+            _candidate(10),
+            _candidate(20, lexical=1.0),
         ],
         max_chapters=2,
         min_candidate_distance_seconds=1,
@@ -62,14 +62,15 @@ def test_raw_semantic_and_lexical_shift_do_not_increase_candidate_score() -> Non
     )
     by_time = {candidate.time: candidate for candidate in prepared}
 
-    assert by_time[10].candidate_score == by_time[20].candidate_score
+    assert by_time[10].candidate_score == 0.0
+    assert by_time[20].candidate_score == 0.21
 
 
-def test_boundary_quality_penalty_reduces_candidate_score() -> None:
+def test_candidate_score_increases_with_semantic_valley_depth() -> None:
     prepared = prepare_boundary_candidates_for_review(
         [
-            _candidate(10, valley=0.4, quality=1.0),
-            _candidate(20, valley=0.4, quality=0.0),
+            _candidate(10, lexical=1.0),
+            _candidate(20, semantic_valley=1.0),
         ],
         max_chapters=2,
         min_candidate_distance_seconds=1,
@@ -77,7 +78,23 @@ def test_boundary_quality_penalty_reduces_candidate_score() -> None:
     )
     by_time = {candidate.time: candidate for candidate in prepared}
 
-    assert by_time[10].candidate_score == 0.4
+    assert by_time[10].candidate_score == 0.21
+    assert by_time[20].candidate_score == 0.49
+
+
+def test_local_gap_score_still_contributes_to_candidate_score() -> None:
+    prepared = prepare_boundary_candidates_for_review(
+        [
+            _candidate(10, cheap=0.0),
+            _candidate(20, cheap=1.0),
+        ],
+        max_chapters=2,
+        min_candidate_distance_seconds=1,
+        config=_retention_config(limit=4),
+    )
+    by_time = {candidate.time: candidate for candidate in prepared}
+
+    assert by_time[10].candidate_score == 0.0
     assert by_time[20].candidate_score == 0.3
 
 
@@ -85,7 +102,7 @@ def test_nearby_candidates_collapse_to_strongest_score() -> None:
     prepared = prepare_boundary_candidates_for_review(
         [
             _candidate(20, lexical=0.2),
-            _candidate(25, valley=1.0, lexical=1.0),
+            _candidate(25, semantic_valley=1.0, lexical=1.0),
             _candidate(50, lexical=0.2),
         ],
         max_chapters=3,
@@ -100,10 +117,10 @@ def test_nearby_candidates_collapse_to_strongest_score() -> None:
 def test_prepare_candidates_retains_top_score_and_timeline_coverage() -> None:
     prepared = prepare_boundary_candidates_for_review(
         [
-            _candidate(10, valley=0.1),
-            _candidate(20, valley=0.9),
-            _candidate(30, valley=0.2),
-            _candidate(40, valley=0.8),
+            _candidate(10, semantic_valley=0.1),
+            _candidate(20, semantic_valley=0.9),
+            _candidate(30, semantic_valley=0.2),
+            _candidate(40, semantic_valley=0.8),
         ],
         max_chapters=1,
         min_candidate_distance_seconds=1,
@@ -156,6 +173,7 @@ def _candidate(
     *,
     cheap: float = 0.0,
     valley: float = 0.0,
+    semantic_valley: float = 0.0,
     lexical: float = 0.0,
     semantic_shift: float = 0.0,
     marker: float = 0.0,
@@ -176,6 +194,7 @@ def _candidate(
         semantic_shift_score=semantic_shift,
         semantic_cohesion_score=1.0 - semantic_shift if semantic_shift else 0.0,
         valley_depth_score=valley,
+        semantic_valley_depth_score=semantic_valley,
         lexical_shift_score=lexical,
         discourse_marker_score=marker,
         pause_score=pause,

@@ -47,7 +47,7 @@ def run_transcript_pipeline(
         ffmpeg_service.extract_audio(source_path, audio_path)
         audio = ffmpeg_service.validate_audio(audio_path)
 
-        transcript_result = ai_service_client.transcribe(
+        result = ai_service_client.transcribe(
             request_id=job_id,
             audio_path=audio_path,
             options=options,
@@ -58,7 +58,7 @@ def run_transcript_pipeline(
                 session,
                 job_id=job_id,
                 media_id=str(message.media_id),
-                result=transcript_result,
+                result=result,
             )
 
         return _completed_output(transcript, options=options, audio=audio)
