@@ -8,17 +8,7 @@ class TranscriptJobOptions(BaseModel):
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     language: Literal["auto", "en"] = "auto"
-    generate_srt: bool = Field(
-        default=True, validation_alias="generateSrt", serialization_alias="generateSrt"
-    )
-    generate_vtt: bool = Field(
-        default=True, validation_alias="generateVtt", serialization_alias="generateVtt"
-    )
-    burn_transcript: bool = Field(
-        default=False,
-        validation_alias="burnTranscript",
-        serialization_alias="burnTranscript",
-    )
+
     use_vad: bool = Field(
         default=True, validation_alias="useVad", serialization_alias="useVad"
     )

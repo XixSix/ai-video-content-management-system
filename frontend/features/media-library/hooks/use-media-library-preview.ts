@@ -52,7 +52,7 @@ function mapClipCandidate(
           ? "REJECTED"
           : "RECOMMENDED",
     aspectRatio: "9:16",
-    platform: "TIKTOK",
+    platform: "YOUTUBE_SHORTS",
     burnSubtitles: true,
     transcriptVersionLabel: `Transcript v${candidate.transcriptVersion}`,
     shortClipStatus: shortClip?.status,

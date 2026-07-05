@@ -106,11 +106,7 @@ function getPlatformLabel(platform: LongToShortCandidate["platform"]) {
     return "YouTube Shorts"
   }
 
-  if (platform === "INSTAGRAM_REELS") {
-    return "Instagram Reels"
-  }
-
-  return "TikTok"
+  return "Facebook Reels"
 }
 
 function getTimeRangeLabel(candidate: LongToShortCandidate) {
@@ -250,7 +246,7 @@ function mapClipCandidate(
           ? "REJECTED"
           : "RECOMMENDED",
     aspectRatio: "9:16",
-    platform: "TIKTOK",
+    platform: "YOUTUBE_SHORTS",
     burnSubtitles: true,
     transcriptVersionLabel: `Transcript v${candidate.transcriptVersion}`,
     shortClipStatus: shortClip?.status,

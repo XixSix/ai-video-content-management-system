@@ -6,10 +6,7 @@ export type LongToShortClipModel = "AUTO" | "BALANCED" | "VIRAL_HOOKS"
 export type LongToShortGenre = "AUTO" | "PODCAST" | "INTERVIEW" | "TUTORIAL" | "WEBINAR"
 export type LongToShortClipLength = "AUTO" | "15_30" | "30_60" | "60_90"
 export type LongToShortMode = "AI_CLIPPING" | "MANUAL_MOMENTS"
-export type LongToShortPlatform =
-  | "TIKTOK"
-  | "YOUTUBE_SHORTS"
-  | "INSTAGRAM_REELS"
+export type LongToShortPlatform = "YOUTUBE_SHORTS" | "FACEBOOK_REELS"
 export type LongToShortCandidateStatus =
   | "RECOMMENDED"
   | "SELECTED"

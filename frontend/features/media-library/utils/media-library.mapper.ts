@@ -30,7 +30,12 @@ function formatAssetTitle(asset: GeneratedAssetData) {
 }
 
 export function isEditorOutputAssetType(assetType: GeneratedAssetType) {
-  return !assetType.startsWith("SHORT_CLIP_");
+  return (
+    assetType !== "THUMBNAIL" &&
+    assetType !== "THUMBNAIL_SPRITE" &&
+    assetType !== "WAVEFORM_PEAKS" &&
+    !assetType.startsWith("SHORT_CLIP_")
+  );
 }
 
 function getAssetMediaType(asset: GeneratedAssetData): MediaAssetType {

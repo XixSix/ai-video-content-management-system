@@ -33,7 +33,7 @@
  *           nullable: true
  *         platform:
  *           type: string
- *           enum: [YOUTUBE, FACEBOOK, TIKTOK]
+ *           enum: [YOUTUBE, FACEBOOK]
  *         title:
  *           type: string
  *           nullable: true
@@ -107,7 +107,7 @@
  *               format: uuid
  *             platform:
  *               type: string
- *               enum: [YOUTUBE, FACEBOOK, TIKTOK]
+ *               enum: [YOUTUBE, FACEBOOK]
  *             accountName:
  *               type: string
  *               nullable: true
@@ -132,7 +132,7 @@
  *           format: uuid
  *         platform:
  *           type: string
- *           enum: [YOUTUBE, FACEBOOK, TIKTOK]
+ *           enum: [YOUTUBE, FACEBOOK]
  *         platformAccountId:
  *           type: string
  *           format: uuid
@@ -258,7 +258,7 @@
  *         name: platform
  *         schema:
  *           type: string
- *           enum: [YOUTUBE, FACEBOOK, TIKTOK]
+ *           enum: [YOUTUBE, FACEBOOK]
  *       - in: query
  *         name: status
  *         schema:

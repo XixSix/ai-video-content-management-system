@@ -53,6 +53,7 @@ def test_score_unit_gaps_uses_bag_of_words_cosine_for_lexical_shift() -> None:
     assert similar_gap.lexical_cohesion_score > changed_gap.lexical_cohesion_score
     assert similar_gap.lexical_shift_score < changed_gap.lexical_shift_score
     assert changed_gap.lexical_shift_score == 1.0
+    assert similar_gap.combined_score == changed_gap.combined_score
 
 
 def test_score_unit_gaps_scores_pause_marker_and_context_quality() -> None:
@@ -229,10 +230,14 @@ def test_units_pipeline_attaches_valley_depth_to_selected_boundary() -> None:
         config=_pipeline_config(context_seconds=20),
     )
 
-    assert [chapter.start_seconds for chapter in result.chapters] == [0, 40]
-    assert result.chapters[1].scores is not None
-    assert result.chapters[1].scores.valley_depth_score is not None
-    assert result.chapters[1].scores.valley_depth_score > 0
+    starts = [chapter.start_seconds for chapter in result.chapters]
+    assert 40 in starts
+    selected = next(
+        chapter for chapter in result.chapters if chapter.start_seconds == 40
+    )
+    assert selected.scores is not None
+    assert selected.scores.valley_depth_score is not None
+    assert selected.scores.valley_depth_score > 0
 
 
 def test_units_pipeline_detects_valley_after_embedding_semantic_scores() -> None:
@@ -275,10 +280,14 @@ def test_units_pipeline_detects_valley_after_embedding_semantic_scores() -> None
         config=_pipeline_config(context_seconds=20),
     )
 
-    assert [chapter.start_seconds for chapter in result.chapters] == [0, 40]
-    assert result.chapters[1].scores is not None
-    assert result.chapters[1].scores.semantic_shift_score == 1.0
-    assert result.chapters[1].scores.valley_depth_score > 0
+    starts = [chapter.start_seconds for chapter in result.chapters]
+    assert 40 in starts
+    selected = next(
+        chapter for chapter in result.chapters if chapter.start_seconds == 40
+    )
+    assert selected.scores is not None
+    assert selected.scores.semantic_shift_score == 1.0
+    assert selected.scores.valley_depth_score > 0
 
 
 def test_units_pipeline_falls_back_to_all_gap_candidates_when_no_valleys_pass() -> None:

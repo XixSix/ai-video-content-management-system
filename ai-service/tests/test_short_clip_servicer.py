@@ -6,11 +6,13 @@ import grpc
 import pytest
 
 from app.grpc.short_clip_servicer import ShortClipServicer
+from app.providers.short_clip.noop_candidate import NoopShortClipCandidateProvider
 from app.schemas.short_clip import (
     ClipCandidate,
     ShortClipGenerationRequest,
     ShortClipGenerationResult,
 )
+from app.workflows.short_clip.workflow import ShortClipWorkflow
 from short_clip.v1 import short_clip_pb2
 
 
@@ -108,14 +110,22 @@ def test_generate_clip_candidates_rejects_unsorted_segments() -> None:
     assert "sorted" in error.value.details
 
 
-def test_noop_workflow_returns_no_candidates() -> None:
-    response = ShortClipServicer().GenerateClipCandidates(
+def test_noop_workflow_returns_deterministic_candidates() -> None:
+    workflow = ShortClipWorkflow(
+        candidate_provider=NoopShortClipCandidateProvider(
+            model_name="noop-short-clip-v1"
+        )
+    )
+    response = ShortClipServicer(workflow=workflow).GenerateClipCandidates(
         _generate_request(),
         _context(),
     )
 
     assert response.source == short_clip_pb2.SHORT_CLIP_SOURCE_NOOP
-    assert not response.candidates
+    assert response.candidates
+    assert response.candidates[0].start_segment_id == "seg-1"
+    assert response.candidates[0].end_segment_id == "seg-2"
+    assert response.candidates[0].duration_seconds == 20
 
 
 def _context() -> grpc.ServicerContext:

@@ -22,42 +22,6 @@ export const platformInfoList: PlatformInfo[] = [
     backendSupported: true,
     backendId: "FACEBOOK",
   },
-  {
-    id: "tiktok",
-    name: "TikTok",
-    description: "Feed or Inbox",
-    color: "#000000",
-    badgeLabel: "Soon",
-    mockAccountName: "vidpilot_creator",
-    backendSupported: false,
-  },
-  {
-    id: "instagram",
-    name: "Instagram",
-    description: "Business or creator",
-    color: "#E4405F",
-    badgeLabel: "Soon",
-    mockAccountName: "vidpilot.business",
-    backendSupported: false,
-  },
-  {
-    id: "linkedin",
-    name: "LinkedIn",
-    description: "Personal page or profile",
-    color: "#0A66C2",
-    badgeLabel: "Soon",
-    mockAccountName: "VidPilot Team",
-    backendSupported: false,
-  },
-  {
-    id: "x",
-    name: "X",
-    description: "Profile",
-    color: "#000000",
-    badgeLabel: "Soon",
-    mockAccountName: "VidPilot X",
-    backendSupported: false,
-  },
 ]
 
 export const platformFilterOptions: {

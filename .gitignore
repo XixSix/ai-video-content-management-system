@@ -16,3 +16,5 @@ todo.txt
 .config.kiro/
 .pytest_cache
 checklist.txt
+snapshot
+performance-results

@@ -53,6 +53,20 @@ def test_boundary_provider_rejects_invalid_response_shape() -> None:
         provider.evaluate_boundaries([_boundary_input()])
 
 
+def test_boundary_provider_ignores_unusable_local_llm_wrapper() -> None:
+    provider = OpenAICompatibleChapterBoundaryEvaluationProvider(
+        chat_client=_FakeChatClient(
+            {
+                "version": "1.0",
+                "label": "chapter_boundary_evaluation",
+                "data": {"text": "The model summarized the conversation instead."},
+            }
+        )
+    )
+
+    assert provider.evaluate_boundaries([_boundary_input()]) == []
+
+
 def test_title_provider_maps_json_response() -> None:
     client = _FakeChatClient(
         {
@@ -95,6 +109,24 @@ def test_title_provider_truncates_overlong_title_and_summary() -> None:
     assert titles[0].title.endswith("...")
     assert len(titles[0].summary or "") == 240
     assert (titles[0].summary or "").endswith("...")
+
+
+def test_title_provider_repairs_single_title_response() -> None:
+    provider = OpenAICompatibleChapterTitleProvider(
+        chat_client=_FakeChatClient(
+            {
+                "title": "Childhood Memories",
+                "description": "A discussion about games and parenting styles.",
+                "keywords": "childhood, games",
+            }
+        )
+    )
+
+    titles = provider.generate_titles([_title_input()])
+
+    assert titles[0].chapter_index == 0
+    assert titles[0].title == "Childhood Memories"
+    assert titles[0].summary == "A discussion about games and parenting styles."
 
 
 def test_short_clip_provider_maps_json_response() -> None:

@@ -1,5 +1,4 @@
-import { Video } from "@remotion/media";
-import { AbsoluteFill, Img } from "remotion";
+import { AbsoluteFill, Img, Video } from "remotion";
 
 import type { RenderOverlayMediaLayer } from "../render-document";
 
@@ -24,10 +23,10 @@ export const OverlayMediaLayer: React.FC<{
         <Video
           src={layer.src}
           muted={layer.muted}
-          objectFit={layer.fit}
           style={{
             width: "100%",
             height: "100%",
+            objectFit: layer.fit,
           }}
         />
       ) : (

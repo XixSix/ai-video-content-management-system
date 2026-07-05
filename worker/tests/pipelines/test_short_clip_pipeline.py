@@ -10,7 +10,9 @@ from app.db.short_clip_repository import (
 from app.pipelines.short_clip.pipeline import (
     build_fake_clip_candidates,
     build_srt_for_candidate,
+    generate_clip_candidates,
 )
+from app.schemas.short_clip.result import ShortClipCandidateResult
 from app.schemas.jobs.short_clip_message import ShortClipJobPreferences
 
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000001")
@@ -102,6 +104,61 @@ def test_fake_provider_builds_duration_valid_candidates() -> None:
     assert candidates[0].title
     assert candidates[0].score <= 10
     assert len(candidates[0].source_segment_ids) == 2
+
+
+def test_generate_clip_candidates_uses_ai_service(monkeypatch) -> None:
+    source = _source()
+    expected = ShortClipCandidateResult(
+        start_segment_id=source.segments[0].id,
+        end_segment_id=source.segments[1].id,
+        source_segment_ids=[source.segments[0].id, source.segments[1].id],
+        start_time=0,
+        end_time=25,
+        duration=25,
+        title="AI candidate",
+        reason="Selected by ai-service.",
+        score=9.2,
+        text="The first setup line opens the idea. This moment explains the payoff clearly.",
+        provider="NOOP",
+        model="noop-short-clip-v1",
+    )
+
+    class FakeAIServiceClient:
+        def generate_short_clip_candidates(
+            self, **kwargs: object
+        ) -> list[ShortClipCandidateResult]:
+            assert kwargs["request_id"] == "job-1"
+            assert kwargs["source"] == source
+            return [expected]
+
+    monkeypatch.setattr(
+        "app.pipelines.short_clip.pipeline.ai_service_client",
+        FakeAIServiceClient(),
+    )
+
+    candidates = generate_clip_candidates("job-1", source, _preferences())
+
+    assert candidates == [expected]
+
+
+def test_generate_clip_candidates_falls_back_when_ai_service_unavailable(
+    monkeypatch,
+) -> None:
+    class UnavailableAIServiceClient:
+        def generate_short_clip_candidates(
+            self, **kwargs: object
+        ) -> list[ShortClipCandidateResult]:
+            raise RuntimeError("ai-service unavailable")
+
+    monkeypatch.setattr(
+        "app.pipelines.short_clip.pipeline.ai_service_client",
+        UnavailableAIServiceClient(),
+    )
+
+    candidates = generate_clip_candidates("job-1", _source(), _preferences())
+
+    assert candidates
+    assert candidates[0].provider == "deterministic-fake"
 
 
 def test_srt_timing_is_relative_to_candidate_start() -> None:

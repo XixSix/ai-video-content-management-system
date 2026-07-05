@@ -1,10 +1,4 @@
-export type SocialPlatform =
-  | "youtube"
-  | "tiktok"
-  | "instagram"
-  | "facebook"
-  | "linkedin"
-  | "x"
+export type SocialPlatform = "youtube" | "facebook"
 
 export type BackendPlatform = "YOUTUBE" | "FACEBOOK"
 export type PlatformAccountStatus = "CONNECTED" | "EXPIRED" | "REVOKED"

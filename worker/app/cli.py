@@ -73,6 +73,16 @@ def media_previews_worker() -> None:
     )
 
 
+def short_clip_worker() -> None:
+    """Start the short clip Celery worker."""
+    configure_logging(settings.log_level)
+    _run_worker(
+        settings.short_clip_queue_name,
+        default_hostname="short-clip@%h",
+        log_level=settings.log_level,
+    )
+
+
 def render_exports_worker() -> None:
     """Start the render exports Celery worker."""
     configure_logging(settings.log_level)

@@ -7,11 +7,18 @@ from app.core.config import settings
 from app.proto_path import ensure_proto_generated_on_path
 from app.schemas.chaptering.output import ChapteringJobOptions
 from app.schemas.chaptering.result import ChapteringResult, ChapteringTranscript
+from app.db.short_clip_repository import ShortClipSource
+from app.schemas.jobs.short_clip_message import ShortClipJobPreferences
+from app.schemas.short_clip.result import ShortClipCandidateResult
 from app.schemas.transcript.output import TranscriptJobOptions
 from app.schemas.transcript.result import TranscriptResult
 from app.utils.ai_chaptering_mapper import (
     build_generate_chapters_request,
     map_generate_chapters_response,
+)
+from app.utils.ai_short_clip_mapper import (
+    build_generate_clip_candidates_request,
+    map_generate_clip_candidates_response,
 )
 from app.utils.ai_transcription_mapper import (
     build_transcribe_request,
@@ -21,6 +28,7 @@ from app.utils.ai_transcription_mapper import (
 ensure_proto_generated_on_path()
 
 from chaptering.v1 import chaptering_pb2_grpc  # type: ignore # noqa: E402
+from short_clip.v1 import short_clip_pb2_grpc  # type: ignore # noqa: E402
 from transcription.v1 import transcription_pb2_grpc  # type: ignore # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -150,6 +158,63 @@ class AIServiceClient:
         except ValueError as error:
             logger.warning(
                 "ai-service returned invalid chaptering response "
+                "request_id=%s error=%s",
+                request_id,
+                error,
+            )
+            raise AIServiceTerminalError(
+                str(error),
+                error_code="AI_SERVICE_INVALID_RESPONSE",
+            ) from error
+
+    def generate_short_clip_candidates(
+        self,
+        *,
+        request_id: str,
+        source: ShortClipSource,
+        preferences: ShortClipJobPreferences,
+    ) -> list[ShortClipCandidateResult]:
+        request = build_generate_clip_candidates_request(
+            request_id=request_id,
+            source=source,
+            preferences=preferences,
+        )
+
+        try:
+            with grpc.insecure_channel(self.target) as channel:
+                stub = short_clip_pb2_grpc.ShortClipServiceStub(channel)
+                response = stub.GenerateClipCandidates(
+                    request,
+                    timeout=self.timeout_seconds,
+                )
+        except grpc.RpcError as error:
+            if error.code() in TERMINAL_GRPC_CODES:
+                logger.warning(
+                    "ai-service terminal short clip gRPC error request_id=%s code=%s",
+                    request_id,
+                    error.code().name,
+                )
+                raise AIServiceTerminalError(
+                    error.details() or "ai-service rejected short clip request",
+                    error_code=f"AI_SERVICE_{error.code().name}",
+                ) from error
+
+            logger.exception(
+                "ai-service retryable short clip gRPC error request_id=%s",
+                request_id,
+            )
+            raise
+
+        logger.info("ai-service short clip completed request_id=%s", request_id)
+        try:
+            return map_generate_clip_candidates_response(
+                request_id=request_id,
+                source=source,
+                response=response,
+            )
+        except ValueError as error:
+            logger.warning(
+                "ai-service returned invalid short clip response "
                 "request_id=%s error=%s",
                 request_id,
                 error,

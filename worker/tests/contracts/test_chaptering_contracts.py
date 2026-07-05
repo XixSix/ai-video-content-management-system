@@ -79,7 +79,7 @@ def test_completed_output_shape() -> None:
                 title="Introduction",
                 summary="The speaker introduces the main topic.",
                 transcript_version=2,
-                source="RULE_BASED",
+                source="SEGMENTS",
                 score=1.0,
                 boundary_score=1.0,
                 pause_score=0.0,
@@ -113,7 +113,7 @@ def test_completed_output_shape() -> None:
                 "title": "Introduction",
                 "summary": "The speaker introduces the main topic.",
                 "transcriptVersion": 2,
-                "source": "RULE_BASED",
+                "source": "SEGMENTS",
                 "score": 1.0,
                 "boundaryScore": 1.0,
                 "pauseScore": 0.0,
@@ -123,12 +123,10 @@ def test_completed_output_shape() -> None:
             }
         ],
         "options": {
-            "transcriptId": str(TRANSCRIPT_ID),
-            "transcriptVersion": 2,
             "minChapterDuration": 120.0,
             "targetChapterDuration": 180.0,
             "maxChapters": 3,
-            "useLlm": False,
+            "useLlm": True,
             "useEmbeddings": False,
         },
     }

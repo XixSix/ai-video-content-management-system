@@ -2,6 +2,7 @@
 
 import {
   useMutation,
+  useQueries,
   useQuery,
   useQueryClient,
   type QueryClient,
@@ -77,5 +78,21 @@ export function useMediaPreviewUrl(
     enabled: Boolean(workspaceId) && Boolean(mediaId) && enabled,
     staleTime: 4 * 60 * 1000,
     retry: 1,
+  });
+}
+
+export function useMediaPreviewUrls(
+  workspaceId: string,
+  mediaIds: string[],
+  enabled = true,
+) {
+  return useQueries({
+    queries: mediaIds.map((mediaId) => ({
+      queryKey: mediaQueryKeys.preview(workspaceId, mediaId),
+      queryFn: () => mediaService.getPreviewUrl(workspaceId, mediaId),
+      enabled: Boolean(workspaceId) && enabled,
+      staleTime: 4 * 60 * 1000,
+      retry: 1,
+    })),
   });
 }

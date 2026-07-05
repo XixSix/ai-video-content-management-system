@@ -33,7 +33,9 @@ class OpenAICompatibleShortClipCandidateProvider:
                 "language": candidate_input.language,
                 "media_duration_seconds": candidate_input.media_duration_seconds,
                 "preferences": candidate_input.preferences.model_dump(),
-                "chapters": [chapter.model_dump() for chapter in candidate_input.chapters],
+                "chapters": [
+                    chapter.model_dump() for chapter in candidate_input.chapters
+                ],
                 "segments": [
                     segment.model_dump() for segment in candidate_input.segments
                 ],

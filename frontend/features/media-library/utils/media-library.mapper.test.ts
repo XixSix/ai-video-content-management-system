@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  isEditorOutputAssetType,
   mapGeneratedAssetToLibraryItem,
   mapMediaResponseToLibraryItem,
 } from "./media-library.mapper"
@@ -50,5 +51,13 @@ describe("media library mapper", () => {
     expect(item.generatedAssetId).toBe("asset-id")
     expect(item.status).toBe("UPLOADED")
     expect(item.type).toBe("VIDEO")
+  })
+
+  it("hides generated preview helper assets from editor outputs", () => {
+    expect(isEditorOutputAssetType("THUMBNAIL")).toBe(false)
+    expect(isEditorOutputAssetType("THUMBNAIL_SPRITE")).toBe(false)
+    expect(isEditorOutputAssetType("WAVEFORM_PEAKS")).toBe(false)
+    expect(isEditorOutputAssetType("EXPORT_VIDEO")).toBe(true)
+    expect(isEditorOutputAssetType("SUBTITLE_VTT")).toBe(true)
   })
 })

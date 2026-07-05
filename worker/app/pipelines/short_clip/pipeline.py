@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+import logging
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import UUID
@@ -16,6 +16,8 @@ from app.schemas.short_clip.output import (
     ShortClipCompletedOutput,
     ShortClipSummary,
 )
+from app.schemas.short_clip.result import ShortClipCandidateResult
+from app.services.ai_service import AIServiceTerminalError, ai_service_client
 from app.services.ffmpeg_service import FFmpegServiceError, ffmpeg_service
 from app.services.s3_service import (
     S3ServiceError,
@@ -24,29 +26,22 @@ from app.services.s3_service import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 class TerminalShortClipPipelineError(Exception):
     def __init__(self, message: str, *, error_code: str | None = None) -> None:
         self.error_code = error_code
         super().__init__(f"{error_code}: {message}" if error_code else message)
 
 
-@dataclass(frozen=True)
-class DraftClipCandidate:
-    start_segment_id: UUID
-    end_segment_id: UUID
-    source_segment_ids: list[UUID]
-    start_time: float
-    end_time: float
-    duration: float
-    title: str
-    reason: str
-    score: float
-    text: str
+DraftClipCandidate = ShortClipCandidateResult
 
 
 def run_short_clip_pipeline(
     message: ShortClipJobMessage,
 ) -> ShortClipCompletedOutput:
+    job_id = str(message.job_id)
     settings.tmp_dir.mkdir(parents=True, exist_ok=True)
     preferences = message.preferences
 
@@ -64,7 +59,7 @@ def run_short_clip_pipeline(
         )
 
     _validate_source(source, message)
-    drafts = build_fake_clip_candidates(source, preferences)
+    drafts = generate_clip_candidates(job_id, source, preferences)
 
     if not drafts:
         raise TerminalShortClipPipelineError(
@@ -260,6 +255,29 @@ def build_fake_clip_candidates(
     return candidates[: preferences.clip_count]
 
 
+def generate_clip_candidates(
+    job_id: str,
+    source: short_clip_repository.ShortClipSource,
+    preferences: ShortClipJobPreferences,
+) -> list[DraftClipCandidate]:
+    """Generate candidates through ai-service with a deterministic local fallback."""
+    try:
+        return ai_service_client.generate_short_clip_candidates(
+            request_id=job_id,
+            source=source,
+            preferences=preferences,
+        )
+    except AIServiceTerminalError:
+        raise
+    except Exception:
+        logger.exception(
+            "ai-service short clip generation failed; using deterministic fallback "
+            "job_id=%s",
+            job_id,
+        )
+        return build_fake_clip_candidates(source, preferences)
+
+
 def build_srt_for_candidate(
     segments: list[short_clip_repository.ShortClipTranscriptSegment],
     start_time: float,
@@ -355,6 +373,8 @@ def _draft_from_segments(
         reason="Deterministic MVP candidate built from timestamped transcript segments.",
         score=min(score, 10.0),
         text=text,
+        provider="deterministic-fake",
+        model="deterministic-short-clip-v1",
     )
 
 

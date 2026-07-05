@@ -79,7 +79,118 @@ def test_short_clip_workflow_falls_back_when_repaired_llm_candidates_are_empty()
     assert result.candidates == []
 
 
-def _request() -> ShortClipGenerationRequest:
+def test_short_clip_workflow_ranks_candidates_before_clipping() -> None:
+    workflow = ShortClipWorkflow(
+        candidate_provider=_StaticProvider(
+            source="LLM",
+            model_name="fake-llm",
+            proposals=[
+                ClipCandidateProposal(
+                    start_segment_id="seg-1",
+                    end_segment_id="seg-2",
+                    title="Lower score",
+                    score=4.0,
+                ),
+                ClipCandidateProposal(
+                    start_segment_id="seg-2",
+                    end_segment_id="seg-3",
+                    title="Higher score",
+                    score=9.0,
+                ),
+            ],
+        )
+    )
+
+    result = workflow.execute(_request(clip_count=1))
+
+    assert [candidate.title for candidate in result.candidates] == ["Higher score"]
+
+
+def test_short_clip_workflow_uses_timestamp_tiebreak_for_equal_scores() -> None:
+    workflow = ShortClipWorkflow(
+        candidate_provider=_StaticProvider(
+            source="LLM",
+            model_name="fake-llm",
+            proposals=[
+                ClipCandidateProposal(
+                    start_segment_id="seg-2",
+                    end_segment_id="seg-3",
+                    title="Later candidate",
+                    score=8.0,
+                ),
+                ClipCandidateProposal(
+                    start_segment_id="seg-1",
+                    end_segment_id="seg-2",
+                    title="Earlier candidate",
+                    score=8.0,
+                ),
+            ],
+        )
+    )
+
+    result = workflow.execute(_request(clip_count=2))
+
+    assert [candidate.title for candidate in result.candidates] == [
+        "Earlier candidate",
+        "Later candidate",
+    ]
+
+
+def test_short_clip_workflow_drops_invalid_high_score_before_ranking() -> None:
+    workflow = ShortClipWorkflow(
+        candidate_provider=_StaticProvider(
+            source="LLM",
+            model_name="fake-llm",
+            proposals=[
+                ClipCandidateProposal(
+                    start_segment_id="unknown",
+                    end_segment_id="seg-2",
+                    title="Invalid high score",
+                    score=10.0,
+                ),
+                ClipCandidateProposal(
+                    start_segment_id="seg-1",
+                    end_segment_id="seg-2",
+                    title="Valid lower score",
+                    score=7.0,
+                ),
+            ],
+        )
+    )
+
+    result = workflow.execute(_request(clip_count=1))
+
+    assert [candidate.title for candidate in result.candidates] == ["Valid lower score"]
+
+
+def test_short_clip_workflow_deduplicates_exact_ranges_before_ranking() -> None:
+    workflow = ShortClipWorkflow(
+        candidate_provider=_StaticProvider(
+            source="LLM",
+            model_name="fake-llm",
+            proposals=[
+                ClipCandidateProposal(
+                    start_segment_id="seg-1",
+                    end_segment_id="seg-2",
+                    title="First range",
+                    score=5.0,
+                ),
+                ClipCandidateProposal(
+                    start_segment_id="seg-1",
+                    end_segment_id="seg-2",
+                    title="Duplicate range",
+                    score=10.0,
+                ),
+            ],
+        )
+    )
+
+    result = workflow.execute(_request(clip_count=2))
+
+    assert [candidate.title for candidate in result.candidates] == ["First range"]
+
+
+def _request(*, clip_count: int = 1) -> ShortClipGenerationRequest:
     return ShortClipGenerationRequest(
         request_id="short-clip-workflow-test",
         language="en",
@@ -97,9 +208,15 @@ def _request() -> ShortClipGenerationRequest:
                 end_seconds=20,
                 text="Deliver the practical takeaway.",
             ),
+            ShortClipTranscriptSegment(
+                segment_id="seg-3",
+                start_seconds=20,
+                end_seconds=30,
+                text="Close with a concrete next action.",
+            ),
         ],
         preferences=ShortClipPreferences(
-            clip_count=1,
+            clip_count=clip_count,
             clip_length="15_30",
             min_duration_seconds=15,
             max_duration_seconds=30,

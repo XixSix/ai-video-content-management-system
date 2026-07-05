@@ -9,7 +9,7 @@ from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
 
 if TYPE_CHECKING:
-    from app.pipelines.short_clip.pipeline import DraftClipCandidate
+    from app.schemas.short_clip.result import ShortClipCandidateResult
 from app.schemas.jobs.short_clip_message import ShortClipJobPreferences
 
 
@@ -151,7 +151,7 @@ def load_short_clip_source(
                 SELECT id, segment_index, start_time, end_time, text, clean_text
                 FROM transcript_segments
                 WHERE transcript_id = :transcript_id
-                ORDER BY segment_index ASC, start_time ASC
+                ORDER BY start_time ASC, end_time ASC, segment_index ASC
                 """
             ),
             {"transcript_id": transcript_id},
@@ -273,7 +273,7 @@ def save_clip_candidates(
     transcript_id: str,
     transcript_version: int,
     project_id: UUID | None,
-    candidates: list["DraftClipCandidate"],
+    candidates: list["ShortClipCandidateResult"],
     preferences: ShortClipJobPreferences,
 ) -> list[PersistedClipCandidate]:
     now = datetime.now(UTC)
@@ -350,7 +350,8 @@ def save_clip_candidates(
                         "preferences": preferences.model_dump(
                             mode="json", by_alias=True
                         ),
-                        "provider": "deterministic-fake",
+                        "provider": candidate.provider,
+                        "model": candidate.model,
                     }
                 ),
                 "now": now,

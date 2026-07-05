@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { PublishStatus } from '../../infrastructure/db/generated/prisma/client'
 
-export const publishTaskPlatformSchema = z.enum(['YOUTUBE', 'FACEBOOK', 'TIKTOK'])
+export const publishTaskPlatformSchema = z.enum(['YOUTUBE', 'FACEBOOK'])
 
 export const publishTaskParamsSchema = z.strictObject({
   publishTaskId: z.uuid()

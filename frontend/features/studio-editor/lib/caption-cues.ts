@@ -32,6 +32,26 @@ function createWordGroup(word: StudioTranscriptWord): StudioCaptionWordGroup {
   }
 }
 
+function createSegmentFallbackWordGroup(
+  segment: StudioTranscriptSegment
+): StudioCaptionWordGroup {
+  const visibleText = getVisibleText(segment.text)
+
+  return {
+    id: `group-fallback-${segment.id}`,
+    sourceWordId: `fallback-${segment.id}`,
+    sourceSegmentId: segment.id,
+    startTime: segment.startTime,
+    endTime: segment.endTime,
+    sourceText: segment.text,
+    text: visibleText,
+    confidence: segment.confidence,
+    isEdited: false,
+    isOmitted: visibleText.length === 0,
+    isSynthetic: true,
+  }
+}
+
 export function formatCaptionTimestamp(timeSeconds: number) {
   const totalHundredths = Math.max(0, Math.round(timeSeconds * 100))
   const hours = Math.floor(totalHundredths / 360000)
@@ -134,11 +154,18 @@ export function buildCaptionCues(
   let currentCue: StudioCaptionCue | null = null
 
   for (const segment of segments) {
-    const nextGroups = (wordsBySegmentId.get(segment.id) ?? [])
+    const segmentWords = wordsBySegmentId.get(segment.id) ?? []
+    const nextGroups = (segmentWords.length > 0 ? segmentWords : [])
       .sort((left, right) => left.wordIndex - right.wordIndex)
       .map(createWordGroup)
+    const cueWordGroups =
+      nextGroups.length > 0 ? nextGroups : [createSegmentFallbackWordGroup(segment)]
 
-    const visibleTextLength = nextGroups.reduce((count, group) => count + group.text.length, 0)
+    if (cueWordGroups.every((group) => group.isOmitted)) {
+      continue
+    }
+
+    const visibleTextLength = cueWordGroups.reduce((count, group) => count + group.text.length, 0)
 
     if (!currentCue) {
       currentCue = {
@@ -147,7 +174,7 @@ export function buildCaptionCues(
         endTime: segment.endTime,
         speakerLabel: segment.speakerLabel,
         sourceSegmentIds: [segment.id],
-        wordGroups: nextGroups,
+        wordGroups: cueWordGroups,
       }
 
       continue
@@ -159,7 +186,7 @@ export function buildCaptionCues(
       currentCue.speakerLabel === segment.speakerLabel &&
       gapSeconds <= MAX_SEGMENT_GAP_SECONDS &&
       segment.endTime - currentCue.startTime <= MAX_CUE_DURATION_SECONDS &&
-      currentCue.wordGroups.length + nextGroups.length <= MAX_CUE_WORD_GROUPS &&
+      currentCue.wordGroups.length + cueWordGroups.length <= MAX_CUE_WORD_GROUPS &&
       cueTextLength + visibleTextLength <= MAX_CUE_TEXT_LENGTH
 
     if (!canAppend) {
@@ -170,7 +197,7 @@ export function buildCaptionCues(
         endTime: segment.endTime,
         speakerLabel: segment.speakerLabel,
         sourceSegmentIds: [segment.id],
-        wordGroups: nextGroups,
+        wordGroups: cueWordGroups,
       }
       continue
     }
@@ -179,7 +206,7 @@ export function buildCaptionCues(
       ...currentCue,
       endTime: segment.endTime,
       sourceSegmentIds: [...currentCue.sourceSegmentIds, segment.id],
-      wordGroups: [...currentCue.wordGroups, ...nextGroups],
+      wordGroups: [...currentCue.wordGroups, ...cueWordGroups],
     }
   }
 

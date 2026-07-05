@@ -1,2 +1,4 @@
 .matplotlib_cache
 .venv
+.uv_cache
+__pycache__

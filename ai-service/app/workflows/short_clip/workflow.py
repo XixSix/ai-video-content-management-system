@@ -152,10 +152,21 @@ def _repair_candidates(
         )
         selected_ranges.add(candidate_range)
 
-        if len(candidates) >= request.preferences.clip_count:
-            break
+    return _rank_candidates(candidates, request.preferences.clip_count)
 
-    return candidates
+
+def _rank_candidates(
+    candidates: list[ClipCandidate],
+    clip_count: int,
+) -> list[ClipCandidate]:
+    return sorted(
+        candidates,
+        key=lambda candidate: (
+            -candidate.score,
+            candidate.start_seconds,
+            candidate.end_seconds,
+        ),
+    )[:clip_count]
 
 
 def _join_segment_text(segments: list[ShortClipTranscriptSegment]) -> str:

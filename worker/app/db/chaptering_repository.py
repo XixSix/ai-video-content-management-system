@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.schemas.chaptering.result import (
     ChapterCandidate,
+    ChapterGenerationSource,
     ChapterSource,
     ChapteringTranscript,
     ChapteringTranscriptSegment,
@@ -90,7 +91,7 @@ def load_transcript_for_chaptering(
                   clean_text
                 FROM transcript_segments
                 WHERE transcript_id = :transcript_id
-                ORDER BY segment_index ASC, start_time ASC
+                ORDER BY start_time ASC, end_time ASC, segment_index ASC
                 """
             ),
             {"transcript_id": transcript_id},
@@ -144,7 +145,7 @@ def save_chapters(
     transcript_id: str,
     transcript_version: int,
     chapters: list[ChapterCandidate],
-    source: ChapterSource,
+    source: ChapterGenerationSource,
     model: str,
 ) -> PersistedChapteringSummary:
     """Replace transcript chapters with the current generated chapter set."""
@@ -168,7 +169,6 @@ def save_chapters(
                   start_time,
                   end_time,
                   title,
-                  summary,
                   transcript_version,
                   source,
                   score,
@@ -189,7 +189,6 @@ def save_chapters(
                   :start_time,
                   :end_time,
                   :title,
-                  :summary,
                   :transcript_version,
                   CAST(:source AS "ChapterSource"),
                   :score,
@@ -212,9 +211,8 @@ def save_chapters(
                 "start_time": chapter.start_time,
                 "end_time": chapter.end_time,
                 "title": chapter.title,
-                "summary": chapter.summary,
                 "transcript_version": transcript_version,
-                "source": source,
+                "source": _chapter_db_source_from_generation_source(source),
                 "score": chapter.score.score,
                 "boundary_score": chapter.score.boundary_score,
                 "pause_score": chapter.score.pause_score,
@@ -254,7 +252,6 @@ def _find_chapter_rows(
                   start_time,
                   end_time,
                   title,
-                  summary,
                   transcript_version,
                   source::text AS source,
                   score,
@@ -285,7 +282,7 @@ def _chapter_from_row(row: RowMapping) -> PersistedChapterSummary:
         start_time=float(row["start_time"]),
         end_time=float(row["end_time"]),
         title=row["title"],
-        summary=row["summary"],
+        summary=None,
         transcript_version=row["transcript_version"],
         source=_parse_chapter_source(row["source"]),
         score=row["score"],
@@ -298,7 +295,20 @@ def _chapter_from_row(row: RowMapping) -> PersistedChapterSummary:
 
 
 def _parse_chapter_source(source: object) -> ChapterSource:
-    if source in {"RULE_BASED", "LLM", "USER_EDITED"}:
+    if source in {"IMPORTED", "WORDS", "SEGMENTS"}:
         return cast(ChapterSource, source)
 
     raise ValueError(f"Unknown chapter source: {source}")
+
+
+def _chapter_db_source_from_generation_source(
+    source: ChapterGenerationSource,
+) -> ChapterSource:
+    """Map AI-service generation source values to the current DB chapter source enum."""
+    if source in {"RULE_BASED", "LLM"}:
+        return "SEGMENTS"
+
+    if source == "USER_EDITED":
+        return "WORDS"
+
+    raise ValueError(f"Unknown generation chapter source: {source}")

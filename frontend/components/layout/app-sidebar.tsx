@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Box, Sparkles } from "lucide-react";
+import { Rocket, Sparkles } from "lucide-react";
 import { navigationConfig } from "./dashboard-nav";
 import { useLongToShortStore } from "@/features/long-to-short/long-to-short.store";
 import { useSocialAccountsStore } from "@/features/social-accounts/social-accounts.store";
@@ -87,13 +87,13 @@ export function AppSidebar() {
       <SidebarHeader className="gap-3 px-3 pb-2 pt-4 group-data-[collapsible=icon]:px-2">
         <Link
           href="/"
-          className="flex h-10 items-center gap-2 overflow-hidden rounded-lg px-2 text-[15px] font-semibold tracking-normal transition-[padding] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+          className="flex h-10 items-center gap-2 overflow-hidden rounded-lg px-2 font-sans text-[15px] font-semibold tracking-normal text-sidebar-foreground transition-[padding] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-sidebar-border bg-surface-raised shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
-            <Box className="size-4 text-primary" />
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary text-primary-foreground shadow-[0_8px_24px_-18px_var(--primary)]">
+            <Rocket className="size-4" />
           </span>
           <span className="min-w-0 truncate group-data-[collapsible=icon]:hidden">
-            Antigravity
+            VidPilot
           </span>
         </Link>
 

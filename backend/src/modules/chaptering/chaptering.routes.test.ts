@@ -187,6 +187,15 @@ describe('chaptering routes', () => {
 
     expect(response.status).toBe(200)
     expect(response.body.data.job.status).toBe('QUEUED')
+    expect(generateChaptersMock).toHaveBeenCalledWith({
+      userId: authenticatedUser.id,
+      mediaId,
+      minChapterDuration: 180,
+      targetChapterDuration: 300,
+      maxChapters: 5,
+      useLlm: true,
+      useEmbeddings: false
+    })
   })
 
   it('returns chapters for a media item', async () => {

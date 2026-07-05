@@ -121,7 +121,7 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
     monkeypatch.setattr(
         transcript_handler.jobs_repository,
         "mark_job_queued_from_pending",
-        lambda session, job_id: _job(JobStatus.QUEUED),
+        lambda session, job_id, **kwargs: _job(JobStatus.QUEUED),
     )
 
     def mark_completed(

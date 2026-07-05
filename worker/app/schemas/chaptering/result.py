@@ -3,8 +3,10 @@ from typing import Literal
 from uuid import UUID
 
 
-type ChapterSource = Literal["RULE_BASED", "LLM", "USER_EDITED"]
+type ChapterGenerationSource = Literal["RULE_BASED", "LLM", "USER_EDITED"]
+type ChapterSource = Literal["IMPORTED", "WORDS", "SEGMENTS"]
 CHAPTER_SOURCE_RULE_BASED = "RULE_BASED"
+CHAPTER_SOURCE_SEGMENTS = "SEGMENTS"
 RULE_BASED_CHAPTERING_MODEL = "rule-based-chaptering-v1"
 
 
@@ -52,6 +54,6 @@ class ChapterCandidate:
 class ChapteringResult:
     transcript_id: UUID
     transcript_version: int
-    source: ChapterSource
+    source: ChapterGenerationSource
     model: str
     chapters: list[ChapterCandidate]

@@ -9,16 +9,6 @@ from app.schemas.chaptering.result import ChapterSource
 class ChapteringJobOptions(BaseModel):
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
-    transcript_id: UUID | None = Field(
-        default=None,
-        validation_alias="transcriptId",
-        serialization_alias="transcriptId",
-    )
-    transcript_version: int | None = Field(
-        default=None,
-        validation_alias="transcriptVersion",
-        serialization_alias="transcriptVersion",
-    )
     min_chapter_duration: float = Field(
         default=180,
         validation_alias="minChapterDuration",
@@ -33,7 +23,7 @@ class ChapteringJobOptions(BaseModel):
         default=5, validation_alias="maxChapters", serialization_alias="maxChapters"
     )
     use_llm: bool = Field(
-        default=False, validation_alias="useLlm", serialization_alias="useLlm"
+        default=True, validation_alias="useLlm", serialization_alias="useLlm"
     )
     use_embeddings: bool = Field(
         default=False,
@@ -59,7 +49,7 @@ class ChapteringOutputSummary(BaseModel):
         validation_alias="transcriptVersion",
         serialization_alias="transcriptVersion",
     )
-    source: ChapterSource = "RULE_BASED"
+    source: ChapterSource = "SEGMENTS"
     score: float | None = None
     boundary_score: float | None = Field(
         default=None,

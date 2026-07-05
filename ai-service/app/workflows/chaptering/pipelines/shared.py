@@ -146,7 +146,4 @@ def _merge_valley_gap_scores(
     valleys can leave no legal candidate inside max chapter duration.
     """
     valleys_by_time = {gap_score.time: gap_score for gap_score in valley_gap_scores}
-    return [
-        valleys_by_time.get(gap_score.time, gap_score)
-        for gap_score in gap_scores
-    ]
+    return [valleys_by_time.get(gap_score.time, gap_score) for gap_score in gap_scores]

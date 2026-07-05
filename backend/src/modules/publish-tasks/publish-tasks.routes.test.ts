@@ -180,6 +180,7 @@ describe('publish task routes', () => {
     ['missing platform account', { mediaId, platform: 'FACEBOOK' }],
     ['both target ids', { mediaId, shortClipId, platform: 'FACEBOOK', platformAccountId }],
     ['neither target id', { platform: 'FACEBOOK', platformAccountId }],
+    ['unsupported MVP platform', { mediaId, platform: 'TIKTOK', platformAccountId }],
     ['invalid platform', { mediaId, platform: 'INSTAGRAM', platformAccountId }]
   ])('returns validation errors for invalid create body: %s', async (_, body) => {
     const response = await request(app)
