@@ -1,16 +1,16 @@
 from uuid import UUID
 
 from app.db import (
-    chaptering_repository,
+    chapters_repository,
     jobs_repository,
     short_clip_repository,
     transcript_repository,
 )
-from app.schemas.chaptering.result import ChapterBoundaryScore, ChapterCandidate
+from app.schemas.chapters.result import ChapterBoundaryScore, ChapterCandidate
 from app.schemas.db.processsing_job import JobStatus
-from app.services.placeholder_transcription_service import (
-    PlaceholderTranscriptResult,
-    PlaceholderTranscriptSegment,
+from app.schemas.transcribe.result import (
+    TranscriptResult,
+    TranscriptSegmentResult,
 )
 
 JOB_ID = "00000000-0000-4000-8000-000000000001"
@@ -60,22 +60,22 @@ class FakeSession:
         return FakeResult()
 
 
-def _result() -> PlaceholderTranscriptResult:
+def _result() -> TranscriptResult:
     return _result_with_model("worker-placeholder-transcriber-v1")
 
 
-def _result_with_model(model: str) -> PlaceholderTranscriptResult:
-    return PlaceholderTranscriptResult(
+def _result_with_model(model: str) -> TranscriptResult:
+    return TranscriptResult(
         language="en",
         source="IMPORTED",
         model=model,
         full_text="Hello world",
         word_count=2,
         segments=[
-            PlaceholderTranscriptSegment(
+            TranscriptSegmentResult(
                 start_time=0.0, end_time=1.0, text="Hello", confidence=1.0
             ),
-            PlaceholderTranscriptSegment(
+            TranscriptSegmentResult(
                 start_time=1.0, end_time=2.0, text="world", confidence=1.0
             ),
         ],
@@ -138,7 +138,7 @@ def test_save_transcript_returns_existing_summary_without_duplicate_insert() -> 
     assert len(session.params) == 1
 
 
-def test_chaptering_loads_transcript_segments_in_timeline_order() -> None:
+def test_generate_chapters_loads_transcript_segments_in_timeline_order() -> None:
     transcript_row = {
         "id": "00000000-0000-4000-8000-000000000004",
         "media_id": MEDIA_ID,
@@ -148,7 +148,7 @@ def test_chaptering_loads_transcript_segments_in_timeline_order() -> None:
     }
     session = FakeSession(rows=[transcript_row, []])
 
-    chaptering_repository.load_transcript_for_chaptering(
+    chapters_repository.load_transcript_for_chapters(
         session,
         transcript_id="00000000-0000-4000-8000-000000000004",
         media_id=MEDIA_ID,
@@ -237,7 +237,7 @@ def test_save_chapters_persists_boundary_scores() -> None:
         ),
     )
 
-    summary = chaptering_repository.save_chapters(
+    summary = chapters_repository.save_chapters(
         session,
         job_id=JOB_ID,
         media_id=MEDIA_ID,
@@ -245,7 +245,7 @@ def test_save_chapters_persists_boundary_scores() -> None:
         transcript_version=2,
         chapters=[chapter],
         source="RULE_BASED",
-        model="ai-service-chaptering-v1",
+        model="ai-service-generate-chapters-v1",
     )
 
     insert_params = session.params[1]
@@ -257,5 +257,5 @@ def test_save_chapters_persists_boundary_scores() -> None:
     assert insert_params["duration_score"] == 0.8
     assert insert_params["source"] == "SEGMENTS"
     assert "summary" not in insert_params
-    assert summary.model == "ai-service-chaptering-v1"
+    assert summary.model == "ai-service-generate-chapters-v1"
     assert summary.chapters[0].score == 0.91

@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class AudioMetadata(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid")
 
     path: Path
     duration_seconds: float | None
@@ -14,7 +14,7 @@ class AudioMetadata(BaseModel):
 
 
 class AudioSanityResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid")
 
     metadata: AudioMetadata
     silence_ratio: float

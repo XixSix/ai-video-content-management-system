@@ -6,7 +6,7 @@ from typing import Any
 
 from app.core.config import settings
 from app.schemas.media_preview.probe import MediaProbe
-from app.schemas.transcript.audio import AudioMetadata, AudioSanityResult
+from app.schemas.transcribe.audio import AudioMetadata, AudioSanityResult
 
 
 class FFmpegServiceError(Exception):

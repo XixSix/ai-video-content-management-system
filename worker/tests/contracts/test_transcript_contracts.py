@@ -4,17 +4,11 @@ import pytest
 from pydantic import ValidationError
 
 from app.schemas.db.processsing_job import JobStatus
-from app.schemas.jobs.transcript_message import (
-    TranscriptJobMessage,
-    TranscriptJobResultMessage,
+from app.schemas.jobs.transcribe_message import (
+    TranscribeJobMessage,
+    TranscribeJobResultMessage,
 )
-from app.schemas.transcript.output import (
-    TranscriptArtifactsOutput,
-    TranscriptAudioOutput,
-    TranscriptCompletedOutput,
-    TranscriptJobOptions,
-    TranscriptOutputSummary,
-)
+from app.schemas.transcribe.output import TranscribeJobOutput
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000002")
@@ -22,22 +16,24 @@ USER_ID = UUID("00000000-0000-4000-8000-000000000003")
 TRANSCRIPT_ID = UUID("00000000-0000-4000-8000-000000000004")
 
 
-def test_transcript_job_message_is_strict() -> None:
+def test_transcribe_job_message_is_strict() -> None:
     payload = {
+        "version": 1,
         "jobId": str(JOB_ID),
-        "mediaId": str(MEDIA_ID),
-        "userId": str(USER_ID),
-        "s3Key": "uploads/video.mp4",
+        "jobType": "TRANSCRIBE",
         "taskName": "transcribe",
     }
 
-    assert TranscriptJobMessage.model_validate(payload).job_id == JOB_ID
+    assert TranscribeJobMessage.model_validate(payload).job_id == JOB_ID
 
     with pytest.raises(ValidationError):
-        TranscriptJobMessage.model_validate({**payload, "extra": True})
+        TranscribeJobMessage.model_validate({**payload, "extra": True})
 
     with pytest.raises(ValidationError):
-        TranscriptJobMessage.model_validate({**payload, "taskName": "wrong"})
+        TranscribeJobMessage.model_validate({**payload, "taskName": "wrong"})
+
+    with pytest.raises(ValidationError):
+        TranscribeJobMessage.model_validate({**payload, "mediaId": str(MEDIA_ID)})
 
 
 def test_result_message_has_stable_shape_for_completed_and_skipped() -> None:
@@ -48,10 +44,10 @@ def test_result_message_has_stable_shape_for_completed_and_skipped() -> None:
         "status": JobStatus.COMPLETED,
     }
 
-    completed = TranscriptJobResultMessage(skipped=False, **base).model_dump(
+    completed = TranscribeJobResultMessage(skipped=False, **base).model_dump(
         mode="json", by_alias=True
     )
-    skipped = TranscriptJobResultMessage(skipped=True, **base).model_dump(
+    skipped = TranscribeJobResultMessage(skipped=True, **base).model_dump(
         mode="json", by_alias=True
     )
 
@@ -70,54 +66,17 @@ def test_result_message_has_stable_shape_for_completed_and_skipped() -> None:
 
 
 def test_completed_output_shape_has_no_mock_field() -> None:
-    output = TranscriptCompletedOutput(
-        transcript=TranscriptOutputSummary(
-            id=TRANSCRIPT_ID,
-            language="en",
-            model="ai-service-mock-transcriber-v1",
-            segment_count=2,
-            word_count=12,
-            full_text_preview="Hello",
-        ),
-        audio=TranscriptAudioOutput(
-            duration_seconds=12.34,
-            sample_rate=16000,
-            channels=1,
-            codec_name="pcm_s16le",
-            silence_ratio=0.12,
-        ),
-        artifacts=TranscriptArtifactsOutput(),
-        options=TranscriptJobOptions(language="en"),
+    output = TranscribeJobOutput(
+        transcript_id=TRANSCRIPT_ID,
+        segment_count=2,
+        word_count=12,
     ).model_dump(mode="json", by_alias=True)
 
     assert output == {
-        "type": "transcript.completed",
+        "type": "transcribe.job.output",
         "version": 1,
-        "transcript": {
-            "id": str(TRANSCRIPT_ID),
-            "language": "en",
-            "source": "IMPORTED",
-            "model": "ai-service-mock-transcriber-v1",
-            "segmentCount": 2,
-            "wordCount": 12,
-            "fullTextPreview": "Hello",
-        },
-        "audio": {
-            "durationSeconds": 12.34,
-            "sampleRate": 16000,
-            "channels": 1,
-            "codecName": "pcm_s16le",
-            "silenceRatio": 0.12,
-        },
-        "artifacts": {
-            "srtKey": None,
-            "vttKey": None,
-        },
-        "options": {
-            "language": "en",
-            "useVad": True,
-            "sourceSeparation": False,
-            "useDiarization": False,
-        },
+        "transcriptId": str(TRANSCRIPT_ID),
+        "segmentCount": 2,
+        "wordCount": 12,
     }
     assert "mock" not in output
