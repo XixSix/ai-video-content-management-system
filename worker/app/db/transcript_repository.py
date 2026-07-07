@@ -6,9 +6,22 @@ from sqlalchemy import text
 from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
 
-from app.schemas.transcript.result import TranscriptResult
+from app.schemas.transcribe.result import TranscriptResult
 
 FULL_TEXT_PREVIEW_MAX_LENGTH = 300
+
+
+@dataclass(frozen=True)
+class TranscribeMediaSource:
+    id: UUID
+    user_id: UUID
+    workspace_id: UUID
+    media_type: str
+    status: str
+    s3_bucket: str
+    s3_key: str
+    s3_region: str | None
+    mime_type: str | None
 
 
 @dataclass(frozen=True)
@@ -69,6 +82,51 @@ def find_transcript_by_job_id(
         return None
 
     return _summary_from_row(row)
+
+
+def load_transcribe_media_source(
+    session: Session,
+    media_id: str,
+) -> TranscribeMediaSource | None:
+    """Load source media metadata for a transcribe job from the database."""
+    row = (
+        session.execute(
+            text(
+                """
+                SELECT
+                  id,
+                  user_id,
+                  workspace_id,
+                  type::text AS media_type,
+                  status::text AS status,
+                  s3_bucket,
+                  s3_key,
+                  s3_region,
+                  mime_type
+                FROM media
+                WHERE id = :media_id
+                """
+            ),
+            {"media_id": media_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
+
+    if row is None:
+        return None
+
+    return TranscribeMediaSource(
+        id=UUID(str(row["id"])),
+        user_id=UUID(str(row["user_id"])),
+        workspace_id=UUID(str(row["workspace_id"])),
+        media_type=row["media_type"],
+        status=row["status"],
+        s3_bucket=row["s3_bucket"],
+        s3_key=row["s3_key"],
+        s3_region=row["s3_region"],
+        mime_type=row["mime_type"],
+    )
 
 
 def save_transcript(

@@ -5,14 +5,19 @@ import grpc
 
 from app.core.config import settings
 from app.proto_path import ensure_proto_generated_on_path
-from app.schemas.chaptering.output import ChapteringJobOptions
-from app.schemas.chaptering.result import ChapteringResult, ChapteringTranscript
+from app.schemas.chapters.options import GenerateChaptersJobOptions
+from app.schemas.chapters.result import (
+    GeneratedChaptersResult,
+    GenerateChaptersTranscript,
+)
 from app.db.short_clip_repository import ShortClipSource
-from app.schemas.jobs.short_clip_message import ShortClipJobPreferences
+from app.schemas.short_clip.options import (
+    GenerateShortClipsJobOptions,
+)
 from app.schemas.short_clip.result import ShortClipCandidateResult
-from app.schemas.transcript.output import TranscriptJobOptions
-from app.schemas.transcript.result import TranscriptResult
-from app.utils.ai_chaptering_mapper import (
+from app.schemas.transcribe.input import TranscribeOptions
+from app.schemas.transcribe.result import TranscriptResult
+from app.utils.ai_generate_chapters_mapper import (
     build_generate_chapters_request,
     map_generate_chapters_response,
 )
@@ -20,7 +25,7 @@ from app.utils.ai_short_clip_mapper import (
     build_generate_clip_candidates_request,
     map_generate_clip_candidates_response,
 )
-from app.utils.ai_transcription_mapper import (
+from app.utils.ai_transcribe_mapper import (
     build_transcribe_request,
     map_transcribe_response,
 )
@@ -29,7 +34,7 @@ ensure_proto_generated_on_path()
 
 from chaptering.v1 import chaptering_pb2_grpc  # type: ignore # noqa: E402
 from short_clip.v1 import short_clip_pb2_grpc  # type: ignore # noqa: E402
-from transcription.v1 import transcription_pb2_grpc  # type: ignore # noqa: E402
+from transcribe.v1 import transcribe_pb2_grpc  # type: ignore # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +66,7 @@ class AIServiceClient:
         *,
         request_id: str,
         audio_path: Path,
-        options: TranscriptJobOptions,
+        options: TranscribeOptions,
     ) -> TranscriptResult:
         request = build_transcribe_request(
             request_id=request_id,
@@ -71,7 +76,7 @@ class AIServiceClient:
 
         try:
             with grpc.insecure_channel(self.target) as channel:
-                stub = transcription_pb2_grpc.TranscriptionServiceStub(channel)
+                stub = transcribe_pb2_grpc.TranscribeServiceStub(channel)
                 response = stub.Transcribe(
                     request,
                     timeout=self.timeout_seconds,
@@ -114,9 +119,9 @@ class AIServiceClient:
         self,
         *,
         request_id: str,
-        transcript: ChapteringTranscript,
-        options: ChapteringJobOptions,
-    ) -> ChapteringResult:
+        transcript: GenerateChaptersTranscript,
+        options: GenerateChaptersJobOptions,
+    ) -> GeneratedChaptersResult:
         request = build_generate_chapters_request(
             request_id=request_id,
             transcript=transcript,
@@ -133,22 +138,22 @@ class AIServiceClient:
         except grpc.RpcError as error:
             if error.code() in TERMINAL_GRPC_CODES:
                 logger.warning(
-                    "ai-service terminal chaptering gRPC error request_id=%s code=%s",
+                    "ai-service terminal chapter generation gRPC error request_id=%s code=%s",
                     request_id,
                     error.code().name,
                 )
                 raise AIServiceTerminalError(
-                    error.details() or "ai-service rejected chaptering request",
+                    error.details() or "ai-service rejected chapter generation request",
                     error_code=f"AI_SERVICE_{error.code().name}",
                 ) from error
 
             logger.exception(
-                "ai-service retryable chaptering gRPC error request_id=%s",
+                "ai-service retryable chapter generation gRPC error request_id=%s",
                 request_id,
             )
             raise
 
-        logger.info("ai-service chaptering completed request_id=%s", request_id)
+        logger.info("ai-service chapter generation completed request_id=%s", request_id)
         try:
             return map_generate_chapters_response(
                 request_id=request_id,
@@ -157,7 +162,7 @@ class AIServiceClient:
             )
         except ValueError as error:
             logger.warning(
-                "ai-service returned invalid chaptering response "
+                "ai-service returned invalid chapter generation response "
                 "request_id=%s error=%s",
                 request_id,
                 error,
@@ -172,12 +177,12 @@ class AIServiceClient:
         *,
         request_id: str,
         source: ShortClipSource,
-        preferences: ShortClipJobPreferences,
+        options: GenerateShortClipsJobOptions,
     ) -> list[ShortClipCandidateResult]:
         request = build_generate_clip_candidates_request(
             request_id=request_id,
             source=source,
-            preferences=preferences,
+            options=options,
         )
 
         try:

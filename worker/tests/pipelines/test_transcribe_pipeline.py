@@ -5,12 +5,15 @@ from uuid import UUID
 
 import pytest
 
-from app.db.transcript_repository import PersistedTranscriptSummary
-from app.pipelines.transcript import pipeline as transcript_pipeline
-from app.schemas.jobs.transcript_message import TranscriptJobMessage
-from app.schemas.transcript.audio import AudioMetadata, AudioSanityResult
-from app.schemas.transcript.output import TranscriptJobOptions
-from app.schemas.transcript.result import TranscriptResult, TranscriptSegmentResult
+from app.db.transcript_repository import (
+    PersistedTranscriptSummary,
+    TranscribeMediaSource,
+)
+from app.pipelines.transcribe import pipeline as transcribe_pipeline
+from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
+from app.schemas.transcribe.audio import AudioMetadata, AudioSanityResult
+from app.schemas.transcribe.input import TranscribeOptions
+from app.schemas.transcribe.result import TranscriptResult, TranscriptSegmentResult
 from app.services.ffmpeg_service import AudioSanityError
 from app.services.s3_service import S3SourceObjectNotFoundError
 
@@ -25,28 +28,56 @@ def _session() -> Iterator[object]:
     yield object()
 
 
-def _message() -> TranscriptJobMessage:
-    return TranscriptJobMessage.model_validate(
+def _job() -> ProcessingJobRow:
+    return ProcessingJobRow.model_validate(
         {
-            "jobId": str(JOB_ID),
+            "id": str(JOB_ID),
             "mediaId": str(MEDIA_ID),
             "userId": str(USER_ID),
-            "s3Key": "uploads/video.mp4",
+            "jobType": JobType.TRANSCRIBE,
+            "status": JobStatus.QUEUED,
+            "progress": 0,
+            "currentStep": None,
+            "errorMessage": None,
+            "queueName": "transcribe_queue",
             "taskName": "transcribe",
+            "externalTaskId": None,
+            "attemptCount": 0,
+            "input": None,
+            "output": None,
+            "createdAt": "2026-05-27T00:00:00Z",
+            "updatedAt": "2026-05-27T00:00:00Z",
+            "startedAt": None,
+            "completedAt": None,
         }
     )
 
 
-def _options() -> TranscriptJobOptions:
-    return TranscriptJobOptions.model_validate(
+def _source() -> TranscribeMediaSource:
+    return TranscribeMediaSource(
+        id=MEDIA_ID,
+        user_id=USER_ID,
+        workspace_id=UUID("00000000-0000-4000-8000-000000000005"),
+        media_type="VIDEO",
+        status="UPLOADED",
+        s3_bucket="vidpilot-media",
+        s3_key="uploads/video.mp4",
+        s3_region="us-east-1",
+        mime_type="video/mp4",
+    )
+
+
+def _options() -> TranscribeOptions:
+    return TranscribeOptions.model_validate(
         {
             "language": "en",
             "generateSrt": True,
             "generateVtt": True,
             "burnTranscript": False,
-            "useVad": True,
-            "sourceSeparation": False,
-            "useDiarization": False,
+            "vad": {"enabled": True, "sensitivity": "medium"},
+            "sourceSeparation": {"enabled": False, "mode": "vocals_only"},
+            "diarization": {"enabled": False},
+            "wordTimestamps": {"enabled": True},
         }
     )
 
@@ -102,7 +133,7 @@ def _summary() -> PersistedTranscriptSummary:
     )
 
 
-def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
+def test_run_transcribe_pipeline_stores_audio_and_returns_completed_output(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -114,12 +145,13 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
     }
     storage_dir = tmp_path / "storage"
 
-    monkeypatch.setattr(transcript_pipeline, "get_db_session", _session)
-    monkeypatch.setattr(transcript_pipeline.settings, "storage_dir", storage_dir)
+    monkeypatch.setattr(transcribe_pipeline, "get_db_session", _session)
+    monkeypatch.setattr(transcribe_pipeline.settings, "storage_dir", storage_dir)
 
-    def download_file(s3_key: str, destination_path: Path) -> Path:
+    def download_file(s3_key: str, destination_path: Path, *, bucket: str) -> Path:
         calls["downloaded"] += 1
         assert s3_key == "uploads/video.mp4"
+        assert bucket == "vidpilot-media"
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         destination_path.write_bytes(b"video")
         return destination_path
@@ -140,7 +172,7 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         *,
         request_id: str,
         audio_path: Path,
-        options: TranscriptJobOptions,
+        options: TranscribeOptions,
     ) -> TranscriptResult:
         calls["called_ai_service"] += 1
         assert request_id == str(JOB_ID)
@@ -161,23 +193,28 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
         assert result.full_text == "Hello world"
         return _summary()
 
-    monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)
+    monkeypatch.setattr(transcribe_pipeline.s3_service, "download_file", download_file)
     monkeypatch.setattr(
-        transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio
+        transcribe_pipeline.ffmpeg_service, "extract_audio", extract_audio
     )
     monkeypatch.setattr(
-        transcript_pipeline.ffmpeg_service, "validate_audio", validate_audio
+        transcribe_pipeline.ffmpeg_service, "validate_audio", validate_audio
     )
     monkeypatch.setattr(
-        transcript_pipeline.ai_service_client,
+        transcribe_pipeline.ai_service_client,
         "transcribe",
         transcribe,
     )
     monkeypatch.setattr(
-        transcript_pipeline.transcript_repository, "save_transcript", save_transcript
+        transcribe_pipeline.transcript_repository, "save_transcript", save_transcript
+    )
+    monkeypatch.setattr(
+        transcribe_pipeline.transcript_repository,
+        "load_transcribe_media_source",
+        lambda session, media_id: _source(),
     )
 
-    output = transcript_pipeline.run_transcript_pipeline(_message(), options=_options())
+    output = transcribe_pipeline.run_transcribe_pipeline(_job(), options=_options())
 
     assert calls == {
         "downloaded": 1,
@@ -191,43 +228,55 @@ def test_run_transcript_pipeline_stores_audio_and_returns_completed_output(
     assert (
         storage_dir / "transcripts" / str(JOB_ID) / "audio.wav"
     ).read_bytes() == b"wav"
-    assert output.transcript.id == TRANSCRIPT_ID
-    assert output.transcript.segment_count == 2
-    assert output.audio.duration_seconds == 12.5
-    assert output.audio.sample_rate == 16000
-    assert output.audio.silence_ratio == 0.2
+    assert output.transcript_id == TRANSCRIPT_ID
+    assert output.segment_count == 2
+    assert output.word_count == 2
 
 
-def test_run_transcript_pipeline_maps_missing_source_to_terminal_error(
+def test_run_transcribe_pipeline_maps_missing_source_to_terminal_error(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
     monkeypatch.setattr(
-        transcript_pipeline.settings, "storage_dir", tmp_path / "storage"
+        transcribe_pipeline.settings, "storage_dir", tmp_path / "storage"
     )
 
-    def raise_not_found(s3_key: str, destination_path: Path) -> Path:
+    monkeypatch.setattr(transcribe_pipeline, "get_db_session", _session)
+    monkeypatch.setattr(
+        transcribe_pipeline.transcript_repository,
+        "load_transcribe_media_source",
+        lambda session, media_id: _source(),
+    )
+
+    def raise_not_found(s3_key: str, destination_path: Path, *, bucket: str) -> Path:
         raise S3SourceObjectNotFoundError("not found")
 
     monkeypatch.setattr(
-        transcript_pipeline.s3_service, "download_file", raise_not_found
+        transcribe_pipeline.s3_service, "download_file", raise_not_found
     )
 
-    with pytest.raises(transcript_pipeline.TerminalTranscriptPipelineError) as error:
-        transcript_pipeline.run_transcript_pipeline(_message(), options=_options())
+    with pytest.raises(transcribe_pipeline.TerminalTranscribePipelineError) as error:
+        transcribe_pipeline.run_transcribe_pipeline(_job(), options=_options())
 
     assert error.value.error_code == "SOURCE_OBJECT_NOT_FOUND"
 
 
-def test_run_transcript_pipeline_maps_audio_sanity_to_terminal_error(
+def test_run_transcribe_pipeline_maps_audio_sanity_to_terminal_error(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
     monkeypatch.setattr(
-        transcript_pipeline.settings, "storage_dir", tmp_path / "storage"
+        transcribe_pipeline.settings, "storage_dir", tmp_path / "storage"
     )
 
-    def download_file(s3_key: str, destination_path: Path) -> Path:
+    monkeypatch.setattr(transcribe_pipeline, "get_db_session", _session)
+    monkeypatch.setattr(
+        transcribe_pipeline.transcript_repository,
+        "load_transcribe_media_source",
+        lambda session, media_id: _source(),
+    )
+
+    def download_file(s3_key: str, destination_path: Path, *, bucket: str) -> Path:
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         destination_path.write_bytes(b"video")
         return destination_path
@@ -239,15 +288,15 @@ def test_run_transcript_pipeline_maps_audio_sanity_to_terminal_error(
     def raise_audio_error(audio_path: Path) -> AudioSanityResult:
         raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")
 
-    monkeypatch.setattr(transcript_pipeline.s3_service, "download_file", download_file)
+    monkeypatch.setattr(transcribe_pipeline.s3_service, "download_file", download_file)
     monkeypatch.setattr(
-        transcript_pipeline.ffmpeg_service, "extract_audio", extract_audio
+        transcribe_pipeline.ffmpeg_service, "extract_audio", extract_audio
     )
     monkeypatch.setattr(
-        transcript_pipeline.ffmpeg_service, "validate_audio", raise_audio_error
+        transcribe_pipeline.ffmpeg_service, "validate_audio", raise_audio_error
     )
 
-    with pytest.raises(transcript_pipeline.TerminalTranscriptPipelineError) as error:
-        transcript_pipeline.run_transcript_pipeline(_message(), options=_options())
+    with pytest.raises(transcribe_pipeline.TerminalTranscribePipelineError) as error:
+        transcribe_pipeline.run_transcribe_pipeline(_job(), options=_options())
 
     assert error.value.error_code == "AUDIO_NO_SPEECH_DETECTED"

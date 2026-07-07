@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from transcription.v1 import transcription_pb2 as transcription_dot_v1_dot_transcription__pb2
+from transcribe.v1 import transcribe_pb2 as transcribe_dot_v1_dot_transcribe__pb2
 
 GRPC_GENERATED_VERSION = '1.80.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in transcription/v1/transcription_pb2_grpc.py depends on'
+        + ' but the generated code in transcribe/v1/transcribe_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class TranscriptionServiceStub(object):
+class TranscribeServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -35,13 +35,13 @@ class TranscriptionServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Transcribe = channel.unary_unary(
-                '/transcription.v1.TranscriptionService/Transcribe',
-                request_serializer=transcription_dot_v1_dot_transcription__pb2.TranscribeRequest.SerializeToString,
-                response_deserializer=transcription_dot_v1_dot_transcription__pb2.TranscribeResponse.FromString,
+                '/aiservice.v1.TranscribeService/Transcribe',
+                request_serializer=transcribe_dot_v1_dot_transcribe__pb2.TranscribeRequest.SerializeToString,
+                response_deserializer=transcribe_dot_v1_dot_transcribe__pb2.TranscribeResponse.FromString,
                 _registered_method=True)
 
 
-class TranscriptionServiceServicer(object):
+class TranscribeServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def Transcribe(self, request, context):
@@ -51,22 +51,22 @@ class TranscriptionServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_TranscriptionServiceServicer_to_server(servicer, server):
+def add_TranscribeServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Transcribe': grpc.unary_unary_rpc_method_handler(
                     servicer.Transcribe,
-                    request_deserializer=transcription_dot_v1_dot_transcription__pb2.TranscribeRequest.FromString,
-                    response_serializer=transcription_dot_v1_dot_transcription__pb2.TranscribeResponse.SerializeToString,
+                    request_deserializer=transcribe_dot_v1_dot_transcribe__pb2.TranscribeRequest.FromString,
+                    response_serializer=transcribe_dot_v1_dot_transcribe__pb2.TranscribeResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'transcription.v1.TranscriptionService', rpc_method_handlers)
+            'aiservice.v1.TranscribeService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('transcription.v1.TranscriptionService', rpc_method_handlers)
+    server.add_registered_method_handlers('aiservice.v1.TranscribeService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class TranscriptionService(object):
+class TranscribeService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -83,9 +83,9 @@ class TranscriptionService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/transcription.v1.TranscriptionService/Transcribe',
-            transcription_dot_v1_dot_transcription__pb2.TranscribeRequest.SerializeToString,
-            transcription_dot_v1_dot_transcription__pb2.TranscribeResponse.FromString,
+            '/aiservice.v1.TranscribeService/Transcribe',
+            transcribe_dot_v1_dot_transcribe__pb2.TranscribeRequest.SerializeToString,
+            transcribe_dot_v1_dot_transcribe__pb2.TranscribeResponse.FromString,
             options,
             channel_credentials,
             insecure,
