@@ -26,7 +26,11 @@ def run_generate_chapters_pipeline(
 ) -> GenerateChaptersJobOutput:
     """Run chapter generation AI processing and return the completed payload."""
     job_id = str(job.id)
-    transcript = _load_transcript(job, transcript_id=transcript_id)
+    transcript = _load_transcript(
+        job,
+        transcript_id=transcript_id,
+        transcript_version=transcript_version,
+    )
 
     logger.info("Starting chapter generation pipeline job_id=%s", job_id)
 
@@ -59,6 +63,11 @@ def run_generate_chapters_pipeline(
             str(error),
             error_code=error.error_code,
         ) from error
+    except chapters_repository.TranscriptVersionMismatchError as error:
+        raise TerminalGenerateChaptersPipelineError(
+            str(error),
+            error_code="TRANSCRIPT_VERSION_MISMATCH",
+        ) from error
 
     return _completed_output(chapters)
 
@@ -67,13 +76,21 @@ def _load_transcript(
     job: ProcessingJobRow,
     *,
     transcript_id: str,
+    transcript_version: int,
 ) -> GenerateChaptersTranscript:
-    with get_db_session() as session:
-        transcript = chapters_repository.load_transcript_for_chapters(
-            session,
-            transcript_id=transcript_id,
-            media_id=str(job.media_id),
-        )
+    try:
+        with get_db_session() as session:
+            transcript = chapters_repository.load_transcript_for_chapters(
+                session,
+                transcript_id=transcript_id,
+                media_id=str(job.media_id),
+                transcript_version=transcript_version,
+            )
+    except chapters_repository.TranscriptVersionMismatchError as error:
+        raise TerminalGenerateChaptersPipelineError(
+            str(error),
+            error_code="TRANSCRIPT_VERSION_MISMATCH",
+        ) from error
 
     if transcript is None:
         raise TerminalGenerateChaptersPipelineError(

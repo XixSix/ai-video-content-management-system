@@ -18,21 +18,21 @@ class _DatabaseSettings:
 
 class _CeleryAppSettings:
     rabbitmq_url: AmqpDsn = Field(alias="RABBITMQ_URL")
-    transcript_queue_name: str = Field(
-        default="transcript_queue",
-        alias="TRANSCRIPT_QUEUE_NAME",
+    transcribe_queue_name: str = Field(
+        default="transcribe_queue",
+        alias="TRANSCRIBE_QUEUE_NAME",
     )
-    transcript_task_name: str = Field(
-        default="transcript_task",
-        alias="TRANSCRIPT_TASK_NAME",
+    transcribe_task_name: str = Field(
+        default="transcribe_task",
+        alias="TRANSCRIBE_TASK_NAME",
     )
-    chaptering_queue_name: str = Field(
-        default="chaptering_queue",
-        alias="CHAPTERING_QUEUE_NAME",
+    generate_chapters_queue_name: str = Field(
+        default="generate_chapters_queue",
+        alias="GENERATE_CHAPTERS_QUEUE_NAME",
     )
-    chaptering_task_name: str = Field(
-        default="chaptering_task",
-        alias="CHAPTERING_TASK_NAME",
+    generate_chapters_task_name: str = Field(
+        default="generate_chapters_task",
+        alias="GENERATE_CHAPTERS_TASK_NAME",
     )
     media_previews_queue_name: str = Field(
         default="media_previews_queue",
@@ -42,13 +42,13 @@ class _CeleryAppSettings:
         default="media_preview_task",
         alias="MEDIA_PREVIEW_TASK_NAME",
     )
-    short_clip_queue_name: str = Field(
-        default="short_clip_queue",
-        alias="SHORT_CLIP_QUEUE_NAME",
+    generate_short_clips_queue_name: str = Field(
+        default="generate_short_clips_queue",
+        alias="GENERATE_SHORT_CLIPS_QUEUE_NAME",
     )
-    short_clip_task_name: str = Field(
-        default="short_clip_task",
-        alias="SHORT_CLIP_TASK_NAME",
+    generate_short_clips_task_name: str = Field(
+        default="generate_short_clips_task",
+        alias="GENERATE_SHORT_CLIPS_TASK_NAME",
     )
     render_exports_queue_name: str = Field(
         default="render_exports_queue",

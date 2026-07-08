@@ -15,16 +15,21 @@ dependencies = [
     "psycopg[binary]>=3.3.4",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.1",
-    "pytest>=9.0.3",
-    "ruff>=0.15.14",
     "sqlalchemy>=2.0.50",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.15.20",
+]
+
 [project.scripts]
+transcribe_worker = "app.cli:transcribe_worker"
 transcript_worker = "app.cli:transcript_worker"
-chaptering_worker = "app.cli:chaptering_worker"
+generate_chapters_worker = "app.cli:generate_chapters_worker"
 media_previews_worker = "app.cli:media_previews_worker"
-short_clip_worker = "app.cli:short_clip_worker"
+generate_short_clips_worker = "app.cli:generate_short_clips_worker"
 render_exports_worker = "app.cli:render_exports_worker"
 publish_worker = "app.cli:publish_worker"
 

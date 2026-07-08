@@ -10,7 +10,16 @@ from sqlalchemy.orm import Session
 
 if TYPE_CHECKING:
     from app.schemas.short_clip.result import ShortClipCandidateResult
-from app.schemas.jobs.short_clip_message import ShortClipJobPreferences
+from app.schemas.short_clip.input import GenerateShortClipsOptions
+
+
+class TranscriptVersionMismatchError(Exception):
+    def __init__(self, *, expected: int, actual: int) -> None:
+        self.expected = expected
+        self.actual = actual
+        super().__init__(
+            f"Expected transcript version {expected}, found version {actual}"
+        )
 
 
 @dataclass(frozen=True)
@@ -101,11 +110,19 @@ class PersistedShortClipAsset:
     s3_key: str
 
 
+@dataclass(frozen=True)
+class PersistedShortClipsSummary:
+    candidates: list[PersistedClipCandidate]
+    short_clips: list[PersistedShortClip]
+    assets: list[PersistedShortClipAsset]
+
+
 def load_short_clip_source(
     session: Session,
     *,
     media_id: str,
     transcript_id: str,
+    transcript_version: int,
 ) -> ShortClipSource | None:
     row = (
         session.execute(
@@ -131,17 +148,33 @@ def load_short_clip_source(
                 JOIN transcripts t ON t.media_id = m.id
                 WHERE m.id = :media_id
                   AND t.id = :transcript_id
+                  AND t.version = :transcript_version
                   AND m.status = 'UPLOADED'
                   AND m.type = 'VIDEO'
+                FOR SHARE OF t
                 """
             ),
-            {"media_id": media_id, "transcript_id": transcript_id},
+            {
+                "media_id": media_id,
+                "transcript_id": transcript_id,
+                "transcript_version": transcript_version,
+            },
         )
         .mappings()
         .one_or_none()
     )
 
     if row is None:
+        actual_version = _find_transcript_version(
+            session,
+            media_id=media_id,
+            transcript_id=transcript_id,
+        )
+        if actual_version is not None and actual_version != transcript_version:
+            raise TranscriptVersionMismatchError(
+                expected=transcript_version,
+                actual=actual_version,
+            )
         return None
 
     segment_rows = (
@@ -166,10 +199,14 @@ def load_short_clip_source(
                 SELECT id, start_time, end_time, title
                 FROM video_chapters
                 WHERE transcript_id = :transcript_id
+                  AND transcript_version = :transcript_version
                 ORDER BY chapter_index ASC, start_time ASC
                 """
             ),
-            {"transcript_id": transcript_id},
+            {
+                "transcript_id": transcript_id,
+                "transcript_version": transcript_version,
+            },
         )
         .mappings()
         .all()
@@ -201,13 +238,28 @@ def load_short_clip_source(
     )
 
 
+def _find_transcript_version(
+    session: Session,
+    *,
+    media_id: str,
+    transcript_id: str,
+) -> int | None:
+    return session.execute(
+        text(
+            """
+            SELECT version
+            FROM transcripts
+            WHERE id = :transcript_id
+              AND media_id = :media_id
+            """
+        ),
+        {"media_id": media_id, "transcript_id": transcript_id},
+    ).scalar_one_or_none()
+
+
 def find_output_by_job_id(
     session: Session, job_id: str
-) -> tuple[
-    list[PersistedClipCandidate],
-    list[PersistedShortClip],
-    list[PersistedShortClipAsset],
-]:
+) -> PersistedShortClipsSummary | None:
     candidate_rows = (
         session.execute(
             text(
@@ -261,7 +313,14 @@ def find_output_by_job_id(
     )
     assets = [_asset_from_row(row) for row in asset_rows]
 
-    return candidates, short_clips, assets
+    if not candidates or not short_clips or not assets:
+        return None
+
+    return PersistedShortClipsSummary(
+        candidates=candidates,
+        short_clips=short_clips,
+        assets=assets,
+    )
 
 
 def save_clip_candidates(
@@ -274,8 +333,14 @@ def save_clip_candidates(
     transcript_version: int,
     project_id: UUID | None,
     candidates: list["ShortClipCandidateResult"],
-    preferences: ShortClipJobPreferences,
+    options: GenerateShortClipsOptions,
 ) -> list[PersistedClipCandidate]:
+    _guard_transcript_version(
+        session,
+        media_id=media_id,
+        transcript_id=transcript_id,
+        transcript_version=transcript_version,
+    )
     now = datetime.now(UTC)
 
     for candidate in candidates:
@@ -347,9 +412,7 @@ def save_clip_candidates(
                         ],
                         "startSegmentId": str(candidate.start_segment_id),
                         "endSegmentId": str(candidate.end_segment_id),
-                        "preferences": preferences.model_dump(
-                            mode="json", by_alias=True
-                        ),
+                        "options": options.model_dump(mode="json", by_alias=True),
                         "provider": candidate.provider,
                         "model": candidate.model,
                     }
@@ -374,6 +437,33 @@ def save_clip_candidates(
         .all()
     )
     return [_candidate_from_row(row) for row in rows]
+
+
+def _guard_transcript_version(
+    session: Session,
+    *,
+    media_id: str,
+    transcript_id: str,
+    transcript_version: int,
+) -> None:
+    actual_version = session.execute(
+        text(
+            """
+            SELECT version
+            FROM transcripts
+            WHERE id = :transcript_id
+              AND media_id = :media_id
+            FOR SHARE
+            """
+        ),
+        {"media_id": media_id, "transcript_id": transcript_id},
+    ).scalar_one_or_none()
+
+    if actual_version is not None and actual_version != transcript_version:
+        raise TranscriptVersionMismatchError(
+            expected=transcript_version,
+            actual=actual_version,
+        )
 
 
 def create_or_update_short_clip_for_candidate(

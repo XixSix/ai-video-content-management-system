@@ -43,22 +43,27 @@ def _has_hostname_arg(argv: Sequence[str]) -> bool:
     )
 
 
-def transcript_worker() -> None:
-    """Start the transcript Celery worker."""
+def transcribe_worker() -> None:
+    """Start the transcribe Celery worker."""
     configure_logging(settings.log_level)
     _run_worker(
-        settings.transcript_queue_name,
-        default_hostname="transcript@%h",
+        settings.transcribe_queue_name,
+        default_hostname="transcribe@%h",
         log_level=settings.log_level,
     )
 
 
-def chaptering_worker() -> None:
-    """Start the chaptering Celery worker."""
+def transcript_worker() -> None:
+    """Start the transcribe worker using the legacy command alias."""
+    transcribe_worker()
+
+
+def generate_chapters_worker() -> None:
+    """Start the chapter generation Celery worker."""
     configure_logging(settings.log_level)
     _run_worker(
-        settings.chaptering_queue_name,
-        default_hostname="chaptering@%h",
+        settings.generate_chapters_queue_name,
+        default_hostname="generate-chapters@%h",
         log_level=settings.log_level,
     )
 
@@ -73,11 +78,11 @@ def media_previews_worker() -> None:
     )
 
 
-def short_clip_worker() -> None:
+def generate_short_clips_worker() -> None:
     """Start the short clip Celery worker."""
     configure_logging(settings.log_level)
     _run_worker(
-        settings.short_clip_queue_name,
+        settings.generate_short_clips_queue_name,
         default_hostname="short-clip@%h",
         log_level=settings.log_level,
     )

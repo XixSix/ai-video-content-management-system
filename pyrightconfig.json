@@ -1,9 +1,11 @@
 {
   "include": [
     "ai-service/app",
+    "worker/app"
+  ],
+  "ignore": [
     "ai-service/tests",
-    "worker/app",
-    "worker/tests",
+    "worker/tests"
   ],
   "extraPaths": [
     "ai-service/proto/generated",

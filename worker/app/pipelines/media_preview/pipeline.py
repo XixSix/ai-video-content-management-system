@@ -15,13 +15,11 @@ from app.pipelines.media_preview.algorithms import (
     select_best_thumbnail,
     write_compact_json,
 )
-from app.schemas.db.processsing_job import JobType
-from app.schemas.jobs.media_preview_message import MediaPreviewJobMessage
+from app.schemas.db.processsing_job import JobType, ProcessingJobRow
 from app.schemas.media_preview.output import (
     MediaPreviewArtifact,
-    MediaPreviewCompletedOutput,
+    MediaPreviewJobOutput,
     MediaPreviewPipelineOutput,
-    PersistedAssetSummary,
 )
 from app.services.ffmpeg_service import (
     FFmpegBinaryNotFoundError,
@@ -38,56 +36,71 @@ class TerminalMediaPreviewPipelineError(Exception):
 
 
 def run_media_preview_pipeline(
-    message: MediaPreviewJobMessage,
-) -> MediaPreviewCompletedOutput:
+    job: ProcessingJobRow,
+) -> MediaPreviewJobOutput:
     """Run media preview processing, upload artifacts to S3, persist to DB, and
     return a completed output struct."""
     settings.tmp_dir.mkdir(parents=True, exist_ok=True)
 
+    with get_db_session() as session:
+        source = media_preview_repository.load_media_preview_source(
+            session,
+            str(job.media_id),
+        )
+
+    if source is None:
+        raise TerminalMediaPreviewPipelineError(
+            "Source media was not found",
+            error_code="MEDIA_PREVIEW_SOURCE_NOT_FOUND",
+        )
+
+    _validate_source(job, source)
+
     with TemporaryDirectory(
-        prefix=f"media-preview-{message.job_id}-",
+        prefix=f"media-preview-{job.id}-",
         dir=settings.tmp_dir,
     ) as temporary_directory:
         workspace = Path(temporary_directory)
-        pipeline_output = _run_pipeline(message, workspace)
-        return _upload_and_persist(message, pipeline_output)
+        pipeline_output = _run_pipeline(job, source, workspace)
+        return _upload_and_persist(job, source, pipeline_output)
 
 
 def _run_pipeline(
-    message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
     workspace: Path,
 ) -> MediaPreviewPipelineOutput:
     """Download source and run the appropriate generation algorithm."""
     workspace.mkdir(parents=True, exist_ok=True)
-    source_suffix = Path(message.s3_key).suffix or ".source"
+    source_suffix = Path(source.s3_key).suffix or ".source"
     source_path = workspace / f"source{source_suffix}"
 
     try:
         s3_service.download_file(
-            message.s3_key,
+            source.s3_key,
             source_path,
-            bucket=message.s3_bucket,
+            bucket=source.s3_bucket,
         )
         probe = ffmpeg_service.probe_media(source_path)
 
-        if message.job_type == JobType.GENERATE_THUMBNAIL:
+        if job.job_type == JobType.GENERATE_THUMBNAIL:
             if not probe.has_video:
                 raise TerminalMediaPreviewPipelineError(
                     "Source media has no video stream",
                     error_code="VIDEO_STREAM_NOT_FOUND",
                 )
             return _generate_thumbnail(
-                message, source_path, probe.duration_seconds, workspace
+                job, source, source_path, probe.duration_seconds, workspace
             )
 
-        if message.job_type == JobType.GENERATE_THUMBNAIL_SPRITE:
+        if job.job_type == JobType.GENERATE_THUMBNAIL_SPRITE:
             if not probe.has_video:
                 raise TerminalMediaPreviewPipelineError(
                     "Source media has no video stream",
                     error_code="VIDEO_STREAM_NOT_FOUND",
                 )
             return _generate_sprite(
-                message, source_path, probe.duration_seconds, workspace
+                job, source, source_path, probe.duration_seconds, workspace
             )
 
         if not probe.has_audio:
@@ -96,7 +109,8 @@ def _run_pipeline(
                 error_code="AUDIO_STREAM_NOT_FOUND",
             )
         return _generate_waveform(
-            message,
+            job,
+            source,
             source_path,
             probe.duration_seconds,
             workspace,
@@ -124,30 +138,32 @@ def _run_pipeline(
 
 
 def _upload_and_persist(
-    message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
     pipeline_output: MediaPreviewPipelineOutput,
-) -> MediaPreviewCompletedOutput:
+) -> MediaPreviewJobOutput:
     """Upload artifacts to S3, persist assets to DB, and return completed output."""
-    job_id = str(message.job_id)
+    job_id = str(job.id)
 
     for artifact in pipeline_output.artifacts:
         s3_service.upload_file(
             artifact.local_path,
             artifact.object_key,
             content_type=artifact.mime_type,
+            bucket=source.s3_bucket,
         )
 
     with get_db_session() as session:
         persisted = [
             media_preview_repository.upsert_asset(
                 session,
-                user_id=str(message.user_id),
-                media_id=str(message.media_id),
+                user_id=str(job.user_id),
+                media_id=str(job.media_id),
                 job_id=job_id,
                 asset_type=artifact.asset_type,
-                s3_bucket=settings.s3_bucket,
+                s3_bucket=source.s3_bucket,
                 s3_key=artifact.object_key,
-                s3_region=settings.s3_region,
+                s3_region=source.s3_region,
                 mime_type=artifact.mime_type,
                 file_size_bytes=artifact.local_path.stat().st_size,
                 metadata=artifact.metadata,
@@ -155,23 +171,16 @@ def _upload_and_persist(
             for artifact in pipeline_output.artifacts
         ]
 
-    return MediaPreviewCompletedOutput(
-        assets=[
-            PersistedAssetSummary(
-                id=asset.id,
-                asset_type=asset.asset_type,
-                s3_bucket=asset.s3_bucket,
-                s3_key=asset.s3_key,
-                metadata=asset.metadata,
-            )
-            for asset in persisted
-        ],
-        summary=pipeline_output.summary,
+    asset_ids = [asset.id for asset in persisted]
+    return MediaPreviewJobOutput(
+        asset_count=len(asset_ids),
+        asset_ids=asset_ids,
     )
 
 
 def _generate_thumbnail(
-    message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
     source_path: Path,
     duration_seconds: float,
     workspace: Path,
@@ -201,7 +210,7 @@ def _generate_thumbnail(
         max_width=settings.thumbnail_max_width,
         jpeg_quality=settings.thumbnail_jpeg_quality,
     )
-    object_key = f"{_output_prefix(message)}/thumbnail.jpg"
+    object_key = f"{_output_prefix(job, source)}/thumbnail.jpg"
     metadata = {
         "algorithmVersion": 1,
         "selectedTimestampSeconds": round(selected.timestamp_seconds, 6),
@@ -226,7 +235,8 @@ def _generate_thumbnail(
 
 
 def _generate_sprite(
-    message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
     source_path: Path,
     duration_seconds: float,
     workspace: Path,
@@ -259,7 +269,7 @@ def _generate_sprite(
         MediaPreviewArtifact(
             asset_type="THUMBNAIL_SPRITE",
             local_path=sheet_path,
-            object_key=f"{_output_prefix(message)}/{sheet_path.name}",
+            object_key=f"{_output_prefix(job, source)}/{sheet_path.name}",
             mime_type="image/jpeg",
             metadata=metadata,
         )
@@ -276,7 +286,8 @@ def _generate_sprite(
 
 
 def _generate_waveform(
-    message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
     source_path: Path,
     duration_seconds: float,
     workspace: Path,
@@ -299,7 +310,7 @@ def _generate_waveform(
             MediaPreviewArtifact(
                 asset_type="WAVEFORM_PEAKS",
                 local_path=output_path,
-                object_key=f"{_output_prefix(message)}/waveform.json",
+                object_key=f"{_output_prefix(job, source)}/waveform.json",
                 mime_type="application/json",
                 metadata=metadata,
             )
@@ -311,8 +322,46 @@ def _generate_waveform(
     )
 
 
-def _output_prefix(message: MediaPreviewJobMessage) -> str:
+def _validate_source(
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
+) -> None:
+    if str(source.user_id) != str(job.user_id):
+        raise TerminalMediaPreviewPipelineError(
+            "Source media user does not match processing job",
+            error_code="MEDIA_PREVIEW_USER_MISMATCH",
+        )
+
+    if source.status != "UPLOADED":
+        raise TerminalMediaPreviewPipelineError(
+            "Source media is not uploaded",
+            error_code="MEDIA_PREVIEW_MEDIA_NOT_UPLOADED",
+        )
+
+    if job.job_type in {
+        JobType.GENERATE_THUMBNAIL,
+        JobType.GENERATE_THUMBNAIL_SPRITE,
+    } and source.media_type not in {"VIDEO", "IMAGE"}:
+        raise TerminalMediaPreviewPipelineError(
+            "Source media type does not support thumbnail previews",
+            error_code="MEDIA_PREVIEW_MEDIA_TYPE_UNSUPPORTED",
+        )
+
+    if job.job_type == JobType.GENERATE_WAVEFORM_PEAK and source.media_type not in {
+        "VIDEO",
+        "AUDIO",
+    }:
+        raise TerminalMediaPreviewPipelineError(
+            "Source media type does not support waveform previews",
+            error_code="MEDIA_PREVIEW_MEDIA_TYPE_UNSUPPORTED",
+        )
+
+
+def _output_prefix(
+    job: ProcessingJobRow,
+    source: media_preview_repository.MediaPreviewSource,
+) -> str:
     return (
-        f"generated/workspaces/{message.workspace_id}/media/{message.media_id}"
-        f"/previews/{message.job_id}"
+        f"generated/workspaces/{source.workspace_id}/media/{job.media_id}"
+        f"/previews/{job.id}"
     )
