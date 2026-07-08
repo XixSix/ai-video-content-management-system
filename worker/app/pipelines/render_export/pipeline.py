@@ -6,11 +6,9 @@ from typing import Any
 from app.core.config import settings
 from app.db import render_export_repository
 from app.db.client import get_db_session
-from app.schemas.jobs.render_export_message import RenderExportJobMessage
-from app.schemas.render_export.output import (
-    RenderExportAssetSummary,
-    RenderExportCompletedOutput,
-)
+from app.schemas.db.processsing_job import ProcessingJobRow
+from app.schemas.render_export.input import RenderExportJobInput
+from app.schemas.render_export.output import RenderExportJobOutput
 from app.services.renderer_service import RendererServiceError, renderer_service
 from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
 
@@ -44,19 +42,29 @@ GEOMETRY_DEFAULTS = {
 
 
 def run_render_export_pipeline(
-    message: RenderExportJobMessage,
-) -> RenderExportCompletedOutput:
+    job: ProcessingJobRow,
+    *,
+    job_input: RenderExportJobInput,
+) -> RenderExportJobOutput:
     """Render the saved editor snapshot into an exported project video asset."""
     settings.tmp_dir.mkdir(parents=True, exist_ok=True)
+
+    if job.project_id is None:
+        raise TerminalRenderExportPipelineError(
+            "Processing job projectId is required",
+            error_code="RENDER_EXPORT_PROJECT_REQUIRED",
+        )
 
     with get_db_session() as session:
         project = render_export_repository.find_project_render_source(
             session,
-            project_id=str(message.project_id),
+            project_id=str(job.project_id),
+            editor_snapshot_id=str(job_input.editor_snapshot_id),
+            editor_snapshot_version=job_input.editor_snapshot_version,
         )
         captions = render_export_repository.find_latest_caption_source(
             session,
-            media_id=str(message.media_id),
+            media_id=str(job.media_id),
         )
 
     if project is None:
@@ -65,10 +73,10 @@ def run_render_export_pipeline(
             error_code="RENDER_SOURCE_NOT_FOUND",
         )
 
-    _guard_project_message(project, message)
+    _guard_project_job(project, job)
 
     with TemporaryDirectory(
-        prefix=f"render-export-{message.job_id}-",
+        prefix=f"render-export-{job.id}-",
         dir=settings.tmp_dir,
     ) as temporary_directory:
         workspace = Path(temporary_directory)
@@ -101,8 +109,13 @@ def run_render_export_pipeline(
                 error_code="RENDER_EXPORT_FAILED",
             ) from error
 
-        object_key = _output_object_key(message)
-        s3_service.upload_file(output_path, object_key, content_type="video/mp4")
+        object_key = _output_object_key(job, project)
+        s3_service.upload_file(
+            output_path,
+            object_key,
+            content_type="video/mp4",
+            bucket=project.media.s3_bucket,
+        )
 
         transcript_version = captions.transcript_version if captions else None
         metadata = {
@@ -119,33 +132,20 @@ def run_render_export_pipeline(
         with get_db_session() as session:
             asset = render_export_repository.upsert_export_asset(
                 session,
-                user_id=str(message.user_id),
-                media_id=str(message.media_id),
-                project_id=str(message.project_id),
-                job_id=str(message.job_id),
+                user_id=str(job.user_id),
+                media_id=str(job.media_id),
+                project_id=str(job.project_id),
+                job_id=str(job.id),
                 transcript_version=transcript_version,
-                s3_bucket=settings.s3_bucket,
+                s3_bucket=project.media.s3_bucket,
                 s3_key=object_key,
-                s3_region=settings.s3_region,
+                s3_region=project.media.s3_region,
                 mime_type="video/mp4",
                 file_size_bytes=output_path.stat().st_size,
                 metadata=metadata,
             )
 
-    return RenderExportCompletedOutput(
-        asset=RenderExportAssetSummary(
-            id=asset.id,
-            asset_type=asset.asset_type,
-            s3_bucket=asset.s3_bucket,
-            s3_key=asset.s3_key,
-            metadata=asset.metadata,
-        ),
-        summary={
-            "assetId": str(asset.id),
-            "snapshotVersion": project.snapshot.version,
-            "durationInFrames": document["durationInFrames"],
-        },
-    )
+    return RenderExportJobOutput(asset_id=asset.id)
 
 
 def build_render_document(
@@ -337,21 +337,27 @@ def _presign_project_media(
     }
 
 
-def _guard_project_message(
+def _guard_project_job(
     project: render_export_repository.RenderExportProject,
-    message: RenderExportJobMessage,
+    job: ProcessingJobRow,
 ) -> None:
-    if str(project.id) != str(message.project_id):
-        raise TerminalRenderExportPipelineError("Message projectId mismatch")
+    if job.project_id is None or str(project.id) != str(job.project_id):
+        raise TerminalRenderExportPipelineError(
+            "Project does not match processing job",
+            error_code="RENDER_EXPORT_PROJECT_MISMATCH",
+        )
 
-    if str(project.workspace_id) != str(message.workspace_id):
-        raise TerminalRenderExportPipelineError("Message workspaceId mismatch")
+    if str(project.media.id) != str(job.media_id):
+        raise TerminalRenderExportPipelineError(
+            "Source media does not match processing job",
+            error_code="RENDER_EXPORT_MEDIA_MISMATCH",
+        )
 
-    if str(project.media.id) != str(message.media_id):
-        raise TerminalRenderExportPipelineError("Message mediaId mismatch")
-
-    if str(project.user_id) != str(message.user_id):
-        raise TerminalRenderExportPipelineError("Message userId mismatch")
+    if str(project.user_id) != str(job.user_id):
+        raise TerminalRenderExportPipelineError(
+            "Project user does not match processing job",
+            error_code="RENDER_EXPORT_USER_MISMATCH",
+        )
 
 
 def _resolve_duration_seconds(
@@ -536,8 +542,11 @@ def _get(source: dict[str, Any], *path: str) -> Any:
     return current
 
 
-def _output_object_key(message: RenderExportJobMessage) -> str:
+def _output_object_key(
+    job: ProcessingJobRow,
+    project: render_export_repository.RenderExportProject,
+) -> str:
     return (
-        f"generated/workspaces/{message.workspace_id}/projects/{message.project_id}"
-        f"/exports/{message.job_id}/export.mp4"
+        f"generated/workspaces/{project.workspace_id}/projects/{job.project_id}"
+        f"/exports/{job.id}/export.mp4"
     )

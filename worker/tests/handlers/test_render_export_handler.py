@@ -8,17 +8,16 @@ from app.db.render_export_repository import PersistedRenderExportAsset
 from app.handlers import render_export_handler
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.render_export_message import RenderExportJobMessage
-from app.schemas.render_export.output import (
-    RenderExportAssetSummary,
-    RenderExportCompletedOutput,
-)
+from app.schemas.render_export.input import RenderExportJobInput
+from app.schemas.render_export.output import RenderExportJobOutput
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000002")
 PROJECT_ID = UUID("00000000-0000-4000-8000-000000000003")
-WORKSPACE_ID = UUID("00000000-0000-4000-8000-000000000004")
 USER_ID = UUID("00000000-0000-4000-8000-000000000005")
 ASSET_ID = UUID("00000000-0000-4000-8000-000000000006")
+SNAPSHOT_ID = UUID("00000000-0000-4000-8000-000000000007")
+PUBLISH_TASK_ID = UUID("00000000-0000-4000-8000-000000000008")
 
 
 @contextmanager
@@ -29,11 +28,9 @@ def _session() -> Iterator[object]:
 def _message() -> RenderExportJobMessage:
     return RenderExportJobMessage.model_validate(
         {
+            "version": 1,
             "jobId": str(JOB_ID),
-            "mediaId": str(MEDIA_ID),
-            "projectId": str(PROJECT_ID),
-            "workspaceId": str(WORKSPACE_ID),
-            "userId": str(USER_ID),
+            "jobType": "EXPORT_RENDER",
             "taskName": "export_render",
         }
     )
@@ -44,6 +41,12 @@ def _job(
     *,
     input_payload: dict[str, object] | None = None,
 ) -> ProcessingJobRow:
+    if input_payload is None:
+        input_payload = {
+            "editorSnapshotId": str(SNAPSHOT_ID),
+            "editorSnapshotVersion": 3,
+        }
+
     return ProcessingJobRow.model_validate(
         {
             "id": str(JOB_ID),
@@ -79,18 +82,8 @@ def _asset() -> PersistedRenderExportAsset:
     )
 
 
-def _completed_output() -> RenderExportCompletedOutput:
-    asset = _asset()
-    return RenderExportCompletedOutput(
-        asset=RenderExportAssetSummary(
-            id=asset.id,
-            asset_type=asset.asset_type,
-            s3_bucket=asset.s3_bucket,
-            s3_key=asset.s3_key,
-            metadata=asset.metadata,
-        ),
-        summary={"assetId": str(ASSET_ID)},
-    )
+def _completed_output() -> RenderExportJobOutput:
+    return RenderExportJobOutput(asset_id=ASSET_ID)
 
 
 def _patch_job_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
@@ -126,8 +119,15 @@ def _patch_job_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
         lambda session, job_id: None,
     )
 
-    def run_pipeline(message: RenderExportJobMessage) -> RenderExportCompletedOutput:
+    def run_pipeline(
+        job: ProcessingJobRow,
+        *,
+        job_input: RenderExportJobInput,
+    ) -> RenderExportJobOutput:
         calls["pipeline"] += 1
+        assert job.id == JOB_ID
+        assert job_input.editor_snapshot_id == SNAPSHOT_ID
+        assert job_input.editor_snapshot_version == 3
         return _completed_output()
 
     monkeypatch.setattr(
@@ -149,16 +149,9 @@ def test_process_render_export_job_calls_pipeline_and_completes(
     assert result["skipped"] is False
     assert calls["pipeline"] == 1
     assert calls["completed"] == {
-        "type": "render_export.completed",
+        "type": "render_export.job.output",
         "version": 1,
-        "asset": {
-            "id": str(ASSET_ID),
-            "assetType": "EXPORT_VIDEO",
-            "s3Bucket": "vidpilot-media",
-            "s3Key": f"generated/exports/{JOB_ID}/export.mp4",
-            "metadata": {"renderer": "remotion"},
-        },
-        "summary": {"assetId": str(ASSET_ID)},
+        "assetId": str(ASSET_ID),
     }
 
 
@@ -177,10 +170,7 @@ def test_process_render_export_job_reuses_existing_asset(
     assert result["status"] == "COMPLETED"
     assert result["skipped"] is True
     assert calls["pipeline"] == 0
-    assert calls["completed"]["summary"] == {
-        "reused": True,
-        "assetId": str(ASSET_ID),
-    }
+    assert calls["completed"]["assetId"] == str(ASSET_ID)
 
 
 def test_process_render_export_job_dispatches_chained_publish(
@@ -190,10 +180,12 @@ def test_process_render_export_job_dispatches_chained_publish(
     chained_job = _job(
         JobStatus.QUEUED,
         input_payload={
-            "publishTaskId": "00000000-0000-4000-8000-000000000007",
+            "editorSnapshotId": str(SNAPSHOT_ID),
+            "editorSnapshotVersion": 3,
+            "publishTaskId": str(PUBLISH_TASK_ID),
         },
     )
-    dispatched: list[tuple[ProcessingJobRow, str]] = []
+    dispatched: list[tuple[ProcessingJobRow, str, str]] = []
     monkeypatch.setattr(
         render_export_handler.jobs_repository,
         "mark_job_queued_from_pending",
@@ -202,37 +194,45 @@ def test_process_render_export_job_dispatches_chained_publish(
     monkeypatch.setattr(
         render_export_handler,
         "dispatch_chained_publish_job",
-        lambda job, *, export_asset_id: dispatched.append((job, export_asset_id)),
+        lambda job, *, publish_task_id, export_asset_id: dispatched.append(
+            (job, publish_task_id, export_asset_id)
+        ),
     )
 
     result = render_export_handler.process_render_export_job(_message())
 
     assert result["status"] == "COMPLETED"
     assert calls["pipeline"] == 1
-    assert dispatched == [(chained_job, str(ASSET_ID))]
+    assert dispatched == [(chained_job, str(PUBLISH_TASK_ID), str(ASSET_ID))]
 
 
 def test_record_render_export_job_failure_marks_dependent_publish_failed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    calls: list[tuple[str, str, str]] = []
+    calls: list[tuple[str, str, str, str | None]] = []
     monkeypatch.setattr(render_export_handler, "get_db_session", _session)
     monkeypatch.setattr(
         render_export_handler.jobs_repository,
         "mark_job_failed",
-        lambda session, job_id, error_message: calls.append(
-            ("job", job_id, error_message)
+        lambda session, job_id, error_message, *, error_code=None: calls.append(
+            ("job", job_id, error_message, error_code)
         ),
     )
     monkeypatch.setattr(
         render_export_handler,
         "record_chained_publish_render_failure",
-        lambda job_id, error_message: calls.append(("publish", job_id, error_message)),
+        lambda job_id, error_message: calls.append(
+            ("publish", job_id, error_message, None)
+        ),
     )
 
-    render_export_handler.record_render_export_job_failure(str(JOB_ID), "Render failed")
+    render_export_handler.record_render_export_job_failure(
+        str(JOB_ID),
+        "Render failed",
+        error_code="RENDER_EXPORT_FAILED",
+    )
 
     assert calls == [
-        ("job", str(JOB_ID), "Render failed"),
-        ("publish", str(JOB_ID), "Render failed"),
+        ("job", str(JOB_ID), "Render failed", "RENDER_EXPORT_FAILED"),
+        ("publish", str(JOB_ID), "Render failed", None),
     ]

@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from typing import Any
 
 from pydantic import ValidationError
@@ -120,16 +119,14 @@ def increment_publish_job_attempt(job_id: str) -> int | None:
 def dispatch_chained_publish_job(
     render_job: ProcessingJobRow,
     *,
+    publish_task_id: str,
     export_asset_id: str,
 ) -> None:
-    publish_task_id = _publish_task_id_from_job(render_job)
-
-    if publish_task_id is None:
-        return
-
-    scheduled_at = _publish_scheduled_at_from_job(render_job)
-
     with get_db_session() as session:
+        scheduled_at = publish_repository.find_publish_task_scheduled_at(
+            session,
+            publish_task_id,
+        )
         dispatch = publish_repository.create_publish_job_from_render(
             session,
             render_job=render_job,
@@ -214,18 +211,6 @@ def _parse_job_input(job: ProcessingJobRow) -> PublishJobInput:
             "Processing job input is invalid",
             error_code="PUBLISH_JOB_INPUT_INVALID",
         ) from error
-
-
-def _publish_scheduled_at_from_job(job: ProcessingJobRow) -> datetime | None:
-    if not isinstance(job.input, dict):
-        return None
-
-    scheduled_at = job.input.get("publishScheduledAt")
-
-    if not isinstance(scheduled_at, str) or not scheduled_at:
-        return None
-
-    return datetime.fromisoformat(scheduled_at.replace("Z", "+00:00"))
 
 
 def _should_skip_job(job: ProcessingJobRow) -> bool:

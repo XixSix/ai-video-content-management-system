@@ -69,6 +69,8 @@ def find_project_render_source(
     session: Session,
     *,
     project_id: str,
+    editor_snapshot_id: str,
+    editor_snapshot_version: int,
 ) -> RenderExportProject | None:
     row = (
         session.execute(
@@ -98,12 +100,18 @@ def find_project_render_source(
                 JOIN media m ON m.id = p.source_media_id
                 JOIN editor_snapshots es ON es.project_id = p.id
                 WHERE p.id = :project_id
+                  AND es.id = :editor_snapshot_id
+                  AND es.version = :editor_snapshot_version
                   AND p.status <> 'DELETED'
                   AND m.status = 'UPLOADED'
                   AND m.type = 'VIDEO'
                 """
             ),
-            {"project_id": project_id},
+            {
+                "project_id": project_id,
+                "editor_snapshot_id": editor_snapshot_id,
+                "editor_snapshot_version": editor_snapshot_version,
+            },
         )
         .mappings()
         .one_or_none()
