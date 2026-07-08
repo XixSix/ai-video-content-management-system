@@ -8,10 +8,10 @@ celery_app = Celery(
     broker=str(settings.rabbitmq_url),
     backend=None,
     include=[
-        "app.consumers.transcript_consumer",
-        "app.consumers.chaptering_consumer",
+        "app.consumers.transcribe_consumer",
+        "app.consumers.generate_chapters_consumer",
         "app.consumers.media_preview_consumer",
-        "app.consumers.short_clip_consumer",
+        "app.consumers.generate_short_clips_consumer",
         "app.consumers.render_export_consumer",
         "app.consumers.publish_consumer",
     ],
@@ -20,13 +20,13 @@ celery_app = Celery(
 celery_app.conf.update(
     task_queues=(
         Queue(
-            settings.transcript_queue_name,
-            routing_key=settings.transcript_queue_name,
+            settings.transcribe_queue_name,
+            routing_key=settings.transcribe_queue_name,
             durable=True,
         ),
         Queue(
-            settings.chaptering_queue_name,
-            routing_key=settings.chaptering_queue_name,
+            settings.generate_chapters_queue_name,
+            routing_key=settings.generate_chapters_queue_name,
             durable=True,
         ),
         Queue(
@@ -35,8 +35,8 @@ celery_app.conf.update(
             durable=True,
         ),
         Queue(
-            settings.short_clip_queue_name,
-            routing_key=settings.short_clip_queue_name,
+            settings.generate_short_clips_queue_name,
+            routing_key=settings.generate_short_clips_queue_name,
             durable=True,
         ),
         Queue(
@@ -50,24 +50,24 @@ celery_app.conf.update(
             durable=True,
         ),
     ),
-    task_default_queue=settings.transcript_queue_name,
-    task_default_routing_key=settings.transcript_queue_name,
+    task_default_queue=settings.transcribe_queue_name,
+    task_default_routing_key=settings.transcribe_queue_name,
     task_routes={
-        settings.transcript_task_name: {
-            "queue": settings.transcript_queue_name,
-            "routing_key": settings.transcript_queue_name,
+        settings.transcribe_task_name: {
+            "queue": settings.transcribe_queue_name,
+            "routing_key": settings.transcribe_queue_name,
         },
-        settings.chaptering_task_name: {
-            "queue": settings.chaptering_queue_name,
-            "routing_key": settings.chaptering_queue_name,
+        settings.generate_chapters_task_name: {
+            "queue": settings.generate_chapters_queue_name,
+            "routing_key": settings.generate_chapters_queue_name,
         },
         settings.media_preview_task_name: {
             "queue": settings.media_previews_queue_name,
             "routing_key": settings.media_previews_queue_name,
         },
-        settings.short_clip_task_name: {
-            "queue": settings.short_clip_queue_name,
-            "routing_key": settings.short_clip_queue_name,
+        settings.generate_short_clips_task_name: {
+            "queue": settings.generate_short_clips_queue_name,
+            "routing_key": settings.generate_short_clips_queue_name,
         },
         settings.render_export_task_name: {
             "queue": settings.render_exports_queue_name,

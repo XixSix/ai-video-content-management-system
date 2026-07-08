@@ -17,6 +17,63 @@ class PersistedMediaPreviewAsset:
     metadata: dict[str, Any] | None
 
 
+@dataclass(frozen=True)
+class MediaPreviewSource:
+    id: UUID
+    user_id: UUID
+    workspace_id: UUID
+    media_type: str
+    status: str
+    s3_bucket: str
+    s3_key: str
+    s3_region: str | None
+    mime_type: str | None
+
+
+def load_media_preview_source(
+    session: Session,
+    media_id: str,
+) -> MediaPreviewSource | None:
+    row = (
+        session.execute(
+            text(
+                """
+                SELECT
+                  id,
+                  user_id,
+                  workspace_id,
+                  type::text AS media_type,
+                  status::text AS status,
+                  s3_bucket,
+                  s3_key,
+                  s3_region,
+                  mime_type
+                FROM media
+                WHERE id = :media_id
+                """
+            ),
+            {"media_id": media_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
+
+    if row is None:
+        return None
+
+    return MediaPreviewSource(
+        id=UUID(str(row["id"])),
+        user_id=UUID(str(row["user_id"])),
+        workspace_id=UUID(str(row["workspace_id"])),
+        media_type=row["media_type"],
+        status=row["status"],
+        s3_bucket=row["s3_bucket"],
+        s3_key=row["s3_key"],
+        s3_region=row["s3_region"],
+        mime_type=row["mime_type"],
+    )
+
+
 def find_assets_by_job_id(
     session: Session,
     job_id: str,

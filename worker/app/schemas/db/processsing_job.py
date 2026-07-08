@@ -46,6 +46,7 @@ class ProcessingJobRow(BaseModel):
     status: JobStatus
     progress: int | None
     current_step: str | None = Field(alias="currentStep")
+    error_code: str | None = Field(default=None, alias="errorCode")
     error_message: str | None = Field(alias="errorMessage")
     queue_name: str | None = Field(alias="queueName")
     task_name: str | None = Field(alias="taskName")

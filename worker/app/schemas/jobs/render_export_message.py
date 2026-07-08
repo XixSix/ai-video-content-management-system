@@ -3,18 +3,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.schemas.db.processsing_job import JobStatus
+from app.schemas.db.processsing_job import JobStatus, JobType
+from app.schemas.jobs.base import WorkerJobMessage
 
 
-class RenderExportJobMessage(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-    job_id: UUID = Field(alias="jobId")
-    media_id: UUID = Field(alias="mediaId")
-    project_id: UUID = Field(alias="projectId")
-    workspace_id: UUID = Field(alias="workspaceId")
-    user_id: UUID = Field(alias="userId")
-    task_name: Literal["export_render"] = Field(alias="taskName")
+class RenderExportJobMessage(
+    WorkerJobMessage[Literal[JobType.EXPORT_RENDER], Literal["export_render"]]
+):
+    pass
 
 
 class RenderExportJobResultMessage(BaseModel):

@@ -17,6 +17,15 @@ from app.schemas.chapters.result import (
 CHAPTERS_MODEL_FALLBACK = "ai-service-generate-chapters-v1"
 
 
+class TranscriptVersionMismatchError(Exception):
+    def __init__(self, *, expected: int, actual: int) -> None:
+        self.expected = expected
+        self.actual = actual
+        super().__init__(
+            f"Expected transcript version {expected}, found version {actual}"
+        )
+
+
 @dataclass(frozen=True)
 class PersistedChapterSummary:
     id: UUID
@@ -51,6 +60,7 @@ def load_transcript_for_chapters(
     *,
     transcript_id: str,
     media_id: str,
+    transcript_version: int,
 ) -> GenerateChaptersTranscript | None:
     """Load transcript metadata and ordered timestamped segments for chapter generation."""
     transcript_row = (
@@ -67,15 +77,31 @@ def load_transcript_for_chapters(
                 JOIN media m ON m.id = t.media_id
                 WHERE t.id = :transcript_id
                   AND t.media_id = :media_id
+                  AND t.version = :transcript_version
+                FOR SHARE OF t
                 """
             ),
-            {"transcript_id": transcript_id, "media_id": media_id},
+            {
+                "transcript_id": transcript_id,
+                "media_id": media_id,
+                "transcript_version": transcript_version,
+            },
         )
         .mappings()
         .one_or_none()
     )
 
     if transcript_row is None:
+        actual_version = _find_transcript_version(
+            session,
+            transcript_id=transcript_id,
+            media_id=media_id,
+        )
+        if actual_version is not None and actual_version != transcript_version:
+            raise TranscriptVersionMismatchError(
+                expected=transcript_version,
+                actual=actual_version,
+            )
         return None
 
     segment_rows = (
@@ -118,6 +144,25 @@ def load_transcript_for_chapters(
     )
 
 
+def _find_transcript_version(
+    session: Session,
+    *,
+    transcript_id: str,
+    media_id: str,
+) -> int | None:
+    return session.execute(
+        text(
+            """
+            SELECT version
+            FROM transcripts
+            WHERE id = :transcript_id
+              AND media_id = :media_id
+            """
+        ),
+        {"transcript_id": transcript_id, "media_id": media_id},
+    ).scalar_one_or_none()
+
+
 def find_chapters_by_job_id(
     session: Session, job_id: str
 ) -> PersistedChaptersSummary | None:
@@ -148,6 +193,12 @@ def save_chapters(
     model: str,
 ) -> PersistedChaptersSummary:
     """Replace transcript chapters with the current generated chapter set."""
+    _guard_transcript_version(
+        session,
+        transcript_id=transcript_id,
+        media_id=media_id,
+        transcript_version=transcript_version,
+    )
     now = datetime.now(UTC)
 
     session.execute(
@@ -231,6 +282,33 @@ def save_chapters(
         model=model,
         chapters=persisted,
     )
+
+
+def _guard_transcript_version(
+    session: Session,
+    *,
+    transcript_id: str,
+    media_id: str,
+    transcript_version: int,
+) -> None:
+    actual_version = session.execute(
+        text(
+            """
+            SELECT version
+            FROM transcripts
+            WHERE id = :transcript_id
+              AND media_id = :media_id
+            FOR SHARE
+            """
+        ),
+        {"transcript_id": transcript_id, "media_id": media_id},
+    ).scalar_one_or_none()
+
+    if actual_version is not None and actual_version != transcript_version:
+        raise TranscriptVersionMismatchError(
+            expected=transcript_version,
+            actual=actual_version,
+        )
 
 
 def _find_chapter_rows(

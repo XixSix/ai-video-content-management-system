@@ -102,6 +102,22 @@ def find_publish_task(session: Session, publish_task_id: str) -> PublishTaskRow 
     return _publish_task_from_row(row) if row else None
 
 
+def find_publish_task_scheduled_at(
+    session: Session,
+    publish_task_id: str,
+) -> datetime | None:
+    return session.execute(
+        text(
+            """
+            SELECT scheduled_at
+            FROM publish_tasks
+            WHERE id = :publish_task_id
+            """
+        ),
+        {"publish_task_id": publish_task_id},
+    ).scalar_one_or_none()
+
+
 def find_platform_account(
     session: Session,
     platform_account_id: str,
@@ -446,15 +462,7 @@ def create_publish_job_from_render(
 
     job_input = {
         "publishTaskId": str(task.id),
-        "mediaId": None,
-        "projectId": str(task.project_id) if task.project_id else None,
-        "shortClipId": None,
         "exportAssetId": export_asset_id,
-        "platform": task.platform,
-        "platformAccountId": str(task.platform_account_id)
-        if task.platform_account_id
-        else None,
-        "scheduledAt": scheduled_at.isoformat() if scheduled_at else None,
     }
     row = (
         session.execute(

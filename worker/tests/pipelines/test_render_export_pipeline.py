@@ -13,7 +13,8 @@ from app.db.render_export_repository import (
     RenderExportSnapshot,
 )
 from app.pipelines.render_export import pipeline
-from app.schemas.jobs.render_export_message import RenderExportJobMessage
+from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
+from app.schemas.render_export.input import RenderExportJobInput
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000002")
@@ -31,15 +32,28 @@ def _session() -> Iterator[object]:
     yield object()
 
 
-def _message() -> RenderExportJobMessage:
-    return RenderExportJobMessage.model_validate(
+def _job() -> ProcessingJobRow:
+    return ProcessingJobRow.model_validate(
         {
-            "jobId": str(JOB_ID),
+            "id": str(JOB_ID),
             "mediaId": str(MEDIA_ID),
             "projectId": str(PROJECT_ID),
-            "workspaceId": str(WORKSPACE_ID),
             "userId": str(USER_ID),
+            "jobType": JobType.EXPORT_RENDER,
+            "status": JobStatus.QUEUED,
+            "progress": 0,
+            "currentStep": None,
+            "errorMessage": None,
+            "queueName": "render_exports_queue",
             "taskName": "export_render",
+            "externalTaskId": None,
+            "attemptCount": 0,
+            "input": None,
+            "output": None,
+            "createdAt": "2026-06-24T00:00:00Z",
+            "updatedAt": "2026-06-24T00:00:00Z",
+            "startedAt": None,
+            "completedAt": None,
         }
     )
 
@@ -487,7 +501,9 @@ def test_run_render_export_pipeline_presigns_source_without_downloading(
     monkeypatch.setattr(
         pipeline.render_export_repository,
         "find_project_render_source",
-        lambda session, *, project_id: project,
+        lambda session, *, project_id, editor_snapshot_id, editor_snapshot_version: (
+            project
+        ),
     )
     monkeypatch.setattr(
         pipeline.render_export_repository,
@@ -521,11 +537,13 @@ def test_run_render_export_pipeline_presigns_source_without_downloading(
             object_key: str,
             *,
             content_type: str,
+            bucket: str,
         ) -> str:
             calls["upload"] = {
                 "exists": source_path.exists(),
                 "object_key": object_key,
                 "content_type": content_type,
+                "bucket": bucket,
             }
             return object_key
 
@@ -549,7 +567,13 @@ def test_run_render_export_pipeline_presigns_source_without_downloading(
         ),
     )
 
-    output = pipeline.run_render_export_pipeline(_message())
+    output = pipeline.run_render_export_pipeline(
+        _job(),
+        job_input=RenderExportJobInput(
+            editor_snapshot_id=SNAPSHOT_ID,
+            editor_snapshot_version=3,
+        ),
+    )
 
     assert calls["presigned"] == [
         {
@@ -570,4 +594,5 @@ def test_run_render_export_pipeline_presigns_source_without_downloading(
     assert "http://localhost:9000/vidpilot-media/uploads/audio.mp3" in calls["document"]
     assert calls["upload"]["exists"] is True
     assert calls["upload"]["content_type"] == "video/mp4"
-    assert output.summary["assetId"] == str(ASSET_ID)
+    assert calls["upload"]["bucket"] == "vidpilot-media"
+    assert output.asset_id == ASSET_ID

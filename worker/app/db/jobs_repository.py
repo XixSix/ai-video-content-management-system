@@ -23,6 +23,7 @@ def find_processing_job(session: Session, job_id: str) -> ProcessingJobRow | Non
             status,
             progress,
             current_step AS "currentStep",
+            error_code AS "errorCode",
             error_message AS "errorMessage",
             queue_name AS "queueName",
             task_name AS "taskName",
@@ -67,6 +68,7 @@ def mark_job_queued_from_pending(
               status = :queued_status,
               progress = :progress,
               current_step = :current_step,
+              error_code = NULL,
               error_message = NULL,
               updated_at = :now,
               completed_at = NULL
@@ -81,6 +83,7 @@ def mark_job_queued_from_pending(
               status,
               progress,
               current_step AS "currentStep",
+              error_code AS "errorCode",
               error_message AS "errorMessage",
               queue_name AS "queueName",
               task_name AS "taskName",
@@ -130,6 +133,7 @@ def mark_job_step(
               status = :status,
               progress = :progress,
               current_step = :current_step,
+              error_code = NULL,
               error_message = NULL,
               updated_at = :now,
               started_at = COALESCE(started_at, :now),
@@ -158,6 +162,7 @@ def increment_attempt_count(session: Session, job_id: str) -> None:
               status = :status,
               progress = 0,
               current_step = :current_step,
+              error_code = NULL,
               error_message = NULL,
               updated_at = :now
             WHERE id = :job_id
@@ -172,8 +177,14 @@ def increment_attempt_count(session: Session, job_id: str) -> None:
     )
 
 
-def mark_job_failed(session: Session, job_id: str, error_message: str) -> None:
-    """Mark a processing job as failed with its terminal error message."""
+def mark_job_failed(
+    session: Session,
+    job_id: str,
+    error_message: str,
+    *,
+    error_code: str | None = None,
+) -> None:
+    """Mark a processing job as failed with its terminal error code and message."""
     session.execute(
         text(
             """
@@ -182,6 +193,7 @@ def mark_job_failed(session: Session, job_id: str, error_message: str) -> None:
               status = :status,
               progress = COALESCE(progress, 0),
               current_step = 'Failed',
+              error_code = :error_code,
               error_message = :error_message,
               updated_at = :now,
               completed_at = :now
@@ -191,6 +203,7 @@ def mark_job_failed(session: Session, job_id: str, error_message: str) -> None:
         {
             "job_id": job_id,
             "status": JobStatus.FAILED.value,
+            "error_code": error_code,
             "error_message": error_message,
             "now": datetime.now(UTC),
         },
@@ -212,6 +225,7 @@ def mark_job_completed(
               status = :status,
               progress = 100,
               current_step = 'Completed',
+              error_code = NULL,
               error_message = NULL,
               output = CAST(:output AS jsonb),
               updated_at = :now,
