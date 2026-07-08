@@ -287,10 +287,11 @@ def find_publish_source(
                       s3_key AS filename
                     FROM generated_assets
                     WHERE id = :id
+                      AND project_id = :project_id
                       AND asset_type = 'EXPORT_VIDEO'
                     """
                 ),
-                {"id": export_asset_id},
+                {"id": export_asset_id, "project_id": str(task.project_id)},
             )
             .mappings()
             .one_or_none()
@@ -343,7 +344,6 @@ def mark_publish_task_publishing(
             SET
               status = 'PUBLISHING',
               job_id = :job_id,
-              error_message = NULL,
               updated_at = :now
             WHERE id = :publish_task_id
               AND status <> 'CANCELED'
@@ -374,7 +374,6 @@ def mark_publish_task_published(
               published_at = :now,
               platform_post_id = :platform_post_id,
               platform_post_url = :platform_post_url,
-              error_message = NULL,
               updated_at = :now
             WHERE id = :publish_task_id
             """
@@ -391,7 +390,6 @@ def mark_publish_task_published(
 def mark_publish_task_failed(
     session: Session,
     publish_task_id: str,
-    error_message: str,
 ) -> None:
     session.execute(
         text(
@@ -399,7 +397,6 @@ def mark_publish_task_failed(
             UPDATE publish_tasks
             SET
               status = 'FAILED',
-              error_message = :error_message,
               updated_at = :now
             WHERE id = :publish_task_id
               AND status <> 'CANCELED'
@@ -407,7 +404,6 @@ def mark_publish_task_failed(
         ),
         {
             "publish_task_id": publish_task_id,
-            "error_message": error_message,
             "now": datetime.now(UTC),
         },
     )
@@ -416,7 +412,6 @@ def mark_publish_task_failed(
 def mark_publish_task_failed_for_render_job(
     session: Session,
     render_job_id: str,
-    error_message: str,
 ) -> None:
     session.execute(
         text(
@@ -424,7 +419,6 @@ def mark_publish_task_failed_for_render_job(
             UPDATE publish_tasks
             SET
               status = 'FAILED',
-              error_message = :error_message,
               updated_at = :now
             WHERE job_id = :render_job_id
               AND status <> 'CANCELED'
@@ -432,7 +426,6 @@ def mark_publish_task_failed_for_render_job(
         ),
         {
             "render_job_id": render_job_id,
-            "error_message": error_message,
             "now": datetime.now(UTC),
         },
     )
@@ -502,6 +495,7 @@ def create_publish_job_from_render(
                   status,
                   progress,
                   current_step AS "currentStep",
+                  error_code AS "errorCode",
                   error_message AS "errorMessage",
                   queue_name AS "queueName",
                   task_name AS "taskName",
@@ -522,7 +516,7 @@ def create_publish_job_from_render(
                 if render_job.project_id
                 else None,
                 "queue_name": settings.publish_queue_name,
-                "task_name": settings.publish_task_name,
+                "task_name": "publish",
                 "input": json.dumps(job_input),
                 "now": datetime.now(UTC),
             },
@@ -539,7 +533,6 @@ def create_publish_job_from_render(
             SET
               job_id = :job_id,
               status = :status,
-              error_message = NULL,
               updated_at = :now
             WHERE id = :publish_task_id
             """
@@ -553,9 +546,9 @@ def create_publish_job_from_render(
     )
 
     message = {
+        "version": 1,
         "jobId": str(publish_job.id),
-        **job_input,
-        "userId": str(render_job.user_id),
+        "jobType": "PUBLISH",
         "taskName": "publish",
     }
 
