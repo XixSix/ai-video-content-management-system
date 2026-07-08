@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 
+from pydantic import ValidationError
+
 from app.core.config import settings
 from app.db import jobs_repository, transcript_repository
 from app.db.client import get_db_session
@@ -60,7 +62,7 @@ def process_transcribe_job(message: TranscribeJobMessage) -> dict[str, Any]:
             error_code="TRANSCRIBE_JOB_CLAIM_FAILED",
         )
 
-    job_input = TranscribeJobInput.model_validate(queued_job.input or {})
+    job_input = _parse_job_input(queued_job)
     options = job_input.options
     existing_transcript = _find_existing_transcript(job_id)
 
@@ -190,6 +192,17 @@ def _find_existing_transcript(
     """Return an existing transcript for idempotent transcribe job handling."""
     with get_db_session() as session:
         return transcript_repository.find_transcript_by_job_id(session, job_id)
+
+
+def _parse_job_input(job: ProcessingJobRow) -> TranscribeJobInput:
+    """Parse immutable transcribe input from the processing job row."""
+    try:
+        return TranscribeJobInput.model_validate(job.input or {})
+    except ValidationError as error:
+        raise TerminalTranscribeJobError(
+            "Processing job input is invalid",
+            error_code="TRANSCRIBE_JOB_INPUT_INVALID",
+        ) from error
 
 
 def _completed_output(
