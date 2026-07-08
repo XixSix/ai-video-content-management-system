@@ -10,10 +10,7 @@ from app.schemas.jobs.media_preview_message import (
     MediaPreviewJobMessage,
     MediaPreviewJobResultMessage,
 )
-from app.schemas.media_preview.output import (
-    MediaPreviewCompletedOutput,
-    PersistedAssetSummary,
-)
+from app.schemas.media_preview.output import MediaPreviewJobOutput
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +25,8 @@ def process_media_preview_job(message: MediaPreviewJobMessage) -> dict[str, Any]
     job_id = str(message.job_id)
 
     logger.info(
-        "Processing media preview job job_id=%s media_id=%s job_type=%s",
+        "Processing media preview job job_id=%s job_type=%s",
         job_id,
-        message.media_id,
         message.job_type.value,
     )
 
@@ -42,7 +38,7 @@ def process_media_preview_job(message: MediaPreviewJobMessage) -> dict[str, Any]
         _guard_retry_budget(job)
 
     if _should_skip_job(job):
-        return _skipped_result(message, job.status)
+        return _skipped_result(message, job, job.status)
 
     with get_db_session() as session:
         queued_job = jobs_repository.mark_job_queued_from_pending(
@@ -62,38 +58,54 @@ def process_media_preview_job(message: MediaPreviewJobMessage) -> dict[str, Any]
             JobStatus.GENERATING_MEDIA_PREVIEW,
             JobStatus.QUEUED,
             JobStatus.COMPLETED,
+            JobStatus.CANCELED,
         }:
-            return _skipped_result(message, current_job.status)
+            return _skipped_result(message, current_job, current_job.status)
 
-        raise TerminalMediaPreviewJobError("Processing job could not be marked queued")
+        raise TerminalMediaPreviewJobError(
+            "Processing job could not be marked queued",
+            error_code="MEDIA_PREVIEW_JOB_CLAIM_FAILED",
+        )
 
     existing_assets = _find_existing_assets(job_id)
 
     if existing_assets:
-        output = _completed_output(existing_assets, summary={"reused": True})
+        output = _completed_output(existing_assets)
         _mark_completed(job_id, output)
         return _result_message(
             message,
+            queued_job,
             status=JobStatus.COMPLETED,
             skipped=True,
         )
 
     _mark_processing_started(job_id)
 
-    output = run_media_preview_pipeline(message)
+    output = run_media_preview_pipeline(queued_job)
 
     _mark_completed(job_id, output)
 
     return _result_message(
         message,
+        queued_job,
         status=JobStatus.COMPLETED,
         skipped=False,
     )
 
 
-def record_media_preview_job_failure(job_id: str, error_message: str) -> None:
+def record_media_preview_job_failure(
+    job_id: str,
+    error_message: str,
+    *,
+    error_code: str | None = None,
+) -> None:
     with get_db_session() as session:
-        jobs_repository.mark_job_failed(session, job_id, error_message)
+        jobs_repository.mark_job_failed(
+            session,
+            job_id,
+            error_message,
+            error_code=error_code,
+        )
 
 
 def increment_media_preview_job_attempt(job_id: str) -> int | None:
@@ -108,34 +120,41 @@ def _guard_job(
     message: MediaPreviewJobMessage,
     job: ProcessingJobRow | None,
 ) -> ProcessingJobRow:
+    """Reject jobs that are missing, mismatched, failed, or the wrong type."""
     if not job:
-        raise TerminalMediaPreviewJobError("Processing job was not found")
+        raise TerminalMediaPreviewJobError(
+            "Processing job was not found",
+            error_code="MEDIA_PREVIEW_JOB_NOT_FOUND",
+        )
 
     if job.job_type != message.job_type:
         raise TerminalMediaPreviewJobError(
-            f"Message jobType {message.job_type.value} does not match "
-            f"processing job {job.job_type.value}"
+            f"Expected {message.job_type.value} job, got {job.job_type.value}",
+            error_code="MEDIA_PREVIEW_JOB_TYPE_MISMATCH",
         )
 
-    if str(job.media_id) != str(message.media_id):
+    if job.task_name != message.task_name:
         raise TerminalMediaPreviewJobError(
-            "Message mediaId does not match processing job"
+            "Message taskName does not match processing job",
+            error_code="MEDIA_PREVIEW_TASK_NAME_MISMATCH",
         )
 
-    if str(job.user_id) != str(message.user_id):
+    if job.status in {JobStatus.FAILED, JobStatus.COMPLETED, JobStatus.CANCELED}:
         raise TerminalMediaPreviewJobError(
-            "Message userId does not match processing job"
+            "Processing job is already terminal",
+            error_code="MEDIA_PREVIEW_JOB_ALREADY_TERMINAL",
         )
-
-    if job.status == JobStatus.FAILED:
-        raise TerminalMediaPreviewJobError("Processing job is already failed")
 
     return job
 
 
 def _guard_retry_budget(job: ProcessingJobRow) -> None:
+    """Reject a job when the worker retry budget is already exhausted."""
     if job.attempt_count >= settings.task_max_retries:
-        raise TerminalMediaPreviewJobError("Processing job exceeded max attempts")
+        raise TerminalMediaPreviewJobError(
+            "Processing job exceeded max attempts",
+            error_code="MEDIA_PREVIEW_MAX_ATTEMPTS_EXCEEDED",
+        )
 
 
 def _should_skip_job(job: ProcessingJobRow) -> bool:
@@ -161,7 +180,7 @@ def _mark_processing_started(job_id: str) -> None:
         )
 
 
-def _mark_completed(job_id: str, output: MediaPreviewCompletedOutput) -> None:
+def _mark_completed(job_id: str, output: MediaPreviewJobOutput) -> None:
     with get_db_session() as session:
         jobs_repository.mark_job_completed(
             session,
@@ -172,34 +191,25 @@ def _mark_completed(job_id: str, output: MediaPreviewCompletedOutput) -> None:
 
 def _completed_output(
     assets: list[media_preview_repository.PersistedMediaPreviewAsset],
-    *,
-    summary: dict[str, Any],
-) -> MediaPreviewCompletedOutput:
-    return MediaPreviewCompletedOutput(
-        assets=[
-            PersistedAssetSummary(
-                id=asset.id,
-                asset_type=asset.asset_type,
-                s3_bucket=asset.s3_bucket,
-                s3_key=asset.s3_key,
-                metadata=asset.metadata,
-            )
-            for asset in assets
-        ],
-        summary=summary,
+) -> MediaPreviewJobOutput:
+    asset_ids = [asset.id for asset in assets]
+    return MediaPreviewJobOutput(
+        asset_count=len(asset_ids),
+        asset_ids=asset_ids,
     )
 
 
 def _result_message(
     message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
     *,
     status: JobStatus,
     skipped: bool,
 ) -> dict[str, Any]:
     result = MediaPreviewJobResultMessage(
         job_id=message.job_id,
-        media_id=message.media_id,
-        user_id=message.user_id,
+        media_id=job.media_id,
+        user_id=job.user_id,
         status=status,
         skipped=skipped,
     )
@@ -208,10 +218,12 @@ def _result_message(
 
 def _skipped_result(
     message: MediaPreviewJobMessage,
+    job: ProcessingJobRow,
     status: JobStatus,
 ) -> dict[str, Any]:
     return _result_message(
         message,
+        job,
         status=status,
         skipped=True,
     )

@@ -20,33 +20,18 @@ class MediaPreviewPipelineOutput(BaseModel):
     summary: dict[str, Any] = Field(default_factory=dict)
 
 
-class PersistedAssetSummary(BaseModel):
-    """Lightweight summary of a persisted asset returned by the pipeline."""
+class MediaPreviewJobOutput(BaseModel):
+    """Lightweight media preview output persisted on the processing job."""
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-    id: UUID
-    asset_type: str = Field(
-        validation_alias="assetType",
-        serialization_alias="assetType",
-    )
-    s3_bucket: str = Field(
-        validation_alias="s3Bucket",
-        serialization_alias="s3Bucket",
-    )
-    s3_key: str = Field(
-        validation_alias="s3Key",
-        serialization_alias="s3Key",
-    )
-    metadata: dict[str, Any] | None
-
-
-class MediaPreviewCompletedOutput(BaseModel):
-    """Completed media preview output persisted on the processing job."""
-
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-    type: Literal["media_preview.completed"] = "media_preview.completed"
+    type: Literal["media_preview.job.output"] = "media_preview.job.output"
     version: Literal[1] = 1
-    assets: list[PersistedAssetSummary]
-    summary: dict[str, Any] = Field(default_factory=dict)
+    asset_count: int = Field(
+        validation_alias="assetCount",
+        serialization_alias="assetCount",
+    )
+    asset_ids: list[UUID] = Field(
+        validation_alias="assetIds",
+        serialization_alias="assetIds",
+    )

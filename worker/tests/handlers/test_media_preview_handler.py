@@ -8,14 +8,10 @@ from app.db.media_preview_repository import PersistedMediaPreviewAsset
 from app.handlers import media_preview_handler
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.media_preview_message import MediaPreviewJobMessage
-from app.schemas.media_preview.output import (
-    MediaPreviewCompletedOutput,
-    PersistedAssetSummary,
-)
+from app.schemas.media_preview.output import MediaPreviewJobOutput
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000002")
-WORKSPACE_ID = UUID("00000000-0000-4000-8000-000000000003")
 USER_ID = UUID("00000000-0000-4000-8000-000000000004")
 ASSET_ID = UUID("00000000-0000-4000-8000-000000000005")
 
@@ -28,15 +24,9 @@ def _session() -> Iterator[object]:
 def _message() -> MediaPreviewJobMessage:
     return MediaPreviewJobMessage.model_validate(
         {
+            "version": 1,
             "jobId": str(JOB_ID),
             "jobType": "GENERATE_THUMBNAIL",
-            "mediaId": str(MEDIA_ID),
-            "workspaceId": str(WORKSPACE_ID),
-            "userId": str(USER_ID),
-            "s3Bucket": "source-media",
-            "s3Key": "uploads/video.mp4",
-            "mediaType": "VIDEO",
-            "mimeType": "video/mp4",
             "taskName": "generate_thumbnail",
         }
     )
@@ -77,19 +67,8 @@ def _asset() -> PersistedMediaPreviewAsset:
     )
 
 
-def _completed_output() -> MediaPreviewCompletedOutput:
-    return MediaPreviewCompletedOutput(
-        assets=[
-            PersistedAssetSummary(
-                id=ASSET_ID,
-                asset_type="THUMBNAIL",
-                s3_bucket="generated-media",
-                s3_key=f"generated/previews/{JOB_ID}/thumbnail.jpg",
-                metadata={"algorithmVersion": 1},
-            )
-        ],
-        summary={"selectedTimestampSeconds": 2},
-    )
+def _completed_output() -> MediaPreviewJobOutput:
+    return MediaPreviewJobOutput(asset_count=1, asset_ids=[ASSET_ID])
 
 
 def _patch_job_lifecycle(
@@ -127,8 +106,9 @@ def _patch_job_lifecycle(
         lambda session, job_id: [],
     )
 
-    def run_pipeline(message: MediaPreviewJobMessage) -> MediaPreviewCompletedOutput:
+    def run_pipeline(job: ProcessingJobRow) -> MediaPreviewJobOutput:
         calls["pipeline"] += 1
+        assert job.id == JOB_ID
         return _completed_output()
 
     monkeypatch.setattr(
@@ -148,18 +128,10 @@ def test_process_media_preview_job_calls_pipeline_and_completes(
     assert result["skipped"] is False
     assert calls["pipeline"] == 1
     assert calls["completed"] == {
-        "type": "media_preview.completed",
+        "type": "media_preview.job.output",
         "version": 1,
-        "assets": [
-            {
-                "id": str(ASSET_ID),
-                "assetType": "THUMBNAIL",
-                "s3Bucket": "generated-media",
-                "s3Key": f"generated/previews/{JOB_ID}/thumbnail.jpg",
-                "metadata": {"algorithmVersion": 1},
-            }
-        ],
-        "summary": {"selectedTimestampSeconds": 2},
+        "assetCount": 1,
+        "assetIds": [str(ASSET_ID)],
     }
 
 
@@ -178,4 +150,5 @@ def test_process_media_preview_job_reuses_existing_assets(
     assert result["status"] == "COMPLETED"
     assert result["skipped"] is True
     assert calls["pipeline"] == 0
-    assert calls["completed"]["summary"] == {"reused": True}
+    assert calls["completed"]["assetCount"] == 1
+    assert calls["completed"]["assetIds"] == [str(ASSET_ID)]

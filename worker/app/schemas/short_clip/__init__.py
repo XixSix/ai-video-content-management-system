@@ -1,13 +1,13 @@
-from app.schemas.short_clip.output import (
-    ShortClipAssetSummary,
-    ShortClipCandidateSummary,
-    ShortClipCompletedOutput,
-    ShortClipSummary,
+from app.schemas.short_clip.input import (
+    GenerateShortClipsJobInput,
+    GenerateShortClipsOptions,
+    LLMOptions,
 )
+from app.schemas.short_clip.output import GenerateShortClipsJobOutput
 
 __all__ = [
-    "ShortClipAssetSummary",
-    "ShortClipCandidateSummary",
-    "ShortClipCompletedOutput",
-    "ShortClipSummary",
+    "GenerateShortClipsJobInput",
+    "GenerateShortClipsJobOutput",
+    "GenerateShortClipsOptions",
+    "LLMOptions",
 ]
