@@ -5,7 +5,7 @@ import grpc
 
 from app.core.config import settings
 from app.proto_path import ensure_proto_generated_on_path
-from app.schemas.chapters.options import GenerateChaptersJobOptions
+from app.schemas.chapters.input import GenerateChaptersOptions
 from app.schemas.chapters.result import (
     GeneratedChaptersResult,
     GenerateChaptersTranscript,
@@ -32,7 +32,7 @@ from app.utils.ai_transcribe_mapper import (
 
 ensure_proto_generated_on_path()
 
-from chaptering.v1 import chaptering_pb2_grpc  # type: ignore # noqa: E402
+from generate_chapters.v1 import generate_chapters_pb2_grpc  # type: ignore # noqa: E402
 from short_clip.v1 import short_clip_pb2_grpc  # type: ignore # noqa: E402
 from transcribe.v1 import transcribe_pb2_grpc  # type: ignore # noqa: E402
 
@@ -120,7 +120,7 @@ class AIServiceClient:
         *,
         request_id: str,
         transcript: GenerateChaptersTranscript,
-        options: GenerateChaptersJobOptions,
+        options: GenerateChaptersOptions,
     ) -> GeneratedChaptersResult:
         request = build_generate_chapters_request(
             request_id=request_id,
@@ -130,7 +130,7 @@ class AIServiceClient:
 
         try:
             with grpc.insecure_channel(self.target) as channel:
-                stub = chaptering_pb2_grpc.ChapteringServiceStub(channel)
+                stub = generate_chapters_pb2_grpc.GenerateChaptersServiceStub(channel)
                 response = stub.GenerateChapters(
                     request,
                     timeout=self.timeout_seconds,
