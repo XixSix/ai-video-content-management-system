@@ -10,6 +10,7 @@ from app.db.publish_repository import (
     PublishTaskRow,
 )
 from app.handlers import publish_handler
+from app.pipelines.publish import pipeline as publish_pipeline
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.publish_message import PublishJobMessage
 from app.services.publish_provider import PublishProviderResult
@@ -30,16 +31,9 @@ def _session() -> Iterator[object]:
 def _message() -> PublishJobMessage:
     return PublishJobMessage.model_validate(
         {
+            "version": 1,
             "jobId": str(JOB_ID),
-            "publishTaskId": str(PUBLISH_TASK_ID),
-            "mediaId": str(MEDIA_ID),
-            "projectId": None,
-            "shortClipId": None,
-            "exportAssetId": None,
-            "userId": str(USER_ID),
-            "platform": "FACEBOOK",
-            "platformAccountId": str(PLATFORM_ACCOUNT_ID),
-            "scheduledAt": None,
+            "jobType": "PUBLISH",
             "taskName": "publish",
         }
     )
@@ -58,7 +52,7 @@ def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
             "currentStep": None,
             "errorMessage": None,
             "queueName": "publish_queue",
-            "taskName": "publish_task",
+            "taskName": "publish",
             "externalTaskId": None,
             "attemptCount": 0,
             "input": {"publishTaskId": str(PUBLISH_TASK_ID)},
@@ -133,6 +127,7 @@ def _patch_publish_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, objec
         "steps": [],
     }
     monkeypatch.setattr(publish_handler, "get_db_session", _session)
+    monkeypatch.setattr(publish_pipeline, "get_db_session", _session)
     monkeypatch.setattr(
         publish_handler.jobs_repository,
         "find_processing_job",
@@ -156,41 +151,41 @@ def _patch_publish_lifecycle(monkeypatch: pytest.MonkeyPatch) -> dict[str, objec
     monkeypatch.setattr(
         publish_handler.jobs_repository,
         "mark_job_failed",
-        lambda session, job_id, error_message: calls["failed"].append(
-            (job_id, error_message)
-        ),
+        lambda session, job_id, error_message, *, error_code=None: calls[
+            "failed"
+        ].append((job_id, error_message, error_code)),
     )
     monkeypatch.setattr(
-        publish_handler.publish_repository,
+        publish_pipeline.publish_repository,
         "find_publish_task",
         lambda session, publish_task_id: _task(),
     )
     monkeypatch.setattr(
-        publish_handler.publish_repository,
+        publish_pipeline.publish_repository,
         "find_platform_account",
         lambda session, platform_account_id: _account(),
     )
     monkeypatch.setattr(
-        publish_handler.publish_repository,
+        publish_pipeline.publish_repository,
         "find_publish_source",
         lambda session, task, *, export_asset_id: _source(),
     )
     monkeypatch.setattr(
-        publish_handler.publish_repository,
+        publish_pipeline.publish_repository,
         "mark_publish_task_publishing",
         lambda session, publish_task_id, job_id: calls.update(
             publishing=(publish_task_id, job_id)
         ),
     )
     monkeypatch.setattr(
-        publish_handler.publish_repository,
+        publish_pipeline.publish_repository,
         "mark_publish_task_published",
         lambda session, publish_task_id, **kwargs: calls.update(
             published=(publish_task_id, kwargs)
         ),
     )
     monkeypatch.setattr(
-        publish_handler,
+        publish_pipeline,
         "get_publish_provider",
         lambda platform: _Provider(),
     )
@@ -214,7 +209,11 @@ def test_process_publish_job_marks_task_and_job_completed(
             "platform_post_url": "https://mock.publish.local/facebook/post",
         },
     )
-    assert calls["completed"]["platformPostId"] == "mock-facebook-post"
+    assert calls["completed"] == {
+        "type": "publish.job.output",
+        "version": 1,
+        "publishTaskId": str(PUBLISH_TASK_ID),
+    }
 
 
 def test_process_publish_job_skips_canceled_publish_task(
@@ -222,15 +221,16 @@ def test_process_publish_job_skips_canceled_publish_task(
 ) -> None:
     calls = _patch_publish_lifecycle(monkeypatch)
     monkeypatch.setattr(
-        publish_handler.publish_repository,
+        publish_pipeline.publish_repository,
         "find_publish_task",
         lambda session, publish_task_id: _task("CANCELED"),
     )
 
-    result = publish_handler.process_publish_job(_message())
+    with pytest.raises(publish_pipeline.TerminalPublishPipelineError) as error:
+        publish_handler.process_publish_job(_message())
 
-    assert result["skipped"] is True
-    assert calls["failed"] == [(str(JOB_ID), "Publish task was canceled")]
+    assert error.value.error_code == "PUBLISH_TASK_CANCELED"
+    assert calls["failed"] == []
 
 
 def test_record_publish_job_failure_marks_task_failed(
@@ -241,8 +241,8 @@ def test_record_publish_job_failure_marks_task_failed(
     monkeypatch.setattr(
         publish_handler.jobs_repository,
         "mark_job_failed",
-        lambda session, job_id, error_message: calls.update(
-            job=(job_id, error_message)
+        lambda session, job_id, error_message, *, error_code=None: calls.update(
+            job=(job_id, error_message, error_code)
         ),
     )
     monkeypatch.setattr(
@@ -253,12 +253,18 @@ def test_record_publish_job_failure_marks_task_failed(
     monkeypatch.setattr(
         publish_handler.publish_repository,
         "mark_publish_task_failed",
-        lambda session, publish_task_id, error_message: calls.update(
-            task=(publish_task_id, error_message)
-        ),
+        lambda session, publish_task_id: calls.update(task=publish_task_id),
     )
 
-    publish_handler.record_publish_job_failure(str(JOB_ID), "Provider unavailable")
+    publish_handler.record_publish_job_failure(
+        str(JOB_ID),
+        "Provider unavailable",
+        error_code="PUBLISH_PROVIDER_TERMINAL",
+    )
 
-    assert calls["job"] == (str(JOB_ID), "Provider unavailable")
-    assert calls["task"] == (str(PUBLISH_TASK_ID), "Provider unavailable")
+    assert calls["job"] == (
+        str(JOB_ID),
+        "Provider unavailable",
+        "PUBLISH_PROVIDER_TERMINAL",
+    )
+    assert calls["task"] == str(PUBLISH_TASK_ID)
