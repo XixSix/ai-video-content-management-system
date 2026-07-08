@@ -5,15 +5,16 @@ from uuid import UUID
 import pytest
 
 from app.db import short_clip_repository
-from app.handlers import short_clip_handler
+from app.handlers import generate_short_clips_handler
 from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
-from app.schemas.jobs.short_clip_message import ShortClipJobMessage
-from app.schemas.short_clip.output import (
-    ShortClipAssetSummary,
-    ShortClipCandidateSummary,
-    ShortClipCompletedOutput,
-    ShortClipSummary,
+from app.schemas.jobs.generate_short_clips_message import (
+    GenerateShortClipsJobMessage,
 )
+from app.schemas.short_clip.input import (
+    GenerateShortClipsJobInput,
+    GenerateShortClipsOptions,
+)
+from app.schemas.short_clip.output import GenerateShortClipsJobOutput
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000002")
@@ -29,36 +30,54 @@ def _session() -> Iterator[object]:
     yield object()
 
 
-def _message() -> ShortClipJobMessage:
-    return ShortClipJobMessage.model_validate(
+def _message() -> GenerateShortClipsJobMessage:
+    return GenerateShortClipsJobMessage.model_validate(
         {
+            "version": 1,
             "jobId": str(JOB_ID),
-            "mediaId": str(MEDIA_ID),
-            "userId": str(USER_ID),
-            "transcriptId": str(TRANSCRIPT_ID),
-            "transcriptVersion": 2,
-            "preferences": {
-                "transcriptId": str(TRANSCRIPT_ID),
-                "transcriptVersion": 2,
-                "clipCount": 3,
-                "clipLength": "AUTO",
-                "minDuration": 20,
-                "maxDuration": 60,
-                "aspectRatio": "9:16",
-                "language": "AUTO",
-                "genre": "AUTO",
-                "clipModel": "AUTO",
-                "autoHook": True,
-                "prompt": "",
-                "captionPresetId": "karaoke",
-                "burnSubtitle": True,
-            },
+            "jobType": JobType.GENERATE_SHORT_CLIPS,
             "taskName": "generate_short_clips",
         }
     )
 
 
-def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
+def _options(**overrides: object) -> GenerateShortClipsOptions:
+    options = {
+        "clipCount": 3,
+        "minDuration": 20,
+        "maxDuration": 60,
+        "aspectRatio": "9:16",
+        "platform": "YOUTUBE_SHORTS",
+        "genre": "AUTO",
+        "tone": "AUTO",
+        "language": "auto",
+        "prompt": "",
+        "llm": {"enabled": True, "model": None},
+        "captionPresetId": "karaoke",
+        "burnSubtitle": True,
+    }
+    options.update(overrides)
+    return GenerateShortClipsOptions.model_validate(options)
+
+
+def _job_input(**overrides: object) -> GenerateShortClipsJobInput:
+    job_input = {
+        "transcriptId": str(TRANSCRIPT_ID),
+        "transcriptVersion": 2,
+        "options": _options().model_dump(mode="json", by_alias=True),
+    }
+    job_input.update(overrides)
+    return GenerateShortClipsJobInput.model_validate(job_input)
+
+
+def _job(
+    status: JobStatus = JobStatus.PENDING,
+    *,
+    input_overrides: dict[str, object] | None = None,
+) -> ProcessingJobRow:
+    job_input = _job_input().model_dump(mode="json", by_alias=True)
+    job_input.update(input_overrides or {})
+
     return ProcessingJobRow.model_validate(
         {
             "id": str(JOB_ID),
@@ -70,10 +89,10 @@ def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
             "currentStep": None,
             "errorMessage": None,
             "queueName": None,
-            "taskName": None,
+            "taskName": "generate_short_clips",
             "externalTaskId": None,
             "attemptCount": 0,
-            "input": _message().preferences.model_dump(mode="json", by_alias=True),
+            "input": job_input,
             "output": None,
             "createdAt": "2026-05-27T00:00:00Z",
             "updatedAt": "2026-05-27T00:00:00Z",
@@ -83,61 +102,48 @@ def _job(status: JobStatus = JobStatus.PENDING) -> ProcessingJobRow:
     )
 
 
-def _output() -> ShortClipCompletedOutput:
-    return ShortClipCompletedOutput(
+def _output() -> GenerateShortClipsJobOutput:
+    return GenerateShortClipsJobOutput(
         transcript_id=TRANSCRIPT_ID,
         transcript_version=2,
+        candidate_count=1,
+        short_clip_count=1,
+        asset_count=1,
         candidate_ids=[CANDIDATE_ID],
         short_clip_ids=[SHORT_CLIP_ID],
         asset_ids=[ASSET_ID],
-        candidates=[
-            ShortClipCandidateSummary(
-                id=CANDIDATE_ID,
-                start_time=0,
-                end_time=30,
-                duration=30,
-                title="Useful moment",
-                score=8.5,
-            )
-        ],
-        short_clips=[
-            ShortClipSummary(
-                id=SHORT_CLIP_ID,
-                candidate_id=CANDIDATE_ID,
-                status="READY",
-            )
-        ],
-        assets=[
-            ShortClipAssetSummary(
-                id=ASSET_ID,
-                asset_type="SHORT_CLIP_VIDEO",
-                s3_bucket="vidpilot-media",
-                s3_key="generated/short-clips/clip.mp4",
-            )
-        ],
     )
 
 
-def test_process_short_clip_job_happy_path_returns_contract(
+def test_process_generate_short_clips_job_happy_path_returns_contract(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    calls: dict[str, object] = {"completed_output": None, "steps": []}
+    calls: dict[str, object] = {
+        "completed_output": None,
+        "pipeline_clip_count": None,
+        "steps": [],
+    }
 
-    monkeypatch.setattr(short_clip_handler, "get_db_session", _session)
+    monkeypatch.setattr(generate_short_clips_handler, "get_db_session", _session)
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "find_processing_job",
         lambda session, job_id: _job(),
     )
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "mark_job_queued_from_pending",
-        lambda session, job_id, current_step: _job(JobStatus.QUEUED),
+        lambda session, job_id, current_step: _job(
+            JobStatus.QUEUED,
+            input_overrides={
+                "options": _options(clipCount=1).model_dump(mode="json", by_alias=True)
+            },
+        ),
     )
     monkeypatch.setattr(
-        short_clip_handler.short_clip_repository,
+        generate_short_clips_handler.short_clip_repository,
         "find_output_by_job_id",
-        lambda session, job_id: ([], [], []),
+        lambda session, job_id: None,
     )
 
     def mark_step(
@@ -156,41 +162,56 @@ def test_process_short_clip_job_happy_path_returns_contract(
         calls["completed_output"] = output
 
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "mark_job_step",
         mark_step,
     )
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "mark_job_completed",
         mark_completed,
     )
     monkeypatch.setattr(
-        short_clip_handler, "run_short_clip_pipeline", lambda message: _output()
+        generate_short_clips_handler,
+        "run_generate_short_clips_pipeline",
+        lambda job, *, transcript_id, transcript_version, options: (
+            calls.update(
+                {
+                    "pipeline_clip_count": options.clip_count,
+                    "pipeline_transcript_id": transcript_id,
+                    "pipeline_transcript_version": transcript_version,
+                }
+            )
+            or _output()
+        ),
     )
 
-    result = short_clip_handler.process_short_clip_job(_message())
+    result = generate_short_clips_handler.process_generate_short_clips_job(_message())
 
-    assert result["type"] == "short_clip.job.result"
+    assert result["type"] == "generate_short_clips.job.result"
     assert result["status"] == "COMPLETED"
     assert result["skipped"] is False
     assert calls["steps"] == [
         (JobStatus.GENERATING_SHORT_CLIPS, 50, "Generating short clips")
     ]
+    assert calls["pipeline_clip_count"] == 1
+    assert calls["pipeline_transcript_id"] == str(TRANSCRIPT_ID)
+    assert calls["pipeline_transcript_version"] == 2
+    assert calls["completed_output"]["candidateCount"] == 1
     assert calls["completed_output"]["candidateIds"] == [str(CANDIDATE_ID)]
 
 
-def test_process_short_clip_job_skips_non_pending_job(
+def test_process_generate_short_clips_job_skips_non_pending_job(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(short_clip_handler, "get_db_session", _session)
+    monkeypatch.setattr(generate_short_clips_handler, "get_db_session", _session)
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "find_processing_job",
         lambda session, job_id: _job(JobStatus.QUEUED),
     )
 
-    result = short_clip_handler.process_short_clip_job(_message())
+    result = generate_short_clips_handler.process_generate_short_clips_job(_message())
 
     assert result["status"] == "QUEUED"
     assert result["skipped"] is True
@@ -233,29 +254,33 @@ def test_existing_output_completes_idempotently(
     )
     completed: dict[str, object] = {}
 
-    monkeypatch.setattr(short_clip_handler, "get_db_session", _session)
+    monkeypatch.setattr(generate_short_clips_handler, "get_db_session", _session)
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "find_processing_job",
         lambda session, job_id: _job(),
     )
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "mark_job_queued_from_pending",
         lambda session, job_id, current_step: _job(JobStatus.QUEUED),
     )
     monkeypatch.setattr(
-        short_clip_handler.short_clip_repository,
+        generate_short_clips_handler.short_clip_repository,
         "find_output_by_job_id",
-        lambda session, job_id: ([candidate], [short_clip], [asset]),
+        lambda session, job_id: short_clip_repository.PersistedShortClipsSummary(
+            candidates=[candidate],
+            short_clips=[short_clip],
+            assets=[asset],
+        ),
     )
     monkeypatch.setattr(
-        short_clip_handler.jobs_repository,
+        generate_short_clips_handler.jobs_repository,
         "mark_job_completed",
         lambda session, job_id, output: completed.update(output),
     )
 
-    result = short_clip_handler.process_short_clip_job(_message())
+    result = generate_short_clips_handler.process_generate_short_clips_job(_message())
 
     assert result["status"] == "COMPLETED"
     assert result["skipped"] is True

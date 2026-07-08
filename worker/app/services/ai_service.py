@@ -11,9 +11,7 @@ from app.schemas.chapters.result import (
     GenerateChaptersTranscript,
 )
 from app.db.short_clip_repository import ShortClipSource
-from app.schemas.short_clip.options import (
-    GenerateShortClipsJobOptions,
-)
+from app.schemas.short_clip.input import GenerateShortClipsOptions
 from app.schemas.short_clip.result import ShortClipCandidateResult
 from app.schemas.transcribe.input import TranscribeOptions
 from app.schemas.transcribe.result import TranscriptResult
@@ -22,8 +20,8 @@ from app.utils.ai_generate_chapters_mapper import (
     map_generate_chapters_response,
 )
 from app.utils.ai_short_clip_mapper import (
-    build_generate_clip_candidates_request,
-    map_generate_clip_candidates_response,
+    build_generate_short_clips_request,
+    map_generate_short_clips_response,
 )
 from app.utils.ai_transcribe_mapper import (
     build_transcribe_request,
@@ -33,7 +31,7 @@ from app.utils.ai_transcribe_mapper import (
 ensure_proto_generated_on_path()
 
 from generate_chapters.v1 import generate_chapters_pb2_grpc  # type: ignore # noqa: E402
-from short_clip.v1 import short_clip_pb2_grpc  # type: ignore # noqa: E402
+from generate_short_clips.v1 import generate_short_clips_pb2_grpc  # type: ignore # noqa: E402
 from transcribe.v1 import transcribe_pb2_grpc  # type: ignore # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -177,9 +175,9 @@ class AIServiceClient:
         *,
         request_id: str,
         source: ShortClipSource,
-        options: GenerateShortClipsJobOptions,
+        options: GenerateShortClipsOptions,
     ) -> list[ShortClipCandidateResult]:
-        request = build_generate_clip_candidates_request(
+        request = build_generate_short_clips_request(
             request_id=request_id,
             source=source,
             options=options,
@@ -187,8 +185,10 @@ class AIServiceClient:
 
         try:
             with grpc.insecure_channel(self.target) as channel:
-                stub = short_clip_pb2_grpc.ShortClipServiceStub(channel)
-                response = stub.GenerateClipCandidates(
+                stub = generate_short_clips_pb2_grpc.GenerateShortClipsServiceStub(
+                    channel
+                )
+                response = stub.GenerateShortClips(
                     request,
                     timeout=self.timeout_seconds,
                 )
@@ -212,7 +212,7 @@ class AIServiceClient:
 
         logger.info("ai-service short clip completed request_id=%s", request_id)
         try:
-            return map_generate_clip_candidates_response(
+            return map_generate_short_clips_response(
                 request_id=request_id,
                 source=source,
                 response=response,

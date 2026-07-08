@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from short_clip.v1 import short_clip_pb2 as short__clip_dot_v1_dot_short__clip__pb2
+from generate_short_clips.v1 import generate_short_clips_pb2 as generate__short__clips_dot_v1_dot_generate__short__clips__pb2
 
 GRPC_GENERATED_VERSION = '1.80.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in short_clip/v1/short_clip_pb2_grpc.py depends on'
+        + ' but the generated code in generate_short_clips/v1/generate_short_clips_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class ShortClipServiceStub(object):
+class GenerateShortClipsServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,43 @@ class ShortClipServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GenerateClipCandidates = channel.unary_unary(
-                '/short_clip.v1.ShortClipService/GenerateClipCandidates',
-                request_serializer=short__clip_dot_v1_dot_short__clip__pb2.GenerateClipCandidatesRequest.SerializeToString,
-                response_deserializer=short__clip_dot_v1_dot_short__clip__pb2.GenerateClipCandidatesResponse.FromString,
+        self.GenerateShortClips = channel.unary_unary(
+                '/generate_short_clips.v1.GenerateShortClipsService/GenerateShortClips',
+                request_serializer=generate__short__clips_dot_v1_dot_generate__short__clips__pb2.GenerateShortClipsRequest.SerializeToString,
+                response_deserializer=generate__short__clips_dot_v1_dot_generate__short__clips__pb2.GenerateShortClipsResponse.FromString,
                 _registered_method=True)
 
 
-class ShortClipServiceServicer(object):
+class GenerateShortClipsServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GenerateClipCandidates(self, request, context):
+    def GenerateShortClips(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ShortClipServiceServicer_to_server(servicer, server):
+def add_GenerateShortClipsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GenerateClipCandidates': grpc.unary_unary_rpc_method_handler(
-                    servicer.GenerateClipCandidates,
-                    request_deserializer=short__clip_dot_v1_dot_short__clip__pb2.GenerateClipCandidatesRequest.FromString,
-                    response_serializer=short__clip_dot_v1_dot_short__clip__pb2.GenerateClipCandidatesResponse.SerializeToString,
+            'GenerateShortClips': grpc.unary_unary_rpc_method_handler(
+                    servicer.GenerateShortClips,
+                    request_deserializer=generate__short__clips_dot_v1_dot_generate__short__clips__pb2.GenerateShortClipsRequest.FromString,
+                    response_serializer=generate__short__clips_dot_v1_dot_generate__short__clips__pb2.GenerateShortClipsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'short_clip.v1.ShortClipService', rpc_method_handlers)
+            'generate_short_clips.v1.GenerateShortClipsService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('short_clip.v1.ShortClipService', rpc_method_handlers)
+    server.add_registered_method_handlers('generate_short_clips.v1.GenerateShortClipsService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class ShortClipService(object):
+class GenerateShortClipsService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GenerateClipCandidates(request,
+    def GenerateShortClips(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +83,9 @@ class ShortClipService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/short_clip.v1.ShortClipService/GenerateClipCandidates',
-            short__clip_dot_v1_dot_short__clip__pb2.GenerateClipCandidatesRequest.SerializeToString,
-            short__clip_dot_v1_dot_short__clip__pb2.GenerateClipCandidatesResponse.FromString,
+            '/generate_short_clips.v1.GenerateShortClipsService/GenerateShortClips',
+            generate__short__clips_dot_v1_dot_generate__short__clips__pb2.GenerateShortClipsRequest.SerializeToString,
+            generate__short__clips_dot_v1_dot_generate__short__clips__pb2.GenerateShortClipsResponse.FromString,
             options,
             channel_credentials,
             insecure,
