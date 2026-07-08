@@ -244,7 +244,7 @@ def test_save_chapters_persists_boundary_scores() -> None:
         transcript_id="00000000-0000-4000-8000-000000000004",
         transcript_version=2,
         chapters=[chapter],
-        source="RULE_BASED",
+        source="SEGMENTS",
         model="ai-service-generate-chapters-v1",
     )
 

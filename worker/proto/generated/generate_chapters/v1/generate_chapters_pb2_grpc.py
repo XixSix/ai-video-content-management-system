@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from chaptering.v1 import chaptering_pb2 as chaptering_dot_v1_dot_chaptering__pb2
+from generate_chapters.v1 import generate_chapters_pb2 as generate__chapters_dot_v1_dot_generate__chapters__pb2
 
 GRPC_GENERATED_VERSION = '1.80.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in chaptering/v1/chaptering_pb2_grpc.py depends on'
+        + ' but the generated code in generate_chapters/v1/generate_chapters_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class ChapteringServiceStub(object):
+class GenerateChaptersServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -35,13 +35,13 @@ class ChapteringServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GenerateChapters = channel.unary_unary(
-                '/chaptering.v1.ChapteringService/GenerateChapters',
-                request_serializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersRequest.SerializeToString,
-                response_deserializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersResponse.FromString,
+                '/generate_chapters.v1.GenerateChaptersService/GenerateChapters',
+                request_serializer=generate__chapters_dot_v1_dot_generate__chapters__pb2.GenerateChaptersRequest.SerializeToString,
+                response_deserializer=generate__chapters_dot_v1_dot_generate__chapters__pb2.GenerateChaptersResponse.FromString,
                 _registered_method=True)
 
 
-class ChapteringServiceServicer(object):
+class GenerateChaptersServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GenerateChapters(self, request, context):
@@ -51,22 +51,22 @@ class ChapteringServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ChapteringServiceServicer_to_server(servicer, server):
+def add_GenerateChaptersServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GenerateChapters': grpc.unary_unary_rpc_method_handler(
                     servicer.GenerateChapters,
-                    request_deserializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersRequest.FromString,
-                    response_serializer=chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersResponse.SerializeToString,
+                    request_deserializer=generate__chapters_dot_v1_dot_generate__chapters__pb2.GenerateChaptersRequest.FromString,
+                    response_serializer=generate__chapters_dot_v1_dot_generate__chapters__pb2.GenerateChaptersResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'chaptering.v1.ChapteringService', rpc_method_handlers)
+            'generate_chapters.v1.GenerateChaptersService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('chaptering.v1.ChapteringService', rpc_method_handlers)
+    server.add_registered_method_handlers('generate_chapters.v1.GenerateChaptersService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class ChapteringService(object):
+class GenerateChaptersService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -83,9 +83,9 @@ class ChapteringService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/chaptering.v1.ChapteringService/GenerateChapters',
-            chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersRequest.SerializeToString,
-            chaptering_dot_v1_dot_chaptering__pb2.GenerateChaptersResponse.FromString,
+            '/generate_chapters.v1.GenerateChaptersService/GenerateChapters',
+            generate__chapters_dot_v1_dot_generate__chapters__pb2.GenerateChaptersRequest.SerializeToString,
+            generate__chapters_dot_v1_dot_generate__chapters__pb2.GenerateChaptersResponse.FromString,
             options,
             channel_credentials,
             insecure,

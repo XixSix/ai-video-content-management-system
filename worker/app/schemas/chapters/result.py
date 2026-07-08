@@ -3,15 +3,13 @@ from typing import Literal
 from uuid import UUID
 
 
-type ChapterGenerationSource = Literal["RULE_BASED", "LLM", "USER_EDITED"]
 type ChapterSource = Literal["IMPORTED", "WORDS", "SEGMENTS"]
-CHAPTER_SOURCE_RULE_BASED = "RULE_BASED"
 CHAPTER_SOURCE_SEGMENTS = "SEGMENTS"
-RULE_BASED_CHAPTERING_MODEL = "rule-based-chaptering-v1"
+RULE_BASED_GENERATE_CHAPTERS_MODEL = "rule-based-generate-chapters-v1"
 
 
 @dataclass(frozen=True)
-class ChapteringTranscriptSegment:
+class GenerateChaptersTranscriptSegment:
     id: UUID
     start_time: float
     end_time: float
@@ -20,13 +18,13 @@ class ChapteringTranscriptSegment:
 
 
 @dataclass(frozen=True)
-class ChapteringTranscript:
+class GenerateChaptersTranscript:
     id: UUID
     media_id: UUID
     language: str | None
     version: int
     media_duration: float | None
-    segments: list[ChapteringTranscriptSegment]
+    segments: list[GenerateChaptersTranscriptSegment]
 
 
 @dataclass(frozen=True)
@@ -51,9 +49,9 @@ class ChapterCandidate:
 
 
 @dataclass(frozen=True)
-class ChapteringResult:
+class GeneratedChaptersResult:
     transcript_id: UUID
     transcript_version: int
-    source: ChapterGenerationSource
+    source: ChapterSource
     model: str
     chapters: list[ChapterCandidate]

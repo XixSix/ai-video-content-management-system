@@ -7,15 +7,14 @@ from sqlalchemy.engine import RowMapping
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.chaptering.result import (
+from app.schemas.chapters.result import (
     ChapterCandidate,
-    ChapterGenerationSource,
     ChapterSource,
-    ChapteringTranscript,
-    ChapteringTranscriptSegment,
+    GenerateChaptersTranscript,
+    GenerateChaptersTranscriptSegment,
 )
 
-CHAPTERING_MODEL_FALLBACK = "ai-service-chaptering-v1"
+CHAPTERS_MODEL_FALLBACK = "ai-service-generate-chapters-v1"
 
 
 @dataclass(frozen=True)
@@ -40,20 +39,20 @@ class PersistedChapterSummary:
 
 
 @dataclass(frozen=True)
-class PersistedChapteringSummary:
+class PersistedChaptersSummary:
     transcript_id: UUID
     transcript_version: int
     model: str
     chapters: list[PersistedChapterSummary]
 
 
-def load_transcript_for_chaptering(
+def load_transcript_for_chapters(
     session: Session,
     *,
     transcript_id: str,
     media_id: str,
-) -> ChapteringTranscript | None:
-    """Load transcript metadata and ordered timestamped segments for chaptering."""
+) -> GenerateChaptersTranscript | None:
+    """Load transcript metadata and ordered timestamped segments for chapter generation."""
     transcript_row = (
         session.execute(
             text(
@@ -100,14 +99,14 @@ def load_transcript_for_chaptering(
         .all()
     )
 
-    return ChapteringTranscript(
+    return GenerateChaptersTranscript(
         id=UUID(str(transcript_row["id"])),
         media_id=UUID(str(transcript_row["media_id"])),
         language=transcript_row["language"],
         version=transcript_row["version"],
         media_duration=transcript_row["media_duration"],
         segments=[
-            ChapteringTranscriptSegment(
+            GenerateChaptersTranscriptSegment(
                 id=UUID(str(row["id"])),
                 start_time=float(row["start_time"]),
                 end_time=float(row["end_time"]),
@@ -119,20 +118,20 @@ def load_transcript_for_chaptering(
     )
 
 
-def find_chaptering_by_job_id(
+def find_chapters_by_job_id(
     session: Session, job_id: str
-) -> PersistedChapteringSummary | None:
-    """Find already persisted chapters for idempotent chaptering job handling."""
+) -> PersistedChaptersSummary | None:
+    """Find already persisted chapters for idempotent generate chapters job handling."""
     rows = _find_chapter_rows(session, "job_id = :job_id", {"job_id": job_id})
 
     if not rows:
         return None
 
     chapters = [_chapter_from_row(row) for row in rows]
-    return PersistedChapteringSummary(
+    return PersistedChaptersSummary(
         transcript_id=chapters[0].transcript_id,
         transcript_version=chapters[0].transcript_version,
-        model=CHAPTERING_MODEL_FALLBACK,
+        model=CHAPTERS_MODEL_FALLBACK,
         chapters=chapters,
     )
 
@@ -145,9 +144,9 @@ def save_chapters(
     transcript_id: str,
     transcript_version: int,
     chapters: list[ChapterCandidate],
-    source: ChapterGenerationSource,
+    source: ChapterSource,
     model: str,
-) -> PersistedChapteringSummary:
+) -> PersistedChaptersSummary:
     """Replace transcript chapters with the current generated chapter set."""
     now = datetime.now(UTC)
 
@@ -212,7 +211,7 @@ def save_chapters(
                 "end_time": chapter.end_time,
                 "title": chapter.title,
                 "transcript_version": transcript_version,
-                "source": _chapter_db_source_from_generation_source(source),
+                "source": source,
                 "score": chapter.score.score,
                 "boundary_score": chapter.score.boundary_score,
                 "pause_score": chapter.score.pause_score,
@@ -226,7 +225,7 @@ def save_chapters(
     rows = _find_chapter_rows(session, "job_id = :job_id", {"job_id": job_id})
     persisted = [_chapter_from_row(row) for row in rows]
 
-    return PersistedChapteringSummary(
+    return PersistedChaptersSummary(
         transcript_id=UUID(transcript_id),
         transcript_version=transcript_version,
         model=model,
@@ -299,16 +298,3 @@ def _parse_chapter_source(source: object) -> ChapterSource:
         return cast(ChapterSource, source)
 
     raise ValueError(f"Unknown chapter source: {source}")
-
-
-def _chapter_db_source_from_generation_source(
-    source: ChapterGenerationSource,
-) -> ChapterSource:
-    """Map AI-service generation source values to the current DB chapter source enum."""
-    if source in {"RULE_BASED", "LLM"}:
-        return "SEGMENTS"
-
-    if source == "USER_EDITED":
-        return "WORDS"
-
-    raise ValueError(f"Unknown generation chapter source: {source}")

@@ -6,13 +6,13 @@ import pytest
 from app.schemas.transcribe.input import TranscribeOptions
 from app.services import ai_service
 from app.services.ai_service import AIServiceTerminalError
-from app.schemas.chapters.options import GenerateChaptersJobOptions
+from app.schemas.chapters.input import GenerateChaptersOptions
 from app.schemas.chapters.result import (
     GenerateChaptersTranscript,
     GenerateChaptersTranscriptSegment,
 )
 from app.utils import ai_generate_chapters_mapper, ai_transcribe_mapper
-from chaptering.v1 import chaptering_pb2
+from generate_chapters.v1 import generate_chapters_pb2
 from transcribe.v1 import transcribe_pb2
 
 
@@ -222,14 +222,15 @@ def test_client_bubbles_retryable_grpc_error(monkeypatch: pytest.MonkeyPatch) ->
         )
 
 
-def _generate_chapters_options() -> GenerateChaptersJobOptions:
-    return GenerateChaptersJobOptions.model_validate(
+def _generate_chapters_options() -> GenerateChaptersOptions:
+    return GenerateChaptersOptions.model_validate(
         {
             "minChapterDuration": 60,
             "targetChapterDuration": 120,
+            "maxChapterDuration": 240,
             "maxChapters": 3,
-            "useLlm": True,
-            "useEmbeddings": True,
+            "llm": {"enabled": True},
+            "embeddings": {"enabled": True},
         }
     )
 
@@ -255,21 +256,19 @@ def _generate_chapters_transcript() -> GenerateChaptersTranscript:
 
 def _generate_chapters_response(
     request_id: str = "job-1",
-) -> chaptering_pb2.GenerateChaptersResponse:
-    return chaptering_pb2.GenerateChaptersResponse(
-        request_id=request_id,
-        language="en",
+) -> generate_chapters_pb2.GenerateChaptersResponse:
+    return generate_chapters_pb2.GenerateChaptersResponse(
+        job_id=request_id,
+        status=generate_chapters_pb2.GENERATE_CHAPTERS_STATUS_COMPLETED,
         model="ai-service-generate-chapters-v1",
-        source=chaptering_pb2.CHAPTER_SOURCE_LLM,
+        source=generate_chapters_pb2.CHAPTER_SOURCE_SEGMENTS,
         chapters=[
-            chaptering_pb2.GeneratedChapter(
+            generate_chapters_pb2.GeneratedChapter(
                 index=1,
                 start_seconds=0.0,
-                end_seconds=240.0,
                 title="Introduction",
                 summary="The speaker introduces the topic.",
-                score=0.9,
-                scores=chaptering_pb2.BoundaryScores(
+                scores=generate_chapters_pb2.BoundaryScores(
                     score=0.9,
                     boundary_score=0.8,
                     pause_score=0.1,
@@ -289,16 +288,19 @@ def test_build_generate_chapters_request_maps_transcript_and_options() -> None:
         options=_generate_chapters_options(),
     )
 
-    assert request.request_id == "job-1"
-    assert request.language == "en"
-    assert request.media_duration_seconds == 240.0
-    assert request.segments[0].segment_id == "00000000-0000-4000-8000-000000000006"
+    assert request.job_id == "job-1"
+    assert request.transcript.language == "en"
+    assert request.transcript.media_duration_seconds == 240.0
+    assert (
+        request.transcript.segments[0].segment_id
+        == "00000000-0000-4000-8000-000000000006"
+    )
     assert request.options.min_chapter_duration_seconds == 60
     assert request.options.target_chapter_duration_seconds == 120
     assert request.options.max_chapter_duration_seconds == 240
     assert request.options.max_chapters == 3
-    assert request.options.use_embeddings is True
-    assert request.options.use_llm is True
+    assert request.options.embeddings.enabled is True
+    assert request.options.llm.enabled is True
 
 
 def test_map_generate_chapters_response_returns_result() -> None:
@@ -308,7 +310,7 @@ def test_map_generate_chapters_response_returns_result() -> None:
         response=_generate_chapters_response(),
     )
 
-    assert result.source == "LLM"
+    assert result.source == "SEGMENTS"
     assert result.model == "ai-service-generate-chapters-v1"
     assert result.transcript_version == 2
     assert len(result.chapters) == 1
@@ -316,8 +318,8 @@ def test_map_generate_chapters_response_returns_result() -> None:
     assert result.chapters[0].score.semantic_shift_score == 0.3
 
 
-def test_map_generate_chapters_response_rejects_mismatched_request_id() -> None:
-    with pytest.raises(ValueError, match="request_id does not match"):
+def test_map_generate_chapters_response_rejects_mismatched_job_id() -> None:
+    with pytest.raises(ValueError, match="job_id does not match"):
         ai_generate_chapters_mapper.map_generate_chapters_response(
             request_id="job-1",
             transcript=_generate_chapters_transcript(),
@@ -331,23 +333,25 @@ class ChapteringRaisingStub:
 
     def GenerateChapters(
         self,
-        request: chaptering_pb2.GenerateChaptersRequest,
+        request: generate_chapters_pb2.GenerateChaptersRequest,
         *,
         timeout: int,
-    ) -> chaptering_pb2.GenerateChaptersResponse:
+    ) -> generate_chapters_pb2.GenerateChaptersResponse:
         raise self.error
 
 
 class ChapteringRespondingStub:
-    def __init__(self, response: chaptering_pb2.GenerateChaptersResponse) -> None:
+    def __init__(
+        self, response: generate_chapters_pb2.GenerateChaptersResponse
+    ) -> None:
         self.response = response
 
     def GenerateChapters(
         self,
-        request: chaptering_pb2.GenerateChaptersRequest,
+        request: generate_chapters_pb2.GenerateChaptersRequest,
         *,
         timeout: int,
-    ) -> chaptering_pb2.GenerateChaptersResponse:
+    ) -> generate_chapters_pb2.GenerateChaptersResponse:
         return self.response
 
 
@@ -359,8 +363,8 @@ def test_client_generate_chapters_maps_terminal_grpc_error(
         ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
     )
     monkeypatch.setattr(
-        ai_service.chaptering_pb2_grpc,
-        "ChapteringServiceStub",
+        ai_service.generate_chapters_pb2_grpc,
+        "GenerateChaptersServiceStub",
         lambda channel: ChapteringRaisingStub(grpc_error),
     )
 
@@ -381,8 +385,8 @@ def test_client_generate_chapters_maps_invalid_response_to_terminal_error(
         ai_service.grpc, "insecure_channel", lambda target: FakeChannel()
     )
     monkeypatch.setattr(
-        ai_service.chaptering_pb2_grpc,
-        "ChapteringServiceStub",
+        ai_service.generate_chapters_pb2_grpc,
+        "GenerateChaptersServiceStub",
         lambda channel: ChapteringRespondingStub(
             _generate_chapters_response(request_id="other-job")
         ),
