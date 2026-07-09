@@ -24,6 +24,7 @@ def build_thumbnail_timestamps(
     *,
     candidate_count: int,
 ) -> list[float]:
+    """Return evenly spaced thumbnail candidate timestamps within useful video bounds."""
     if duration_seconds <= 0 or candidate_count <= 0:
         raise ValueError("Thumbnail duration and candidate count must be positive")
 
@@ -40,6 +41,13 @@ def select_best_thumbnail(
     minimum_brightness: float = 20,
     maximum_brightness: float = 235,
 ) -> FrameScore:
+    """Select the strongest thumbnail frame from extracted image candidates.
+
+    The selector scores each frame by sharpness, contrast, and balanced
+    brightness. It first ignores very dark or blown-out frames when possible,
+    then falls back to all candidates if every frame is outside the preferred
+    brightness range.
+    """
     if not candidates:
         raise ValueError("At least one thumbnail candidate is required")
 
@@ -84,6 +92,7 @@ def save_thumbnail(
     max_width: int,
     jpeg_quality: int,
 ) -> Path:
+    """Convert a selected frame to a bounded RGB JPEG thumbnail."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with Image.open(source_path) as image:
@@ -108,6 +117,7 @@ def save_thumbnail(
 
 
 def get_sprite_base_interval(duration_seconds: float) -> float:
+    """Return the default frame interval for a thumbnail sprite duration."""
     if duration_seconds < 30 * 60:
         return 5.0
     if duration_seconds <= 2 * 60 * 60:
@@ -121,6 +131,12 @@ def build_sprite_timestamps(
     minimum_frames: int,
     maximum_frames: int,
 ) -> tuple[list[float], float]:
+    """Build evenly spaced frame timestamps for thumbnail sprite extraction.
+
+    The frame count starts from a duration-based interval, then clamps into the
+    configured minimum and maximum bounds. The returned effective interval is
+    the exact spacing used for metadata and downstream sprite sheet playback.
+    """
     if duration_seconds <= 0:
         raise ValueError("Sprite duration must be positive")
     if minimum_frames <= 0 or maximum_frames < minimum_frames:
@@ -146,6 +162,12 @@ def compose_sprite_sheets(
     jpeg_quality: int,
     effective_interval_seconds: float,
 ) -> list[tuple[Path, dict[str, int | float]]]:
+    """Pack extracted frames into one or more JPEG sprite sheets.
+
+    Frames are resized to the configured cell size, pasted row by row into each
+    sheet, and paired with metadata describing frame indexes, time bounds, grid
+    dimensions, and playback interval.
+    """
     if len(frame_paths) != len(timestamps) or not frame_paths:
         raise ValueError("Sprite frames and timestamps must be non-empty and aligned")
 
@@ -214,6 +236,12 @@ def build_waveform_payload(
     requested_bins_per_second: int,
     maximum_bins: int,
 ) -> dict[str, object]:
+    """Convert a mono PCM WAV file into compact normalized waveform peaks.
+
+    The payload stores max absolute sample amplitude per time bin as uint8-like
+    values in the range 0..255, plus enough metadata for clients to render the
+    waveform without reading the source audio.
+    """
     with wave.open(str(wav_path), "rb") as wav_file:
         channels = wav_file.getnchannels()
         sample_width = wav_file.getsampwidth()
@@ -254,6 +282,7 @@ def build_waveform_payload(
 
 
 def write_compact_json(payload: dict[str, object], output_path: Path) -> Path:
+    """Write minified JSON and verify that the output file is non-empty."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
         json.dumps(payload, separators=(",", ":"), ensure_ascii=False),
@@ -267,6 +296,7 @@ def write_compact_json(payload: dict[str, object], output_path: Path) -> Path:
 
 
 def _measure_frame(path: Path, timestamp_seconds: float) -> FrameScore:
+    """Measure brightness, contrast, and Laplacian sharpness for one frame."""
     with Image.open(path) as image:
         grayscale = np.asarray(image.convert("L"), dtype=np.float32)
 
@@ -302,6 +332,7 @@ def _measure_frame(path: Path, timestamp_seconds: float) -> FrameScore:
 
 
 def _min_max(values: list[float]) -> list[float]:
+    """Normalize values to 0..1, returning neutral scores for flat inputs."""
     minimum = min(values)
     maximum = max(values)
 
@@ -312,6 +343,7 @@ def _min_max(values: list[float]) -> list[float]:
 
 
 def _validate_image(path: Path) -> None:
+    """Raise when an image output is missing, empty, or unreadable."""
     if not path.exists() or path.stat().st_size == 0:
         raise ValueError(f"Generated image is missing or empty: {path}")
 
