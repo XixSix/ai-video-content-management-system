@@ -14,6 +14,12 @@ import {
 } from './transcripts.mapper'
 import * as transcriptQueue from './transcripts.queue'
 import * as transcriptsRepo from './transcripts.repository'
+import {
+  TRANSCRIBE_QUEUE_NAME,
+  TRANSCRIBE_TASK_NAME,
+  TRANSCRIPT_BURN_TASK_NAME,
+  TRANSCRIPT_EXPORT_TASK_NAME
+} from './transcripts.types'
 import type {
   BurnTranscriptInput,
   ExportTranscriptInput,
@@ -53,6 +59,8 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
     jobType: JobType.TRANSCRIBE,
     status: JobStatus.PENDING,
     progress: 0,
+    queueName: TRANSCRIBE_QUEUE_NAME,
+    taskName: TRANSCRIBE_TASK_NAME,
     input: {
       language: input.language,
       useVad: input.useVad,
@@ -64,9 +72,7 @@ export const generateTranscript = async (input: GenerateTranscriptInput): Promis
   try {
     await transcriptQueue.publishTranscriptJob({
       jobId: job.id,
-      mediaId: media.id,
-      userId: input.userId,
-      s3Key: media.s3Key
+      jobType: JobType.TRANSCRIBE
     })
   } catch {
     await transcriptsRepo.updateProcessingJob(job.id, {
@@ -209,6 +215,8 @@ export const exportTranscript = async (input: ExportTranscriptInput): Promise<Tr
     jobType: JobType.GENERATE_SUBTITLE,
     status: JobStatus.PENDING,
     progress: 0,
+    queueName: TRANSCRIBE_QUEUE_NAME,
+    taskName: TRANSCRIPT_EXPORT_TASK_NAME,
     input: {
       transcriptId: transcript.id,
       transcriptVersion: transcript.version,
@@ -219,11 +227,7 @@ export const exportTranscript = async (input: ExportTranscriptInput): Promise<Tr
   try {
     await transcriptQueue.publishTranscriptExportJob({
       jobId: job.id,
-      mediaId: transcript.mediaId,
-      userId: input.userId,
-      transcriptId: transcript.id,
-      transcriptVersion: transcript.version,
-      format: input.format
+      jobType: JobType.GENERATE_SUBTITLE
     })
   } catch {
     await transcriptsRepo.updateProcessingJob(job.id, {
@@ -254,6 +258,8 @@ export const burnTranscript = async (input: BurnTranscriptInput): Promise<Transc
     jobType: JobType.BURN_SUBTITLE,
     status: JobStatus.PENDING,
     progress: 0,
+    queueName: TRANSCRIBE_QUEUE_NAME,
+    taskName: TRANSCRIPT_BURN_TASK_NAME,
     input: {
       transcriptId: transcript.id,
       transcriptVersion: transcript.version
@@ -263,10 +269,7 @@ export const burnTranscript = async (input: BurnTranscriptInput): Promise<Transc
   try {
     await transcriptQueue.publishTranscriptBurnJob({
       jobId: job.id,
-      mediaId: transcript.mediaId,
-      userId: input.userId,
-      transcriptId: transcript.id,
-      transcriptVersion: transcript.version
+      jobType: JobType.BURN_SUBTITLE
     })
   } catch {
     await transcriptsRepo.updateProcessingJob(job.id, {

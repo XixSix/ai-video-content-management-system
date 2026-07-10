@@ -7,6 +7,7 @@ export const toJobResponseData = (job: ProcessingJob): JobResponseData => ({
   jobType: job.jobType,
   status: job.status,
   progress: job.progress,
+  errorCode: job.errorCode,
   errorMessage: job.errorMessage,
   output: job.output,
   attemptCount: job.attemptCount,

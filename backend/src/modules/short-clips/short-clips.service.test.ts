@@ -14,7 +14,7 @@ const findLatestTranscriptByMediaIdAndUserIdMock =
 const findTranscriptByIdAndMediaIdAndUserIdMock =
   jest.fn<(transcriptId: string, mediaId: string, userId: string) => Promise<Transcript | null>>()
 const countTranscriptSegmentsByTranscriptIdMock = jest.fn<(transcriptId: string) => Promise<number>>()
-const findActiveShortClipJobByMediaIdAndUserIdMock =
+const findActiveGenerateShortClipsJobByMediaIdAndUserIdMock =
   jest.fn<(mediaId: string, userId: string) => Promise<ProcessingJob | null>>()
 const createProcessingJobMock = jest.fn<(data: unknown) => Promise<ProcessingJob>>()
 const updateProcessingJobMock = jest.fn<(id: string, data: unknown) => Promise<ProcessingJob>>()
@@ -36,7 +36,7 @@ const findShortClipsByMediaIdAndUserIdMock =
 const findShortClipByIdMock = jest.fn<(id: string) => Promise<ShortClip | null>>()
 const findLatestShortClipVideoAssetMock =
   jest.fn<(shortClipId: string, userId: string) => Promise<GeneratedAsset | null>>()
-type PublishShortClipJobMockInput = {
+type PublishGenerateShortClipsJobMockInput = {
   jobId: string
   mediaId: string
   userId: string
@@ -44,13 +44,13 @@ type PublishShortClipJobMockInput = {
   transcriptVersion: number
   preferences: unknown
 }
-const publishShortClipJobMock = jest.fn<(message: PublishShortClipJobMockInput) => Promise<void>>()
+const publishGenerateShortClipsJobMock = jest.fn<(message: PublishGenerateShortClipsJobMockInput) => Promise<void>>()
 const createPresignedGetUrlMock = jest.fn<(bucket: string, key: string) => Promise<string>>()
 
 jest.unstable_mockModule('./short-clips.repository', () => ({
   countTranscriptSegmentsByTranscriptId: countTranscriptSegmentsByTranscriptIdMock,
   createProcessingJob: createProcessingJobMock,
-  findActiveShortClipJobByMediaIdAndUserId: findActiveShortClipJobByMediaIdAndUserIdMock,
+  findActiveGenerateShortClipsJobByMediaIdAndUserId: findActiveGenerateShortClipsJobByMediaIdAndUserIdMock,
   findClipCandidateById: findClipCandidateByIdMock,
   findClipCandidatesByMediaIdAndUserId: findClipCandidatesByMediaIdAndUserIdMock,
   findLatestTranscriptByMediaIdAndUserId: findLatestTranscriptByMediaIdAndUserIdMock,
@@ -63,7 +63,7 @@ jest.unstable_mockModule('./short-clips.repository', () => ({
 }))
 
 jest.unstable_mockModule('./short-clips.queue', () => ({
-  publishShortClipJob: publishShortClipJobMock
+  publishGenerateShortClipsJob: publishGenerateShortClipsJobMock
 }))
 
 jest.unstable_mockModule('../../infrastructure/s3/uploader', () => ({
@@ -151,6 +151,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   jobType: 'GENERATE_SHORT_CLIPS',
   status: 'PENDING',
   progress: 0,
+  errorCode: null,
   errorMessage: null,
   queueName: null,
   taskName: null,
@@ -235,7 +236,7 @@ describe('short clips service', () => {
     findLatestTranscriptByMediaIdAndUserIdMock.mockReset()
     findTranscriptByIdAndMediaIdAndUserIdMock.mockReset()
     countTranscriptSegmentsByTranscriptIdMock.mockReset()
-    findActiveShortClipJobByMediaIdAndUserIdMock.mockReset()
+    findActiveGenerateShortClipsJobByMediaIdAndUserIdMock.mockReset()
     createProcessingJobMock.mockReset()
     updateProcessingJobMock.mockReset()
     findClipCandidatesByMediaIdAndUserIdMock.mockReset()
@@ -243,17 +244,17 @@ describe('short clips service', () => {
     findShortClipsByMediaIdAndUserIdMock.mockReset()
     findShortClipByIdMock.mockReset()
     findLatestShortClipVideoAssetMock.mockReset()
-    publishShortClipJobMock.mockReset()
+    publishGenerateShortClipsJobMock.mockReset()
     createPresignedGetUrlMock.mockReset()
   })
 
   it('selects the newest transcript, creates a pending job, and publishes it', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateShortClipsJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     countTranscriptSegmentsByTranscriptIdMock.mockResolvedValue(3)
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
-    publishShortClipJobMock.mockResolvedValue()
+    publishGenerateShortClipsJobMock.mockResolvedValue()
 
     const result = await shortClipsService.generateShortClips(generateInput())
 
@@ -283,20 +284,9 @@ describe('short clips service', () => {
         }
       })
     )
-    expect(publishShortClipJobMock).toHaveBeenCalledWith({
+    expect(publishGenerateShortClipsJobMock).toHaveBeenCalledWith({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 2,
-      preferences: expect.objectContaining({
-        transcriptId,
-        transcriptVersion: 2,
-        clipCount: 3,
-        minDuration: 20,
-        maxDuration: 60,
-        aspectRatio: '9:16'
-      })
+      jobType: 'GENERATE_SHORT_CLIPS'
     })
     expect(result).toMatchObject({
       wasCreated: true,
@@ -311,14 +301,14 @@ describe('short clips service', () => {
 
   it('returns an active job without publishing a duplicate', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(createProcessingJob({ status: 'QUEUED' }))
+    findActiveGenerateShortClipsJobByMediaIdAndUserIdMock.mockResolvedValue(createProcessingJob({ status: 'QUEUED' }))
 
     const result = await shortClipsService.generateShortClips(generateInput())
 
     expect(findLatestTranscriptByMediaIdAndUserIdMock).not.toHaveBeenCalled()
     expect(countTranscriptSegmentsByTranscriptIdMock).not.toHaveBeenCalled()
     expect(createProcessingJobMock).not.toHaveBeenCalled()
-    expect(publishShortClipJobMock).not.toHaveBeenCalled()
+    expect(publishGenerateShortClipsJobMock).not.toHaveBeenCalled()
     expect(result).toMatchObject({
       wasCreated: false,
       job: {
@@ -330,7 +320,7 @@ describe('short clips service', () => {
 
   it('rejects media with no transcript', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateShortClipsJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(null)
 
     await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
@@ -342,7 +332,7 @@ describe('short clips service', () => {
 
   it('rejects media with no transcript segments', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateShortClipsJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     countTranscriptSegmentsByTranscriptIdMock.mockResolvedValue(0)
 
@@ -381,12 +371,12 @@ describe('short clips service', () => {
 
   it('marks the job failed if queue publish fails', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveShortClipJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateShortClipsJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     countTranscriptSegmentsByTranscriptIdMock.mockResolvedValue(3)
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
-    publishShortClipJobMock.mockRejectedValue(new Error('RabbitMQ unavailable'))
+    publishGenerateShortClipsJobMock.mockRejectedValue(new Error('RabbitMQ unavailable'))
 
     await expect(shortClipsService.generateShortClips(generateInput())).rejects.toMatchObject({
       statusCode: 502,

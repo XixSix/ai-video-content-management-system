@@ -77,16 +77,9 @@ export const publishPreviewJobs = async (media: Media, jobs: PreviewJobRecord[])
         throw new Error(`Unsupported media preview job type: ${job.jobType}`)
       }
 
-      const message: Omit<MediaPreviewJobMessage, 'taskName'> = {
+      const message: Pick<MediaPreviewJobMessage, 'jobId' | 'jobType'> = {
         jobId: job.id,
-        jobType: definition.jobType,
-        mediaId: media.id,
-        workspaceId: media.workspaceId,
-        userId: media.userId,
-        s3Bucket: media.s3Bucket,
-        s3Key: media.s3Key,
-        mediaType: media.type,
-        mimeType: media.mimeType
+        jobType: definition.jobType
       }
 
       await mediaPreviewsQueue.publishMediaPreviewJob(message)

@@ -105,6 +105,7 @@ const processingJob = (overrides: Partial<ProcessingJob> = {}): ProcessingJob =>
   status: 'PENDING',
   progress: 0,
   currentStep: null,
+  errorCode: null,
   errorMessage: null,
   queueName: 'render_exports_queue',
   taskName: 'export_render',
@@ -150,10 +151,7 @@ describe('render exports service', () => {
     )
     expect(publishRenderExportJobMock).toHaveBeenCalledWith({
       jobId,
-      mediaId,
-      projectId,
-      workspaceId,
-      userId
+      jobType: 'EXPORT_RENDER'
     })
     expect(result.job.id).toBe(jobId)
   })

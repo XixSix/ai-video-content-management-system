@@ -65,6 +65,9 @@
  *         platformPostUrl:
  *           type: string
  *           nullable: true
+ *         errorCode:
+ *           type: string
+ *           nullable: true
  *         errorMessage:
  *           type: string
  *           nullable: true

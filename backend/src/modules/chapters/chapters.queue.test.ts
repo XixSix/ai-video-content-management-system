@@ -6,38 +6,29 @@ jest.unstable_mockModule('../../infrastructure/rabbitmq/publisher', () => ({
   publishCeleryTaskToQueue: publishCeleryTaskToQueueMock
 }))
 
-const { publishChapteringJob } = await import('./chaptering.queue')
+const { publishGenerateChaptersJob } = await import('./chapters.queue')
 
 const jobId = '00000000-0000-4000-8000-000000000001'
-const mediaId = '00000000-0000-4000-8000-000000000002'
-const userId = '00000000-0000-4000-8000-000000000003'
-const transcriptId = '00000000-0000-4000-8000-000000000004'
-
-describe('chaptering queue', () => {
+describe('chapters queue', () => {
   beforeEach(() => {
     publishCeleryTaskToQueueMock.mockReset()
     publishCeleryTaskToQueueMock.mockResolvedValue()
   })
 
-  it('publishes chaptering jobs using the Celery task protocol contract', async () => {
-    await publishChapteringJob({
+  it('publishes generate chapters jobs using the Celery task protocol contract', async () => {
+    await publishGenerateChaptersJob({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 2
+      jobType: 'GENERATE_CHAPTERS'
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
-      queueName: 'chaptering_queue',
-      taskName: 'chaptering_task',
+      queueName: 'generate_chapters_queue',
+      taskName: 'generate_chapters_task',
       taskId: jobId,
       kwargs: {
+        version: 1,
         jobId,
-        mediaId,
-        userId,
-        transcriptId,
-        transcriptVersion: 2,
+        jobType: 'GENERATE_CHAPTERS',
         taskName: 'generate_chapters'
       }
     })

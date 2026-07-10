@@ -63,6 +63,7 @@ export const hasJobChanged = (previous: JobResponseData, next: JobResponseData):
   previous.updatedAt.getTime() !== next.updatedAt.getTime() ||
   previous.status !== next.status ||
   previous.progress !== next.progress ||
+  previous.errorCode !== next.errorCode ||
   previous.errorMessage !== next.errorMessage ||
   JSON.stringify(previous.output) !== JSON.stringify(next.output)
 
@@ -72,6 +73,7 @@ const toJobResponseData = (job: ProcessingJob): JobResponseData => ({
   jobType: job.jobType,
   status: job.status,
   progress: job.progress,
+  errorCode: job.errorCode,
   errorMessage: job.errorMessage,
   output: job.output,
   attemptCount: job.attemptCount,

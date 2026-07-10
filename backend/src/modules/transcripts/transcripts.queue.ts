@@ -1,73 +1,50 @@
 import * as rabbitPublisher from '../../infrastructure/rabbitmq/publisher'
+import { JobType } from '../../infrastructure/db/generated/prisma/client'
+import { buildWorkerJobMessage, type WorkerJobMessage } from '../jobs/jobs.queue-message'
 import {
+  TRANSCRIBE_CELERY_TASK_NAME,
+  TRANSCRIBE_TASK_NAME,
   TRANSCRIPT_BURN_TASK_NAME,
-  TRANSCRIPT_CELERY_TASK_NAME,
   TRANSCRIPT_EXPORT_TASK_NAME,
-  TRANSCRIPT_QUEUE_NAME,
-  TRANSCRIPT_TASK_NAME
+  TRANSCRIBE_QUEUE_NAME
 } from './transcripts.types'
 
-export interface TranscriptJobMessage {
-  jobId: string
-  mediaId: string
-  userId: string
-  s3Key: string
-  taskName: typeof TRANSCRIPT_TASK_NAME
-}
+export type TranscriptJobMessage = WorkerJobMessage<typeof JobType.TRANSCRIBE, typeof TRANSCRIBE_TASK_NAME>
 
-export interface TranscriptExportJobMessage {
-  jobId: string
-  mediaId: string
-  userId: string
-  transcriptId: string
-  transcriptVersion: number
-  format: 'json' | 'txt' | 'srt' | 'vtt'
-  taskName: typeof TRANSCRIPT_EXPORT_TASK_NAME
-}
+export type TranscriptExportJobMessage = WorkerJobMessage<
+  typeof JobType.GENERATE_SUBTITLE,
+  typeof TRANSCRIPT_EXPORT_TASK_NAME
+>
 
-export interface TranscriptBurnJobMessage {
-  jobId: string
-  mediaId: string
-  userId: string
-  transcriptId: string
-  transcriptVersion: number
-  taskName: typeof TRANSCRIPT_BURN_TASK_NAME
-}
+export type TranscriptBurnJobMessage = WorkerJobMessage<typeof JobType.BURN_SUBTITLE, typeof TRANSCRIPT_BURN_TASK_NAME>
 
-export const publishTranscriptJob = async (message: Omit<TranscriptJobMessage, 'taskName'>): Promise<void> => {
+export const publishTranscriptJob = async (message: Pick<TranscriptJobMessage, 'jobId' | 'jobType'>): Promise<void> => {
   await rabbitPublisher.publishCeleryTaskToQueue({
-    queueName: TRANSCRIPT_QUEUE_NAME,
-    taskName: TRANSCRIPT_CELERY_TASK_NAME,
+    queueName: TRANSCRIBE_QUEUE_NAME,
+    taskName: TRANSCRIBE_CELERY_TASK_NAME,
     taskId: message.jobId,
-    kwargs: {
-      ...message,
-      taskName: TRANSCRIPT_TASK_NAME
-    }
+    kwargs: buildWorkerJobMessage({ ...message, taskName: TRANSCRIBE_TASK_NAME })
   })
 }
 
 export const publishTranscriptExportJob = async (
-  message: Omit<TranscriptExportJobMessage, 'taskName'>
+  message: Pick<TranscriptExportJobMessage, 'jobId' | 'jobType'>
 ): Promise<void> => {
   await rabbitPublisher.publishCeleryTaskToQueue({
-    queueName: TRANSCRIPT_QUEUE_NAME,
-    taskName: TRANSCRIPT_CELERY_TASK_NAME,
+    queueName: TRANSCRIBE_QUEUE_NAME,
+    taskName: TRANSCRIBE_CELERY_TASK_NAME,
     taskId: message.jobId,
-    kwargs: {
-      ...message,
-      taskName: TRANSCRIPT_EXPORT_TASK_NAME
-    }
+    kwargs: buildWorkerJobMessage({ ...message, taskName: TRANSCRIPT_EXPORT_TASK_NAME })
   })
 }
 
-export const publishTranscriptBurnJob = async (message: Omit<TranscriptBurnJobMessage, 'taskName'>): Promise<void> => {
+export const publishTranscriptBurnJob = async (
+  message: Pick<TranscriptBurnJobMessage, 'jobId' | 'jobType'>
+): Promise<void> => {
   await rabbitPublisher.publishCeleryTaskToQueue({
-    queueName: TRANSCRIPT_QUEUE_NAME,
-    taskName: TRANSCRIPT_CELERY_TASK_NAME,
+    queueName: TRANSCRIBE_QUEUE_NAME,
+    taskName: TRANSCRIBE_CELERY_TASK_NAME,
     taskId: message.jobId,
-    kwargs: {
-      ...message,
-      taskName: TRANSCRIPT_BURN_TASK_NAME
-    }
+    kwargs: buildWorkerJobMessage({ ...message, taskName: TRANSCRIPT_BURN_TASK_NAME })
   })
 }

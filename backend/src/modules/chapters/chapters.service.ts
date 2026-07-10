@@ -1,11 +1,12 @@
 import type { Media } from '../../infrastructure/db/generated/prisma/client'
 import { JobStatus, JobType, MediaStatus, MediaType } from '../../infrastructure/db/generated/prisma/client'
 import { MediaError } from '../media/media.error'
-import { ChapteringError } from './chaptering.error'
-import { toChapterData, toJobResponseData } from './chaptering.mapper'
-import * as chapteringQueue from './chaptering.queue'
-import * as chapteringRepo from './chaptering.repository'
-import type { ChapterData, GenerateChaptersInput, GenerateChaptersServiceResult } from './chaptering.types'
+import { GenerateChaptersError } from './chapters.error'
+import { toChapterData, toJobResponseData } from './chapters.mapper'
+import * as chaptersQueue from './chapters.queue'
+import * as chaptersRepo from './chapters.repository'
+import { GENERATE_CHAPTERS_QUEUE_NAME, GENERATE_CHAPTERS_TASK_NAME } from './chapters.types'
+import type { ChapterData, GenerateChaptersInput, GenerateChaptersServiceResult } from './chapters.types'
 
 export const generateChapters = async (input: GenerateChaptersInput): Promise<GenerateChaptersServiceResult> => {
   const media = await getOwnedMedia(input.userId, input.mediaId)
@@ -18,7 +19,7 @@ export const generateChapters = async (input: GenerateChaptersInput): Promise<Ge
     throw MediaError.invalidState('Cannot generate chapters for non-video media')
   }
 
-  const activeJob = await chapteringRepo.findActiveChapteringJobByMediaIdAndUserId(media.id, input.userId)
+  const activeJob = await chaptersRepo.findActiveGenerateChaptersJobByMediaIdAndUserId(media.id, input.userId)
 
   if (activeJob) {
     return {
@@ -27,18 +28,20 @@ export const generateChapters = async (input: GenerateChaptersInput): Promise<Ge
     }
   }
 
-  const transcript = await chapteringRepo.findLatestTranscriptByMediaIdAndUserId(media.id, input.userId)
+  const transcript = await chaptersRepo.findLatestTranscriptByMediaIdAndUserId(media.id, input.userId)
 
   if (!transcript) {
-    throw ChapteringError.noTranscript()
+    throw GenerateChaptersError.noTranscript()
   }
 
-  const job = await chapteringRepo.createProcessingJob({
+  const job = await chaptersRepo.createProcessingJob({
     mediaId: media.id,
     userId: input.userId,
     jobType: JobType.GENERATE_CHAPTERS,
     status: JobStatus.PENDING,
     progress: 0,
+    queueName: GENERATE_CHAPTERS_QUEUE_NAME,
+    taskName: GENERATE_CHAPTERS_TASK_NAME,
     input: {
       transcriptId: transcript.id,
       transcriptVersion: transcript.version,
@@ -51,22 +54,19 @@ export const generateChapters = async (input: GenerateChaptersInput): Promise<Ge
   })
 
   try {
-    await chapteringQueue.publishChapteringJob({
+    await chaptersQueue.publishGenerateChaptersJob({
       jobId: job.id,
-      mediaId: media.id,
-      userId: input.userId,
-      transcriptId: transcript.id,
-      transcriptVersion: transcript.version
+      jobType: JobType.GENERATE_CHAPTERS
     })
   } catch {
-    await chapteringRepo.updateProcessingJob(job.id, {
+    await chaptersRepo.updateProcessingJob(job.id, {
       status: JobStatus.FAILED,
       progress: 0,
       errorMessage: 'Failed to publish chapter generation job',
       completedAt: new Date()
     })
 
-    throw ChapteringError.queuePublishFailed()
+    throw GenerateChaptersError.queuePublishFailed()
   }
 
   return {
@@ -90,13 +90,13 @@ export const listMediaChapters = async (userId: string, mediaId: string): Promis
     throw MediaError.invalidState('Cannot list chapters for non-video media')
   }
 
-  const chapters = await chapteringRepo.findChaptersByMediaIdAndUserId(media.id, userId)
+  const chapters = await chaptersRepo.findChaptersByMediaIdAndUserId(media.id, userId)
 
   return chapters.map(toChapterData)
 }
 
 const getOwnedMedia = async (userId: string, mediaId: string): Promise<Media> => {
-  const media = await chapteringRepo.findMediaById(mediaId)
+  const media = await chaptersRepo.findMediaById(mediaId)
 
   if (!media) {
     throw MediaError.notFound()

@@ -63,6 +63,7 @@ const createJobResult = (wasCreated = true): GenerateShortClipsServiceResult => 
     jobType: 'GENERATE_SHORT_CLIPS',
     status: wasCreated ? 'PENDING' : 'QUEUED',
     progress: 0,
+    errorCode: null,
     errorMessage: null,
     output: null,
     attemptCount: 0,
@@ -265,7 +266,7 @@ describe('short clip routes', () => {
     })
   })
 
-  it('returns an active short clip job with HTTP 200', async () => {
+  it('returns an active generate short clips job with HTTP 200', async () => {
     generateShortClipsMock.mockResolvedValue(createJobResult(false))
 
     const response = await request(app)

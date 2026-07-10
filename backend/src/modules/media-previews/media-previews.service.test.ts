@@ -53,6 +53,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   status: 'PENDING',
   progress: 0,
   currentStep: null,
+  errorCode: null,
   errorMessage: null,
   queueName: 'media_previews_queue',
   taskName: 'generate_thumbnail',

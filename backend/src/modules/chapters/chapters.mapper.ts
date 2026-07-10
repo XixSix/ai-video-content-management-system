@@ -1,6 +1,6 @@
 import type { ProcessingJob, VideoChapter } from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
-import type { ChapterData } from './chaptering.types'
+import type { ChapterData } from './chapters.types'
 
 export const toJobResponseData = (job: ProcessingJob): JobResponseData => ({
   id: job.id,
@@ -8,6 +8,7 @@ export const toJobResponseData = (job: ProcessingJob): JobResponseData => ({
   jobType: job.jobType,
   status: job.status,
   progress: job.progress,
+  errorCode: job.errorCode,
   errorMessage: job.errorMessage,
   output: job.output,
   attemptCount: job.attemptCount,

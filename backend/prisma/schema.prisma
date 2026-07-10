@@ -475,6 +475,7 @@ model ProcessingJob {
 
   progress     Int?    @default(0)
   currentStep  String? @map("current_step") @db.VarChar(255)
+  errorCode    String? @map("error_code") @db.VarChar(100)
   errorMessage String? @map("error_message") @db.Text
 
   queueName      String? @map("queue_name") @db.VarChar(100)
@@ -904,7 +905,6 @@ model PublishTask {
 
   platformPostId  String? @map("platform_post_id") @db.Text
   platformPostUrl String? @map("platform_post_url") @db.Text
-  errorMessage    String? @map("error_message") @db.Text
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

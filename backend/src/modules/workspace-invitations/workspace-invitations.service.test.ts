@@ -43,7 +43,7 @@ const inviteeId = '00000000-0000-4000-8000-000000000003'
 const invitationId = '00000000-0000-4000-8000-000000000004'
 const notificationId = '00000000-0000-4000-8000-000000000005'
 const createdAt = new Date('2026-06-21T10:00:00.000Z')
-const expiresAt = new Date('2026-07-08T10:00:00.000Z')
+const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
 const invitationContext: WorkspaceInvitationContext = {
   id: '00000000-0000-4000-8000-000000000006',

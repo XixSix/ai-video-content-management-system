@@ -31,15 +31,9 @@ export interface MediaPreviewDefinition {
 }
 
 export interface MediaPreviewJobMessage {
+  version: 1
   jobId: string
   jobType: MediaPreviewJobType
-  mediaId: string
-  workspaceId: string
-  userId: string
-  s3Bucket: string
-  s3Key: string
-  mediaType: MediaType
-  mimeType: string | null
   taskName: MediaPreviewTaskName
 }
 

@@ -29,6 +29,7 @@ export interface PublishTaskData {
   publishedAt: Date | null
   platformPostId: string | null
   platformPostUrl: string | null
+  errorCode: string | null
   errorMessage: string | null
   createdAt: Date
   updatedAt: Date

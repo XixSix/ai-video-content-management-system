@@ -1,10 +1,10 @@
 import type { ChapterSource } from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
-import type { GenerateChaptersBody } from './chaptering.schema'
+import type { GenerateChaptersBody } from './chapters.schema'
 
-export const CHAPTERING_QUEUE_NAME = 'chaptering_queue'
-export const CHAPTERING_TASK_NAME = 'generate_chapters'
-export const CHAPTERING_CELERY_TASK_NAME = 'chaptering_task'
+export const GENERATE_CHAPTERS_QUEUE_NAME = 'generate_chapters_queue'
+export const GENERATE_CHAPTERS_TASK_NAME = 'generate_chapters'
+export const GENERATE_CHAPTERS_CELERY_TASK_NAME = 'generate_chapters_task'
 
 export type GenerateChaptersInput = GenerateChaptersBody & {
   mediaId: string

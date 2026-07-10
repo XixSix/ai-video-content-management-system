@@ -45,7 +45,8 @@ const publishTaskArgs = {
         candidate: true
       }
     },
-    platformAccount: true
+    platformAccount: true,
+    job: true
   }
 } satisfies Prisma.PublishTaskDefaultArgs
 

@@ -70,10 +70,7 @@ export const createRenderExport = async (
   try {
     await renderExportsQueue.publishRenderExportJob({
       jobId: job.id,
-      mediaId: project.sourceMedia.id,
-      projectId: project.id,
-      workspaceId,
-      userId
+      jobType: JobType.EXPORT_RENDER
     })
   } catch {
     await renderExportsRepo.updateProcessingJob(job.id, {

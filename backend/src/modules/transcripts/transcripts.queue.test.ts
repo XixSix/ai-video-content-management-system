@@ -10,11 +10,6 @@ const { publishTranscriptBurnJob, publishTranscriptExportJob, publishTranscriptJ
   await import('./transcripts.queue')
 
 const jobId = '00000000-0000-4000-8000-000000000003'
-const mediaId = '00000000-0000-4000-8000-000000000001'
-const userId = '00000000-0000-4000-8000-000000000002'
-const transcriptId = '00000000-0000-4000-8000-000000000004'
-const s3Key = 'uploads/users/user/videos/video.mp4'
-
 describe('transcript queue', () => {
   beforeEach(() => {
     publishCeleryTaskToQueueMock.mockReset()
@@ -22,17 +17,16 @@ describe('transcript queue', () => {
   })
 
   it('publishes transcript jobs using the Celery task protocol contract', async () => {
-    await publishTranscriptJob({ jobId, mediaId, userId, s3Key })
+    await publishTranscriptJob({ jobId, jobType: 'TRANSCRIBE' })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
-      queueName: 'transcript_queue',
-      taskName: 'transcript_task',
+      queueName: 'transcribe_queue',
+      taskName: 'transcribe_task',
       taskId: jobId,
       kwargs: {
+        version: 1,
         jobId,
-        mediaId,
-        userId,
-        s3Key,
+        jobType: 'TRANSCRIBE',
         taskName: 'transcribe'
       }
     })
@@ -41,24 +35,17 @@ describe('transcript queue', () => {
   it('publishes transcript export jobs using the Celery task protocol contract', async () => {
     await publishTranscriptExportJob({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 2,
-      format: 'srt'
+      jobType: 'GENERATE_SUBTITLE'
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
-      queueName: 'transcript_queue',
-      taskName: 'transcript_task',
+      queueName: 'transcribe_queue',
+      taskName: 'transcribe_task',
       taskId: jobId,
       kwargs: {
+        version: 1,
         jobId,
-        mediaId,
-        userId,
-        transcriptId,
-        transcriptVersion: 2,
-        format: 'srt',
+        jobType: 'GENERATE_SUBTITLE',
         taskName: 'export_transcript'
       }
     })
@@ -67,22 +54,17 @@ describe('transcript queue', () => {
   it('publishes transcript burn jobs using the Celery task protocol contract', async () => {
     await publishTranscriptBurnJob({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 2
+      jobType: 'BURN_SUBTITLE'
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
-      queueName: 'transcript_queue',
-      taskName: 'transcript_task',
+      queueName: 'transcribe_queue',
+      taskName: 'transcribe_task',
       taskId: jobId,
       kwargs: {
+        version: 1,
         jobId,
-        mediaId,
-        userId,
-        transcriptId,
-        transcriptVersion: 2,
+        jobType: 'BURN_SUBTITLE',
         taskName: 'burn_transcript'
       }
     })

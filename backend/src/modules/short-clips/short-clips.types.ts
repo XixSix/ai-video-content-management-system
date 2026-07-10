@@ -8,9 +8,9 @@ import type {
 } from '../../infrastructure/db/generated/prisma/client'
 import type { JobResponseData } from '../jobs/jobs.types'
 
-export const SHORT_CLIPS_QUEUE_NAME = 'short_clip_queue'
-export const SHORT_CLIPS_TASK_NAME = 'generate_short_clips'
-export const SHORT_CLIPS_CELERY_TASK_NAME = 'short_clip_task'
+export const GENERATE_SHORT_CLIPS_QUEUE_NAME = 'generate_short_clips_queue'
+export const GENERATE_SHORT_CLIPS_TASK_NAME = 'generate_short_clips'
+export const GENERATE_SHORT_CLIPS_CELERY_TASK_NAME = 'generate_short_clips_task'
 
 export type GenerateShortClipsInput = {
   mediaId: string
@@ -34,7 +34,7 @@ export type ShortClipGenerationPreferences = {
   burnSubtitle: boolean
 }
 
-export type NormalizedShortClipJobInput = Omit<ShortClipGenerationPreferences, 'transcriptId'> & {
+export type GenerateShortClipsJobOptions = Omit<ShortClipGenerationPreferences, 'transcriptId'> & {
   transcriptId: string
   transcriptVersion: number
   minDuration: number

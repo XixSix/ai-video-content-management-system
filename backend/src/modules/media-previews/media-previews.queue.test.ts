@@ -21,14 +21,7 @@ describe('media previews queue', () => {
   ] as const)('publishes %s with task name %s', async (jobType, taskName) => {
     await publishMediaPreviewJob({
       jobId: 'job-1',
-      jobType,
-      mediaId: 'media-1',
-      workspaceId: 'workspace-1',
-      userId: 'user-1',
-      s3Bucket: 'vidpilot-media',
-      s3Key: 'uploads/example.mp4',
-      mediaType: 'VIDEO',
-      mimeType: 'video/mp4'
+      jobType
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
@@ -36,15 +29,9 @@ describe('media previews queue', () => {
       taskName: 'media_preview_task',
       taskId: 'job-1',
       kwargs: {
+        version: 1,
         jobId: 'job-1',
         jobType,
-        mediaId: 'media-1',
-        workspaceId: 'workspace-1',
-        userId: 'user-1',
-        s3Bucket: 'vidpilot-media',
-        s3Key: 'uploads/example.mp4',
-        mediaType: 'VIDEO',
-        mimeType: 'video/mp4',
         taskName
       }
     })

@@ -14,15 +14,7 @@ describe('publish tasks queue', () => {
 
     await publishPublishTaskJob({
       jobId: '00000000-0000-4000-8000-000000000001',
-      publishTaskId: '00000000-0000-4000-8000-000000000002',
-      mediaId: '00000000-0000-4000-8000-000000000003',
-      projectId: null,
-      shortClipId: null,
-      exportAssetId: null,
-      userId: '00000000-0000-4000-8000-000000000004',
-      platform: 'FACEBOOK',
-      platformAccountId: '00000000-0000-4000-8000-000000000005',
-      scheduledAt: null
+      jobType: 'PUBLISH'
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
@@ -31,16 +23,9 @@ describe('publish tasks queue', () => {
       taskId: '00000000-0000-4000-8000-000000000001',
       eta: undefined,
       kwargs: {
+        version: 1,
         jobId: '00000000-0000-4000-8000-000000000001',
-        publishTaskId: '00000000-0000-4000-8000-000000000002',
-        mediaId: '00000000-0000-4000-8000-000000000003',
-        projectId: null,
-        shortClipId: null,
-        exportAssetId: null,
-        userId: '00000000-0000-4000-8000-000000000004',
-        platform: 'FACEBOOK',
-        platformAccountId: '00000000-0000-4000-8000-000000000005',
-        scheduledAt: null,
+        jobType: 'PUBLISH',
         taskName: 'publish'
       }
     })
@@ -55,15 +40,7 @@ describe('publish tasks queue', () => {
     await publishPublishTaskJob(
       {
         jobId: '00000000-0000-4000-8000-000000000001',
-        publishTaskId: '00000000-0000-4000-8000-000000000002',
-        mediaId: null,
-        projectId: null,
-        shortClipId: '00000000-0000-4000-8000-000000000003',
-        exportAssetId: null,
-        userId: '00000000-0000-4000-8000-000000000004',
-        platform: 'FACEBOOK',
-        platformAccountId: '00000000-0000-4000-8000-000000000005',
-        scheduledAt: eta
+        jobType: 'PUBLISH'
       },
       eta
     )
@@ -72,8 +49,9 @@ describe('publish tasks queue', () => {
       expect.objectContaining({
         eta,
         kwargs: expect.objectContaining({
-          shortClipId: '00000000-0000-4000-8000-000000000003',
-          scheduledAt: eta,
+          version: 1,
+          jobId: '00000000-0000-4000-8000-000000000001',
+          jobType: 'PUBLISH',
           taskName: 'publish'
         })
       })

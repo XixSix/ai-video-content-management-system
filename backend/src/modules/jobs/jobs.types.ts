@@ -14,6 +14,7 @@ export interface JobResponseData {
   jobType: JobType
   status: JobStatus
   progress: number | null
+  errorCode: string | null
   errorMessage: string | null
   output: Prisma.JsonValue | null
   attemptCount: number

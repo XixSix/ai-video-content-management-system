@@ -42,6 +42,7 @@ const job: JobResponseData = {
   jobType: 'EXPORT_RENDER',
   status: 'PENDING',
   progress: 0,
+  errorCode: null,
   errorMessage: null,
   output: null,
   attemptCount: 0,

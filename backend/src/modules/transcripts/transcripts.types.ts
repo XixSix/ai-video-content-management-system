@@ -2,11 +2,11 @@ import type { JobResponseData } from '../jobs/jobs.types'
 import type { AsrModel, ModelSize, TranscriptSource } from '../../infrastructure/db/generated/prisma/client'
 import type { ExportTranscriptBody, GenerateTranscriptBody, SaveTranscriptEditorDraftBody } from './transcripts.schema'
 
-export const TRANSCRIPT_QUEUE_NAME = 'transcript_queue'
-export const TRANSCRIPT_TASK_NAME = 'transcribe'
+export const TRANSCRIBE_QUEUE_NAME = 'transcribe_queue'
+export const TRANSCRIBE_TASK_NAME = 'transcribe'
 export const TRANSCRIPT_EXPORT_TASK_NAME = 'export_transcript'
 export const TRANSCRIPT_BURN_TASK_NAME = 'burn_transcript'
-export const TRANSCRIPT_CELERY_TASK_NAME = 'transcript_task'
+export const TRANSCRIBE_CELERY_TASK_NAME = 'transcribe_task'
 
 export type GenerateTranscriptInput = GenerateTranscriptBody & {
   mediaId: string
