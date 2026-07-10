@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package generate_short_clips.v1;
+
+service GenerateShortClipsService {
+  rpc GenerateShortClips(GenerateShortClipsRequest) returns (GenerateShortClipsResponse);
+}
+
+message GenerateShortClipsRequest {
+  string job_id = 1;
+  GenerateShortClipsInput input = 2;
+  GenerateShortClipsOptions options = 3;
+}
+
+message GenerateShortClipsInput {
+  TranscriptInput transcript = 1;
+  repeated ChapterContext chapters = 2;
+}
+
+message TranscriptInput {
+  string language = 1;
+  double media_duration_seconds = 2;
+  repeated TranscriptSegment segments = 3;
+}
+
+message TranscriptSegment {
+  string segment_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  optional string speaker = 4;
+  string text = 5;
+}
+
+message ChapterContext {
+  string chapter_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  string title = 4;
+  string summary = 5;
+}
+
+message LLMOptions {
+  bool enabled = 1;
+  optional string model = 2;
+}
+
+message GenerateShortClipsOptions {
+  int32 clip_count = 1;
+  double min_duration_seconds = 2;
+  double max_duration_seconds = 3;
+  string aspect_ratio = 4;
+  string platform = 5;
+  string genre = 6;
+  string tone = 7;
+  optional string prompt = 8;
+  LLMOptions llm = 9;
+}
+
+enum GenerateShortClipsStatus {
+  GENERATE_SHORT_CLIPS_STATUS_UNSPECIFIED = 0;
+  GENERATE_SHORT_CLIPS_STATUS_COMPLETED = 1;
+  GENERATE_SHORT_CLIPS_STATUS_FAILED = 2;
+}
+
+enum GenerateShortClipsErrorCode {
+  GENERATE_SHORT_CLIPS_ERROR_CODE_UNSPECIFIED = 0;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_INVALID_REQUEST = 1;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_INVALID_TRANSCRIPT = 2;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_EMPTY_TRANSCRIPT = 3;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_TRANSCRIPT_TOO_SHORT = 4;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_UNSUPPORTED_LANGUAGE = 5;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_LLM_PROVIDER_FAILED = 6;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_INVALID_MODEL_OUTPUT = 7;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_TIMEOUT = 8;
+  GENERATE_SHORT_CLIPS_ERROR_CODE_INTERNAL = 9;
+}
+
+message GenerateShortClipsError {
+  GenerateShortClipsErrorCode code = 1;
+  string message = 2;
+  bool retryable = 3;
+}
+
+message GenerateShortClipsResponse {
+  string job_id = 1;
+  GenerateShortClipsStatus status = 2;
+  repeated GeneratedShortClipCandidate candidates = 3;
+  optional GenerateShortClipsError error = 4;
+  string model = 5;
+}
+
+message GeneratedShortClipCandidate {
+  int32 index = 1;
+  string start_segment_id = 2;
+  string end_segment_id = 3;
+  repeated string source_segment_ids = 4;
+  double start_seconds = 5;
+  double end_seconds = 6;
+  string title = 7;
+  string reason = 8;
+  double score = 9;
+  string text = 10;
+}

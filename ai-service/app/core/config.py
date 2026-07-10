@@ -171,36 +171,36 @@ class Settings(BaseSettings):
         default=1.2,
         alias="OFFLINE_ASR_MIN_WINDOW_SECONDS",
     )
-    chaptering_strategy: Literal["segment", "word"] = Field(
+    generate_chapters_strategy: Literal["segment", "word"] = Field(
         default="segment",
-        alias="CHAPTERING_STRATEGY",
+        alias="GENERATE_CHAPTERS_STRATEGY",
     )
-    chaptering_model_name: str = Field(
-        default="segment-chaptering-v1",
-        alias="CHAPTERING_MODEL_NAME",
+    generate_chapters_model_name: str = Field(
+        default="segment-generate-chapters-v1",
+        alias="GENERATE_CHAPTERS_MODEL_NAME",
     )
-    chaptering_boundary_evaluation_provider: Literal[
+    generate_chapters_boundary_evaluation_provider: Literal[
         "noop",
         "openai-compatible",
     ] = Field(
         default="noop",
-        alias="CHAPTERING_BOUNDARY_EVALUATION_PROVIDER",
+        alias="GENERATE_CHAPTERS_BOUNDARY_EVALUATION_PROVIDER",
     )
-    chaptering_title_provider: Literal["noop", "openai-compatible"] = Field(
+    generate_chapters_title_provider: Literal["noop", "openai-compatible"] = Field(
         default="noop",
-        alias="CHAPTERING_TITLE_PROVIDER",
+        alias="GENERATE_CHAPTERS_TITLE_PROVIDER",
     )
-    short_clip_candidate_provider: Literal[
+    generate_short_clips_candidate_provider: Literal[
         "noop",
         "openai-compatible",
     ] = Field(
         default="noop",
-        alias="SHORT_CLIP_CANDIDATE_PROVIDER",
+        alias="GENERATE_SHORT_CLIPS_CANDIDATE_PROVIDER",
     )
-    short_clip_model_name: str = Field(
-        default="noop-short-clip-v1",
+    generate_short_clips_model_name: str = Field(
+        default="noop-generate-short-clips-v1",
         min_length=1,
-        alias="SHORT_CLIP_MODEL_NAME",
+        alias="GENERATE_SHORT_CLIPS_MODEL_NAME",
     )
     llm_base_url: str = Field(
         default="http://localhost:8000/v1",
@@ -224,170 +224,172 @@ class Settings(BaseSettings):
         alias="LLM_TEMPERATURE",
     )
     llm_max_tokens: PositiveInt = Field(default=1024, alias="LLM_MAX_TOKENS")
-    chaptering_embedding_provider: Literal["noop", "sentence-transformers"] = Field(
-        default="noop",
-        alias="CHAPTERING_EMBEDDING_PROVIDER",
+    generate_chapters_embedding_provider: Literal["noop", "sentence-transformers"] = (
+        Field(
+            default="noop",
+            alias="GENERATE_CHAPTERS_EMBEDDING_PROVIDER",
+        )
     )
-    chaptering_embedding_model_name: str = Field(
+    generate_chapters_embedding_model_name: str = Field(
         default="Qwen/Qwen3-Embedding-0.6B",
         min_length=1,
-        alias="CHAPTERING_EMBEDDING_MODEL_NAME",
+        alias="GENERATE_CHAPTERS_EMBEDDING_MODEL_NAME",
     )
-    chaptering_embedding_device: str = Field(
+    generate_chapters_embedding_device: str = Field(
         default="cpu",
         min_length=1,
-        alias="CHAPTERING_EMBEDDING_DEVICE",
+        alias="GENERATE_CHAPTERS_EMBEDDING_DEVICE",
     )
-    chaptering_embedding_batch_size: PositiveInt = Field(
+    generate_chapters_embedding_batch_size: PositiveInt = Field(
         default=8,
-        alias="CHAPTERING_EMBEDDING_BATCH_SIZE",
+        alias="GENERATE_CHAPTERS_EMBEDDING_BATCH_SIZE",
     )
-    chaptering_embedding_max_sequence_length: int = Field(
+    generate_chapters_embedding_max_sequence_length: int = Field(
         default=2048,
         ge=1,
         le=32_768,
-        alias="CHAPTERING_EMBEDDING_MAX_SEQUENCE_LENGTH",
+        alias="GENERATE_CHAPTERS_EMBEDDING_MAX_SEQUENCE_LENGTH",
     )
-    chaptering_embedding_cache_path: Path | None = Field(
+    generate_chapters_embedding_cache_path: Path | None = Field(
         default=None,
-        alias="CHAPTERING_EMBEDDING_CACHE_PATH",
+        alias="GENERATE_CHAPTERS_EMBEDDING_CACHE_PATH",
     )
-    chaptering_embedding_local_files_only: bool = Field(
+    generate_chapters_embedding_local_files_only: bool = Field(
         default=False,
-        alias="CHAPTERING_EMBEDDING_LOCAL_FILES_ONLY",
+        alias="GENERATE_CHAPTERS_EMBEDDING_LOCAL_FILES_ONLY",
     )
-    chaptering_target_unit_duration_seconds: PositiveFloat = Field(
+    generate_chapters_target_unit_duration_seconds: PositiveFloat = Field(
         default=12.0,
-        alias="CHAPTERING_TARGET_UNIT_DURATION_SECONDS",
+        alias="GENERATE_CHAPTERS_TARGET_UNIT_DURATION_SECONDS",
     )
-    chaptering_max_unit_duration_seconds: PositiveFloat = Field(
+    generate_chapters_max_unit_duration_seconds: PositiveFloat = Field(
         default=20.0,
-        alias="CHAPTERING_MAX_UNIT_DURATION_SECONDS",
+        alias="GENERATE_CHAPTERS_MAX_UNIT_DURATION_SECONDS",
     )
-    chaptering_target_unit_words: PositiveInt = Field(
+    generate_chapters_target_unit_words: PositiveInt = Field(
         default=40,
-        alias="CHAPTERING_TARGET_UNIT_WORDS",
+        alias="GENERATE_CHAPTERS_TARGET_UNIT_WORDS",
     )
-    chaptering_max_unit_words: PositiveInt = Field(
+    generate_chapters_max_unit_words: PositiveInt = Field(
         default=80,
-        alias="CHAPTERING_MAX_UNIT_WORDS",
+        alias="GENERATE_CHAPTERS_MAX_UNIT_WORDS",
     )
-    chaptering_max_unit_chars: PositiveInt = Field(
+    generate_chapters_max_unit_chars: PositiveInt = Field(
         default=1200,
-        alias="CHAPTERING_MAX_UNIT_CHARS",
+        alias="GENERATE_CHAPTERS_MAX_UNIT_CHARS",
     )
-    chaptering_pause_boundary_seconds: PositiveFloat = Field(
+    generate_chapters_pause_boundary_seconds: PositiveFloat = Field(
         default=1.0,
-        alias="CHAPTERING_PAUSE_BOUNDARY_SECONDS",
+        alias="GENERATE_CHAPTERS_PAUSE_BOUNDARY_SECONDS",
     )
-    chaptering_punctuation_poor_threshold: float = Field(
+    generate_chapters_punctuation_poor_threshold: float = Field(
         default=0.15,
         ge=0.0,
         le=1.0,
-        alias="CHAPTERING_PUNCTUATION_POOR_THRESHOLD",
+        alias="GENERATE_CHAPTERS_PUNCTUATION_POOR_THRESHOLD",
     )
-    chaptering_unit_repair_short_duration_seconds: PositiveFloat = Field(
+    generate_chapters_unit_repair_short_duration_seconds: PositiveFloat = Field(
         default=4.0,
-        alias="CHAPTERING_UNIT_REPAIR_SHORT_DURATION_SECONDS",
+        alias="GENERATE_CHAPTERS_UNIT_REPAIR_SHORT_DURATION_SECONDS",
     )
-    chaptering_unit_repair_min_words: PositiveInt = Field(
+    generate_chapters_unit_repair_min_words: PositiveInt = Field(
         default=8,
-        alias="CHAPTERING_UNIT_REPAIR_MIN_WORDS",
+        alias="GENERATE_CHAPTERS_UNIT_REPAIR_MIN_WORDS",
     )
-    chaptering_unit_repair_fragment_max_words: PositiveInt = Field(
+    generate_chapters_unit_repair_fragment_max_words: PositiveInt = Field(
         default=2,
-        alias="CHAPTERING_UNIT_REPAIR_FRAGMENT_MAX_WORDS",
+        alias="GENERATE_CHAPTERS_UNIT_REPAIR_FRAGMENT_MAX_WORDS",
     )
-    chaptering_unit_repair_sparse_duration_seconds: PositiveFloat = Field(
+    generate_chapters_unit_repair_sparse_duration_seconds: PositiveFloat = Field(
         default=6.0,
-        alias="CHAPTERING_UNIT_REPAIR_SPARSE_DURATION_SECONDS",
+        alias="GENERATE_CHAPTERS_UNIT_REPAIR_SPARSE_DURATION_SECONDS",
     )
-    chaptering_unit_repair_continuation_gap_seconds: PositiveFloat = Field(
+    generate_chapters_unit_repair_continuation_gap_seconds: PositiveFloat = Field(
         default=0.05,
-        alias="CHAPTERING_UNIT_REPAIR_CONTINUATION_GAP_SECONDS",
+        alias="GENERATE_CHAPTERS_UNIT_REPAIR_CONTINUATION_GAP_SECONDS",
     )
-    chaptering_context_window_seconds: PositiveFloat = Field(
+    generate_chapters_context_window_seconds: PositiveFloat = Field(
         default=90.0,
-        alias="CHAPTERING_CONTEXT_WINDOW_SECONDS",
+        alias="GENERATE_CHAPTERS_CONTEXT_WINDOW_SECONDS",
     )
-    chaptering_candidate_score_context_seconds: PositiveFloat = Field(
+    generate_chapters_candidate_score_context_seconds: PositiveFloat = Field(
         default=90.0,
-        alias="CHAPTERING_CANDIDATE_SCORE_CONTEXT_SECONDS",
+        alias="GENERATE_CHAPTERS_CANDIDATE_SCORE_CONTEXT_SECONDS",
     )
-    chaptering_candidate_long_pause_seconds: PositiveFloat = Field(
+    generate_chapters_candidate_long_pause_seconds: PositiveFloat = Field(
         default=1.0,
-        alias="CHAPTERING_CANDIDATE_LONG_PAUSE_SECONDS",
+        alias="GENERATE_CHAPTERS_CANDIDATE_LONG_PAUSE_SECONDS",
     )
-    chaptering_candidate_max_pause_score_seconds: PositiveFloat = Field(
+    generate_chapters_candidate_max_pause_score_seconds: PositiveFloat = Field(
         default=5.0,
-        alias="CHAPTERING_CANDIDATE_MAX_PAUSE_SCORE_SECONDS",
+        alias="GENERATE_CHAPTERS_CANDIDATE_MAX_PAUSE_SCORE_SECONDS",
     )
-    chaptering_candidate_min_context_text_chars: PositiveInt = Field(
+    generate_chapters_candidate_min_context_text_chars: PositiveInt = Field(
         default=120,
-        alias="CHAPTERING_CANDIDATE_MIN_CONTEXT_TEXT_CHARS",
+        alias="GENERATE_CHAPTERS_CANDIDATE_MIN_CONTEXT_TEXT_CHARS",
     )
-    chaptering_candidate_discourse_marker_weight: float = Field(
+    generate_chapters_candidate_discourse_marker_weight: float = Field(
         default=0.30,
         ge=0.0,
-        alias="CHAPTERING_CANDIDATE_DISCOURSE_MARKER_WEIGHT",
+        alias="GENERATE_CHAPTERS_CANDIDATE_DISCOURSE_MARKER_WEIGHT",
     )
-    chaptering_candidate_pause_weight: float = Field(
+    generate_chapters_candidate_pause_weight: float = Field(
         default=0.25,
         ge=0.0,
-        alias="CHAPTERING_CANDIDATE_PAUSE_WEIGHT",
+        alias="GENERATE_CHAPTERS_CANDIDATE_PAUSE_WEIGHT",
     )
-    chaptering_candidate_lexical_shift_weight: float = Field(
+    generate_chapters_candidate_lexical_shift_weight: float = Field(
         default=0.20,
         ge=0.0,
-        alias="CHAPTERING_CANDIDATE_LEXICAL_SHIFT_WEIGHT",
+        alias="GENERATE_CHAPTERS_CANDIDATE_LEXICAL_SHIFT_WEIGHT",
     )
-    chaptering_candidate_boundary_quality_weight: float = Field(
+    generate_chapters_candidate_boundary_quality_weight: float = Field(
         default=0.15,
         ge=0.0,
-        alias="CHAPTERING_CANDIDATE_BOUNDARY_QUALITY_WEIGHT",
+        alias="GENERATE_CHAPTERS_CANDIDATE_BOUNDARY_QUALITY_WEIGHT",
     )
-    chaptering_candidate_duration_sanity_weight: float = Field(
+    generate_chapters_candidate_duration_sanity_weight: float = Field(
         default=0.10,
         ge=0.0,
-        alias="CHAPTERING_CANDIDATE_DURATION_SANITY_WEIGHT",
+        alias="GENERATE_CHAPTERS_CANDIDATE_DURATION_SANITY_WEIGHT",
     )
-    chaptering_embedding_candidate_min_limit: PositiveInt = Field(
+    generate_chapters_embedding_candidate_min_limit: PositiveInt = Field(
         default=12,
-        alias="CHAPTERING_EMBEDDING_CANDIDATE_MIN_LIMIT",
+        alias="GENERATE_CHAPTERS_EMBEDDING_CANDIDATE_MIN_LIMIT",
     )
-    chaptering_embedding_candidate_max_limit: PositiveInt = Field(
+    generate_chapters_embedding_candidate_max_limit: PositiveInt = Field(
         default=40,
-        alias="CHAPTERING_EMBEDDING_CANDIDATE_MAX_LIMIT",
+        alias="GENERATE_CHAPTERS_EMBEDDING_CANDIDATE_MAX_LIMIT",
     )
-    chaptering_embedding_candidate_multiplier: PositiveInt = Field(
+    generate_chapters_embedding_candidate_multiplier: PositiveInt = Field(
         default=4,
-        alias="CHAPTERING_EMBEDDING_CANDIDATE_MULTIPLIER",
+        alias="GENERATE_CHAPTERS_EMBEDDING_CANDIDATE_MULTIPLIER",
     )
-    chaptering_candidate_top_score_fraction: float = Field(
+    generate_chapters_candidate_top_score_fraction: float = Field(
         default=0.60,
         ge=0.0,
         le=1.0,
-        alias="CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION",
+        alias="GENERATE_CHAPTERS_CANDIDATE_TOP_SCORE_FRACTION",
     )
-    chaptering_valley_smoothing_radius: int = Field(
+    generate_chapters_valley_smoothing_radius: int = Field(
         default=1,
         ge=0,
-        alias="CHAPTERING_VALLEY_SMOOTHING_RADIUS",
+        alias="GENERATE_CHAPTERS_VALLEY_SMOOTHING_RADIUS",
     )
-    chaptering_valley_peak_window: PositiveInt = Field(
+    generate_chapters_valley_peak_window: PositiveInt = Field(
         default=2,
-        alias="CHAPTERING_VALLEY_PEAK_WINDOW",
+        alias="GENERATE_CHAPTERS_VALLEY_PEAK_WINDOW",
     )
-    chaptering_valley_min_depth: float = Field(
+    generate_chapters_valley_min_depth: float = Field(
         default=0.18,
         ge=0.0,
-        alias="CHAPTERING_VALLEY_MIN_DEPTH",
+        alias="GENERATE_CHAPTERS_VALLEY_MIN_DEPTH",
     )
-    chaptering_valley_semantic_weight: float = Field(
+    generate_chapters_valley_semantic_weight: float = Field(
         default=0.70,
         ge=0.0,
         le=1.0,
-        alias="CHAPTERING_VALLEY_SEMANTIC_WEIGHT",
+        alias="GENERATE_CHAPTERS_VALLEY_SEMANTIC_WEIGHT",
     )
 
     @property
@@ -396,7 +398,7 @@ class Settings(BaseSettings):
 
     @field_validator(
         "asr_model_storage_path",
-        "chaptering_embedding_cache_path",
+        "generate_chapters_embedding_cache_path",
         mode="before",
     )
     @classmethod

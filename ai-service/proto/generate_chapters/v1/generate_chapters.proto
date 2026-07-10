@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package generate_chapters.v1;
+
+service GenerateChaptersService {
+  rpc GenerateChapters(GenerateChaptersRequest) returns (GenerateChaptersResponse);
+}
+
+message TranscriptInput {
+  string language = 1;
+  double media_duration_seconds = 2;
+  repeated TranscriptSegment segments = 3;
+}
+
+message EmbeddingOptions {
+  bool enabled = 1;
+  optional string model = 2;
+}
+
+message LLMOptions {
+  bool enabled = 1;
+  optional string model = 2;
+}
+
+message GenerateChaptersOptions {
+  double min_chapter_duration_seconds = 1;
+  double target_chapter_duration_seconds = 2;
+  double max_chapter_duration_seconds = 3;
+  int32 max_chapters = 4;
+  EmbeddingOptions embeddings = 5;
+  LLMOptions llm = 6;
+}
+
+message GenerateChaptersRequest {
+  string job_id = 1;
+  TranscriptInput transcript = 2;
+  GenerateChaptersOptions options = 3;
+}
+
+enum GenerateChaptersStatus {
+  GENERATE_CHAPTERS_STATUS_UNSPECIFIED = 0;
+  GENERATE_CHAPTERS_STATUS_COMPLETED = 1;
+  GENERATE_CHAPTERS_STATUS_FAILED = 2;
+}
+
+enum GenerateChaptersErrorCode {
+  GENERATE_CHAPTERS_ERROR_CODE_UNSPECIFIED = 0;
+  GENERATE_CHAPTERS_ERROR_CODE_INVALID_REQUEST = 1;
+  GENERATE_CHAPTERS_ERROR_CODE_INVALID_TRANSCRIPT = 2;
+  GENERATE_CHAPTERS_ERROR_CODE_EMPTY_TRANSCRIPT = 3;
+  GENERATE_CHAPTERS_ERROR_CODE_TRANSCRIPT_TOO_SHORT = 4;
+  GENERATE_CHAPTERS_ERROR_CODE_UNSUPPORTED_LANGUAGE = 5;
+  GENERATE_CHAPTERS_ERROR_CODE_EMBEDDING_PROVIDER_FAILED = 6;
+  GENERATE_CHAPTERS_ERROR_CODE_LLM_PROVIDER_FAILED = 7;
+  GENERATE_CHAPTERS_ERROR_CODE_INVALID_MODEL_OUTPUT = 8;
+  GENERATE_CHAPTERS_ERROR_CODE_TIMEOUT = 9;
+  GENERATE_CHAPTERS_ERROR_CODE_INTERNAL = 10;
+}
+
+enum ChapterSource {
+  CHAPTER_SOURCE_UNSPECIFIED = 0;
+  CHAPTER_SOURCE_SEGMENTS = 1;
+  CHAPTER_SOURCE_WORDS = 2;
+}
+
+message GenerateChaptersError {
+  GenerateChaptersErrorCode code = 1;
+  string message = 2;
+  bool retryable = 3;
+}
+
+message GenerateChaptersResponse {
+  string job_id = 1;
+  GenerateChaptersStatus status = 2;
+  repeated GeneratedChapter chapters = 3;
+  optional GenerateChaptersError error = 4;
+  string model = 5;
+  ChapterSource source = 6;
+}
+
+message TranscriptSegment {
+  string segment_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  optional string speaker = 4;
+  string text = 5;
+  repeated TranscriptWord words = 6;
+}
+
+message TranscriptWord {
+  string word_id = 1;
+  double start_seconds = 2;
+  double end_seconds = 3;
+  optional string speaker = 4;
+  string text = 5;
+}
+
+message GeneratedChapter {
+  int32 index = 1;
+  double start_seconds = 2;
+  string title = 3;
+  string summary = 4;
+  BoundaryScores scores = 5;
+}
+
+message BoundaryScores {
+  optional double score = 1;
+  optional double boundary_score = 2;
+  optional double pause_score = 3;
+  optional double discourse_marker_score = 4;
+  optional double semantic_shift_score = 5;
+  optional double duration_score = 6;
+  optional double boundary_quality_score = 7;
+  optional double lexical_shift_score = 8;
+  optional double llm_confidence_score = 9;
+  optional double valley_depth_score = 10;
+}

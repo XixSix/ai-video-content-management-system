@@ -1,23 +1,23 @@
 import pytest
 
-from app.providers.chaptering.openai_compatible_boundary_evaluation import (
+from app.providers.generate_chapters.openai_compatible_boundary_evaluation import (
     OpenAICompatibleChapterBoundaryEvaluationProvider,
 )
-from app.providers.chaptering.openai_compatible_title import (
+from app.providers.generate_chapters.openai_compatible_title import (
     OpenAICompatibleChapterTitleProvider,
 )
-from app.providers.short_clip.openai_compatible_candidate import (
-    OpenAICompatibleShortClipCandidateProvider,
+from app.providers.generate_short_clips.openai_compatible_candidate import (
+    OpenAICompatibleGenerateShortClipsCandidateProvider,
 )
-from app.schemas.short_clip import (
-    ShortClipPreferences,
-    ShortClipTranscriptSegment,
+from app.schemas.generate_short_clips import (
+    GenerateShortClipsPreferences,
+    GenerateShortClipsTranscriptSegment,
 )
-from app.workflows.chaptering.schemas import (
+from app.workflows.generate_chapters.schemas import (
     BoundaryEvaluationInput,
     ChapterTitleInput,
 )
-from app.workflows.short_clip.schemas import ShortClipCandidateInput
+from app.workflows.generate_short_clips.schemas import GenerateShortClipsCandidateInput
 
 
 def test_boundary_provider_maps_json_response() -> None:
@@ -129,7 +129,7 @@ def test_title_provider_repairs_single_title_response() -> None:
     assert titles[0].summary == "A discussion about games and parenting styles."
 
 
-def test_short_clip_provider_maps_json_response() -> None:
+def test_generate_short_clips_provider_maps_json_response() -> None:
     client = _FakeChatClient(
         {
             "candidates": [
@@ -143,9 +143,9 @@ def test_short_clip_provider_maps_json_response() -> None:
             ]
         }
     )
-    provider = OpenAICompatibleShortClipCandidateProvider(chat_client=client)
+    provider = OpenAICompatibleGenerateShortClipsCandidateProvider(chat_client=client)
 
-    proposals = provider.generate_candidates(_short_clip_input())
+    proposals = provider.generate_candidates(_generate_short_clips_input())
 
     assert proposals[0].start_segment_id == "seg-1"
     assert proposals[0].end_segment_id == "seg-2"
@@ -153,16 +153,16 @@ def test_short_clip_provider_maps_json_response() -> None:
     assert proposals[0].score == 8.5
     assert provider.model_name == "fake-llm"
     assert provider.source == "LLM"
-    assert client.user_payload["task"] == "short_clip_candidate_generation"
+    assert client.user_payload["task"] == "generate_short_clips_candidate_generation"
 
 
-def test_short_clip_provider_rejects_invalid_response_shape() -> None:
-    provider = OpenAICompatibleShortClipCandidateProvider(
+def test_generate_short_clips_provider_rejects_invalid_response_shape() -> None:
+    provider = OpenAICompatibleGenerateShortClipsCandidateProvider(
         chat_client=_FakeChatClient({"candidates": [{"start_segment_id": "seg-1"}]})
     )
 
     with pytest.raises(ValueError):
-        provider.generate_candidates(_short_clip_input())
+        provider.generate_candidates(_generate_short_clips_input())
 
 
 def _boundary_input() -> BoundaryEvaluationInput:
@@ -189,25 +189,25 @@ def _title_input() -> ChapterTitleInput:
     )
 
 
-def _short_clip_input() -> ShortClipCandidateInput:
-    return ShortClipCandidateInput(
+def _generate_short_clips_input() -> GenerateShortClipsCandidateInput:
+    return GenerateShortClipsCandidateInput(
         language="en",
         media_duration_seconds=60,
         segments=[
-            ShortClipTranscriptSegment(
+            GenerateShortClipsTranscriptSegment(
                 segment_id="seg-1",
                 start_seconds=0,
                 end_seconds=10,
                 text="Set up the key idea.",
             ),
-            ShortClipTranscriptSegment(
+            GenerateShortClipsTranscriptSegment(
                 segment_id="seg-2",
                 start_seconds=10,
                 end_seconds=20,
                 text="Deliver the useful takeaway.",
             ),
         ],
-        preferences=ShortClipPreferences(
+        preferences=GenerateShortClipsPreferences(
             clip_count=1,
             clip_length="15_30",
             min_duration_seconds=15,

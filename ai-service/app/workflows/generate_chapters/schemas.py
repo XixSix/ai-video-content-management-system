@@ -1,0 +1,215 @@
+from dataclasses import dataclass
+from typing import Literal
+
+TransitionIntent = Literal[
+    "CONTINUE_TOPIC",
+    "DEVELOP_SUBTOPIC",
+    "INTRODUCE_RELATED_TOPIC",
+    "CHANGE_TOPIC",
+    "START_NEW_STEP",
+    "EXAMPLE_OR_DIGRESSION",
+    "RECAP_OR_CONCLUSION",
+    "RETURN_TO_MAIN_TOPIC",
+]
+
+ALLOWED_TRANSITION_INTENTS: frozenset[str] = frozenset(
+    [
+        "CONTINUE_TOPIC",
+        "DEVELOP_SUBTOPIC",
+        "INTRODUCE_RELATED_TOPIC",
+        "CHANGE_TOPIC",
+        "START_NEW_STEP",
+        "EXAMPLE_OR_DIGRESSION",
+        "RECAP_OR_CONCLUSION",
+        "RETURN_TO_MAIN_TOPIC",
+    ]
+)
+
+
+@dataclass(frozen=True)
+class ChapterUnit:
+    """Store a stable transcript unit for chapter analysis."""
+
+    unit_id: str
+    start_time: float
+    end_time: float
+    text: str
+    clean_text: str
+    segment_ids: list[str]
+
+
+@dataclass(frozen=True)
+class ChapterCandidate:
+    """Store a possible chapter boundary derived from a unit start."""
+
+    time: float
+    unit_index: int
+    unit_id: str
+    left_adjacent_unit_ids: list[str]
+    right_adjacent_unit_ids: list[str]
+    cheap_score: float = 0.0
+    candidate_score: float = 0.0
+    semantic_shift_score: float = 0.0
+    semantic_cohesion_score: float = 0.0
+    discourse_marker_score: float = 0.0
+    pause_score: float = 0.0
+    lexical_shift_score: float = 0.0
+    lexical_valley_depth_score: float = 0.0
+    semantic_valley_depth_score: float = 0.0
+    valley_depth_score: float = 0.0
+    boundary_quality_score: float = 0.0
+    duration_sanity_score: float = 0.0
+    llm_confidence_score: float = 0.0
+    llm_is_boundary: bool | None = None
+    transition_intent: str | None = None
+    llm_reason: str | None = None
+
+
+@dataclass(frozen=True)
+class BoundaryEvaluationInput:
+    """Store bounded context and algorithm scores for one LLM boundary review."""
+
+    candidate_time: float
+    left_context: str
+    right_context: str
+    candidate_score: float
+    lexical_shift_score: float
+    semantic_shift_score: float
+    valley_depth_score: float
+    pause_score: float
+    discourse_marker_score: float
+
+
+@dataclass(frozen=True)
+class BoundaryEvaluation:
+    """Store one validated candidate-boundary judgment from an LLM provider."""
+
+    candidate_time: float
+    is_chapter_boundary: bool
+    confidence: float
+    transition_intent: TransitionIntent
+    reason: str
+
+
+@dataclass(frozen=True)
+class ChapterTitleInput:
+    """Store transcript text for generating one chapter title and summary."""
+
+    chapter_index: int
+    start_time: float
+    end_time: float
+    language: str | None
+    text: str
+
+
+@dataclass(frozen=True)
+class ChapterTitleResult:
+    """Store one generated title/summary result before validation."""
+
+    chapter_index: int
+    title: str
+    summary: str | None = None
+
+
+@dataclass(frozen=True)
+class ChapterGapScore:
+    """Store Phase 3 topic-cohesion scores for one gap between timeline units."""
+
+    time: float
+    unit_index: int
+    unit_id: str
+    left_adjacent_unit_ids: list[str]
+    right_adjacent_unit_ids: list[str]
+    left_text: str
+    right_text: str
+    left_unit_ids: list[str]
+    right_unit_ids: list[str]
+    lexical_cohesion_score: float = 0.0
+    lexical_shift_score: float = 0.0
+    semantic_shift_score: float = 0.0
+    semantic_cohesion_score: float = 0.0
+    lexical_valley_depth_score: float = 0.0
+    semantic_valley_depth_score: float = 0.0
+    valley_depth_score: float = 0.0
+    discourse_marker_score: float = 0.0
+    pause_score: float = 0.0
+    boundary_quality_score: float = 0.0
+    duration_sanity_score: float = 0.0
+    combined_score: float = 0.0
+
+
+@dataclass(frozen=True)
+class ChapterContextWindow:
+    """Store left and right text context around a candidate boundary."""
+
+    candidate_time: float
+    left_text: str
+    right_text: str
+    left_unit_ids: list[str]
+    right_unit_ids: list[str]
+
+
+@dataclass(frozen=True)
+class CandidateScoringConfig:
+    """Store cheap candidate scoring tuning values."""
+
+    context_seconds: float
+    long_pause_seconds: float
+    max_pause_score_seconds: float
+    min_context_text_chars: int
+    discourse_marker_weight: float
+    pause_weight: float
+    lexical_shift_weight: float
+    boundary_quality_weight: float
+    duration_sanity_weight: float
+
+
+@dataclass(frozen=True)
+class CandidateRetentionConfig:
+    """Store candidate retention tuning values for ranking and LLM review."""
+
+    min_limit: int
+    max_limit: int
+    multiplier: int
+    top_score_fraction: float
+
+
+@dataclass(frozen=True)
+class ValleyDetectionConfig:
+    """Store TextTiling-style valley detection tuning values."""
+
+    smoothing_radius: int
+    peak_window: int
+    min_valley_depth: float
+    semantic_weight: float
+
+
+@dataclass(frozen=True)
+class UnitRepairConfig:
+    """Store post-build timeline unit repair thresholds."""
+
+    short_duration_seconds: float
+    min_words: int
+    fragment_max_words: int
+    sparse_duration_seconds: float
+    continuation_gap_seconds: float
+
+
+@dataclass(frozen=True)
+class GenerateChaptersPipelineConfig:
+    """Store deterministic generate_chapters workflow tuning values."""
+
+    strategy: str
+    model_name: str
+    target_unit_duration_seconds: float
+    max_unit_duration_seconds: float
+    target_unit_words: int
+    max_unit_words: int
+    max_unit_chars: int
+    pause_boundary_seconds: float
+    punctuation_poor_threshold: float
+    context_window_seconds: float
+    scoring: CandidateScoringConfig
+    valley: ValleyDetectionConfig
+    retention: CandidateRetentionConfig
+    unit_repair: UnitRepairConfig

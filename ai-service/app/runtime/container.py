@@ -1,9 +1,9 @@
 from app.core.config import Settings, get_settings
 from app.provider_contracts.audio_decoder import AudioDecoderPort
-from app.provider_contracts.chapter_boundary_evaluation import (
+from app.provider_contracts.generate_chapters_boundary_evaluation import (
     ChapterBoundaryEvaluationPort,
 )
-from app.provider_contracts.chapter_title import ChapterTitleProviderPort
+from app.provider_contracts.generate_chapters_title import ChapterTitleProviderPort
 from app.provider_contracts.asr import AsrPort
 from app.provider_contracts.diarization import DiarizationPort
 from app.provider_contracts.source_separation import SourceSeparationPort
@@ -14,119 +14,126 @@ from app.providers.asr.noop_asr import NoopAsr
 from app.providers.audio.noop_decoder import NoopAudioDecoder
 from app.providers.audio.audio_preprocessing import AudioPreprocessor
 from app.providers.audio.torchaudio_decoder import TorchaudioAudioDecoder
-from app.providers.chaptering.noop_embedding import NoopTextEmbeddingProvider
-from app.providers.chaptering.sentence_transformer_embedding import (
+from app.providers.generate_chapters.noop_embedding import NoopTextEmbeddingProvider
+from app.providers.generate_chapters.sentence_transformer_embedding import (
     SentenceTransformerTextEmbeddingProvider,
 )
-from app.providers.chaptering.noop_boundary_evaluation import (
+from app.providers.generate_chapters.noop_boundary_evaluation import (
     NoopChapterBoundaryEvaluationProvider,
 )
-from app.providers.chaptering.noop_title import NoopChapterTitleProvider
-from app.providers.chaptering.openai_compatible_boundary_evaluation import (
+from app.providers.generate_chapters.noop_title import NoopChapterTitleProvider
+from app.providers.generate_chapters.openai_compatible_boundary_evaluation import (
     OpenAICompatibleChapterBoundaryEvaluationProvider,
 )
-from app.providers.chaptering.openai_compatible_title import (
+from app.providers.generate_chapters.openai_compatible_title import (
     OpenAICompatibleChapterTitleProvider,
 )
 from app.providers.diarization.noop_diarization import NoopDiarization
 from app.providers.diarization.pyannote_community import PyannoteCommunityDiarization
 from app.providers.llm.openai_compatible import OpenAICompatibleChatClient
-from app.providers.short_clip.openai_compatible_candidate import (
-    OpenAICompatibleShortClipCandidateProvider,
+from app.providers.generate_short_clips.openai_compatible_candidate import (
+    OpenAICompatibleGenerateShortClipsCandidateProvider,
 )
-from app.providers.short_clip.noop_candidate import NoopShortClipCandidateProvider
+from app.providers.generate_short_clips.noop_candidate import (
+    NoopGenerateShortClipsCandidateProvider,
+)
 from app.providers.source_separation.demucs import DemucsSourceSeparator
 from app.providers.source_separation.noop_demucs import NoopDemucsSourceSeparator
 from app.providers.vad.noop_vad import NoopVad
 from app.providers.vad.silero_vad import SileroVad
-from app.workflows.short_clip.workflow import ShortClipWorkflow
-from app.workflows.chaptering.schemas import (
+from app.workflows.generate_short_clips.workflow import GenerateShortClipsWorkflow
+from app.workflows.generate_chapters.schemas import (
     CandidateRetentionConfig,
     CandidateScoringConfig,
-    ChapteringPipelineConfig,
+    GenerateChaptersPipelineConfig,
     UnitRepairConfig,
     ValleyDetectionConfig,
 )
-from app.workflows.chaptering.workflow import ChapteringWorkflow
-from app.workflows.transcription.config import TranscriptionPipelineConfig
-from app.workflows.transcription.workflow import TranscriptionWorkflow
+from app.workflows.generate_chapters.workflow import GenerateChaptersWorkflow
+from app.workflows.transcribe.config import TranscribePipelineConfig
+from app.workflows.transcribe.workflow import TranscribeWorkflow
 
 
-def build_transcription_workflow(
+def build_transcribe_workflow(
     settings: Settings | None = None,
-) -> TranscriptionWorkflow:
+) -> TranscribeWorkflow:
     settings = settings or get_settings()
 
-    return TranscriptionWorkflow(
+    return TranscribeWorkflow(
         audio_decoder=_build_audio_decoder(settings),
         audio_preprocessor=AudioPreprocessor(settings),
         source_separator=_build_source_separator(settings),
         vad=_build_vad(settings),
         diarizer=_build_diarizer(settings),
         asr=_build_asr(settings),
-        config=_build_transcription_pipeline_config(settings),
+        config=_build_transcribe_pipeline_config(settings),
     )
 
 
-def build_chaptering_workflow(
+def build_generate_chapters_workflow(
     settings: Settings | None = None,
-) -> ChapteringWorkflow:
-    settings = settings or get_settings()
-    llm_client = (
-        build_llm_chat_client(settings) if _chaptering_uses_llm(settings) else None
-    )
-
-    return ChapteringWorkflow(
-        embedding=build_chaptering_embedding_provider(settings),
-        boundary_evaluator=build_chaptering_boundary_evaluation_provider(
-            settings,
-            llm_client=llm_client,
-        ),
-        title_provider=build_chaptering_title_provider(
-            settings,
-            llm_client=llm_client,
-        ),
-        config=_build_chaptering_pipeline_config(settings),
-    )
-
-
-def build_short_clip_workflow(
-    settings: Settings | None = None,
-) -> ShortClipWorkflow:
+) -> GenerateChaptersWorkflow:
     settings = settings or get_settings()
     llm_client = (
         build_llm_chat_client(settings)
-        if settings.short_clip_candidate_provider == "openai-compatible"
+        if _generate_chapters_uses_llm(settings)
         else None
     )
 
-    return ShortClipWorkflow(
-        candidate_provider=build_short_clip_candidate_provider(
+    return GenerateChaptersWorkflow(
+        embedding=build_generate_chapters_embedding_provider(settings),
+        boundary_evaluator=build_generate_chapters_boundary_evaluation_provider(
+            settings,
+            llm_client=llm_client,
+        ),
+        title_provider=build_generate_chapters_title_provider(
+            settings,
+            llm_client=llm_client,
+        ),
+        config=_build_generate_chapters_pipeline_config(settings),
+    )
+
+
+def build_generate_short_clips_workflow(
+    settings: Settings | None = None,
+) -> GenerateShortClipsWorkflow:
+    settings = settings or get_settings()
+    llm_client = (
+        build_llm_chat_client(settings)
+        if settings.generate_short_clips_candidate_provider == "openai-compatible"
+        else None
+    )
+
+    return GenerateShortClipsWorkflow(
+        candidate_provider=build_generate_short_clips_candidate_provider(
             settings,
             llm_client=llm_client,
         ),
         fallback_candidate_provider=(
-            NoopShortClipCandidateProvider(
-                model_name=settings.short_clip_model_name,
+            NoopGenerateShortClipsCandidateProvider(
+                model_name=settings.generate_short_clips_model_name,
             )
-            if settings.short_clip_candidate_provider == "openai-compatible"
+            if settings.generate_short_clips_candidate_provider == "openai-compatible"
             else None
         ),
     )
 
 
-def build_short_clip_candidate_provider(
+def build_generate_short_clips_candidate_provider(
     settings: Settings,
     *,
     llm_client: OpenAICompatibleChatClient | None = None,
-) -> NoopShortClipCandidateProvider | OpenAICompatibleShortClipCandidateProvider:
-    if settings.short_clip_candidate_provider == "openai-compatible":
-        return OpenAICompatibleShortClipCandidateProvider(
+) -> (
+    NoopGenerateShortClipsCandidateProvider
+    | OpenAICompatibleGenerateShortClipsCandidateProvider
+):
+    if settings.generate_short_clips_candidate_provider == "openai-compatible":
+        return OpenAICompatibleGenerateShortClipsCandidateProvider(
             chat_client=llm_client or build_llm_chat_client(settings),
         )
 
-    return NoopShortClipCandidateProvider(
-        model_name=settings.short_clip_model_name,
+    return NoopGenerateShortClipsCandidateProvider(
+        model_name=settings.generate_short_clips_model_name,
     )
 
 
@@ -141,26 +148,28 @@ def build_llm_chat_client(settings: Settings) -> OpenAICompatibleChatClient:
     )
 
 
-def build_chaptering_embedding_provider(settings: Settings) -> TextEmbeddingPort:
-    if settings.chaptering_embedding_provider == "sentence-transformers":
+def build_generate_chapters_embedding_provider(settings: Settings) -> TextEmbeddingPort:
+    if settings.generate_chapters_embedding_provider == "sentence-transformers":
         return SentenceTransformerTextEmbeddingProvider(
-            model_name=settings.chaptering_embedding_model_name,
-            device=settings.chaptering_embedding_device,
-            batch_size=settings.chaptering_embedding_batch_size,
-            max_sequence_length=(settings.chaptering_embedding_max_sequence_length),
-            cache_path=settings.chaptering_embedding_cache_path,
-            local_files_only=settings.chaptering_embedding_local_files_only,
+            model_name=settings.generate_chapters_embedding_model_name,
+            device=settings.generate_chapters_embedding_device,
+            batch_size=settings.generate_chapters_embedding_batch_size,
+            max_sequence_length=(
+                settings.generate_chapters_embedding_max_sequence_length
+            ),
+            cache_path=settings.generate_chapters_embedding_cache_path,
+            local_files_only=settings.generate_chapters_embedding_local_files_only,
         )
 
     return NoopTextEmbeddingProvider()
 
 
-def build_chaptering_boundary_evaluation_provider(
+def build_generate_chapters_boundary_evaluation_provider(
     settings: Settings,
     *,
     llm_client: OpenAICompatibleChatClient | None = None,
 ) -> ChapterBoundaryEvaluationPort:
-    if settings.chaptering_boundary_evaluation_provider == "openai-compatible":
+    if settings.generate_chapters_boundary_evaluation_provider == "openai-compatible":
         return OpenAICompatibleChapterBoundaryEvaluationProvider(
             chat_client=llm_client or build_llm_chat_client(settings),
         )
@@ -168,12 +177,12 @@ def build_chaptering_boundary_evaluation_provider(
     return NoopChapterBoundaryEvaluationProvider()
 
 
-def build_chaptering_title_provider(
+def build_generate_chapters_title_provider(
     settings: Settings,
     *,
     llm_client: OpenAICompatibleChatClient | None = None,
 ) -> ChapterTitleProviderPort:
-    if settings.chaptering_title_provider == "openai-compatible":
+    if settings.generate_chapters_title_provider == "openai-compatible":
         return OpenAICompatibleChapterTitleProvider(
             chat_client=llm_client or build_llm_chat_client(settings),
         )
@@ -181,76 +190,80 @@ def build_chaptering_title_provider(
     return NoopChapterTitleProvider()
 
 
-def _chaptering_uses_llm(settings: Settings) -> bool:
+def _generate_chapters_uses_llm(settings: Settings) -> bool:
     return (
-        settings.chaptering_boundary_evaluation_provider == "openai-compatible"
-        or settings.chaptering_title_provider == "openai-compatible"
+        settings.generate_chapters_boundary_evaluation_provider == "openai-compatible"
+        or settings.generate_chapters_title_provider == "openai-compatible"
     )
 
 
-def _build_chaptering_pipeline_config(settings: Settings) -> ChapteringPipelineConfig:
-    return ChapteringPipelineConfig(
-        strategy=settings.chaptering_strategy,
-        model_name=settings.chaptering_model_name,
-        target_unit_duration_seconds=(settings.chaptering_target_unit_duration_seconds),
-        max_unit_duration_seconds=settings.chaptering_max_unit_duration_seconds,
-        target_unit_words=settings.chaptering_target_unit_words,
-        max_unit_words=settings.chaptering_max_unit_words,
-        max_unit_chars=settings.chaptering_max_unit_chars,
-        pause_boundary_seconds=settings.chaptering_pause_boundary_seconds,
-        punctuation_poor_threshold=settings.chaptering_punctuation_poor_threshold,
-        context_window_seconds=settings.chaptering_context_window_seconds,
+def _build_generate_chapters_pipeline_config(
+    settings: Settings,
+) -> GenerateChaptersPipelineConfig:
+    return GenerateChaptersPipelineConfig(
+        strategy=settings.generate_chapters_strategy,
+        model_name=settings.generate_chapters_model_name,
+        target_unit_duration_seconds=(
+            settings.generate_chapters_target_unit_duration_seconds
+        ),
+        max_unit_duration_seconds=settings.generate_chapters_max_unit_duration_seconds,
+        target_unit_words=settings.generate_chapters_target_unit_words,
+        max_unit_words=settings.generate_chapters_max_unit_words,
+        max_unit_chars=settings.generate_chapters_max_unit_chars,
+        pause_boundary_seconds=settings.generate_chapters_pause_boundary_seconds,
+        punctuation_poor_threshold=settings.generate_chapters_punctuation_poor_threshold,
+        context_window_seconds=settings.generate_chapters_context_window_seconds,
         scoring=CandidateScoringConfig(
-            context_seconds=settings.chaptering_candidate_score_context_seconds,
-            long_pause_seconds=settings.chaptering_candidate_long_pause_seconds,
+            context_seconds=settings.generate_chapters_candidate_score_context_seconds,
+            long_pause_seconds=settings.generate_chapters_candidate_long_pause_seconds,
             max_pause_score_seconds=(
-                settings.chaptering_candidate_max_pause_score_seconds
+                settings.generate_chapters_candidate_max_pause_score_seconds
             ),
-            min_context_text_chars=settings.chaptering_candidate_min_context_text_chars,
+            min_context_text_chars=settings.generate_chapters_candidate_min_context_text_chars,
             discourse_marker_weight=(
-                settings.chaptering_candidate_discourse_marker_weight
+                settings.generate_chapters_candidate_discourse_marker_weight
             ),
-            pause_weight=settings.chaptering_candidate_pause_weight,
-            lexical_shift_weight=settings.chaptering_candidate_lexical_shift_weight,
+            pause_weight=settings.generate_chapters_candidate_pause_weight,
+            lexical_shift_weight=settings.generate_chapters_candidate_lexical_shift_weight,
             boundary_quality_weight=(
-                settings.chaptering_candidate_boundary_quality_weight
+                settings.generate_chapters_candidate_boundary_quality_weight
             ),
             duration_sanity_weight=(
-                settings.chaptering_candidate_duration_sanity_weight
+                settings.generate_chapters_candidate_duration_sanity_weight
             ),
         ),
         valley=ValleyDetectionConfig(
-            smoothing_radius=settings.chaptering_valley_smoothing_radius,
-            peak_window=settings.chaptering_valley_peak_window,
-            min_valley_depth=settings.chaptering_valley_min_depth,
-            semantic_weight=settings.chaptering_valley_semantic_weight,
+            smoothing_radius=settings.generate_chapters_valley_smoothing_radius,
+            peak_window=settings.generate_chapters_valley_peak_window,
+            min_valley_depth=settings.generate_chapters_valley_min_depth,
+            semantic_weight=settings.generate_chapters_valley_semantic_weight,
         ),
         retention=CandidateRetentionConfig(
-            min_limit=settings.chaptering_embedding_candidate_min_limit,
-            max_limit=settings.chaptering_embedding_candidate_max_limit,
-            multiplier=settings.chaptering_embedding_candidate_multiplier,
-            top_score_fraction=settings.chaptering_candidate_top_score_fraction,
+            min_limit=settings.generate_chapters_embedding_candidate_min_limit,
+            max_limit=settings.generate_chapters_embedding_candidate_max_limit,
+            multiplier=settings.generate_chapters_embedding_candidate_multiplier,
+            top_score_fraction=settings.generate_chapters_candidate_top_score_fraction,
         ),
         unit_repair=UnitRepairConfig(
             short_duration_seconds=(
-                settings.chaptering_unit_repair_short_duration_seconds
+                settings.generate_chapters_unit_repair_short_duration_seconds
             ),
-            min_words=settings.chaptering_unit_repair_min_words,
-            fragment_max_words=settings.chaptering_unit_repair_fragment_max_words,
+            min_words=settings.generate_chapters_unit_repair_min_words,
+            fragment_max_words=settings.generate_chapters_unit_repair_fragment_max_words,
             sparse_duration_seconds=(
-                settings.chaptering_unit_repair_sparse_duration_seconds
+                settings.generate_chapters_unit_repair_sparse_duration_seconds
             ),
             continuation_gap_seconds=(
-                settings.chaptering_unit_repair_continuation_gap_seconds
+                settings.generate_chapters_unit_repair_continuation_gap_seconds
             ),
         ),
     )
 
 
-def _build_transcription_pipeline_config(
+def _build_transcribe_pipeline_config(
     settings: Settings,
-) -> TranscriptionPipelineConfig:
-    return TranscriptionPipelineConfig(
+) -> TranscribePipelineConfig:
+    return TranscribePipelineConfig(
         vad_sample_rate=settings.vad_sample_rate,
         vad_min_total_speech_ms=settings.vad_min_total_speech_ms,
         vad_min_speech_ratio=settings.vad_min_speech_ratio,

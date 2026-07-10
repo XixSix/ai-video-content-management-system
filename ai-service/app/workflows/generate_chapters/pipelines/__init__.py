@@ -1,0 +1,1 @@
+"""GenerateChapters pipeline strategy implementations."""

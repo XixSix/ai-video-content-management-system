@@ -6,21 +6,21 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from app.core.config import AI_SERVICE_DIR, get_settings
-from app.scripts.chaptering.analyze_unit import main as analyze_unit_main
-from app.scripts.chaptering.buid_unit import main as build_unit_main
+from app.scripts.generate_chapters.analyze_unit import main as analyze_unit_main
+from app.scripts.generate_chapters.buid_unit import main as build_unit_main
 
-CHAPTERING_EVAL_DIR = AI_SERVICE_DIR / "storage" / "chaptering_eval"
-YTSEG_DIR = CHAPTERING_EVAL_DIR / "ytseg"
+GENERATE_CHAPTERS_EVAL_DIR = AI_SERVICE_DIR / "storage" / "generate_chapters_eval"
+YTSEG_DIR = GENERATE_CHAPTERS_EVAL_DIR / "ytseg"
 
 
-def chaptering_build_units() -> None:
-    """Build chaptering units for the local YTSeg evaluation dataset."""
+def generate_chapters_build_units() -> None:
+    """Build generate_chapters units for the local YTSeg evaluation dataset."""
     parser = ArgumentParser(
-        description="Build chaptering units for the local YTSeg evaluation dataset."
+        description="Build generate_chapters units for the local YTSeg evaluation dataset."
     )
     parser.add_argument(
         "--run-name",
-        default=_chaptering_run_name(),
+        default=_generate_chapters_run_name(),
         help="Name used in the default output directory.",
     )
     parser.add_argument(
@@ -51,14 +51,14 @@ def chaptering_build_units() -> None:
     )
 
 
-def chaptering_analyze_units() -> None:
-    """Analyze built chaptering units for dev and holdout YTSeg splits."""
+def generate_chapters_analyze_units() -> None:
+    """Analyze built generate_chapters units for dev and holdout YTSeg splits."""
     parser = ArgumentParser(
-        description="Analyze built chaptering units for the local YTSeg dataset."
+        description="Analyze built generate_chapters units for the local YTSeg dataset."
     )
     parser.add_argument(
         "--run-name",
-        default=_chaptering_run_name(),
+        default=_generate_chapters_run_name(),
         help="Name used to find the default units directory and write analysis output.",
     )
     parser.add_argument(
@@ -102,20 +102,20 @@ def chaptering_analyze_units() -> None:
 
 
 def _default_units_dir(run_name: str) -> Path:
-    return CHAPTERING_EVAL_DIR / f"units_{run_name}"
+    return GENERATE_CHAPTERS_EVAL_DIR / f"units_{run_name}"
 
 
 def _default_analysis_dir(run_name: str, split: str) -> Path:
-    return CHAPTERING_EVAL_DIR / f"analysis_{run_name}_{split}"
+    return GENERATE_CHAPTERS_EVAL_DIR / f"analysis_{run_name}_{split}"
 
 
-def _chaptering_run_name() -> str:
+def _generate_chapters_run_name() -> str:
     settings = get_settings()
     return "_".join(
         [
-            settings.chaptering_strategy,
-            _compact_number(settings.chaptering_target_unit_duration_seconds),
-            _compact_number(settings.chaptering_max_unit_duration_seconds),
+            settings.generate_chapters_strategy,
+            _compact_number(settings.generate_chapters_target_unit_duration_seconds),
+            _compact_number(settings.generate_chapters_max_unit_duration_seconds),
         ]
     )
 

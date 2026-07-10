@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package transcribe.v1;
+
+service TranscribeService {
+  rpc Transcribe(TranscribeRequest) returns (TranscribeResponse);
+}
+
+message AudioSource {
+  oneof source {
+    string url = 1;
+    string s3_uri = 2;
+    string local_path = 3;
+  }
+}
+
+message VADOptions {
+  bool enabled = 1;
+  optional string sensitivity = 2;
+}
+
+message DiarizationOptions {
+  bool enabled = 1;
+  optional int32 num_speakers = 2;
+  optional int32 min_speakers = 3;
+  optional int32 max_speakers = 4;
+}
+
+message SourceSeparationOptions {
+  bool enabled = 1;
+  optional string mode = 2;
+}
+
+message WordTimestampsOptions {
+  bool enabled = 1;
+}
+
+message TranscribeOptions {
+  string language = 1;
+  VADOptions vad = 2;
+  DiarizationOptions diarization = 3;
+  SourceSeparationOptions source_separation = 4;
+  WordTimestampsOptions word_timestamps = 5;
+}
+
+message TranscribeRequest {
+  string job_id = 1;
+  AudioSource audio = 2;
+  TranscribeOptions options = 3;
+}
+
+enum TranscribeStatus {
+  TRANSCRIBE_STATUS_UNSPECIFIED = 0;
+  TRANSCRIBE_STATUS_COMPLETED = 1;
+  TRANSCRIBE_STATUS_FAILED = 2;
+}
+
+enum TranscribeErrorCode {
+  TRANSCRIBE_ERROR_CODE_UNSPECIFIED = 0;
+  TRANSCRIBE_ERROR_CODE_INVALID_REQUEST = 1;
+  TRANSCRIBE_ERROR_CODE_AUDIO_NOT_FOUND = 2;
+  TRANSCRIBE_ERROR_CODE_AUDIO_READ_FAILED = 3;
+  TRANSCRIBE_ERROR_CODE_UNSUPPORTED_LANGUAGE = 4;
+  TRANSCRIBE_ERROR_CODE_ASR_PROVIDER_FAILED = 5;
+  TRANSCRIBE_ERROR_CODE_TIMEOUT = 6;
+  TRANSCRIBE_ERROR_CODE_INTERNAL = 7;
+}
+
+message TranscribeError {
+  TranscribeErrorCode code = 1;
+  string message = 2;
+  bool retryable = 3;
+}
+
+message TranscribeResponse {
+  string job_id = 1;
+  TranscribeStatus status = 2;
+  repeated TranscriptSegment segments = 3;
+  optional TranscribeError error = 4;
+  string language = 5;
+  string asr_model = 6;
+}
+
+message TranscriptWord {
+  double start_seconds = 1;
+  double end_seconds = 2;
+  optional string speaker = 3;
+  string text = 4;
+  optional float confidence = 5;
+}
+
+message TranscriptSegment {
+  double start_seconds = 1;
+  double end_seconds = 2;
+  optional string speaker = 3;
+  string text = 4;
+  optional float confidence = 5;
+  repeated TranscriptWord words = 6;
+}
