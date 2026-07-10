@@ -61,18 +61,33 @@ export const homeFeaturedTools: FeaturedTool[] = [
     title: "Voiceover for video",
     description: "Add realistic AI voiceovers to uploaded media and Studio edits.",
     href: "/text-to-speech",
+    preview: {
+      alt: "Voiceover workflow preview",
+      lightSrc: "/bg1.3czdpxot5vljk.png",
+      darkSrc: "/bg1-dark.3rjmexebqum6j.png",
+    },
   },
   {
     id: "content-flow",
     title: "Create a content flow",
     description: "Chain transcript, chapter, clip, and publish steps for one source.",
     href: "/studio",
+    preview: {
+      alt: "Content flow workflow preview",
+      lightSrc: "/bg2.1evtyup7e-f6y.png",
+      darkSrc: "/bg2-dark.1t_x43rd46qy4.png",
+    },
   },
   {
     id: "clone-voice",
     title: "Clone a voice",
     description: "Prepare reusable voice assets for narration and publishing flows.",
     href: "/text-to-speech",
+    preview: {
+      alt: "Voice cloning workflow preview",
+      lightSrc: "/bg3.41cudxch35-4b.png",
+      darkSrc: "/bg3-dark.2mv5zn7n4n_2z.png",
+    },
   },
 ]
 

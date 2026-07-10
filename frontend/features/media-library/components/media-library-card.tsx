@@ -126,20 +126,22 @@ export function MediaLibraryCard({
         </div>
 
         <CardHeader className="gap-2 pb-4">
-          <div className="flex items-start justify-between gap-3">
-            <CardTitle className="line-clamp-2 text-[15px]">
+          <div className="flex min-w-0 items-start justify-between gap-3">
+            <CardTitle className="min-w-0 flex-1 overflow-hidden truncate text-[15px]" title={item.title}>
               {item.title}
             </CardTitle>
             {showActions ? (
-              <MediaLibraryActionsMenu
-                item={item}
-                onRename={
-                  item.libraryGroup === "ORIGINAL"
-                    ? (title) => onRename?.(item.id, title)
-                    : undefined
-                }
-                onDelete={() => onDelete?.(item)}
-              />
+              <div className="shrink-0">
+                <MediaLibraryActionsMenu
+                  item={item}
+                  onRename={
+                    item.libraryGroup === "ORIGINAL"
+                      ? (title) => onRename?.(item.id, title)
+                      : undefined
+                  }
+                  onDelete={() => onDelete?.(item)}
+                />
+              </div>
             ) : null}
           </div>
         </CardHeader>
@@ -168,39 +170,41 @@ export function MediaLibraryCard({
       )}
 
       <CardHeader className="gap-2 pb-4">
-        <div className="flex items-start justify-between gap-3">
-          <CardTitle className="line-clamp-2 text-[15px]">
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <CardTitle className="min-w-0 flex-1 overflow-hidden text-[15px]" title={item.title}>
             {href ? (
-              <Link href={href} className="hover:text-foreground-subtle">
+              <Link href={href} className="block w-full truncate hover:text-foreground-subtle">
                 {item.title}
               </Link>
             ) : onOpen ? (
               <button
                 type="button"
-                className="text-left hover:text-foreground-subtle"
+                className="block w-full truncate text-left hover:text-foreground-subtle"
                 onClick={openItem}
               >
                 {item.title}
               </button>
             ) : (
-              <Link href={defaultHref} className="hover:text-foreground-subtle">
+              <Link href={defaultHref} className="block w-full truncate hover:text-foreground-subtle">
                 {item.title}
               </Link>
             )}
           </CardTitle>
           {showActions ? (
-            <MediaLibraryActionsMenu
-              item={item}
-              onRename={
-                item.libraryGroup === "ORIGINAL"
-                  ? (title) => onRename?.(item.id, title)
-                  : undefined
-              }
-              onDelete={() => onDelete?.(item)}
-              onDownload={() => onDownload?.(item)}
-              onRetry={() => onRetry?.(item)}
-              onDismiss={() => onDismiss?.(item)}
-            />
+            <div className="shrink-0">
+              <MediaLibraryActionsMenu
+                item={item}
+                onRename={
+                  item.libraryGroup === "ORIGINAL"
+                    ? (title) => onRename?.(item.id, title)
+                    : undefined
+                }
+                onDelete={() => onDelete?.(item)}
+                onDownload={() => onDownload?.(item)}
+                onRetry={() => onRetry?.(item)}
+                onDismiss={() => onDismiss?.(item)}
+              />
+            </div>
           ) : null}
         </div>
         {item.uploadInterrupted ? (

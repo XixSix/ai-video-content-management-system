@@ -1,10 +1,14 @@
 "use client"
 
+import { useQueries } from "@tanstack/react-query"
+
 import { SectionHeader } from "@/components/shared/section-header"
 import { Card, CardContent } from "@/components/ui/card"
 import { MediaLibraryCard } from "@/features/media-library/components/media-library-card"
 import { MediaLibraryLoading } from "@/features/media-library/components/media-library-loading"
 import { useMediaList } from "@/features/media-library/hooks/use-media-list"
+import { mediaQueryKeys } from "@/features/media-library/hooks/media-query-keys"
+import { mediaService } from "@/features/media-library/services/media.service"
 import { useWorkspace } from "@/features/workspaces/components/workspace-provider"
 
 export function RecentMediaSection() {
@@ -15,6 +19,30 @@ export function RecentMediaSection() {
     sortBy: "createdAt",
     sortOrder: "desc",
   })
+  const recentItems = mediaQuery.data?.items.slice(0, 4) ?? []
+  const imagePreviewQueries = useQueries({
+    queries: recentItems.map((item) => ({
+      queryKey: mediaQueryKeys.preview(selectedWorkspaceId ?? "", item.id),
+      queryFn: () => mediaService.getPreviewUrl(selectedWorkspaceId!, item.id),
+      enabled:
+        Boolean(selectedWorkspaceId) &&
+        item.type === "IMAGE" &&
+        item.status === "UPLOADED" &&
+        !item.thumbnailUrl &&
+        !item.assetUrl,
+      staleTime: 5 * 60 * 1000,
+    })),
+  })
+  const previewUrlById = new Map(
+    recentItems
+      .map((item, index) => [item.id, imagePreviewQueries[index]?.data?.url] as const)
+      .filter((entry): entry is readonly [string, string] => Boolean(entry[1]))
+  )
+  const enrichedRecentItems = recentItems.map((item) =>
+    item.type === "IMAGE" && previewUrlById.has(item.id)
+      ? { ...item, assetUrl: previewUrlById.get(item.id)! }
+      : item
+  )
 
   return (
     <section className="space-y-4">
@@ -26,9 +54,9 @@ export function RecentMediaSection() {
       />
       {mediaQuery.isLoading ? (
         <MediaLibraryLoading viewMode="grid" />
-      ) : mediaQuery.data && mediaQuery.data.items.length > 0 ? (
+      ) : enrichedRecentItems.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {mediaQuery.data.items.slice(0, 4).map((item, index) => (
+          {enrichedRecentItems.map((item, index) => (
             <MediaLibraryCard
               key={item.id}
               eagerThumbnail={index < 4}
