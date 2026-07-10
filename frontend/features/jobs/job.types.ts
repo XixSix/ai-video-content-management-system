@@ -19,6 +19,7 @@ export type ProcessingJobData = {
   jobType: string
   status: ProcessingJobStatus
   progress: number | null
+  errorCode: string | null
   errorMessage: string | null
   output: Record<string, unknown> | null
   attemptCount: number

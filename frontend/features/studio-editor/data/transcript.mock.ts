@@ -64,7 +64,7 @@ export const transcriptSegments: StudioTranscriptSegment[] = [
     segmentIndex: 2,
     startTime: 15.6,
     endTime: 24.3,
-    text: "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
+    text: "Once the wording is right, chapter generation and clip selection stop drifting away from the actual message.",
     speakerLabel: "Speaker 1",
     confidence: 0.96,
   },

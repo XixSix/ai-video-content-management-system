@@ -126,7 +126,7 @@ export function StudioCaptionsPanel() {
         }
 
         toast.error("Transcript generation failed", {
-          description: job.errorMessage ?? "Please try again.",
+          description: job.errorMessage ?? job.errorCode ?? "Please try again.",
         })
       },
     })

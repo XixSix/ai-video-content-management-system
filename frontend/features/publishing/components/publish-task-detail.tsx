@@ -339,7 +339,7 @@ export function PublishTaskDetail({
           ) : null}
         </div>
 
-        {task.status === "FAILED" && task.errorMessage ? (
+        {task.status === "FAILED" && (task.errorMessage || task.errorCode) ? (
           <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4">
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 size-4 text-destructive" />
@@ -348,7 +348,7 @@ export function PublishTaskDetail({
                   Publishing failed
                 </p>
                 <p className="text-sm leading-5 text-destructive">
-                  {task.errorMessage}
+                  {task.errorMessage ?? task.errorCode}
                 </p>
               </div>
             </div>

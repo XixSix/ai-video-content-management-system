@@ -60,7 +60,7 @@ export function useRenderExportFlow({
 
     if (job.status !== "COMPLETED") {
       toast.error("Export failed", {
-        description: job.errorMessage ?? "The render job did not complete.",
+        description: job.errorMessage ?? job.errorCode ?? "The render job did not complete.",
       })
       return
     }

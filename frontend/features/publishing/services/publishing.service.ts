@@ -41,6 +41,7 @@ export type PublishTaskResponseData = {
   publishedAt: string | null
   platformPostId: string | null
   platformPostUrl: string | null
+  errorCode: string | null
   errorMessage: string | null
   createdAt: string
   updatedAt: string

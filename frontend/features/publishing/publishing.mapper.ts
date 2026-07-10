@@ -92,6 +92,7 @@ export function mapPublishTaskResponse(task: PublishTaskResponseData): PublishTa
     scheduledAt: task.scheduledAt,
     publishedAt: task.publishedAt,
     platformPostUrl: task.platformPostUrl,
+    errorCode: task.errorCode,
     errorMessage: task.errorMessage,
     createdAt: task.createdAt,
   }

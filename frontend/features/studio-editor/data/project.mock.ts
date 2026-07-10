@@ -108,7 +108,7 @@ export const studioEditorProject: StudioEditorProject = {
       startTime: 104,
       endTime: 138,
       duration: 34,
-      text: "Once the wording is right, chaptering and clip selection stop drifting away from the actual message.",
+      text: "Once the wording is right, chapter generation and clip selection stop drifting away from the actual message.",
       reviewNotes: [
         "Clear takeaway",
         "Good pacing for vertical video",
