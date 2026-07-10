@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from app.core.config import settings
 from app.db import jobs_repository, transcript_repository
 from app.db.client import get_db_session
+from app.errors import TerminalJobError
 from app.pipelines.transcribe.pipeline import run_transcribe_pipeline
 from app.schemas.db.processsing_job import JobStatus, ProcessingJobRow
 from app.schemas.jobs.transcribe_message import (
@@ -18,10 +19,8 @@ from app.schemas.transcribe.output import TranscribeJobOutput
 logger = logging.getLogger(__name__)
 
 
-class TerminalTranscribeJobError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalTranscribeJobError(TerminalJobError):
+    pass
 
 
 def process_transcribe_job(message: TranscribeJobMessage) -> dict[str, Any]:

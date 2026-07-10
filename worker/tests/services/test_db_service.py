@@ -1,7 +1,5 @@
 from uuid import UUID
 
-import pytest
-
 from app.db import (
     chapters_repository,
     jobs_repository,
@@ -157,7 +155,7 @@ def test_generate_chapters_loads_transcript_segments_in_timeline_order() -> None
     }
     session = FakeSession(rows=[transcript_row, []])
 
-    chapters_repository.load_transcript_for_chapters(
+    chapters_repository.load_transcript(
         session,
         transcript_id="00000000-0000-4000-8000-000000000004",
         media_id=MEDIA_ID,
@@ -172,19 +170,18 @@ def test_generate_chapters_loads_transcript_segments_in_timeline_order() -> None
     )
 
 
-def test_generate_chapters_rejects_a_stale_transcript_version() -> None:
-    session = FakeSession(rows=[None, {"version": 2}])
+def test_generate_chapters_returns_none_when_version_snapshot_is_missing() -> None:
+    session = FakeSession(rows=[None])
 
-    with pytest.raises(chapters_repository.TranscriptVersionMismatchError) as error:
-        chapters_repository.load_transcript_for_chapters(
-            session,
-            transcript_id="00000000-0000-4000-8000-000000000004",
-            media_id=MEDIA_ID,
-            transcript_version=1,
-        )
+    transcript = chapters_repository.load_transcript(
+        session,
+        transcript_id="00000000-0000-4000-8000-000000000004",
+        media_id=MEDIA_ID,
+        transcript_version=1,
+    )
 
-    assert error.value.expected == 1
-    assert error.value.actual == 2
+    assert transcript is None
+    assert len(session.statements) == 1
 
 
 def test_short_clip_source_loads_transcript_segments_in_timeline_order() -> None:
@@ -221,58 +218,68 @@ def test_short_clip_source_loads_transcript_segments_in_timeline_order() -> None
         session.statements[1]
     )
     assert "transcript_version = :transcript_version" in str(session.statements[2])
+    assert session.params[2]["transcript_version"] == 1
 
 
-def test_short_clip_source_rejects_a_stale_transcript_version() -> None:
-    session = FakeSession(rows=[None, {"version": 3}])
+def test_short_clip_source_returns_none_when_version_snapshot_is_missing() -> None:
+    session = FakeSession(rows=[None])
 
-    with pytest.raises(short_clip_repository.TranscriptVersionMismatchError) as error:
-        short_clip_repository.load_short_clip_source(
-            session,
-            media_id=MEDIA_ID,
-            transcript_id="00000000-0000-4000-8000-000000000004",
-            transcript_version=2,
-        )
+    source = short_clip_repository.load_short_clip_source(
+        session,
+        media_id=MEDIA_ID,
+        transcript_id="00000000-0000-4000-8000-000000000004",
+        transcript_version=2,
+    )
 
-    assert error.value.expected == 2
-    assert error.value.actual == 3
-
-
-def test_save_chapters_rejects_version_changed_during_generation() -> None:
-    session = FakeSession(rows=[{"version": 3}])
-
-    with pytest.raises(chapters_repository.TranscriptVersionMismatchError):
-        chapters_repository.save_chapters(
-            session,
-            job_id=JOB_ID,
-            media_id=MEDIA_ID,
-            transcript_id="00000000-0000-4000-8000-000000000004",
-            transcript_version=2,
-            chapters=[],
-            source="SEGMENTS",
-            model="test-model",
-        )
-
+    assert source is None
     assert len(session.statements) == 1
 
 
-def test_save_clip_candidates_rejects_version_changed_during_generation() -> None:
-    session = FakeSession(rows=[{"version": 3}])
+def test_save_chapters_does_not_validate_transcript_version() -> None:
+    session = FakeSession(rows=[[]])
 
-    with pytest.raises(short_clip_repository.TranscriptVersionMismatchError):
-        short_clip_repository.save_clip_candidates(
-            session,
-            job_id=JOB_ID,
-            media_id=MEDIA_ID,
-            user_id="00000000-0000-4000-8000-000000000003",
-            transcript_id="00000000-0000-4000-8000-000000000004",
-            transcript_version=2,
-            project_id=None,
-            candidates=[],
-            options=GenerateShortClipsOptions(),
-        )
+    chapters_repository.save_chapters(
+        session,
+        job_id=JOB_ID,
+        media_id=MEDIA_ID,
+        transcript_id="00000000-0000-4000-8000-000000000004",
+        transcript_version=2,
+        chapters=[],
+        source="SEGMENTS",
+        model="test-model",
+    )
 
-    assert len(session.statements) == 1
+    assert "SELECT version" not in str(session.statements[0])
+
+
+def test_save_clip_candidates_does_not_validate_transcript_version() -> None:
+    session = FakeSession(rows=[[]])
+
+    short_clip_repository.save_clip_candidates(
+        session,
+        job_id=JOB_ID,
+        media_id=MEDIA_ID,
+        user_id="00000000-0000-4000-8000-000000000003",
+        transcript_id="00000000-0000-4000-8000-000000000004",
+        transcript_version=2,
+        project_id=None,
+        candidates=[],
+        options=GenerateShortClipsOptions(),
+    )
+
+    assert "SELECT version" not in str(session.statements[0])
+
+
+def test_mark_short_clips_failed_by_job_id_updates_domain_rows() -> None:
+    session = FakeSession(rows=[])
+
+    short_clip_repository.mark_short_clips_failed_by_job_id(session, JOB_ID)
+
+    statement = str(session.statements[0])
+    assert "UPDATE short_clips sc" in statement
+    assert "FROM clip_candidates cc" in statement
+    assert "cc.job_id = :job_id" in statement
+    assert session.params[0]["job_id"] == JOB_ID
 
 
 def test_increment_attempt_count_releases_job_for_retry() -> None:
@@ -304,7 +311,7 @@ def test_save_chapters_persists_boundary_scores() -> None:
         "semantic_shift_score": 0.0,
         "duration_score": 0.8,
     }
-    session = FakeSession(rows=[{"version": 2}, None, None, [chapter_row]])
+    session = FakeSession(rows=[None, None, [chapter_row]])
     chapter = ChapterCandidate(
         chapter_index=1,
         start_time=0.0,
@@ -333,8 +340,8 @@ def test_save_chapters_persists_boundary_scores() -> None:
         model="ai-service-generate-chapters-v1",
     )
 
-    assert "FOR SHARE" in str(session.statements[0])
-    insert_params = session.params[2]
+    assert "FOR SHARE" not in str(session.statements[0])
+    insert_params = session.params[1]
     assert insert_params["score"] == 0.91
     assert insert_params["boundary_score"] == 0.91
     assert insert_params["pause_score"] == 0.2

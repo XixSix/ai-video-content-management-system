@@ -1,34 +1,31 @@
 import logging
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from uuid import UUID
 
 from app.core.config import settings
 from app.db import short_clip_repository
 from app.db.client import get_db_session
+from app.errors import TerminalPipelineError
+from app.errors.policies import raise_if_retryable, raise_terminal
 from app.schemas.db.processsing_job import ProcessingJobRow
 from app.schemas.short_clip.input import GenerateShortClipsOptions
 from app.schemas.short_clip.output import GenerateShortClipsJobOutput
 from app.schemas.short_clip.result import ShortClipCandidateResult
 from app.services.ai_service import AIServiceTerminalError, ai_service_client
 from app.services.ffmpeg_service import FFmpegServiceError, ffmpeg_service
-from app.services.s3_service import (
-    S3ServiceError,
-    S3SourceObjectNotFoundError,
-    s3_service,
-)
-
+from app.services.s3_service import S3ServiceError, s3_service
 
 logger = logging.getLogger(__name__)
 
+GENERATE_SHORT_CLIPS_TERMINAL_S3_CODES = {"SOURCE_OBJECT_NOT_FOUND"}
+GENERATE_SHORT_CLIPS_TERMINAL_FFMPEG_CODES = {
+    "FFMPEG_COMMAND_FAILED",
+    "FFMPEG_OUTPUT_EMPTY",
+}
 
-class TerminalGenerateShortClipsPipelineError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
 
-
-DraftClipCandidate = ShortClipCandidateResult
+class TerminalGenerateShortClipsPipelineError(TerminalPipelineError):
+    pass
 
 
 def run_generate_short_clips_pipeline(
@@ -39,7 +36,7 @@ def run_generate_short_clips_pipeline(
     options: GenerateShortClipsOptions,
 ) -> GenerateShortClipsJobOutput:
     job_id = str(job.id)
-    settings.tmp_dir.mkdir(parents=True, exist_ok=True)
+    logger.info("Starting generate short clips pipeline job_id=%s", job_id)
 
     try:
         with get_db_session() as session:
@@ -49,42 +46,24 @@ def run_generate_short_clips_pipeline(
                 transcript_id=transcript_id,
                 transcript_version=transcript_version,
             )
-    except short_clip_repository.TranscriptVersionMismatchError as error:
-        raise TerminalGenerateShortClipsPipelineError(
-            str(error),
-            error_code="TRANSCRIPT_VERSION_MISMATCH",
-        ) from error
 
-    if source is None:
-        raise TerminalGenerateShortClipsPipelineError(
-            "Media or transcript source was not found",
-            error_code="SHORT_CLIP_SOURCE_NOT_FOUND",
+        source = _validate_source(
+            source,
+            job,
+            transcript_version=transcript_version,
         )
+        candidates = generate_clip_candidates(job_id, source, options)
 
-    _validate_source(
-        source,
-        job,
-        transcript_version=transcript_version,
-    )
-    drafts = generate_clip_candidates(job_id, source, options)
-
-    if not drafts:
-        raise TerminalGenerateShortClipsPipelineError(
-            "No valid short clip candidates could be generated",
-            error_code="SHORT_CLIP_CANDIDATES_EMPTY",
-        )
-
-    try:
         with get_db_session() as session:
             persisted_candidates = short_clip_repository.save_clip_candidates(
                 session,
-                job_id=str(job.id),
+                job_id=job_id,
                 media_id=str(job.media_id),
                 user_id=str(job.user_id),
                 transcript_id=transcript_id,
                 transcript_version=transcript_version,
                 project_id=source.project_id,
-                candidates=drafts,
+                candidates=candidates,
                 options=options,
             )
             selected_candidate = max(
@@ -98,51 +77,30 @@ def run_generate_short_clips_pipeline(
                     aspect_ratio=options.aspect_ratio,
                 )
             )
-    except short_clip_repository.TranscriptVersionMismatchError as error:
-        raise TerminalGenerateShortClipsPipelineError(
-            str(error),
-            error_code="TRANSCRIPT_VERSION_MISMATCH",
-        ) from error
 
-    with TemporaryDirectory(
-        prefix=f"short-clip-{job.id}-",
-        dir=settings.tmp_dir,
-    ) as temporary_directory:
-        workspace = Path(temporary_directory)
+        workspace = _workspace_for_job(job_id)
+        workspace.mkdir(parents=True, exist_ok=True)
         source_path = workspace / _source_filename(source.media.s3_key)
         output_path = workspace / "short-clip.mp4"
         subtitle_path = workspace / "short-clip.srt"
 
-        try:
-            s3_service.download_file(
-                source.media.s3_key,
-                source_path,
-                bucket=source.media.s3_bucket,
-            )
-            subtitle_path.write_text(
-                build_srt_for_candidate(source.segments, selected_candidate.start_time),
-                encoding="utf-8",
-            )
-            ffmpeg_service.render_short_clip(
-                source_path,
-                output_path,
-                start_time=selected_candidate.start_time,
-                duration=selected_candidate.duration,
-                aspect_ratio=options.aspect_ratio,
-                subtitle_path=subtitle_path if options.burn_subtitle else None,
-            )
-        except S3SourceObjectNotFoundError as error:
-            _mark_short_clip_failed(short_clip.id)
-            raise TerminalGenerateShortClipsPipelineError(
-                "Source media object was not found",
-                error_code=error.error_code,
-            ) from error
-        except (OSError, S3ServiceError, FFmpegServiceError) as error:
-            _mark_short_clip_failed(short_clip.id)
-            raise TerminalGenerateShortClipsPipelineError(
-                str(error),
-                error_code="SHORT_CLIP_RENDER_FAILED",
-            ) from error
+        s3_service.download_file(
+            source.media.s3_key,
+            source_path,
+            bucket=source.media.s3_bucket,
+        )
+        subtitle_path.write_text(
+            build_srt_for_candidate(source.segments, selected_candidate.start_time),
+            encoding="utf-8",
+        )
+        ffmpeg_service.render_short_clip(
+            source_path,
+            output_path,
+            start_time=selected_candidate.start_time,
+            duration=selected_candidate.duration,
+            aspect_ratio=options.aspect_ratio,
+            subtitle_path=subtitle_path if options.burn_subtitle else None,
+        )
 
         video_key = _output_key(job, short_clip.id, "mp4")
         subtitle_key = _output_key(job, short_clip.id, "srt")
@@ -170,7 +128,7 @@ def run_generate_short_clips_pipeline(
                 if selected_candidate.chapter_id
                 else None,
                 short_clip_id=str(short_clip.id),
-                job_id=str(job.id),
+                job_id=job_id,
                 asset_type="SHORT_CLIP_VIDEO",
                 transcript_version=transcript_version,
                 s3_bucket=source.media.s3_bucket,
@@ -194,7 +152,7 @@ def run_generate_short_clips_pipeline(
                 if selected_candidate.chapter_id
                 else None,
                 short_clip_id=str(short_clip.id),
-                job_id=str(job.id),
+                job_id=job_id,
                 asset_type="SHORT_CLIP_SUBTITLE",
                 transcript_version=transcript_version,
                 s3_bucket=source.media.s3_bucket,
@@ -206,76 +164,39 @@ def run_generate_short_clips_pipeline(
             )
             short_clip_repository.mark_short_clip_ready(session, str(short_clip.id))
 
-    candidate_ids = [candidate.id for candidate in persisted_candidates]
-    short_clip_ids = [short_clip.id]
-    asset_ids = [video_asset.id, subtitle_asset.id]
+        candidate_ids = [candidate.id for candidate in persisted_candidates]
+        short_clip_ids = [short_clip.id]
+        asset_ids = [video_asset.id, subtitle_asset.id]
 
-    return GenerateShortClipsJobOutput(
-        transcript_id=UUID(transcript_id),
-        transcript_version=transcript_version,
-        candidate_count=len(candidate_ids),
-        short_clip_count=len(short_clip_ids),
-        asset_count=len(asset_ids),
-        candidate_ids=candidate_ids,
-        short_clip_ids=short_clip_ids,
-        asset_ids=asset_ids,
-    )
-
-
-def build_fake_clip_candidates(
-    source: short_clip_repository.ShortClipSource,
-    options: GenerateShortClipsOptions,
-) -> list[DraftClipCandidate]:
-    """Build deterministic candidate windows from ordered transcript segments."""
-    segments = source.segments
-    candidates: list[DraftClipCandidate] = []
-
-    for start_index, start_segment in enumerate(segments):
-        window_segments: list[short_clip_repository.ShortClipTranscriptSegment] = []
-
-        for segment in segments[start_index:]:
-            window_segments.append(segment)
-            duration = window_segments[-1].end_time - window_segments[0].start_time
-
-            if duration < options.min_duration:
-                continue
-
-            if duration > options.max_duration:
-                break
-
-            candidates.append(_draft_from_segments(window_segments, options))
-            break
-
-        if len(candidates) >= options.clip_count:
-            break
-
-    if not candidates and segments:
-        candidates.append(_draft_from_segments(segments[:1], options))
-
-    return candidates[: options.clip_count]
-
-
-def generate_clip_candidates(
-    job_id: str,
-    source: short_clip_repository.ShortClipSource,
-    options: GenerateShortClipsOptions,
-) -> list[DraftClipCandidate]:
-    """Generate candidates through ai-service with a deterministic local fallback."""
-    try:
-        return ai_service_client.generate_short_clip_candidates(
-            request_id=job_id,
-            source=source,
-            options=options,
+        return GenerateShortClipsJobOutput(
+            transcript_id=UUID(transcript_id),
+            transcript_version=transcript_version,
+            candidate_count=len(candidate_ids),
+            short_clip_count=len(short_clip_ids),
+            asset_count=len(asset_ids),
+            candidate_ids=candidate_ids,
+            short_clip_ids=short_clip_ids,
+            asset_ids=asset_ids,
         )
-    except AIServiceTerminalError:
-        raise
-    except Exception:
-        logger.exception(
-            "ai-service short clip generation failed; using deterministic fallback "
-            "job_id=%s",
+    except S3ServiceError as error:
+        raise_if_retryable(
+            error,
+            terminal_codes=GENERATE_SHORT_CLIPS_TERMINAL_S3_CODES,
+        )
+        raise_terminal(error, TerminalGenerateShortClipsPipelineError)
+    except FFmpegServiceError as error:
+        raise_if_retryable(
+            error,
+            terminal_codes=GENERATE_SHORT_CLIPS_TERMINAL_FFMPEG_CODES,
+        )
+        raise_terminal(error, TerminalGenerateShortClipsPipelineError)
+    except AIServiceTerminalError as error:
+        logger.warning(
+            "AI service rejected generate short clips job_id=%s error=%s",
             job_id,
+            error,
         )
-        return build_fake_clip_candidates(source, options)
+        raise_terminal(error, TerminalGenerateShortClipsPipelineError)
 
 
 def build_srt_for_candidate(
@@ -304,12 +225,31 @@ def build_srt_for_candidate(
     return "\n".join(lines).strip() + "\n"
 
 
-def _validate_source(
+def generate_clip_candidates(
+    job_id: str,
     source: short_clip_repository.ShortClipSource,
+    options: GenerateShortClipsOptions,
+) -> list[ShortClipCandidateResult]:
+    """Generate short clip candidates through ai-service."""
+    return ai_service_client.generate_short_clip_candidates(
+        request_id=job_id,
+        source=source,
+        options=options,
+    )
+
+
+def _validate_source(
+    source: short_clip_repository.ShortClipSource | None,
     job: ProcessingJobRow,
     *,
     transcript_version: int,
-) -> None:
+) -> short_clip_repository.ShortClipSource:
+    if source is None:
+        raise TerminalGenerateShortClipsPipelineError(
+            "Media or transcript source was not found",
+            error_code="SHORT_CLIP_SOURCE_NOT_FOUND",
+        )
+
     if str(source.media.user_id) != str(job.user_id):
         raise TerminalGenerateShortClipsPipelineError(
             "Source media user does not match processing job",
@@ -365,45 +305,7 @@ def _validate_source(
             )
         previous_start = segment.start_time
 
-
-def _draft_from_segments(
-    segments: list[short_clip_repository.ShortClipTranscriptSegment],
-    options: GenerateShortClipsOptions,
-) -> DraftClipCandidate:
-    text = " ".join(segment.text.strip() for segment in segments).strip()
-    title = _title_from_text(text)
-    duration = segments[-1].end_time - segments[0].start_time
-    duration_score = max(
-        0.0,
-        1.0
-        - abs(duration - ((options.min_duration + options.max_duration) / 2))
-        / max(options.max_duration, 1.0),
-    )
-    text_score = min(len(text.split()) / 80, 1.0)
-    score = round(6.0 + (duration_score * 2.0) + (text_score * 2.0), 2)
-
-    return DraftClipCandidate(
-        start_segment_id=segments[0].id,
-        end_segment_id=segments[-1].id,
-        source_segment_ids=[segment.id for segment in segments],
-        start_time=segments[0].start_time,
-        end_time=segments[-1].end_time,
-        duration=duration,
-        title=title,
-        reason="Deterministic MVP candidate built from timestamped transcript segments.",
-        score=min(score, 10.0),
-        text=text,
-        provider="deterministic-fake",
-        model="deterministic-short-clip-v1",
-    )
-
-
-def _title_from_text(text: str) -> str:
-    words = text.split()
-    if not words:
-        return "Generated short clip"
-    title = " ".join(words[:8])
-    return title[:80]
+    return source
 
 
 def _source_filename(s3_key: str) -> str:
@@ -411,13 +313,12 @@ def _source_filename(s3_key: str) -> str:
     return filename or "source.mp4"
 
 
+def _workspace_for_job(job_id: str) -> Path:
+    return settings.storage_dir / "short-clips" / job_id
+
+
 def _output_key(job: ProcessingJobRow, short_clip_id: UUID, extension: str) -> str:
     return f"generated/short-clips/{job.media_id}/{job.id}/{short_clip_id}.{extension}"
-
-
-def _mark_short_clip_failed(short_clip_id: UUID) -> None:
-    with get_db_session() as session:
-        short_clip_repository.mark_short_clip_failed(session, str(short_clip_id))
 
 
 def _srt_time(seconds: float) -> str:

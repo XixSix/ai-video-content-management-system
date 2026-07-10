@@ -2,6 +2,8 @@ import logging
 
 from app.db import chapters_repository
 from app.db.client import get_db_session
+from app.errors import TerminalPipelineError
+from app.errors.policies import raise_terminal
 from app.schemas.db.processsing_job import ProcessingJobRow
 from app.schemas.chapters.input import GenerateChaptersOptions
 from app.schemas.chapters.output import GenerateChaptersJobOutput
@@ -11,10 +13,8 @@ from app.services.ai_service import AIServiceTerminalError, ai_service_client
 logger = logging.getLogger(__name__)
 
 
-class TerminalGenerateChaptersPipelineError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalGenerateChaptersPipelineError(TerminalPipelineError):
+    pass
 
 
 def run_generate_chapters_pipeline(
@@ -26,20 +26,23 @@ def run_generate_chapters_pipeline(
 ) -> GenerateChaptersJobOutput:
     """Run chapter generation AI processing and return the completed payload."""
     job_id = str(job.id)
-    transcript = _load_transcript(
-        job,
-        transcript_id=transcript_id,
-        transcript_version=transcript_version,
-    )
 
     logger.info("Starting chapter generation pipeline job_id=%s", job_id)
 
-    _validate_transcript_for_ai_service(
-        transcript,
-        transcript_version=transcript_version,
-    )
-
     try:
+        with get_db_session() as session:
+            transcript = chapters_repository.load_transcript(
+                session,
+                transcript_id=transcript_id,
+                media_id=str(job.media_id),
+                transcript_version=transcript_version,
+            )
+
+        transcript = _validate_transcript(
+            transcript,
+            transcript_version=transcript_version,
+        )
+
         result = ai_service_client.generate_chapters(
             request_id=job_id,
             transcript=transcript,
@@ -58,54 +61,25 @@ def run_generate_chapters_pipeline(
                 model=result.model,
             )
 
+        return _completed_output(chapters)
     except AIServiceTerminalError as error:
-        raise TerminalGenerateChaptersPipelineError(
-            str(error),
-            error_code=error.error_code,
-        ) from error
-    except chapters_repository.TranscriptVersionMismatchError as error:
-        raise TerminalGenerateChaptersPipelineError(
-            str(error),
-            error_code="TRANSCRIPT_VERSION_MISMATCH",
-        ) from error
-
-    return _completed_output(chapters)
+        logger.warning(
+            "AI service rejected generate chapters job_id=%s error=%s", job_id, error
+        )
+        raise_terminal(error, TerminalGenerateChaptersPipelineError)
 
 
-def _load_transcript(
-    job: ProcessingJobRow,
+def _validate_transcript(
+    transcript: GenerateChaptersTranscript | None,
     *,
-    transcript_id: str,
     transcript_version: int,
 ) -> GenerateChaptersTranscript:
-    try:
-        with get_db_session() as session:
-            transcript = chapters_repository.load_transcript_for_chapters(
-                session,
-                transcript_id=transcript_id,
-                media_id=str(job.media_id),
-                transcript_version=transcript_version,
-            )
-    except chapters_repository.TranscriptVersionMismatchError as error:
-        raise TerminalGenerateChaptersPipelineError(
-            str(error),
-            error_code="TRANSCRIPT_VERSION_MISMATCH",
-        ) from error
-
     if transcript is None:
         raise TerminalGenerateChaptersPipelineError(
             "Transcript was not found for chapter generation",
             error_code="TRANSCRIPT_NOT_FOUND",
         )
 
-    return transcript
-
-
-def _validate_transcript_for_ai_service(
-    transcript: GenerateChaptersTranscript,
-    *,
-    transcript_version: int,
-) -> None:
     if transcript.version != transcript_version:
         raise TerminalGenerateChaptersPipelineError(
             "Transcript version does not match generate chapters job",
@@ -147,6 +121,8 @@ def _validate_transcript_for_ai_service(
                 error_code="TRANSCRIPT_SEGMENT_EMPTY",
             )
         previous_start = segment.start_time
+
+    return transcript
 
 
 def _completed_output(

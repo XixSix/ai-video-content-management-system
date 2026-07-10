@@ -1,4 +1,8 @@
+from collections.abc import Iterator
+from contextlib import contextmanager
 from uuid import UUID
+
+import pytest
 
 from app.db.short_clip_repository import (
     ShortClipChapter,
@@ -7,13 +11,17 @@ from app.db.short_clip_repository import (
     ShortClipTranscript,
     ShortClipTranscriptSegment,
 )
-from app.pipelines.short_clip.pipeline import (
-    build_fake_clip_candidates,
+from app.pipelines.generate_short_clips.pipeline import (
+    TerminalGenerateShortClipsPipelineError,
+    _validate_source,
     build_srt_for_candidate,
     generate_clip_candidates,
+    run_generate_short_clips_pipeline,
 )
+from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
+from app.schemas.short_clip.input import GenerateShortClipsOptions
 from app.schemas.short_clip.result import ShortClipCandidateResult
-from app.schemas.jobs.short_clip_message import ShortClipJobPreferences
+from app.services.ai_service import AIServiceTerminalError
 
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000001")
 USER_ID = UUID("00000000-0000-4000-8000-000000000002")
@@ -21,21 +29,24 @@ WORKSPACE_ID = UUID("00000000-0000-4000-8000-000000000003")
 TRANSCRIPT_ID = UUID("00000000-0000-4000-8000-000000000004")
 
 
-def _preferences(**overrides: object) -> ShortClipJobPreferences:
-    return ShortClipJobPreferences.model_validate(
+@contextmanager
+def _session() -> Iterator[object]:
+    yield object()
+
+
+def _options(**overrides: object) -> GenerateShortClipsOptions:
+    return GenerateShortClipsOptions.model_validate(
         {
-            "transcriptId": str(TRANSCRIPT_ID),
-            "transcriptVersion": 2,
             "clipCount": 2,
-            "clipLength": "AUTO",
             "minDuration": 20,
             "maxDuration": 45,
             "aspectRatio": "9:16",
-            "language": "AUTO",
+            "platform": "YOUTUBE_SHORTS",
             "genre": "AUTO",
-            "clipModel": "AUTO",
-            "autoHook": True,
+            "tone": "AUTO",
+            "language": "auto",
             "prompt": "",
+            "llm": {"enabled": True, "model": None},
             "captionPresetId": "karaoke",
             "burnSubtitle": True,
             **overrides,
@@ -95,15 +106,38 @@ def _source() -> ShortClipSource:
     )
 
 
-def test_fake_provider_builds_duration_valid_candidates() -> None:
-    candidates = build_fake_clip_candidates(_source(), _preferences())
+def _job() -> ProcessingJobRow:
+    return ProcessingJobRow.model_validate(
+        {
+            "id": "00000000-0000-4000-8000-000000000098",
+            "mediaId": str(MEDIA_ID),
+            "userId": str(USER_ID),
+            "jobType": JobType.GENERATE_SHORT_CLIPS,
+            "status": JobStatus.QUEUED,
+            "progress": 0,
+            "currentStep": None,
+            "errorMessage": None,
+            "queueName": "generate_short_clips_queue",
+            "taskName": "generate_short_clips",
+            "externalTaskId": None,
+            "attemptCount": 0,
+            "input": None,
+            "output": None,
+            "createdAt": "2026-05-27T00:00:00Z",
+            "updatedAt": "2026-05-27T00:00:00Z",
+            "startedAt": None,
+            "completedAt": None,
+        }
+    )
 
-    assert len(candidates) == 2
-    assert candidates[0].start_time == 0
-    assert 20 <= candidates[0].duration <= 45
-    assert candidates[0].title
-    assert candidates[0].score <= 10
-    assert len(candidates[0].source_segment_ids) == 2
+
+def test_validate_source_rejects_stale_transcript_version() -> None:
+    try:
+        _validate_source(_source(), _job(), transcript_version=3)
+    except TerminalGenerateShortClipsPipelineError as error:
+        assert error.error_code == "TRANSCRIPT_VERSION_MISMATCH"
+    else:
+        raise AssertionError("Expected stale transcript version to be rejected")
 
 
 def test_generate_clip_candidates_uses_ai_service(monkeypatch) -> None:
@@ -132,16 +166,16 @@ def test_generate_clip_candidates_uses_ai_service(monkeypatch) -> None:
             return [expected]
 
     monkeypatch.setattr(
-        "app.pipelines.short_clip.pipeline.ai_service_client",
+        "app.pipelines.generate_short_clips.pipeline.ai_service_client",
         FakeAIServiceClient(),
     )
 
-    candidates = generate_clip_candidates("job-1", source, _preferences())
+    candidates = generate_clip_candidates("job-1", source, _options())
 
     assert candidates == [expected]
 
 
-def test_generate_clip_candidates_falls_back_when_ai_service_unavailable(
+def test_generate_clip_candidates_raises_when_ai_service_unavailable(
     monkeypatch,
 ) -> None:
     class UnavailableAIServiceClient:
@@ -151,14 +185,48 @@ def test_generate_clip_candidates_falls_back_when_ai_service_unavailable(
             raise RuntimeError("ai-service unavailable")
 
     monkeypatch.setattr(
-        "app.pipelines.short_clip.pipeline.ai_service_client",
+        "app.pipelines.generate_short_clips.pipeline.ai_service_client",
         UnavailableAIServiceClient(),
     )
 
-    candidates = generate_clip_candidates("job-1", _source(), _preferences())
+    try:
+        generate_clip_candidates("job-1", _source(), _options())
+    except RuntimeError as error:
+        assert str(error) == "ai-service unavailable"
+    else:
+        raise AssertionError("Expected ai-service failure to bubble")
 
-    assert candidates
-    assert candidates[0].provider == "deterministic-fake"
+
+def test_run_generate_short_clips_pipeline_converts_ai_terminal_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def generate_clip_candidates_failure(*args: object, **kwargs: object) -> object:
+        raise AIServiceTerminalError(
+            "ai-service rejected short clip request",
+            error_code="AI_SERVICE_INVALID_RESPONSE",
+        )
+
+    monkeypatch.setattr(
+        "app.pipelines.generate_short_clips.pipeline.get_db_session", _session
+    )
+    monkeypatch.setattr(
+        "app.pipelines.generate_short_clips.pipeline.short_clip_repository.load_short_clip_source",
+        lambda *args, **kwargs: _source(),
+    )
+    monkeypatch.setattr(
+        "app.pipelines.generate_short_clips.pipeline.generate_clip_candidates",
+        generate_clip_candidates_failure,
+    )
+
+    with pytest.raises(TerminalGenerateShortClipsPipelineError) as error:
+        run_generate_short_clips_pipeline(
+            _job(),
+            transcript_id=str(TRANSCRIPT_ID),
+            transcript_version=2,
+            options=_options(),
+        )
+
+    assert error.value.error_code == "AI_SERVICE_INVALID_RESPONSE"
 
 
 def test_srt_timing_is_relative_to_candidate_start() -> None:

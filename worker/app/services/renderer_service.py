@@ -2,9 +2,10 @@ import subprocess
 from pathlib import Path
 
 from app.core.config import settings
+from app.errors import ServiceError
 
 
-class RendererServiceError(Exception):
+class RendererServiceError(ServiceError):
     pass
 
 
@@ -37,15 +38,22 @@ class RendererService:
             )
         except FileNotFoundError as error:
             raise RendererServiceError(
-                f"Renderer command was not found: {settings.renderer_npm_binary}"
+                f"Renderer command was not found: {settings.renderer_npm_binary}",
+                error_code="RENDERER_COMMAND_NOT_FOUND",
             ) from error
         except subprocess.TimeoutExpired as error:
-            raise RendererServiceError("Renderer command timed out") from error
+            raise RendererServiceError(
+                "Renderer command timed out",
+                error_code="RENDERER_TIMEOUT",
+            ) from error
         except subprocess.CalledProcessError as error:
             stderr = error.stderr.strip()
             stdout = error.stdout.strip()
             details = stderr or stdout or f"exit code {error.returncode}"
-            raise RendererServiceError(f"Renderer command failed: {details}") from error
+            raise RendererServiceError(
+                f"Renderer command failed: {details}",
+                error_code="RENDERER_COMMAND_FAILED",
+            ) from error
 
         return output_path
 

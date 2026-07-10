@@ -1,11 +1,15 @@
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from PIL import UnidentifiedImageError
 
 from app.core.config import settings
 from app.db import media_preview_repository
 from app.db.client import get_db_session
+from app.errors import TerminalPipelineError
+from app.errors.policies import (
+    raise_if_retryable,
+    raise_terminal,
+)
 from app.pipelines.media_preview.algorithms import (
     build_sprite_timestamps,
     build_thumbnail_timestamps,
@@ -22,17 +26,26 @@ from app.schemas.media_preview.output import (
     MediaPreviewPipelineOutput,
 )
 from app.services.ffmpeg_service import (
-    FFmpegBinaryNotFoundError,
-    FFmpegCommandError,
+    FFmpegServiceError,
     ffmpeg_service,
 )
-from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
+from app.services.s3_service import S3ServiceError, s3_service
 
 
-class TerminalMediaPreviewPipelineError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalMediaPreviewPipelineError(TerminalPipelineError):
+    pass
+
+
+MEDIA_PREVIEW_TERMINAL_S3_CODES = {"SOURCE_OBJECT_NOT_FOUND"}
+MEDIA_PREVIEW_TERMINAL_FFMPEG_CODES = {
+    "FFMPEG_BINARY_NOT_FOUND",
+    "FFMPEG_COMMAND_FAILED",
+    "FFMPEG_INVALID_PROBE_JSON",
+    "FFMPEG_OUTPUT_EMPTY",
+    "FFMPEG_SPRITE_FRAME_COUNT_MISMATCH",
+    "MEDIA_INVALID_DURATION",
+    "MEDIA_STREAMS_NOT_FOUND",
+}
 
 
 def run_media_preview_pipeline(
@@ -40,7 +53,7 @@ def run_media_preview_pipeline(
 ) -> MediaPreviewJobOutput:
     """Run media preview processing, upload artifacts to S3, persist to DB, and
     return a completed output struct."""
-    settings.tmp_dir.mkdir(parents=True, exist_ok=True)
+    job_id = str(job.id)
 
     with get_db_session() as session:
         source = media_preview_repository.load_media_preview_source(
@@ -48,29 +61,8 @@ def run_media_preview_pipeline(
             str(job.media_id),
         )
 
-    if source is None:
-        raise TerminalMediaPreviewPipelineError(
-            "Source media was not found",
-            error_code="MEDIA_PREVIEW_SOURCE_NOT_FOUND",
-        )
-
-    _validate_source(job, source)
-
-    with TemporaryDirectory(
-        prefix=f"media-preview-{job.id}-",
-        dir=settings.tmp_dir,
-    ) as temporary_directory:
-        workspace = Path(temporary_directory)
-        pipeline_output = _run_pipeline(job, source, workspace)
-        return _upload_and_persist(job, source, pipeline_output)
-
-
-def _run_pipeline(
-    job: ProcessingJobRow,
-    source: media_preview_repository.MediaPreviewSource,
-    workspace: Path,
-) -> MediaPreviewPipelineOutput:
-    """Download source and run the appropriate generation algorithm."""
+    source = _validate_source(job, source)
+    workspace = _workspace_for_job(job_id)
     workspace.mkdir(parents=True, exist_ok=True)
     source_suffix = Path(source.s3_key).suffix or ".source"
     source_path = workspace / f"source{source_suffix}"
@@ -89,61 +81,63 @@ def _run_pipeline(
                     "Source media has no video stream",
                     error_code="VIDEO_STREAM_NOT_FOUND",
                 )
-            return _generate_thumbnail(
+            pipeline_output = _generate_thumbnail(
                 job, source, source_path, probe.duration_seconds, workspace
             )
 
-        if job.job_type == JobType.GENERATE_THUMBNAIL_SPRITE:
+        elif job.job_type == JobType.GENERATE_THUMBNAIL_SPRITE:
             if not probe.has_video:
                 raise TerminalMediaPreviewPipelineError(
                     "Source media has no video stream",
                     error_code="VIDEO_STREAM_NOT_FOUND",
                 )
-            return _generate_sprite(
+            pipeline_output = _generate_sprite(
                 job, source, source_path, probe.duration_seconds, workspace
             )
 
-        if not probe.has_audio:
-            raise TerminalMediaPreviewPipelineError(
-                "Source media has no audio stream",
-                error_code="AUDIO_STREAM_NOT_FOUND",
+        else:
+            if not probe.has_audio:
+                raise TerminalMediaPreviewPipelineError(
+                    "Source media has no audio stream",
+                    error_code="AUDIO_STREAM_NOT_FOUND",
+                )
+            pipeline_output = _generate_waveform(
+                job,
+                source,
+                source_path,
+                probe.duration_seconds,
+                workspace,
             )
-        return _generate_waveform(
-            job,
-            source,
-            source_path,
-            probe.duration_seconds,
-            workspace,
+    except S3ServiceError as error:
+        raise_if_retryable(error, terminal_codes=MEDIA_PREVIEW_TERMINAL_S3_CODES)
+        raise_terminal(
+            error,
+            TerminalMediaPreviewPipelineError,
+            message="Source media was not found",
         )
-    except S3SourceObjectNotFoundError as error:
-        raise TerminalMediaPreviewPipelineError(
-            "Source media was not found",
-            error_code=error.error_code,
-        ) from error
-    except FFmpegBinaryNotFoundError as error:
-        raise TerminalMediaPreviewPipelineError(
-            str(error),
-            error_code="FFMPEG_NOT_AVAILABLE",
-        ) from error
-    except FFmpegCommandError as error:
-        raise TerminalMediaPreviewPipelineError(
-            str(error),
+    except FFmpegServiceError as error:
+        raise_if_retryable(
+            error,
+            terminal_codes=MEDIA_PREVIEW_TERMINAL_FFMPEG_CODES,
+        )
+
+        if error.error_code == "FFMPEG_BINARY_NOT_FOUND":
+            raise_terminal(
+                error,
+                TerminalMediaPreviewPipelineError,
+                error_code="FFMPEG_NOT_AVAILABLE",
+            )
+
+        raise_terminal(
+            error,
+            TerminalMediaPreviewPipelineError,
             error_code="INVALID_MEDIA",
-        ) from error
+        )
     except (UnidentifiedImageError, OSError, ValueError) as error:
         raise TerminalMediaPreviewPipelineError(
             str(error),
             error_code="INVALID_PREVIEW_OUTPUT",
         ) from error
-
-
-def _upload_and_persist(
-    job: ProcessingJobRow,
-    source: media_preview_repository.MediaPreviewSource,
-    pipeline_output: MediaPreviewPipelineOutput,
-) -> MediaPreviewJobOutput:
-    """Upload artifacts to S3, persist assets to DB, and return completed output."""
-    job_id = str(job.id)
 
     for artifact in pipeline_output.artifacts:
         s3_service.upload_file(
@@ -324,8 +318,14 @@ def _generate_waveform(
 
 def _validate_source(
     job: ProcessingJobRow,
-    source: media_preview_repository.MediaPreviewSource,
-) -> None:
+    source: media_preview_repository.MediaPreviewSource | None,
+) -> media_preview_repository.MediaPreviewSource:
+    if source is None:
+        raise TerminalMediaPreviewPipelineError(
+            "Source media was not found",
+            error_code="MEDIA_PREVIEW_SOURCE_NOT_FOUND",
+        )
+
     if str(source.user_id) != str(job.user_id):
         raise TerminalMediaPreviewPipelineError(
             "Source media user does not match processing job",
@@ -355,6 +355,12 @@ def _validate_source(
             "Source media type does not support waveform previews",
             error_code="MEDIA_PREVIEW_MEDIA_TYPE_UNSUPPORTED",
         )
+
+    return source
+
+
+def _workspace_for_job(job_id: str) -> Path:
+    return settings.storage_dir / "media-previews" / job_id
 
 
 def _output_prefix(

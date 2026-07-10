@@ -4,6 +4,7 @@ from typing import Any
 from app.core.config import settings
 from app.db import jobs_repository, media_preview_repository
 from app.db.client import get_db_session
+from app.errors import TerminalJobError
 from app.pipelines.media_preview.pipeline import run_media_preview_pipeline
 from app.schemas.db.processsing_job import JobStatus, ProcessingJobRow
 from app.schemas.jobs.media_preview_message import (
@@ -15,10 +16,8 @@ from app.schemas.media_preview.output import MediaPreviewJobOutput
 logger = logging.getLogger(__name__)
 
 
-class TerminalMediaPreviewJobError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalMediaPreviewJobError(TerminalJobError):
+    pass
 
 
 def process_media_preview_job(message: MediaPreviewJobMessage) -> dict[str, Any]:

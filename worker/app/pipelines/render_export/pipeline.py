@@ -6,17 +6,20 @@ from typing import Any
 from app.core.config import settings
 from app.db import render_export_repository
 from app.db.client import get_db_session
+from app.errors import TerminalPipelineError
+from app.errors.policies import raise_if_retryable, raise_terminal
 from app.schemas.db.processsing_job import ProcessingJobRow
 from app.schemas.render_export.input import RenderExportJobInput
 from app.schemas.render_export.output import RenderExportJobOutput
 from app.services.renderer_service import RendererServiceError, renderer_service
-from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
+from app.services.s3_service import S3ServiceError, s3_service
 
 
-class TerminalRenderExportPipelineError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalRenderExportPipelineError(TerminalPipelineError):
+    pass
+
+
+RENDER_EXPORT_TERMINAL_S3_CODES = {"SOURCE_OBJECT_NOT_FOUND"}
 
 
 GEOMETRY_DEFAULTS = {
@@ -98,14 +101,21 @@ def run_render_export_pipeline(
             )
             document_path.write_text(json.dumps(document), encoding="utf-8")
             renderer_service.render_document(document_path, output_path)
-        except S3SourceObjectNotFoundError as error:
-            raise TerminalRenderExportPipelineError(
-                "Source media was not found",
-                error_code=error.error_code,
-            ) from error
+        except S3ServiceError as error:
+            raise_if_retryable(error, terminal_codes=RENDER_EXPORT_TERMINAL_S3_CODES)
+            raise_terminal(
+                error,
+                TerminalRenderExportPipelineError,
+                message="Source media was not found",
+            )
         except (OSError, ValueError, RendererServiceError) as error:
+            message = (
+                error.error_message
+                if isinstance(error, RendererServiceError)
+                else str(error)
+            )
             raise TerminalRenderExportPipelineError(
-                str(error),
+                message,
                 error_code="RENDER_EXPORT_FAILED",
             ) from error
 
@@ -210,7 +220,13 @@ def build_render_document(
 
             if track_id == "OVERLAY_MEDIA":
                 media_id = _segment_media_id(segment, layer_by_id)
-                project_media = project_media_by_id.get(media_id) if media_id else None
+
+                if not media_id:
+                    raise ValueError(
+                        f"Overlay segment {segment.get('id', 'unknown')} references missing project media"
+                    )
+
+                project_media = project_media_by_id.get(media_id)
 
                 if not project_media:
                     raise ValueError(
@@ -242,7 +258,13 @@ def build_render_document(
 
             if track_id == "AUDIO":
                 media_id = _segment_media_id(segment, layer_by_id)
-                project_media = project_media_by_id.get(media_id) if media_id else None
+
+                if not media_id:
+                    raise ValueError(
+                        f"Audio segment {segment.get('id', 'unknown')} references missing project media"
+                    )
+
+                project_media = project_media_by_id.get(media_id)
 
                 if not project_media:
                     raise ValueError(
@@ -407,7 +429,7 @@ def _muted_track_ids(snapshot: dict[str, Any]) -> set[str]:
 
 
 def _text_animation_name(layer: dict[str, Any]) -> str:
-    style = layer.get("style") if isinstance(layer.get("style"), dict) else {}
+    style = _dict_or_empty(layer.get("style"))
     animation_name = style.get("animationName")
 
     return (
@@ -431,7 +453,7 @@ def _text_animation_name(layer: dict[str, Any]) -> str:
 
 
 def _text_animation_by(layer: dict[str, Any]) -> str:
-    style = layer.get("style") if isinstance(layer.get("style"), dict) else {}
+    style = _dict_or_empty(layer.get("style"))
     animation_by = style.get("animationBy")
 
     return (
@@ -442,9 +464,13 @@ def _text_animation_by(layer: dict[str, Any]) -> str:
 
 
 def _text_animation_duration(layer: dict[str, Any]) -> float:
-    style = layer.get("style") if isinstance(layer.get("style"), dict) else {}
+    style = _dict_or_empty(layer.get("style"))
 
     return max(0.01, _number(style.get("animationDuration"), 0.2))
+
+
+def _dict_or_empty(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
 
 
 def _text_style(raw_style: Any) -> dict[str, Any]:

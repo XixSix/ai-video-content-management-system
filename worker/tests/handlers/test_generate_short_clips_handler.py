@@ -217,6 +217,48 @@ def test_process_generate_short_clips_job_skips_non_pending_job(
     assert result["skipped"] is True
 
 
+def test_record_generate_short_clips_job_failure_marks_job_and_short_clips_failed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, str, str | None] | tuple[str, str]] = []
+
+    def mark_job_failed(
+        session: object,
+        job_id: str,
+        error_message: str,
+        *,
+        error_code: str | None = None,
+    ) -> None:
+        calls.append(("job_failed", job_id, error_code))
+        assert error_message == "Render failed"
+
+    def mark_short_clips_failed_by_job_id(session: object, job_id: str) -> None:
+        calls.append(("short_clips_failed", job_id))
+
+    monkeypatch.setattr(generate_short_clips_handler, "get_db_session", _session)
+    monkeypatch.setattr(
+        generate_short_clips_handler.jobs_repository,
+        "mark_job_failed",
+        mark_job_failed,
+    )
+    monkeypatch.setattr(
+        generate_short_clips_handler.short_clip_repository,
+        "mark_short_clips_failed_by_job_id",
+        mark_short_clips_failed_by_job_id,
+    )
+
+    generate_short_clips_handler.record_generate_short_clips_job_failure(
+        str(JOB_ID),
+        "Render failed",
+        error_code="SHORT_CLIP_RENDER_FAILED",
+    )
+
+    assert calls == [
+        ("job_failed", str(JOB_ID), "SHORT_CLIP_RENDER_FAILED"),
+        ("short_clips_failed", str(JOB_ID)),
+    ]
+
+
 def test_existing_output_completes_idempotently(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

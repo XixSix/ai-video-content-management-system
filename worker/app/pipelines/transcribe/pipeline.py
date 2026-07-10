@@ -4,23 +4,35 @@ from pathlib import Path
 from app.core.config import settings
 from app.db import transcript_repository
 from app.db.client import get_db_session
+from app.errors import TerminalPipelineError
+from app.errors.policies import (
+    raise_if_retryable,
+    raise_terminal,
+)
 from app.schemas.db.processsing_job import ProcessingJobRow
 from app.schemas.transcribe.input import TranscribeOptions
 from app.schemas.transcribe.output import TranscribeJobOutput
 from app.services.ffmpeg_service import (
-    AudioSanityError,
+    FFmpegServiceError,
     ffmpeg_service,
 )
 from app.services.ai_service import AIServiceTerminalError, ai_service_client
-from app.services.s3_service import S3SourceObjectNotFoundError, s3_service
+from app.services.s3_service import S3ServiceError, s3_service
 
 logger = logging.getLogger(__name__)
 
+TRANSCRIBE_TERMINAL_S3_CODES = {"SOURCE_OBJECT_NOT_FOUND"}
+TRANSCRIBE_TERMINAL_FFMPEG_CODES = {
+    "AUDIO_EXTRACTION_EMPTY_OUTPUT",
+    "AUDIO_INVALID_DURATION",
+    "AUDIO_INVALID_SAMPLE_RATE",
+    "AUDIO_INVALID_CHANNELS",
+    "AUDIO_NO_SPEECH_DETECTED",
+}
 
-class TerminalTranscribePipelineError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+
+class TerminalTranscribePipelineError(TerminalPipelineError):
+    pass
 
 
 def run_transcribe_pipeline(
@@ -66,13 +78,13 @@ def run_transcribe_pipeline(
                 error_code="TRANSCRIBE_MEDIA_TYPE_UNSUPPORTED",
             )
 
-        source_path = _download_source(
-            source.s3_key,
-            workspace,
+        source_url = s3_service.create_presigned_get_url(
+            object_key=source.s3_key,
             bucket=source.s3_bucket,
+            expires_in_seconds=settings.ffmpeg_timeout_seconds + 300,
         )
         audio_path = workspace / "audio.wav"
-        ffmpeg_service.extract_audio(source_path, audio_path)
+        ffmpeg_service.extract_audio(source_url, audio_path)
         ffmpeg_service.validate_audio(audio_path)
 
         result = ai_service_client.transcribe(
@@ -90,39 +102,22 @@ def run_transcribe_pipeline(
             )
 
         return _completed_output(transcript)
-    except S3SourceObjectNotFoundError as error:
-        logger.warning("Source media not found job_id=%s error=%s", job_id, error)
-        raise TerminalTranscribePipelineError(
-            str(error),
-            error_code=error.error_code,
-        ) from error
-    except AudioSanityError as error:
-        logger.warning("Audio sanity check failed job_id=%s error=%s", job_id, error)
-        raise TerminalTranscribePipelineError(
-            str(error),
-            error_code=error.error_code,
-        ) from error
+    except S3ServiceError as error:
+        raise_if_retryable(error, terminal_codes=TRANSCRIBE_TERMINAL_S3_CODES)
+        raise_terminal(error, TerminalTranscribePipelineError)
+    except FFmpegServiceError as error:
+        raise_if_retryable(error, terminal_codes=TRANSCRIBE_TERMINAL_FFMPEG_CODES)
+        raise_terminal(error, TerminalTranscribePipelineError)
     except AIServiceTerminalError as error:
         logger.warning(
             "AI service rejected transcribe job_id=%s error=%s", job_id, error
         )
-        raise TerminalTranscribePipelineError(
-            str(error),
-            error_code=error.error_code,
-        ) from error
+        raise_terminal(error, TerminalTranscribePipelineError)
 
 
 def _workspace_for_job(job_id: str) -> Path:
     """Return the local storage workspace path for a transcribe job."""
     return settings.storage_dir / "transcripts" / job_id
-
-
-def _download_source(s3_key: str, workspace: Path, *, bucket: str) -> Path:
-    """Download source media into the job workspace with its original suffix."""
-    suffix = Path(s3_key).suffix or ".source"
-    source_path = workspace / f"source{suffix}"
-
-    return s3_service.download_file(s3_key, source_path, bucket=bucket)
 
 
 def _completed_output(

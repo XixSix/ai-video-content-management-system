@@ -4,14 +4,11 @@ import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.core.config import settings
+from app.errors import ServiceError
 
 
-class S3ServiceError(Exception):
+class S3ServiceError(ServiceError):
     pass
-
-
-class S3SourceObjectNotFoundError(S3ServiceError):
-    error_code = "SOURCE_OBJECT_NOT_FOUND"
 
 
 class S3Service:
@@ -56,16 +53,19 @@ class S3Service:
             self.client.download_file(source_bucket, object_key, str(destination_path))
         except ClientError as error:
             if _is_not_found_error(error):
-                raise S3SourceObjectNotFoundError(
-                    f"{S3SourceObjectNotFoundError.error_code}: s3://{source_bucket}/{object_key} was not found"
+                raise S3ServiceError(
+                    f"s3://{source_bucket}/{object_key} was not found",
+                    error_code="SOURCE_OBJECT_NOT_FOUND",
                 ) from error
 
             raise S3ServiceError(
-                f"Failed to download s3://{source_bucket}/{object_key}"
+                f"Failed to download s3://{source_bucket}/{object_key}",
+                error_code="S3_DOWNLOAD_FAILED",
             ) from error
         except BotoCoreError as error:
             raise S3ServiceError(
-                f"Failed to download s3://{source_bucket}/{object_key}"
+                f"Failed to download s3://{source_bucket}/{object_key}",
+                error_code="S3_DOWNLOAD_FAILED",
             ) from error
 
         return destination_path
@@ -77,7 +77,10 @@ class S3Service:
         filename = Path(object_key).name
 
         if not filename:
-            raise S3ServiceError("Object key does not contain a filename")
+            raise S3ServiceError(
+                "Object key does not contain a filename",
+                error_code="S3_OBJECT_KEY_INVALID",
+            )
 
         return self.download_file(object_key, tmp_dir / filename)
 
@@ -107,7 +110,8 @@ class S3Service:
                 )
         except (BotoCoreError, ClientError) as error:
             raise S3ServiceError(
-                f"Failed to upload {source_path} to s3://{destination_bucket}/{object_key}"
+                f"Failed to upload {source_path} to s3://{destination_bucket}/{object_key}",
+                error_code="S3_UPLOAD_FAILED",
             ) from error
 
         return object_key
@@ -128,11 +132,13 @@ class S3Service:
                 return False
 
             raise S3ServiceError(
-                f"Failed to check s3://{target_bucket}/{object_key}"
+                f"Failed to check s3://{target_bucket}/{object_key}",
+                error_code="S3_OBJECT_CHECK_FAILED",
             ) from error
         except BotoCoreError as error:
             raise S3ServiceError(
-                f"Failed to check s3://{target_bucket}/{object_key}"
+                f"Failed to check s3://{target_bucket}/{object_key}",
+                error_code="S3_OBJECT_CHECK_FAILED",
             ) from error
 
     def create_presigned_get_url(
@@ -146,8 +152,9 @@ class S3Service:
         target_bucket = bucket or self.bucket
 
         if not self.object_exists(object_key, bucket=target_bucket):
-            raise S3SourceObjectNotFoundError(
-                f"{S3SourceObjectNotFoundError.error_code}: s3://{target_bucket}/{object_key} was not found"
+            raise S3ServiceError(
+                f"s3://{target_bucket}/{object_key} was not found",
+                error_code="SOURCE_OBJECT_NOT_FOUND",
             )
 
         try:
@@ -158,16 +165,19 @@ class S3Service:
             )
         except ClientError as error:
             if _is_not_found_error(error):
-                raise S3SourceObjectNotFoundError(
-                    f"{S3SourceObjectNotFoundError.error_code}: s3://{target_bucket}/{object_key} was not found"
+                raise S3ServiceError(
+                    f"s3://{target_bucket}/{object_key} was not found",
+                    error_code="SOURCE_OBJECT_NOT_FOUND",
                 ) from error
 
             raise S3ServiceError(
-                f"Failed to create download URL for s3://{target_bucket}/{object_key}"
+                f"Failed to create download URL for s3://{target_bucket}/{object_key}",
+                error_code="S3_PRESIGN_FAILED",
             ) from error
         except BotoCoreError as error:
             raise S3ServiceError(
-                f"Failed to create download URL for s3://{target_bucket}/{object_key}"
+                f"Failed to create download URL for s3://{target_bucket}/{object_key}",
+                error_code="S3_PRESIGN_FAILED",
             ) from error
 
         return url

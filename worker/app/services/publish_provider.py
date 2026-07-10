@@ -1,23 +1,32 @@
 import json
 import mimetypes
-import urllib.error
-import urllib.parse
-import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Callable, NoReturn, Protocol
+
+from facebook_business.api import FacebookAdsApi
+from facebook_business.exceptions import FacebookRequestError
+from google.auth.exceptions import RefreshError, TransportError
+from google.auth.transport.requests import Request as GoogleAuthRequest
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+from requests import RequestException
 
 from app.core.config import settings
 from app.db import publish_repository
+from app.errors import ServiceError
 from app.services.platform_token_crypto import (
+    PlatformTokenCryptoError,
     decrypt_platform_token,
     encrypt_platform_token,
 )
 from app.services.s3_service import s3_service
 
 
-class PublishProviderError(Exception):
+class PublishProviderError(ServiceError):
     retryable = False
 
 
@@ -42,84 +51,19 @@ class PublishProviderResult:
     platform_post_url: str
 
 
-@dataclass(frozen=True)
-class HttpJsonResponse:
-    data: dict[str, Any]
-    headers: dict[str, str]
-
-
 class PublishProvider(Protocol):
     def publish(self, payload: PublishProviderInput) -> PublishProviderResult: ...
 
 
-class HttpJsonClient:
-    def request(
-        self,
-        url: str,
-        *,
-        method: str = "GET",
-        headers: dict[str, str] | None = None,
-        body: bytes | None = None,
-        timeout_seconds: int = 120,
-    ) -> HttpJsonResponse:
-        request = urllib.request.Request(
-            url,
-            data=body,
-            headers=headers or {},
-            method=method,
-        )
-
-        try:
-            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-                payload = response.read()
-                response_headers = dict(response.headers.items())
-        except urllib.error.HTTPError as error:
-            error_payload = error.read().decode("utf-8", errors="replace")
-            _raise_http_error(error.code, error_payload)
-        except urllib.error.URLError as error:
-            raise RetryablePublishProviderError("Platform request failed") from error
-
-        data: dict[str, Any] = {}
-
-        if payload:
-            try:
-                decoded = json.loads(payload.decode("utf-8"))
-            except json.JSONDecodeError as error:
-                raise RetryablePublishProviderError(
-                    "Platform returned invalid JSON"
-                ) from error
-
-            if isinstance(decoded, dict) and decoded.get("error"):
-                raise TerminalPublishProviderError(_extract_platform_error(decoded))
-
-            if not isinstance(decoded, dict):
-                raise RetryablePublishProviderError("Platform returned invalid payload")
-
-            data = decoded
-
-        return HttpJsonResponse(data=data, headers=response_headers)
-
-    def request_json(
-        self,
-        url: str,
-        *,
-        method: str = "GET",
-        headers: dict[str, str] | None = None,
-        body: bytes | None = None,
-        timeout_seconds: int = 120,
-    ) -> dict[str, Any]:
-        return self.request(
-            url,
-            method=method,
-            headers=headers,
-            body=body,
-            timeout_seconds=timeout_seconds,
-        ).data
-
-
 class YouTubePublishProvider:
-    def __init__(self, *, http_client: HttpJsonClient | None = None) -> None:
-        self.http_client = http_client or HttpJsonClient()
+    def __init__(
+        self,
+        *,
+        service_builder: Callable[..., Any] = build,
+        media_upload_factory: Callable[..., Any] = MediaFileUpload,
+    ) -> None:
+        self.service_builder = service_builder
+        self.media_upload_factory = media_upload_factory
 
     def publish(self, payload: PublishProviderInput) -> PublishProviderResult:
         access_token = _require_decrypted_token(payload.account)
@@ -143,39 +87,31 @@ class YouTubePublishProvider:
         if tags:
             metadata["snippet"]["tags"] = tags
 
-        query = urllib.parse.urlencode(
-            {"part": "snippet,status", "uploadType": "resumable"}
+        credentials = Credentials(token=access_token)
+        youtube = self.service_builder(
+            "youtube",
+            "v3",
+            credentials=credentials,
+            cache_discovery=False,
         )
-        session = self.http_client.request(
-            f"https://www.googleapis.com/upload/youtube/v3/videos?{query}",
-            method="POST",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json; charset=UTF-8",
-                "X-Upload-Content-Type": mime_type,
-                "X-Upload-Content-Length": str(local_path.stat().st_size),
-            },
-            body=json.dumps(metadata).encode("utf-8"),
+        media = self.media_upload_factory(
+            str(local_path),
+            mimetype=mime_type,
+            resumable=True,
         )
-        upload_url = session.headers.get("Location") or session.headers.get("location")
 
-        if not isinstance(upload_url, str):
-            raise RetryablePublishProviderError(
-                "YouTube resumable upload session did not include uploadUrl"
+        try:
+            response = (
+                youtube.videos()
+                .insert(part="snippet,status", body=metadata, media_body=media)
+                .execute(num_retries=3)
             )
+        except HttpError as error:
+            _raise_google_api_error(error, "YouTube publish failed")
+        except (OSError, TimeoutError) as error:
+            raise RetryablePublishProviderError("YouTube publish failed") from error
 
-        response = self.http_client.request_json(
-            upload_url,
-            method="PUT",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": mime_type,
-                "Content-Length": str(local_path.stat().st_size),
-            },
-            body=local_path.read_bytes(),
-            timeout_seconds=1800,
-        )
-        video_id = response.get("id")
+        video_id = response.get("id") if isinstance(response, dict) else None
 
         if not isinstance(video_id, str) or not video_id:
             raise RetryablePublishProviderError(
@@ -189,8 +125,12 @@ class YouTubePublishProvider:
 
 
 class FacebookPageVideoPublishProvider:
-    def __init__(self, *, http_client: HttpJsonClient | None = None) -> None:
-        self.http_client = http_client or HttpJsonClient()
+    def __init__(
+        self,
+        *,
+        api_factory: Callable[[str], FacebookAdsApi] | None = None,
+    ) -> None:
+        self.api_factory = api_factory or _build_facebook_api
 
     def publish(self, payload: PublishProviderInput) -> PublishProviderResult:
         access_token = _require_decrypted_token(payload.account)
@@ -199,106 +139,38 @@ class FacebookPageVideoPublishProvider:
             raise TerminalPublishProviderError("Facebook Page id is missing")
 
         local_path = _download_publish_source(payload.source)
-        mime_type = payload.source.mime_type or _guess_mime_type(local_path)
-        file_length = local_path.stat().st_size
-        upload_handle = self._upload_to_meta(
-            access_token=access_token,
-            file_length=file_length,
-            file_path=local_path,
-            mime_type=mime_type,
-        )
-        video_id = self._publish_page_video(
-            page_id=payload.account.platform_user_id,
-            page_access_token=access_token,
-            task=payload.task,
-            source=payload.source,
-            upload_handle=upload_handle,
-        )
+        api = self.api_factory(access_token)
+        params = {
+            "title": _task_title(payload.task, payload.source),
+            "description": _task_description(payload.task),
+        }
 
-        return PublishProviderResult(
-            platform_post_id=video_id,
-            platform_post_url=f"https://www.facebook.com/{video_id}",
-        )
+        try:
+            with local_path.open("rb") as video_file:
+                response = api.call(
+                    "POST",
+                    (payload.account.platform_user_id, "videos"),
+                    params=params,
+                    files={"source": video_file},
+                    api_version=settings.facebook_graph_api_version,
+                )
+        except FacebookRequestError as error:
+            _raise_facebook_api_error(error)
+        except RequestException as error:
+            raise RetryablePublishProviderError("Facebook publish failed") from error
 
-    def _upload_to_meta(
-        self,
-        *,
-        access_token: str,
-        file_length: int,
-        file_path: Path,
-        mime_type: str,
-    ) -> str:
-        params = urllib.parse.urlencode(
-            {
-                "file_name": file_path.name,
-                "file_length": str(file_length),
-                "file_type": mime_type,
-                "access_token": access_token,
-            }
-        )
-        session = self.http_client.request_json(
-            f"https://graph.facebook.com/{settings.facebook_graph_api_version}/{settings.facebook_app_id}/uploads?{params}",
-            method="POST",
-        )
-        session_id = session.get("id")
-
-        if not isinstance(session_id, str) or not session_id:
-            raise RetryablePublishProviderError(
-                "Facebook upload session did not include id"
-            )
-
-        response = self.http_client.request_json(
-            f"https://graph.facebook.com/{settings.facebook_graph_api_version}/{session_id}",
-            method="POST",
-            headers={
-                "Authorization": f"OAuth {access_token}",
-                "file_offset": "0",
-                "Content-Type": "application/octet-stream",
-            },
-            body=file_path.read_bytes(),
-            timeout_seconds=1800,
-        )
-        handle = response.get("h")
-
-        if not isinstance(handle, str) or not handle:
-            raise RetryablePublishProviderError(
-                "Facebook upload response did not include file handle"
-            )
-
-        return handle
-
-    def _publish_page_video(
-        self,
-        *,
-        page_id: str,
-        page_access_token: str,
-        task: publish_repository.PublishTaskRow,
-        source: publish_repository.PublishSourceRow,
-        upload_handle: str,
-    ) -> str:
-        form = urllib.parse.urlencode(
-            {
-                "access_token": page_access_token,
-                "title": _task_title(task, source),
-                "description": _task_description(task),
-                "fbuploader_video_file_chunk": upload_handle,
-            }
-        ).encode("utf-8")
-        response = self.http_client.request_json(
-            f"https://graph-video.facebook.com/{settings.facebook_graph_api_version}/{page_id}/videos",
-            method="POST",
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-            body=form,
-            timeout_seconds=300,
-        )
-        video_id = response.get("id")
+        response_body = response.json()
+        video_id = response_body.get("id") if isinstance(response_body, dict) else None
 
         if not isinstance(video_id, str) or not video_id:
             raise RetryablePublishProviderError(
                 "Facebook publish response did not include video id"
             )
 
-        return video_id
+        return PublishProviderResult(
+            platform_post_id=video_id,
+            platform_post_url=f"https://www.facebook.com/{video_id}",
+        )
 
 
 def get_publish_provider(platform: str) -> PublishProvider:
@@ -321,38 +193,38 @@ def ensure_fresh_youtube_account(
     if not account.refresh_token_encrypted:
         raise TerminalPublishProviderError("YouTube account must be reconnected")
 
-    refresh_token = decrypt_platform_token(account.refresh_token_encrypted)
-    form = urllib.parse.urlencode(
-        {
-            "client_id": settings.youtube_client_id,
-            "client_secret": settings.youtube_client_secret,
-            "refresh_token": refresh_token,
-            "grant_type": "refresh_token",
-        }
-    ).encode("utf-8")
-    response = HttpJsonClient().request_json(
-        "https://oauth2.googleapis.com/token",
-        method="POST",
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        body=form,
-        timeout_seconds=60,
+    try:
+        refresh_token = decrypt_platform_token(account.refresh_token_encrypted)
+    except PlatformTokenCryptoError as error:
+        raise TerminalPublishProviderError(
+            error.error_message,
+            error_code=error.error_code,
+        ) from error
+
+    credentials = Credentials(
+        token=None,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=settings.youtube_client_id,
+        client_secret=settings.youtube_client_secret,
     )
-    access_token = response.get("access_token")
+
+    try:
+        credentials.refresh(GoogleAuthRequest())
+    except TransportError as error:
+        raise RetryablePublishProviderError("YouTube token refresh failed") from error
+    except RefreshError as error:
+        raise TerminalPublishProviderError(
+            "YouTube account must be reconnected"
+        ) from error
+
+    access_token = credentials.token
 
     if not isinstance(access_token, str) or not access_token:
         raise TerminalPublishProviderError("YouTube token refresh failed")
 
-    expires_in = response.get("expires_in")
-    expires_at = (
-        datetime.now(UTC) + timedelta(seconds=int(expires_in))
-        if isinstance(expires_in, int)
-        else None
-    )
-    refresh_token_value = (
-        response["refresh_token"]
-        if isinstance(response.get("refresh_token"), str)
-        else refresh_token
-    )
+    expires_at = _as_utc_datetime(credentials.expiry)
+    refresh_token_value = credentials.refresh_token or refresh_token
     publish_repository.update_platform_account_credentials(
         session,
         str(account.id),
@@ -373,6 +245,16 @@ def ensure_fresh_youtube_account(
     )
 
 
+def _build_facebook_api(access_token: str) -> FacebookAdsApi:
+    return FacebookAdsApi.init(
+        app_id=settings.facebook_app_id,
+        app_secret=settings.facebook_app_secret,
+        access_token=access_token,
+        api_version=settings.facebook_graph_api_version,
+        timeout=1800,
+    )
+
+
 def _require_decrypted_token(account: publish_repository.PlatformAccountRow) -> str:
     if not account.access_token_encrypted:
         raise TerminalPublishProviderError("Platform account token is missing")
@@ -383,7 +265,13 @@ def _require_decrypted_token(account: publish_repository.PlatformAccountRow) -> 
     if account.platform == "FACEBOOK" and _expires_soon(account.expires_at):
         raise TerminalPublishProviderError("Facebook account must be reconnected")
 
-    return decrypt_platform_token(account.access_token_encrypted)
+    try:
+        return decrypt_platform_token(account.access_token_encrypted)
+    except PlatformTokenCryptoError as error:
+        raise TerminalPublishProviderError(
+            error.error_message,
+            error_code=error.error_code,
+        ) from error
 
 
 def _download_publish_source(source: publish_repository.PublishSourceRow) -> Path:
@@ -442,21 +330,54 @@ def _expires_soon(value: datetime | None) -> bool:
     )
 
 
-def _raise_http_error(status_code: int, payload: str) -> None:
-    message = payload or f"Platform request failed with status {status_code}"
+def _as_utc_datetime(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
 
+    if value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+
+    return value.astimezone(UTC)
+
+
+def _raise_google_api_error(error: HttpError, fallback: str) -> NoReturn:
+    status_code = error.status_code
+    message = _extract_google_error_message(error) or fallback
     if status_code in {408, 409, 425, 429} or status_code >= 500:
         raise RetryablePublishProviderError(message)
 
     raise TerminalPublishProviderError(message)
 
 
-def _extract_platform_error(payload: dict[str, Any]) -> str:
-    error = payload.get("error")
+def _extract_google_error_message(error: HttpError) -> str | None:
+    try:
+        payload = json.loads(error.content.decode("utf-8"))
+    except (AttributeError, UnicodeDecodeError, json.JSONDecodeError):
+        return str(error) or None
 
-    if isinstance(error, dict):
-        message = error.get("message")
+    if not isinstance(payload, dict):
+        return str(error) or None
+
+    error_payload = payload.get("error")
+    if isinstance(error_payload, dict):
+        message = error_payload.get("message")
         if isinstance(message, str):
             return message
 
-    return "Platform request failed"
+    return str(error) or None
+
+
+def _raise_facebook_api_error(error: FacebookRequestError) -> NoReturn:
+    status_code = error.http_status()
+    message = (
+        error.api_error_message() or error.get_message() or "Facebook publish failed"
+    )
+
+    if (
+        error.api_transient_error()
+        or status_code in {408, 409, 425, 429}
+        or status_code >= 500
+    ):
+        raise RetryablePublishProviderError(message)
+
+    raise TerminalPublishProviderError(message)
