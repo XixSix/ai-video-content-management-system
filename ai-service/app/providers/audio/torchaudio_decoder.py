@@ -23,7 +23,7 @@ class TorchaudioAudioDecoder:
         self._supported_channels = set(supported_channels)
 
     def decode(self, local_path: Path) -> AudioWaveform:
-        """Load, validate, and downmix audio for transcription."""
+        """Load, validate, and downmix audio for transcribe."""
         try:
             metadata = self._load_audio_metadata(local_path)
         except Exception as exc:

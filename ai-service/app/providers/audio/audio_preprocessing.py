@@ -30,7 +30,7 @@ def preprocess_audio(
     loudness_meters: dict[int, pyln.Meter] | None = None,
     resamplers: dict[tuple[int, int], torchaudio.transforms.Resample] | None = None,
 ) -> np.ndarray:
-    """Convert, resample, and normalize audio for transcription."""
+    """Convert, resample, and normalize audio for transcribe."""
     if loudness_meters is None:
         loudness_meters = {}
 

@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from app.providers.chaptering.sentence_transformer_embedding import (
+from app.providers.generate_chapters.sentence_transformer_embedding import (
     SentenceTransformerTextEmbeddingProvider,
 )
 

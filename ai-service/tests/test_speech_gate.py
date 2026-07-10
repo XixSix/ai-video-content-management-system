@@ -1,5 +1,5 @@
 from app.provider_contracts.vad import SpeechRegion
-from app.workflows.transcription.speech_gate import speech_regions_pass_gate
+from app.workflows.transcribe.speech_gate import speech_regions_pass_gate
 
 
 def test_speech_regions_gate_rejects_empty_regions() -> None:

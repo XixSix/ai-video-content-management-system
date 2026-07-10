@@ -4,10 +4,10 @@ from pydantic import ValidationError
 from app.core.config import Settings
 
 
-def test_settings_use_chaptering_defaults() -> None:
+def test_settings_use_generate_chapters_defaults() -> None:
     settings = Settings(_env_file=None)
 
-    assert settings.chaptering_target_unit_duration_seconds == 12
+    assert settings.generate_chapters_target_unit_duration_seconds == 12
     assert settings.diarization_provider == "noop"
     assert settings.pyannote_auth_token == ""
     assert (
@@ -44,35 +44,37 @@ def test_settings_use_chaptering_defaults() -> None:
     assert settings.offline_asr_merge_gap_seconds == 0.6
     assert settings.offline_asr_max_window_seconds == 30
     assert settings.offline_asr_min_window_seconds == 1.2
-    assert settings.chaptering_embedding_provider == "noop"
-    assert settings.chaptering_embedding_model_name == "Qwen/Qwen3-Embedding-0.6B"
-    assert settings.chaptering_embedding_device == "cpu"
-    assert settings.chaptering_embedding_batch_size == 8
-    assert settings.chaptering_embedding_max_sequence_length == 2048
-    assert settings.chaptering_embedding_cache_path is None
-    assert settings.chaptering_embedding_local_files_only is False
-    assert settings.chaptering_boundary_evaluation_provider == "noop"
-    assert settings.chaptering_title_provider == "noop"
-    assert settings.short_clip_candidate_provider == "noop"
-    assert settings.short_clip_model_name == "noop-short-clip-v1"
+    assert settings.generate_chapters_embedding_provider == "noop"
+    assert (
+        settings.generate_chapters_embedding_model_name == "Qwen/Qwen3-Embedding-0.6B"
+    )
+    assert settings.generate_chapters_embedding_device == "cpu"
+    assert settings.generate_chapters_embedding_batch_size == 8
+    assert settings.generate_chapters_embedding_max_sequence_length == 2048
+    assert settings.generate_chapters_embedding_cache_path is None
+    assert settings.generate_chapters_embedding_local_files_only is False
+    assert settings.generate_chapters_boundary_evaluation_provider == "noop"
+    assert settings.generate_chapters_title_provider == "noop"
+    assert settings.generate_short_clips_candidate_provider == "noop"
+    assert settings.generate_short_clips_model_name == "noop-generate-short-clips-v1"
     assert settings.llm_base_url == "http://localhost:8000/v1"
     assert settings.llm_api_key == ""
     assert settings.llm_model_name == "Qwen/Qwen3-8B"
     assert settings.llm_timeout_seconds == 30
     assert settings.llm_temperature == 0
     assert settings.llm_max_tokens == 1024
-    assert settings.chaptering_max_unit_duration_seconds == 20
-    assert settings.chaptering_target_unit_words == 40
-    assert settings.chaptering_max_unit_words == 80
-    assert settings.chaptering_unit_repair_short_duration_seconds == 4
-    assert settings.chaptering_unit_repair_min_words == 8
-    assert settings.chaptering_unit_repair_fragment_max_words == 2
-    assert settings.chaptering_unit_repair_sparse_duration_seconds == 6
-    assert settings.chaptering_unit_repair_continuation_gap_seconds == 0.05
-    assert settings.chaptering_valley_smoothing_radius == 1
-    assert settings.chaptering_valley_peak_window == 2
-    assert settings.chaptering_valley_min_depth == 0.18
-    assert settings.chaptering_valley_semantic_weight == 0.70
+    assert settings.generate_chapters_max_unit_duration_seconds == 20
+    assert settings.generate_chapters_target_unit_words == 40
+    assert settings.generate_chapters_max_unit_words == 80
+    assert settings.generate_chapters_unit_repair_short_duration_seconds == 4
+    assert settings.generate_chapters_unit_repair_min_words == 8
+    assert settings.generate_chapters_unit_repair_fragment_max_words == 2
+    assert settings.generate_chapters_unit_repair_sparse_duration_seconds == 6
+    assert settings.generate_chapters_unit_repair_continuation_gap_seconds == 0.05
+    assert settings.generate_chapters_valley_smoothing_radius == 1
+    assert settings.generate_chapters_valley_peak_window == 2
+    assert settings.generate_chapters_valley_min_depth == 0.18
+    assert settings.generate_chapters_valley_semantic_weight == 0.70
 
 
 def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -122,58 +124,60 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("OFFLINE_ASR_MERGE_GAP_SECONDS", "0.4")
     monkeypatch.setenv("OFFLINE_ASR_MAX_WINDOW_SECONDS", "20")
     monkeypatch.setenv("OFFLINE_ASR_MIN_WINDOW_SECONDS", "1.5")
-    monkeypatch.setenv("CHAPTERING_STRATEGY", "word")
-    monkeypatch.setenv("CHAPTERING_MODEL_NAME", "chaptering-v1")
+    monkeypatch.setenv("GENERATE_CHAPTERS_STRATEGY", "word")
+    monkeypatch.setenv("GENERATE_CHAPTERS_MODEL_NAME", "generate-chapters-v1")
     monkeypatch.setenv(
-        "CHAPTERING_BOUNDARY_EVALUATION_PROVIDER",
+        "GENERATE_CHAPTERS_BOUNDARY_EVALUATION_PROVIDER",
         "openai-compatible",
     )
-    monkeypatch.setenv("CHAPTERING_TITLE_PROVIDER", "openai-compatible")
-    monkeypatch.setenv("SHORT_CLIP_CANDIDATE_PROVIDER", "openai-compatible")
-    monkeypatch.setenv("SHORT_CLIP_MODEL_NAME", "short-clip-custom")
+    monkeypatch.setenv("GENERATE_CHAPTERS_TITLE_PROVIDER", "openai-compatible")
+    monkeypatch.setenv("GENERATE_SHORT_CLIPS_CANDIDATE_PROVIDER", "openai-compatible")
+    monkeypatch.setenv("GENERATE_SHORT_CLIPS_MODEL_NAME", "generate-short-clips-custom")
     monkeypatch.setenv("LLM_BASE_URL", "https://llm.example.test/v1")
     monkeypatch.setenv("LLM_API_KEY", "local-token")
     monkeypatch.setenv("LLM_MODEL_NAME", "Qwen/custom")
     monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "45")
     monkeypatch.setenv("LLM_TEMPERATURE", "0.2")
     monkeypatch.setenv("LLM_MAX_TOKENS", "2048")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_PROVIDER", "sentence-transformers")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_MODEL_NAME", "Qwen/custom-embedding")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_DEVICE", "cuda")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_BATCH_SIZE", "16")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_MAX_SEQUENCE_LENGTH", "4096")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_CACHE_PATH", "/tmp/qwen-cache")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_LOCAL_FILES_ONLY", "true")
-    monkeypatch.setenv("CHAPTERING_TARGET_UNIT_DURATION_SECONDS", "18")
-    monkeypatch.setenv("CHAPTERING_MAX_UNIT_DURATION_SECONDS", "25")
-    monkeypatch.setenv("CHAPTERING_TARGET_UNIT_WORDS", "70")
-    monkeypatch.setenv("CHAPTERING_MAX_UNIT_WORDS", "140")
-    monkeypatch.setenv("CHAPTERING_MAX_UNIT_CHARS", "900")
-    monkeypatch.setenv("CHAPTERING_PAUSE_BOUNDARY_SECONDS", "1")
-    monkeypatch.setenv("CHAPTERING_PUNCTUATION_POOR_THRESHOLD", "0.25")
-    monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_SHORT_DURATION_SECONDS", "3")
-    monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_MIN_WORDS", "6")
-    monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_FRAGMENT_MAX_WORDS", "3")
-    monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_SPARSE_DURATION_SECONDS", "5")
-    monkeypatch.setenv("CHAPTERING_UNIT_REPAIR_CONTINUATION_GAP_SECONDS", "0.1")
-    monkeypatch.setenv("CHAPTERING_CONTEXT_WINDOW_SECONDS", "100")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_SCORE_CONTEXT_SECONDS", "45")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_LONG_PAUSE_SECONDS", "2")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_MAX_PAUSE_SCORE_SECONDS", "4")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_MIN_CONTEXT_TEXT_CHARS", "100")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_DISCOURSE_MARKER_WEIGHT", "0.2")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_PAUSE_WEIGHT", "0.2")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_LEXICAL_SHIFT_WEIGHT", "0.2")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_BOUNDARY_QUALITY_WEIGHT", "0.2")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_DURATION_SANITY_WEIGHT", "0.2")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_CANDIDATE_MIN_LIMIT", "8")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_CANDIDATE_MAX_LIMIT", "120")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_CANDIDATE_MULTIPLIER", "3")
-    monkeypatch.setenv("CHAPTERING_CANDIDATE_TOP_SCORE_FRACTION", "0.5")
-    monkeypatch.setenv("CHAPTERING_VALLEY_SMOOTHING_RADIUS", "2")
-    monkeypatch.setenv("CHAPTERING_VALLEY_PEAK_WINDOW", "4")
-    monkeypatch.setenv("CHAPTERING_VALLEY_MIN_DEPTH", "0.3")
-    monkeypatch.setenv("CHAPTERING_VALLEY_SEMANTIC_WEIGHT", "0.6")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_PROVIDER", "sentence-transformers")
+    monkeypatch.setenv(
+        "GENERATE_CHAPTERS_EMBEDDING_MODEL_NAME", "Qwen/custom-embedding"
+    )
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_DEVICE", "cuda")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_BATCH_SIZE", "16")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_MAX_SEQUENCE_LENGTH", "4096")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_CACHE_PATH", "/tmp/qwen-cache")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_LOCAL_FILES_ONLY", "true")
+    monkeypatch.setenv("GENERATE_CHAPTERS_TARGET_UNIT_DURATION_SECONDS", "18")
+    monkeypatch.setenv("GENERATE_CHAPTERS_MAX_UNIT_DURATION_SECONDS", "25")
+    monkeypatch.setenv("GENERATE_CHAPTERS_TARGET_UNIT_WORDS", "70")
+    monkeypatch.setenv("GENERATE_CHAPTERS_MAX_UNIT_WORDS", "140")
+    monkeypatch.setenv("GENERATE_CHAPTERS_MAX_UNIT_CHARS", "900")
+    monkeypatch.setenv("GENERATE_CHAPTERS_PAUSE_BOUNDARY_SECONDS", "1")
+    monkeypatch.setenv("GENERATE_CHAPTERS_PUNCTUATION_POOR_THRESHOLD", "0.25")
+    monkeypatch.setenv("GENERATE_CHAPTERS_UNIT_REPAIR_SHORT_DURATION_SECONDS", "3")
+    monkeypatch.setenv("GENERATE_CHAPTERS_UNIT_REPAIR_MIN_WORDS", "6")
+    monkeypatch.setenv("GENERATE_CHAPTERS_UNIT_REPAIR_FRAGMENT_MAX_WORDS", "3")
+    monkeypatch.setenv("GENERATE_CHAPTERS_UNIT_REPAIR_SPARSE_DURATION_SECONDS", "5")
+    monkeypatch.setenv("GENERATE_CHAPTERS_UNIT_REPAIR_CONTINUATION_GAP_SECONDS", "0.1")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CONTEXT_WINDOW_SECONDS", "100")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_SCORE_CONTEXT_SECONDS", "45")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_LONG_PAUSE_SECONDS", "2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_MAX_PAUSE_SCORE_SECONDS", "4")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_MIN_CONTEXT_TEXT_CHARS", "100")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_DISCOURSE_MARKER_WEIGHT", "0.2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_PAUSE_WEIGHT", "0.2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_LEXICAL_SHIFT_WEIGHT", "0.2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_BOUNDARY_QUALITY_WEIGHT", "0.2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_DURATION_SANITY_WEIGHT", "0.2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_CANDIDATE_MIN_LIMIT", "8")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_CANDIDATE_MAX_LIMIT", "120")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_CANDIDATE_MULTIPLIER", "3")
+    monkeypatch.setenv("GENERATE_CHAPTERS_CANDIDATE_TOP_SCORE_FRACTION", "0.5")
+    monkeypatch.setenv("GENERATE_CHAPTERS_VALLEY_SMOOTHING_RADIUS", "2")
+    monkeypatch.setenv("GENERATE_CHAPTERS_VALLEY_PEAK_WINDOW", "4")
+    monkeypatch.setenv("GENERATE_CHAPTERS_VALLEY_MIN_DEPTH", "0.3")
+    monkeypatch.setenv("GENERATE_CHAPTERS_VALLEY_SEMANTIC_WEIGHT", "0.6")
 
     settings = Settings(_env_file=None)
 
@@ -224,55 +228,57 @@ def test_settings_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> None
     assert settings.offline_asr_merge_gap_seconds == 0.4
     assert settings.offline_asr_max_window_seconds == 20
     assert settings.offline_asr_min_window_seconds == 1.5
-    assert settings.chaptering_strategy == "word"
-    assert settings.chaptering_model_name == "chaptering-v1"
-    assert settings.chaptering_boundary_evaluation_provider == "openai-compatible"
-    assert settings.chaptering_title_provider == "openai-compatible"
-    assert settings.short_clip_candidate_provider == "openai-compatible"
-    assert settings.short_clip_model_name == "short-clip-custom"
+    assert settings.generate_chapters_strategy == "word"
+    assert settings.generate_chapters_model_name == "generate-chapters-v1"
+    assert (
+        settings.generate_chapters_boundary_evaluation_provider == "openai-compatible"
+    )
+    assert settings.generate_chapters_title_provider == "openai-compatible"
+    assert settings.generate_short_clips_candidate_provider == "openai-compatible"
+    assert settings.generate_short_clips_model_name == "generate-short-clips-custom"
     assert settings.llm_base_url == "https://llm.example.test/v1"
     assert settings.llm_api_key == "local-token"
     assert settings.llm_model_name == "Qwen/custom"
     assert settings.llm_timeout_seconds == 45
     assert settings.llm_temperature == 0.2
     assert settings.llm_max_tokens == 2048
-    assert settings.chaptering_embedding_provider == "sentence-transformers"
-    assert settings.chaptering_embedding_model_name == "Qwen/custom-embedding"
-    assert settings.chaptering_embedding_device == "cuda"
-    assert settings.chaptering_embedding_batch_size == 16
-    assert settings.chaptering_embedding_max_sequence_length == 4096
-    assert str(settings.chaptering_embedding_cache_path) == "/tmp/qwen-cache"
-    assert settings.chaptering_embedding_local_files_only is True
-    assert settings.chaptering_target_unit_duration_seconds == 18
-    assert settings.chaptering_max_unit_duration_seconds == 25
-    assert settings.chaptering_target_unit_words == 70
-    assert settings.chaptering_max_unit_words == 140
-    assert settings.chaptering_max_unit_chars == 900
-    assert settings.chaptering_pause_boundary_seconds == 1
-    assert settings.chaptering_punctuation_poor_threshold == 0.25
-    assert settings.chaptering_unit_repair_short_duration_seconds == 3
-    assert settings.chaptering_unit_repair_min_words == 6
-    assert settings.chaptering_unit_repair_fragment_max_words == 3
-    assert settings.chaptering_unit_repair_sparse_duration_seconds == 5
-    assert settings.chaptering_unit_repair_continuation_gap_seconds == 0.1
-    assert settings.chaptering_context_window_seconds == 100
-    assert settings.chaptering_candidate_score_context_seconds == 45
-    assert settings.chaptering_candidate_long_pause_seconds == 2
-    assert settings.chaptering_candidate_max_pause_score_seconds == 4
-    assert settings.chaptering_candidate_min_context_text_chars == 100
-    assert settings.chaptering_candidate_discourse_marker_weight == 0.2
-    assert settings.chaptering_candidate_pause_weight == 0.2
-    assert settings.chaptering_candidate_lexical_shift_weight == 0.2
-    assert settings.chaptering_candidate_boundary_quality_weight == 0.2
-    assert settings.chaptering_candidate_duration_sanity_weight == 0.2
-    assert settings.chaptering_embedding_candidate_min_limit == 8
-    assert settings.chaptering_embedding_candidate_max_limit == 120
-    assert settings.chaptering_embedding_candidate_multiplier == 3
-    assert settings.chaptering_candidate_top_score_fraction == 0.5
-    assert settings.chaptering_valley_smoothing_radius == 2
-    assert settings.chaptering_valley_peak_window == 4
-    assert settings.chaptering_valley_min_depth == 0.3
-    assert settings.chaptering_valley_semantic_weight == 0.6
+    assert settings.generate_chapters_embedding_provider == "sentence-transformers"
+    assert settings.generate_chapters_embedding_model_name == "Qwen/custom-embedding"
+    assert settings.generate_chapters_embedding_device == "cuda"
+    assert settings.generate_chapters_embedding_batch_size == 16
+    assert settings.generate_chapters_embedding_max_sequence_length == 4096
+    assert str(settings.generate_chapters_embedding_cache_path) == "/tmp/qwen-cache"
+    assert settings.generate_chapters_embedding_local_files_only is True
+    assert settings.generate_chapters_target_unit_duration_seconds == 18
+    assert settings.generate_chapters_max_unit_duration_seconds == 25
+    assert settings.generate_chapters_target_unit_words == 70
+    assert settings.generate_chapters_max_unit_words == 140
+    assert settings.generate_chapters_max_unit_chars == 900
+    assert settings.generate_chapters_pause_boundary_seconds == 1
+    assert settings.generate_chapters_punctuation_poor_threshold == 0.25
+    assert settings.generate_chapters_unit_repair_short_duration_seconds == 3
+    assert settings.generate_chapters_unit_repair_min_words == 6
+    assert settings.generate_chapters_unit_repair_fragment_max_words == 3
+    assert settings.generate_chapters_unit_repair_sparse_duration_seconds == 5
+    assert settings.generate_chapters_unit_repair_continuation_gap_seconds == 0.1
+    assert settings.generate_chapters_context_window_seconds == 100
+    assert settings.generate_chapters_candidate_score_context_seconds == 45
+    assert settings.generate_chapters_candidate_long_pause_seconds == 2
+    assert settings.generate_chapters_candidate_max_pause_score_seconds == 4
+    assert settings.generate_chapters_candidate_min_context_text_chars == 100
+    assert settings.generate_chapters_candidate_discourse_marker_weight == 0.2
+    assert settings.generate_chapters_candidate_pause_weight == 0.2
+    assert settings.generate_chapters_candidate_lexical_shift_weight == 0.2
+    assert settings.generate_chapters_candidate_boundary_quality_weight == 0.2
+    assert settings.generate_chapters_candidate_duration_sanity_weight == 0.2
+    assert settings.generate_chapters_embedding_candidate_min_limit == 8
+    assert settings.generate_chapters_embedding_candidate_max_limit == 120
+    assert settings.generate_chapters_embedding_candidate_multiplier == 3
+    assert settings.generate_chapters_candidate_top_score_fraction == 0.5
+    assert settings.generate_chapters_valley_smoothing_radius == 2
+    assert settings.generate_chapters_valley_peak_window == 4
+    assert settings.generate_chapters_valley_min_depth == 0.3
+    assert settings.generate_chapters_valley_semantic_weight == 0.6
 
 
 def test_settings_reject_invalid_port(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -286,18 +292,18 @@ def test_settings_treat_empty_model_storage_path_as_none(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("ASR_MODEL_STORAGE_PATH", "")
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_CACHE_PATH", "")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_CACHE_PATH", "")
 
     settings = Settings(_env_file=None)
 
     assert settings.asr_model_storage_path is None
-    assert settings.chaptering_embedding_cache_path is None
+    assert settings.generate_chapters_embedding_cache_path is None
 
 
 def test_settings_reject_invalid_embedding_provider(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("CHAPTERING_EMBEDDING_PROVIDER", "unknown")
+    monkeypatch.setenv("GENERATE_CHAPTERS_EMBEDDING_PROVIDER", "unknown")
 
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
@@ -306,7 +312,7 @@ def test_settings_reject_invalid_embedding_provider(
 def test_settings_reject_invalid_llm_provider_switches(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("SHORT_CLIP_CANDIDATE_PROVIDER", "unknown")
+    monkeypatch.setenv("GENERATE_SHORT_CLIPS_CANDIDATE_PROVIDER", "unknown")
 
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
