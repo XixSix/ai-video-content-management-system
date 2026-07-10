@@ -4,9 +4,10 @@ import os
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from app.core.config import settings
+from app.errors import ServiceError
 
 
-class PlatformTokenCryptoError(Exception):
+class PlatformTokenCryptoError(ServiceError):
     pass
 
 
@@ -24,7 +25,8 @@ def _token_key() -> bytes:
 
     if len(key) != 32:
         raise PlatformTokenCryptoError(
-            "PLATFORM_TOKEN_ENCRYPTION_KEY must be a base64-encoded 32-byte key"
+            "PLATFORM_TOKEN_ENCRYPTION_KEY must be a base64-encoded 32-byte key",
+            error_code="PLATFORM_TOKEN_KEY_INVALID",
         )
 
     return key
@@ -34,7 +36,10 @@ def decrypt_platform_token(encrypted_token: str) -> str:
     parts = encrypted_token.split(":")
 
     if len(parts) != 4 or parts[0] != "v1":
-        raise PlatformTokenCryptoError("Invalid encrypted token format")
+        raise PlatformTokenCryptoError(
+            "Invalid encrypted token format",
+            error_code="PLATFORM_TOKEN_FORMAT_INVALID",
+        )
 
     _, iv_encoded, auth_tag_encoded, ciphertext_encoded = parts
     iv = _decode_base64url(iv_encoded)
@@ -48,7 +53,10 @@ def decrypt_platform_token(encrypted_token: str) -> str:
             .decode("utf-8")
         )
     except Exception as error:  # pragma: no cover - exact crypto errors vary.
-        raise PlatformTokenCryptoError("Could not decrypt platform token") from error
+        raise PlatformTokenCryptoError(
+            "Could not decrypt platform token",
+            error_code="PLATFORM_TOKEN_DECRYPT_FAILED",
+        ) from error
 
 
 def encrypt_platform_token(token: str) -> str:

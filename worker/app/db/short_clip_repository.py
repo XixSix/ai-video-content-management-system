@@ -8,18 +8,10 @@ from sqlalchemy import text
 from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
 
-if TYPE_CHECKING:
-    from app.schemas.short_clip.result import ShortClipCandidateResult
 from app.schemas.short_clip.input import GenerateShortClipsOptions
 
-
-class TranscriptVersionMismatchError(Exception):
-    def __init__(self, *, expected: int, actual: int) -> None:
-        self.expected = expected
-        self.actual = actual
-        super().__init__(
-            f"Expected transcript version {expected}, found version {actual}"
-        )
+if TYPE_CHECKING:
+    from app.schemas.short_clip.result import ShortClipCandidateResult
 
 
 @dataclass(frozen=True)
@@ -165,16 +157,6 @@ def load_short_clip_source(
     )
 
     if row is None:
-        actual_version = _find_transcript_version(
-            session,
-            media_id=media_id,
-            transcript_id=transcript_id,
-        )
-        if actual_version is not None and actual_version != transcript_version:
-            raise TranscriptVersionMismatchError(
-                expected=transcript_version,
-                actual=actual_version,
-            )
         return None
 
     segment_rows = (
@@ -236,25 +218,6 @@ def load_short_clip_source(
         segments=[_segment_from_row(segment_row) for segment_row in segment_rows],
         chapters=[_chapter_from_row(chapter_row) for chapter_row in chapter_rows],
     )
-
-
-def _find_transcript_version(
-    session: Session,
-    *,
-    media_id: str,
-    transcript_id: str,
-) -> int | None:
-    return session.execute(
-        text(
-            """
-            SELECT version
-            FROM transcripts
-            WHERE id = :transcript_id
-              AND media_id = :media_id
-            """
-        ),
-        {"media_id": media_id, "transcript_id": transcript_id},
-    ).scalar_one_or_none()
 
 
 def find_output_by_job_id(
@@ -335,12 +298,6 @@ def save_clip_candidates(
     candidates: list["ShortClipCandidateResult"],
     options: GenerateShortClipsOptions,
 ) -> list[PersistedClipCandidate]:
-    _guard_transcript_version(
-        session,
-        media_id=media_id,
-        transcript_id=transcript_id,
-        transcript_version=transcript_version,
-    )
     now = datetime.now(UTC)
 
     for candidate in candidates:
@@ -439,33 +396,6 @@ def save_clip_candidates(
     return [_candidate_from_row(row) for row in rows]
 
 
-def _guard_transcript_version(
-    session: Session,
-    *,
-    media_id: str,
-    transcript_id: str,
-    transcript_version: int,
-) -> None:
-    actual_version = session.execute(
-        text(
-            """
-            SELECT version
-            FROM transcripts
-            WHERE id = :transcript_id
-              AND media_id = :media_id
-            FOR SHARE
-            """
-        ),
-        {"media_id": media_id, "transcript_id": transcript_id},
-    ).scalar_one_or_none()
-
-    if actual_version is not None and actual_version != transcript_version:
-        raise TranscriptVersionMismatchError(
-            expected=transcript_version,
-            actual=actual_version,
-        )
-
-
 def create_or_update_short_clip_for_candidate(
     session: Session,
     *,
@@ -552,6 +482,21 @@ def mark_short_clip_failed(session: Session, short_clip_id: str) -> None:
             """
         ),
         {"short_clip_id": short_clip_id, "now": datetime.now(UTC)},
+    )
+
+
+def mark_short_clips_failed_by_job_id(session: Session, job_id: str) -> None:
+    session.execute(
+        text(
+            """
+            UPDATE short_clips sc
+            SET status = 'FAILED', updated_at = :now
+            FROM clip_candidates cc
+            WHERE sc.candidate_id = cc.id
+              AND cc.job_id = :job_id
+            """
+        ),
+        {"job_id": job_id, "now": datetime.now(UTC)},
     )
 
 

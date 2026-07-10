@@ -4,7 +4,6 @@ import pytest
 
 from app.schemas.transcribe.audio import AudioMetadata
 from app.services.ffmpeg_service import (
-    AudioSanityError,
     FFmpegService,
     FFmpegServiceError,
     parse_silence_ratio,
@@ -62,7 +61,7 @@ def test_audio_sanity_rejects_invalid_metadata(
 ) -> None:
     audio_path = _write_audio_file(tmp_path / "audio.wav")
 
-    with pytest.raises(AudioSanityError) as error:
+    with pytest.raises(FFmpegServiceError) as error:
         validate_audio_sanity(
             audio_path,
             metadata=_metadata(path=audio_path, **metadata_overrides),
@@ -77,7 +76,7 @@ def test_audio_sanity_rejects_invalid_metadata(
 def test_audio_sanity_rejects_missing_or_empty_file(tmp_path: Path) -> None:
     missing_path = tmp_path / "missing.wav"
 
-    with pytest.raises(AudioSanityError) as missing_error:
+    with pytest.raises(FFmpegServiceError) as missing_error:
         validate_audio_sanity(
             missing_path,
             metadata=_metadata(path=missing_path),
@@ -89,7 +88,7 @@ def test_audio_sanity_rejects_missing_or_empty_file(tmp_path: Path) -> None:
     empty_path = tmp_path / "empty.wav"
     empty_path.touch()
 
-    with pytest.raises(AudioSanityError) as empty_error:
+    with pytest.raises(FFmpegServiceError) as empty_error:
         validate_audio_sanity(
             empty_path,
             metadata=_metadata(path=empty_path),

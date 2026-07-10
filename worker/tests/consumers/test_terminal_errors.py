@@ -62,7 +62,7 @@ def test_transcribe_consumer_records_pipeline_terminal_failure(
     assert failures == [
         (
             str(JOB_ID),
-            "SOURCE_OBJECT_NOT_FOUND: Source media missing",
+            "Source media missing",
             "SOURCE_OBJECT_NOT_FOUND",
         )
     ]
@@ -108,9 +108,7 @@ def test_generate_chapters_consumer_records_job_terminal_failure(
             taskName="generate_chapters",
         )
 
-    assert failures == [
-        (str(JOB_ID), "TRANSCRIPT_EMPTY: Transcript is empty", "TRANSCRIPT_EMPTY")
-    ]
+    assert failures == [(str(JOB_ID), "Transcript is empty", "TRANSCRIPT_EMPTY")]
 
 
 def test_generate_short_clips_consumer_records_pipeline_terminal_failure(
@@ -153,9 +151,7 @@ def test_generate_short_clips_consumer_records_pipeline_terminal_failure(
             taskName="generate_short_clips",
         )
 
-    assert failures == [
-        (str(JOB_ID), "TRANSCRIPT_EMPTY: Transcript is empty", "TRANSCRIPT_EMPTY")
-    ]
+    assert failures == [(str(JOB_ID), "Transcript is empty", "TRANSCRIPT_EMPTY")]
 
 
 def test_media_preview_consumer_records_pipeline_terminal_failure(
@@ -204,7 +200,7 @@ def test_media_preview_consumer_records_pipeline_terminal_failure(
     assert failures == [
         (
             str(JOB_ID),
-            "SOURCE_OBJECT_NOT_FOUND: Source media missing",
+            "Source media missing",
             "SOURCE_OBJECT_NOT_FOUND",
         )
     ]
@@ -256,7 +252,7 @@ def test_render_export_consumer_records_pipeline_terminal_failure(
     assert failures == [
         (
             str(JOB_ID),
-            "RENDER_SOURCE_NOT_FOUND: Render source missing",
+            "Render source missing",
             "RENDER_SOURCE_NOT_FOUND",
         )
     ]
@@ -304,7 +300,7 @@ def test_publish_consumer_records_job_terminal_failure(
     assert failures == [
         (
             str(JOB_ID),
-            "PUBLISH_TARGET_NOT_FOUND: Publish target was not found",
+            "Publish target was not found",
             "PUBLISH_TARGET_NOT_FOUND",
         )
     ]
@@ -352,7 +348,7 @@ def test_publish_consumer_records_pipeline_terminal_failure(
     assert failures == [
         (
             str(JOB_ID),
-            "PUBLISH_PROVIDER_TERMINAL: Provider rejected the upload",
+            "Provider rejected the upload",
             "PUBLISH_PROVIDER_TERMINAL",
         )
     ]

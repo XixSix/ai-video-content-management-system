@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from app.core.config import settings
 from app.db import jobs_repository, short_clip_repository
 from app.db.client import get_db_session
+from app.errors import TerminalJobError
 from app.pipelines.generate_short_clips.pipeline import (
     run_generate_short_clips_pipeline,
 )
@@ -20,10 +21,8 @@ from app.schemas.short_clip.output import GenerateShortClipsJobOutput
 logger = logging.getLogger(__name__)
 
 
-class TerminalGenerateShortClipsJobError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalGenerateShortClipsJobError(TerminalJobError):
+    pass
 
 
 def process_generate_short_clips_job(
@@ -117,6 +116,7 @@ def record_generate_short_clips_job_failure(
             error_message,
             error_code=error_code,
         )
+        short_clip_repository.mark_short_clips_failed_by_job_id(session, job_id)
 
 
 def increment_generate_short_clips_job_attempt(job_id: str) -> int | None:

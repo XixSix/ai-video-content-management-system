@@ -4,6 +4,7 @@ from pathlib import Path
 import grpc
 
 from app.core.config import settings
+from app.errors import ServiceError
 from app.proto_path import ensure_proto_generated_on_path
 from app.schemas.chapters.input import GenerateChaptersOptions
 from app.schemas.chapters.result import (
@@ -43,10 +44,8 @@ TERMINAL_GRPC_CODES = {
 }
 
 
-class AIServiceTerminalError(Exception):
-    def __init__(self, message: str, *, error_code: str) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}")
+class AIServiceTerminalError(ServiceError):
+    pass
 
 
 class AIServiceClient:

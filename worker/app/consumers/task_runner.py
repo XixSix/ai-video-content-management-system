@@ -60,7 +60,7 @@ def run_consumer_task(
             _record_failure(
                 record_failure,
                 job_id,
-                str(error),
+                getattr(error, "error_message", str(error)),
                 error_code=getattr(error, "error_code", None),
                 record_error_code=record_error_code,
             )

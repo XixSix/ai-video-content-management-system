@@ -7,6 +7,7 @@ from app.core.celery_app import celery_app
 from app.core.config import settings
 from app.db import jobs_repository, publish_repository
 from app.db.client import get_db_session
+from app.errors import TerminalJobError
 from app.pipelines.publish.pipeline import run_publish_pipeline
 from app.schemas.db.processsing_job import JobStatus, ProcessingJobRow
 from app.schemas.jobs.publish_message import (
@@ -18,10 +19,8 @@ from app.schemas.publish.input import PublishJobInput
 logger = logging.getLogger(__name__)
 
 
-class TerminalPublishJobError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalPublishJobError(TerminalJobError):
+    pass
 
 
 def process_publish_job(message: PublishJobMessage) -> dict[str, Any]:

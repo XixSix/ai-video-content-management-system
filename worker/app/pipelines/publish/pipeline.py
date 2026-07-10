@@ -3,6 +3,8 @@ from typing import Any
 
 from app.db import publish_repository
 from app.db.client import get_db_session
+from app.errors import TerminalPipelineError
+from app.errors.policies import raise_terminal
 from app.schemas.db.processsing_job import ProcessingJobRow
 from app.schemas.publish.input import PublishJobInput
 from app.schemas.publish.output import PublishJobOutput
@@ -15,10 +17,8 @@ from app.services.publish_provider import (
 )
 
 
-class TerminalPublishPipelineError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalPublishPipelineError(TerminalPipelineError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -90,10 +90,11 @@ def run_publish_pipeline(
     except RetryablePublishProviderError:
         raise
     except TerminalPublishProviderError as error:
-        raise TerminalPublishPipelineError(
-            str(error),
+        raise_terminal(
+            error,
+            TerminalPublishPipelineError,
             error_code="PUBLISH_PROVIDER_TERMINAL",
-        ) from error
+        )
 
     with get_db_session() as session:
         publish_repository.mark_publish_task_published(

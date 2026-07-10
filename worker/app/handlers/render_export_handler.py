@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from app.core.config import settings
 from app.db import jobs_repository, render_export_repository
 from app.db.client import get_db_session
+from app.errors import TerminalJobError
 from app.handlers.publish_handler import (
     dispatch_chained_publish_job,
     record_chained_publish_render_failure,
@@ -22,10 +23,8 @@ from app.schemas.render_export.output import RenderExportJobOutput
 logger = logging.getLogger(__name__)
 
 
-class TerminalRenderExportJobError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalRenderExportJobError(TerminalJobError):
+    pass
 
 
 def process_render_export_job(message: RenderExportJobMessage) -> dict[str, Any]:

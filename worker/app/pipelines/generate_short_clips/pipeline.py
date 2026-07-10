@@ -28,9 +28,6 @@ class TerminalGenerateShortClipsPipelineError(TerminalPipelineError):
     pass
 
 
-DraftClipCandidate = ShortClipCandidateResult
-
-
 def run_generate_short_clips_pipeline(
     job: ProcessingJobRow,
     *,
@@ -232,7 +229,7 @@ def generate_clip_candidates(
     job_id: str,
     source: short_clip_repository.ShortClipSource,
     options: GenerateShortClipsOptions,
-) -> list[DraftClipCandidate]:
+) -> list[ShortClipCandidateResult]:
     """Generate short clip candidates through ai-service."""
     return ai_service_client.generate_short_clip_candidates(
         request_id=job_id,

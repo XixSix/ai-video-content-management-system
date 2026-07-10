@@ -153,8 +153,8 @@ def test_run_generate_chapters_pipeline_calls_ai_and_persists_chapters(
     monkeypatch.setattr(pipeline, "get_db_session", _session)
     monkeypatch.setattr(
         pipeline.chapters_repository,
-        "load_transcript_for_chapters",
-        lambda session, transcript_id, media_id: _transcript(),
+        "load_transcript",
+        lambda session, transcript_id, media_id, transcript_version: _transcript(),
     )
 
     def generate_chapters(
@@ -231,8 +231,8 @@ def test_run_generate_chapters_pipeline_rejects_missing_transcript(
     monkeypatch.setattr(pipeline, "get_db_session", _session)
     monkeypatch.setattr(
         pipeline.chapters_repository,
-        "load_transcript_for_chapters",
-        lambda session, transcript_id, media_id: None,
+        "load_transcript",
+        lambda session, transcript_id, media_id, transcript_version: None,
     )
 
     with pytest.raises(pipeline.TerminalGenerateChaptersPipelineError) as error:
@@ -252,8 +252,8 @@ def test_run_generate_chapters_pipeline_maps_ai_service_terminal_error(
     monkeypatch.setattr(pipeline, "get_db_session", _session)
     monkeypatch.setattr(
         pipeline.chapters_repository,
-        "load_transcript_for_chapters",
-        lambda session, transcript_id, media_id: _transcript(),
+        "load_transcript",
+        lambda session, transcript_id, media_id, transcript_version: _transcript(),
     )
     monkeypatch.setattr(
         pipeline.ai_service_client,
@@ -275,3 +275,24 @@ def test_run_generate_chapters_pipeline_maps_ai_service_terminal_error(
         )
 
     assert error.value.error_code == "AI_SERVICE_INVALID_ARGUMENT"
+
+
+def test_run_generate_chapters_pipeline_rejects_stale_transcript_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(pipeline, "get_db_session", _session)
+    monkeypatch.setattr(
+        pipeline.chapters_repository,
+        "load_transcript",
+        lambda session, transcript_id, media_id, transcript_version: None,
+    )
+
+    with pytest.raises(pipeline.TerminalGenerateChaptersPipelineError) as error:
+        pipeline.run_generate_chapters_pipeline(
+            _job(),
+            transcript_id=str(TRANSCRIPT_ID),
+            transcript_version=2,
+            options=_options(),
+        )
+
+    assert error.value.error_code == "TRANSCRIPT_NOT_FOUND"

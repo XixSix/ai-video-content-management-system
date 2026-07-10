@@ -6,7 +6,6 @@ from botocore.exceptions import ClientError, EndpointConnectionError
 from app.services.s3_service import (
     S3Service,
     S3ServiceError,
-    S3SourceObjectNotFoundError,
 )
 
 
@@ -55,7 +54,7 @@ def test_download_file_maps_not_found_to_terminal_error(tmp_path: Path) -> None:
     )
     service = _service_with_error(error)
 
-    with pytest.raises(S3SourceObjectNotFoundError) as raised:
+    with pytest.raises(S3ServiceError) as raised:
         service.download_file("missing.mp4", tmp_path / "source.mp4")
 
     assert raised.value.error_code == "SOURCE_OBJECT_NOT_FOUND"
@@ -66,8 +65,10 @@ def test_download_file_keeps_transient_errors_retryable(tmp_path: Path) -> None:
         EndpointConnectionError(endpoint_url="http://minio:9000")
     )
 
-    with pytest.raises(S3ServiceError):
+    with pytest.raises(S3ServiceError) as raised:
         service.download_file("video.mp4", tmp_path / "source.mp4")
+
+    assert raised.value.error_code == "S3_DOWNLOAD_FAILED"
 
 
 def test_create_presigned_get_url_returns_http_url() -> None:
@@ -99,5 +100,7 @@ def test_create_presigned_get_url_maps_missing_sources() -> None:
     )
     service = _service_with_error(error)
 
-    with pytest.raises(S3SourceObjectNotFoundError):
+    with pytest.raises(S3ServiceError) as raised:
         service.create_presigned_get_url("missing.mp4")
+
+    assert raised.value.error_code == "SOURCE_OBJECT_NOT_FOUND"

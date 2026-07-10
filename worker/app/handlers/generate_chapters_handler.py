@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from app.core.config import settings
 from app.db import chapters_repository, jobs_repository
 from app.db.client import get_db_session
+from app.errors import TerminalJobError
 from app.pipelines.generate_chapters.pipeline import run_generate_chapters_pipeline
 from app.schemas.chapters.input import GenerateChaptersJobInput
 from app.schemas.chapters.output import GenerateChaptersJobOutput
@@ -18,10 +19,8 @@ from app.schemas.jobs.generate_chapters_message import (
 logger = logging.getLogger(__name__)
 
 
-class TerminalGenerateChaptersJobError(Exception):
-    def __init__(self, message: str, *, error_code: str | None = None) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}" if error_code else message)
+class TerminalGenerateChaptersJobError(TerminalJobError):
+    pass
 
 
 def process_generate_chapters_job(

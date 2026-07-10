@@ -15,8 +15,8 @@ from app.schemas.db.processsing_job import JobStatus, JobType, ProcessingJobRow
 from app.schemas.jobs.transcribe_message import TranscribeJobMessage
 from app.schemas.transcribe.audio import AudioMetadata, AudioSanityResult
 from app.schemas.transcribe.result import TranscriptResult, TranscriptSegmentResult
-from app.services.ffmpeg_service import AudioSanityError
-from app.services.s3_service import S3ServiceError, S3SourceObjectNotFoundError
+from app.services.ffmpeg_service import FFmpegServiceError
+from app.services.s3_service import S3ServiceError
 
 JOB_ID = UUID("00000000-0000-4000-8000-000000000001")
 MEDIA_ID = UUID("00000000-0000-4000-8000-000000000002")
@@ -103,7 +103,7 @@ def _audio(tmp_path: Path) -> AudioSanityResult:
 def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object]:
     calls: dict[str, object] = {
         "completed_output": None,
-        "downloaded": 0,
+        "presigned": 0,
         "extracted": 0,
         "steps": [],
         "saved": 0,
@@ -141,15 +141,21 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
     ) -> None:
         calls["steps"].append((status, progress, current_step))
 
-    def download_file(s3_key: str, destination_path: Path, *, bucket: str) -> Path:
-        calls["downloaded"] += 1
+    def create_presigned_get_url(
+        object_key: str, *, bucket: str, expires_in_seconds: int
+    ) -> str:
+        calls["presigned"] += 1
+        assert object_key == "uploads/video.mp4"
         assert bucket == "vidpilot-media"
-        destination_path.parent.mkdir(parents=True, exist_ok=True)
-        destination_path.write_bytes(b"video")
-        return destination_path
+        return "http://minio:9000/vidpilot-media/uploads/video.mp4?signature=test"
 
-    def extract_audio(source_path: Path, output_path: Path) -> Path:
+    def extract_audio(source: str, output_path: Path) -> Path:
         calls["extracted"] += 1
+        assert (
+            source
+            == "http://minio:9000/vidpilot-media/uploads/video.mp4?signature=test"
+        )
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_bytes(b"wav")
         return output_path
 
@@ -223,7 +229,11 @@ def _patch_common(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, 
     monkeypatch.setattr(
         transcribe_pipeline.transcript_repository, "save_transcript", save_transcript
     )
-    monkeypatch.setattr(transcribe_pipeline.s3_service, "download_file", download_file)
+    monkeypatch.setattr(
+        transcribe_pipeline.s3_service,
+        "create_presigned_get_url",
+        create_presigned_get_url,
+    )
     monkeypatch.setattr(
         transcribe_pipeline.ffmpeg_service, "extract_audio", extract_audio
     )
@@ -254,7 +264,7 @@ def test_process_transcribe_job_happy_path_returns_contract(
         "status": "COMPLETED",
         "skipped": False,
     }
-    assert calls["downloaded"] == 1
+    assert calls["presigned"] == 1
     assert calls["extracted"] == 1
     assert calls["called_ai_service"] == 1
     assert calls["saved"] == 1
@@ -267,7 +277,7 @@ def test_process_transcribe_job_happy_path_returns_contract(
     assert calls["completed_output"]["wordCount"] == 2
     assert "mock" not in calls["completed_output"]
     storage_workspace = tmp_path / "storage" / "transcripts" / str(JOB_ID)
-    assert (storage_workspace / "source.mp4").read_bytes() == b"video"
+    assert not (storage_workspace / "source.mp4").exists()
     assert (storage_workspace / "audio.wav").read_bytes() == b"wav"
 
 
@@ -288,7 +298,7 @@ def test_process_transcribe_job_checks_existing_before_download(
     assert "transcriptId" not in result
     assert "segmentCount" not in result
     assert "wordCount" not in result
-    assert calls["downloaded"] == 0
+    assert calls["presigned"] == 0
     assert calls["extracted"] == 0
     assert calls["saved"] == 0
     assert calls["steps"] == []
@@ -325,11 +335,15 @@ def test_source_not_found_is_terminal(
 ) -> None:
     _patch_common(monkeypatch, tmp_path)
 
-    def raise_not_found(s3_key: str, destination_path: Path, *, bucket: str) -> Path:
-        raise S3SourceObjectNotFoundError("not found")
+    def raise_not_found(
+        object_key: str, *, bucket: str, expires_in_seconds: int
+    ) -> str:
+        raise S3ServiceError("not found", error_code="SOURCE_OBJECT_NOT_FOUND")
 
     monkeypatch.setattr(
-        transcribe_pipeline.s3_service, "download_file", raise_not_found
+        transcribe_pipeline.s3_service,
+        "create_presigned_get_url",
+        raise_not_found,
     )
 
     with pytest.raises(transcribe_pipeline.TerminalTranscribePipelineError) as error:
@@ -343,11 +357,15 @@ def test_s3_transient_failure_bubbles_for_retry(
 ) -> None:
     _patch_common(monkeypatch, tmp_path)
 
-    def raise_retryable(s3_key: str, destination_path: Path, *, bucket: str) -> Path:
+    def raise_retryable(
+        object_key: str, *, bucket: str, expires_in_seconds: int
+    ) -> str:
         raise S3ServiceError("temporary")
 
     monkeypatch.setattr(
-        transcribe_pipeline.s3_service, "download_file", raise_retryable
+        transcribe_pipeline.s3_service,
+        "create_presigned_get_url",
+        raise_retryable,
     )
 
     with pytest.raises(S3ServiceError):
@@ -360,7 +378,10 @@ def test_audio_sanity_failure_is_terminal(
     _patch_common(monkeypatch, tmp_path)
 
     def raise_audio_error(audio_path: Path) -> AudioSanityResult:
-        raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")
+        raise FFmpegServiceError(
+            "Audio is mostly silence",
+            error_code="AUDIO_NO_SPEECH_DETECTED",
+        )
 
     monkeypatch.setattr(
         transcribe_pipeline.ffmpeg_service, "validate_audio", raise_audio_error

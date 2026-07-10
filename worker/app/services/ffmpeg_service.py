@@ -5,30 +5,13 @@ from pathlib import Path
 from typing import Any
 
 from app.core.config import settings
+from app.errors import ServiceError
 from app.schemas.media_preview.probe import MediaProbe
 from app.schemas.transcribe.audio import AudioMetadata, AudioSanityResult
 
 
-class FFmpegServiceError(Exception):
+class FFmpegServiceError(ServiceError):
     pass
-
-
-class FFmpegBinaryNotFoundError(FFmpegServiceError):
-    pass
-
-
-class FFmpegTimeoutError(FFmpegServiceError):
-    pass
-
-
-class FFmpegCommandError(FFmpegServiceError):
-    pass
-
-
-class AudioSanityError(Exception):
-    def __init__(self, error_code: str, message: str) -> None:
-        self.error_code = error_code
-        super().__init__(f"{error_code}: {message}")
 
 
 class FFmpegService:
@@ -45,20 +28,20 @@ class FFmpegService:
 
     def extract_audio(
         self,
-        video_path: Path,
+        source: Path | str,
         output_path: Path,
         *,
         sample_rate: int = settings.audio_sample_rate,
         channels: int = settings.audio_channels,
     ) -> Path:
-        """Extract a normalized WAV audio track from a source media file."""
+        """Extract a normalized WAV audio track from a source path or URL."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         command = [
             self.ffmpeg_binary,
             "-y",
             "-i",
-            str(video_path),
+            str(source),
             "-vn",
             "-ac",
             str(channels),
@@ -90,12 +73,18 @@ class FFmpegService:
         try:
             payload = json.loads(result.stdout or "{}")
         except json.JSONDecodeError as error:
-            raise FFmpegCommandError("Invalid ffprobe JSON output") from error
+            raise FFmpegServiceError(
+                "Invalid ffprobe JSON output",
+                error_code="FFMPEG_INVALID_PROBE_JSON",
+            ) from error
 
         streams = payload.get("streams")
 
         if not isinstance(streams, list) or not streams:
-            raise FFmpegCommandError("No media streams found")
+            raise FFmpegServiceError(
+                "No media streams found",
+                error_code="MEDIA_STREAMS_NOT_FOUND",
+            )
 
         video_stream = next(
             (
@@ -131,7 +120,10 @@ class FFmpegService:
         )
 
         if duration_seconds is None or duration_seconds <= 0:
-            raise FFmpegCommandError("Media duration is missing or invalid")
+            raise FFmpegServiceError(
+                "Media duration is missing or invalid",
+                error_code="MEDIA_INVALID_DURATION",
+            )
 
         return MediaProbe(
             duration_seconds=duration_seconds,
@@ -217,8 +209,9 @@ class FFmpegService:
         frames = sorted(output_pattern.parent.glob("frame-*.jpg"))
 
         if len(frames) != frame_count:
-            raise FFmpegCommandError(
-                f"Expected {frame_count} sprite frames, generated {len(frames)}"
+            raise FFmpegServiceError(
+                f"Expected {frame_count} sprite frames, generated {len(frames)}",
+                error_code="FFMPEG_SPRITE_FRAME_COUNT_MISMATCH",
             )
 
         for frame in frames:
@@ -335,9 +328,9 @@ class FFmpegService:
     ) -> AudioSanityResult:
         """Validate extracted audio metadata and reject unusable audio files."""
         if not audio_path.exists() or audio_path.stat().st_size == 0:
-            raise AudioSanityError(
-                "AUDIO_EXTRACTION_EMPTY_OUTPUT",
+            raise FFmpegServiceError(
                 "Extracted audio file is missing or empty",
+                error_code="AUDIO_EXTRACTION_EMPTY_OUTPUT",
             )
 
         metadata = self.probe_audio(audio_path)
@@ -386,17 +379,20 @@ class FFmpegService:
                 timeout=self.timeout_seconds,
             )
         except FileNotFoundError as error:
-            raise FFmpegBinaryNotFoundError(
-                f"FFmpeg binary not found: {command[0]}"
+            raise FFmpegServiceError(
+                f"FFmpeg binary not found: {command[0]}",
+                error_code="FFMPEG_BINARY_NOT_FOUND",
             ) from error
         except subprocess.TimeoutExpired as error:
-            raise FFmpegTimeoutError(
-                f"Command timed out: {_command_name(command)}"
+            raise FFmpegServiceError(
+                f"Command timed out: {_command_name(command)}",
+                error_code="FFMPEG_TIMEOUT",
             ) from error
         except subprocess.CalledProcessError as error:
             message = error.stderr.strip() or error.stdout.strip() or str(error)
-            raise FFmpegCommandError(
-                f"Command failed: {_command_name(command)}: {message}"
+            raise FFmpegServiceError(
+                f"Command failed: {_command_name(command)}: {message}",
+                error_code="FFMPEG_COMMAND_FAILED",
             ) from error
 
 
@@ -405,12 +401,18 @@ def _first_stream(payload: dict[str, Any]) -> dict[str, Any]:
     streams = payload.get("streams")
 
     if not isinstance(streams, list) or not streams:
-        raise FFmpegServiceError("No audio stream found")
+        raise FFmpegServiceError(
+            "No audio stream found",
+            error_code="FFMPEG_AUDIO_STREAM_NOT_FOUND",
+        )
 
     stream = streams[0]
 
     if not isinstance(stream, dict):
-        raise FFmpegServiceError("Invalid ffprobe audio stream")
+        raise FFmpegServiceError(
+            "Invalid ffprobe audio stream",
+            error_code="FFMPEG_INVALID_AUDIO_STREAM",
+        )
 
     return stream
 
@@ -459,29 +461,34 @@ def validate_audio_sanity(
 ) -> AudioSanityResult:
     """Validate audio extraction output against worker transcription requirements."""
     if not audio_path.exists() or audio_path.stat().st_size == 0:
-        raise AudioSanityError(
-            "AUDIO_EXTRACTION_EMPTY_OUTPUT", "Extracted audio file is missing or empty"
+        raise FFmpegServiceError(
+            "Extracted audio file is missing or empty",
+            error_code="AUDIO_EXTRACTION_EMPTY_OUTPUT",
         )
 
     if metadata.duration_seconds is None or metadata.duration_seconds <= 0:
-        raise AudioSanityError(
-            "AUDIO_INVALID_DURATION", "Extracted audio duration is missing or invalid"
+        raise FFmpegServiceError(
+            "Extracted audio duration is missing or invalid",
+            error_code="AUDIO_INVALID_DURATION",
         )
 
     if metadata.sample_rate is None or metadata.sample_rate != expected_sample_rate:
-        raise AudioSanityError(
-            "AUDIO_INVALID_SAMPLE_RATE",
+        raise FFmpegServiceError(
             f"Expected sample rate {expected_sample_rate}, got {metadata.sample_rate}",
+            error_code="AUDIO_INVALID_SAMPLE_RATE",
         )
 
     if metadata.channels is None or metadata.channels != expected_channels:
-        raise AudioSanityError(
-            "AUDIO_INVALID_CHANNELS",
+        raise FFmpegServiceError(
             f"Expected {expected_channels} channel(s), got {metadata.channels}",
+            error_code="AUDIO_INVALID_CHANNELS",
         )
 
     if silence_ratio > silence_threshold:
-        raise AudioSanityError("AUDIO_NO_SPEECH_DETECTED", "Audio is mostly silence")
+        raise FFmpegServiceError(
+            "Audio is mostly silence",
+            error_code="AUDIO_NO_SPEECH_DETECTED",
+        )
 
     return AudioSanityResult(metadata=metadata, silence_ratio=silence_ratio)
 
@@ -506,7 +513,10 @@ def _escape_filter_path(path: Path) -> str:
 
 def _validate_non_empty_output(output_path: Path) -> None:
     if not output_path.exists() or output_path.stat().st_size == 0:
-        raise FFmpegCommandError(f"FFmpeg output is missing or empty: {output_path}")
+        raise FFmpegServiceError(
+            f"FFmpeg output is missing or empty: {output_path}",
+            error_code="FFMPEG_OUTPUT_EMPTY",
+        )
 
 
 ffmpeg_service = FFmpegService()
