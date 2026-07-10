@@ -8,12 +8,13 @@ import * as shortClipsQueue from './short-clips.queue'
 import * as shortClipsRepo from './short-clips.repository'
 import type { GenerateShortClipsBody, ListClipCandidatesQuery, ListShortClipsQuery } from './short-clips.schema'
 import { ShortClipsError } from './short-clips.error'
+import { GENERATE_SHORT_CLIPS_QUEUE_NAME, GENERATE_SHORT_CLIPS_TASK_NAME } from './short-clips.types'
 import type {
   ClipCandidateData,
   CreateShortClipDownloadUrlResult,
+  GenerateShortClipsJobOptions,
   GenerateShortClipsInput,
   GenerateShortClipsServiceResult,
-  NormalizedShortClipJobInput,
   PaginatedResult,
   ShortClipData,
   ShortClipGenerationPreferences,
@@ -31,7 +32,7 @@ export const generateShortClips = async (input: GenerateShortClipsInput): Promis
     throw MediaError.invalidState('Cannot generate short clips for non-video media')
   }
 
-  const activeJob = await shortClipsRepo.findActiveShortClipJobByMediaIdAndUserId(media.id, input.userId)
+  const activeJob = await shortClipsRepo.findActiveGenerateShortClipsJobByMediaIdAndUserId(media.id, input.userId)
 
   if (activeJob) {
     return {
@@ -54,7 +55,7 @@ export const generateShortClips = async (input: GenerateShortClipsInput): Promis
     throw ShortClipsError.noTranscriptSegments()
   }
 
-  const jobInput = normalizeShortClipJobInput(input.preferences, transcript.id, transcript.version)
+  const jobOptions = normalizeGenerateShortClipsJobOptions(input.preferences, transcript.id, transcript.version)
 
   const job = await shortClipsRepo.createProcessingJob({
     mediaId: media.id,
@@ -62,17 +63,15 @@ export const generateShortClips = async (input: GenerateShortClipsInput): Promis
     jobType: JobType.GENERATE_SHORT_CLIPS,
     status: JobStatus.PENDING,
     progress: 0,
-    input: jobInput
+    queueName: GENERATE_SHORT_CLIPS_QUEUE_NAME,
+    taskName: GENERATE_SHORT_CLIPS_TASK_NAME,
+    input: jobOptions
   })
 
   try {
-    await shortClipsQueue.publishShortClipJob({
+    await shortClipsQueue.publishGenerateShortClipsJob({
       jobId: job.id,
-      mediaId: media.id,
-      userId: input.userId,
-      transcriptId: transcript.id,
-      transcriptVersion: transcript.version,
-      preferences: jobInput
+      jobType: JobType.GENERATE_SHORT_CLIPS
     })
   } catch {
     await shortClipsRepo.updateProcessingJob(job.id, {
@@ -266,11 +265,11 @@ const getOwnedShortClip = async (userId: string, shortClipId: string): Promise<S
   return clip
 }
 
-const normalizeShortClipJobInput = (
+const normalizeGenerateShortClipsJobOptions = (
   preferences: ShortClipGenerationPreferences | GenerateShortClipsBody,
   transcriptId: string,
   transcriptVersion: number
-): NormalizedShortClipJobInput => {
+): GenerateShortClipsJobOptions => {
   const durationDefaults = durationRangeForClipLength(preferences.clipLength)
   const minDuration = preferences.minDuration ?? durationDefaults.minDuration
   const maxDuration = preferences.maxDuration ?? durationDefaults.maxDuration
@@ -297,7 +296,7 @@ const normalizeShortClipJobInput = (
 
 const durationRangeForClipLength = (
   clipLength: ShortClipGenerationPreferences['clipLength']
-): Pick<NormalizedShortClipJobInput, 'minDuration' | 'maxDuration'> => {
+): Pick<GenerateShortClipsJobOptions, 'minDuration' | 'maxDuration'> => {
   if (clipLength === '15_30') {
     return { minDuration: 15, maxDuration: 30 }
   }

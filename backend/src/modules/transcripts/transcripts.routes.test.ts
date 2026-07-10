@@ -63,6 +63,7 @@ const createJobResult = (): GenerateTranscriptResult => ({
     jobType: 'TRANSCRIBE',
     status: 'QUEUED',
     progress: 0,
+    errorCode: null,
     errorMessage: null,
     output: null,
     attemptCount: 0,

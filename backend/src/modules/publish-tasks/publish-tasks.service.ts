@@ -23,8 +23,8 @@ import type {
 } from './publish-tasks.schema'
 import { PublishTasksError } from './publish-tasks.error'
 import {
-  PUBLISH_CELERY_TASK_NAME,
   PUBLISH_QUEUE_NAME,
+  PUBLISH_TASK_NAME,
   type PaginatedResult,
   type PublishTaskData,
   type PublishTaskJobResult
@@ -192,8 +192,7 @@ export const cancelPublishTask = async (userId: string, publishTaskId: string): 
   }
 
   const updatedTask = await publishTasksRepo.updatePublishTask(task.id, {
-    status: PublishStatus.CANCELED,
-    errorMessage: null
+    status: PublishStatus.CANCELED
   })
 
   return toPublishTaskData(updatedTask)
@@ -234,7 +233,7 @@ const startDirectPublishTask = async (
     status: JobStatus.PENDING,
     progress: 0,
     queueName: PUBLISH_QUEUE_NAME,
-    taskName: PUBLISH_CELERY_TASK_NAME,
+    taskName: PUBLISH_TASK_NAME,
     input: {
       publishTaskId: task.id,
       mediaId: task.mediaId,
@@ -250,23 +249,14 @@ const startDirectPublishTask = async (
   const updatedTask = await publishTasksRepo.updatePublishTask(task.id, {
     jobId: job.id,
     status: scheduledAt ? PublishStatus.SCHEDULED : PublishStatus.PUBLISHING,
-    scheduledAt,
-    errorMessage: null
+    scheduledAt
   })
 
   try {
     await publishTasksQueue.publishPublishTaskJob(
       {
         jobId: job.id,
-        publishTaskId: task.id,
-        mediaId: task.mediaId,
-        projectId: task.projectId,
-        shortClipId: task.shortClipId,
-        exportAssetId: publishContext.exportAsset?.id ?? null,
-        userId,
-        platform: task.platform,
-        platformAccountId: publishContext.platformAccountId,
-        scheduledAt: scheduledAtIso
+        jobType: JobType.PUBLISH
       },
       scheduledAtIso ?? undefined
     )
@@ -316,17 +306,13 @@ const startProjectPublishTask = async (
   const updatedTask = await publishTasksRepo.updatePublishTask(task.id, {
     jobId: job.id,
     status: scheduledAt ? PublishStatus.SCHEDULED : PublishStatus.PUBLISHING,
-    scheduledAt,
-    errorMessage: null
+    scheduledAt
   })
 
   try {
     await renderExportsQueue.publishRenderExportJob({
       jobId: job.id,
-      mediaId: publishContext.jobMediaId,
-      projectId: project.id,
-      workspaceId: project.workspaceId,
-      userId
+      jobType: JobType.EXPORT_RENDER
     })
   } catch {
     await markJobAndTaskFailed(job, task.id, renderQueueFailureMessage)
@@ -352,8 +338,7 @@ const markJobAndTaskFailed = async (job: ProcessingJob, publishTaskId: string, m
       completedAt: new Date()
     }),
     publishTasksRepo.updatePublishTask(publishTaskId, {
-      status: PublishStatus.FAILED,
-      errorMessage: message
+      status: PublishStatus.FAILED
     })
   ])
 }

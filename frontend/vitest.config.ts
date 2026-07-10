@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     clearMocks: true,
     environment: "node",
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.{idea,git,cache,output,temp}/**", "e2e/**"],
     restoreMocks: true,
   },
 })

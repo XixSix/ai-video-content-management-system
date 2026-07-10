@@ -91,6 +91,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   jobType: 'TRANSCRIBE',
   status: 'PENDING',
   progress: 0,
+  errorCode: null,
   errorMessage: null,
   queueName: null,
   taskName: null,
@@ -228,7 +229,7 @@ describe('transcripts service', () => {
         }
       })
     )
-    expect(publishTranscriptJobMock).toHaveBeenCalledWith({ jobId, mediaId, userId, s3Key })
+    expect(publishTranscriptJobMock).toHaveBeenCalledWith({ jobId, jobType: 'TRANSCRIBE' })
     expect(updateProcessingJobMock).not.toHaveBeenCalled()
     expect(result.job).toMatchObject({
       id: jobId,
@@ -243,7 +244,7 @@ describe('transcripts service', () => {
     findActiveTranscriptJobByMediaIdAndUserIdMock.mockResolvedValue(
       createProcessingJob({
         status: 'QUEUED',
-        queueName: 'transcript_queue',
+        queueName: 'transcribe_queue',
         taskName: 'transcribe'
       })
     )
@@ -363,11 +364,7 @@ describe('transcripts service', () => {
     )
     expect(publishTranscriptExportJobMock).toHaveBeenCalledWith({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 3,
-      format: 'vtt'
+      jobType: 'GENERATE_SUBTITLE'
     })
     expect(result.job).toMatchObject({
       id: jobId,
@@ -402,10 +399,7 @@ describe('transcripts service', () => {
     )
     expect(publishTranscriptBurnJobMock).toHaveBeenCalledWith({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 4
+      jobType: 'BURN_SUBTITLE'
     })
     expect(result.job).toMatchObject({
       id: jobId,

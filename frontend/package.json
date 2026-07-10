@@ -8,6 +8,7 @@
     "start": "next start --port 5173",
     "lint": "npm run build --workspace @vidpilot/composition && eslint",
     "test": "npm run build --workspace @vidpilot/composition && vitest run",
+    "test:e2e": "playwright test",
     "snapshot": "node scripts/capture-snapshots.mjs"
   },
   "dependencies": {

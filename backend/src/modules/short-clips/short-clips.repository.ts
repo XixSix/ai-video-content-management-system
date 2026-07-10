@@ -76,7 +76,7 @@ export const countTranscriptSegmentsByTranscriptId = async (transcriptId: string
     }
   })
 
-export const findActiveShortClipJobByMediaIdAndUserId = async (
+export const findActiveGenerateShortClipsJobByMediaIdAndUserId = async (
   mediaId: string,
   userId: string
 ): Promise<ProcessingJob | null> =>

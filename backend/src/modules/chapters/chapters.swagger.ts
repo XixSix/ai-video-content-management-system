@@ -181,7 +181,7 @@
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       502:
- *         description: Failed to publish chaptering job
+ *         description: Failed to publish generate chapters job
  *         content:
  *           application/json:
  *             schema:

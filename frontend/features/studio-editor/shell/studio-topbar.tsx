@@ -224,7 +224,7 @@ export function StudioTopbar({
               toast[job.status === "COMPLETED" ? "success" : "error"](
                 job.status === "COMPLETED" ? "Publish completed" : "Publish failed",
                 {
-                  description: job.errorMessage ?? projectName,
+                  description: job.errorMessage ?? job.errorCode ?? projectName,
                 }
               )
               return
@@ -261,7 +261,7 @@ export function StudioTopbar({
         toast[job.status === "COMPLETED" ? "success" : "error"](
           job.status === "COMPLETED" ? "Publish completed" : "Publish failed",
           {
-            description: job.errorMessage ?? projectName,
+            description: job.errorMessage ?? job.errorCode ?? projectName,
           }
         )
       },

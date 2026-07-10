@@ -1,4 +1,5 @@
 import * as rabbitPublisher from '../../infrastructure/rabbitmq/publisher'
+import { buildWorkerJobMessage } from '../jobs/jobs.queue-message'
 import {
   GENERATE_THUMBNAIL_SPRITE_TASK_NAME,
   GENERATE_THUMBNAIL_TASK_NAME,
@@ -20,14 +21,13 @@ const getTaskName = (jobType: MediaPreviewJobMessage['jobType']): MediaPreviewTa
   }
 }
 
-export const publishMediaPreviewJob = async (message: Omit<MediaPreviewJobMessage, 'taskName'>): Promise<void> => {
+export const publishMediaPreviewJob = async (
+  message: Pick<MediaPreviewJobMessage, 'jobId' | 'jobType'>
+): Promise<void> => {
   await rabbitPublisher.publishCeleryTaskToQueue({
     queueName: MEDIA_PREVIEWS_QUEUE_NAME,
     taskName: MEDIA_PREVIEWS_CELERY_TASK_NAME,
     taskId: message.jobId,
-    kwargs: {
-      ...message,
-      taskName: getTaskName(message.jobType)
-    }
+    kwargs: buildWorkerJobMessage({ ...message, taskName: getTaskName(message.jobType) })
   })
 }

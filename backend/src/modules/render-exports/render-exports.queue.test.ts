@@ -17,10 +17,7 @@ describe('render exports queue', () => {
   it('publishes render export jobs using the Celery task protocol contract', async () => {
     await publishRenderExportJob({
       jobId: 'job-1',
-      mediaId: 'media-1',
-      projectId: 'project-1',
-      workspaceId: 'workspace-1',
-      userId: 'user-1'
+      jobType: 'EXPORT_RENDER'
     })
 
     expect(publishCeleryTaskToQueueMock).toHaveBeenCalledWith({
@@ -28,11 +25,9 @@ describe('render exports queue', () => {
       taskName: 'render_export_task',
       taskId: 'job-1',
       kwargs: {
+        version: 1,
         jobId: 'job-1',
-        mediaId: 'media-1',
-        projectId: 'project-1',
-        workspaceId: 'workspace-1',
-        userId: 'user-1',
+        jobType: 'EXPORT_RENDER',
         taskName: 'export_render'
       }
     })

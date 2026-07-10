@@ -40,6 +40,7 @@ export type PublishTask = {
   scheduledAt: string | null
   publishedAt: string | null
   platformPostUrl: string | null
+  errorCode: string | null
   errorMessage: string | null
   createdAt: string
 }

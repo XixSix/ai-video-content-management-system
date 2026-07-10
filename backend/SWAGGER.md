@@ -99,8 +99,8 @@ backend/src/
 │   │   └── health.swagger.ts   # Health check documentation
 │   ├── media/
 │   │   └── media.swagger.ts    # Media endpoints documentation
-│   └── chaptering/
-│       └── chaptering.swagger.ts # Chapter endpoints documentation
+│   └── chapters/
+│       └── chapters.swagger.ts   # Chapter endpoints documentation
 └── app.ts                      # Swagger UI integration
 ```
 

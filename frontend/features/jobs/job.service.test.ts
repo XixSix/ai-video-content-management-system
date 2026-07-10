@@ -12,6 +12,7 @@ const job = {
   jobType: "TRANSCRIBE",
   status: "COMPLETED",
   progress: 100,
+  errorCode: null,
   errorMessage: null,
   output: null,
   attemptCount: 0,

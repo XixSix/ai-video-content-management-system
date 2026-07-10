@@ -258,6 +258,7 @@ export const ProcessingJobScalarFieldEnum = {
   status: 'status',
   progress: 'progress',
   currentStep: 'currentStep',
+  errorCode: 'errorCode',
   errorMessage: 'errorMessage',
   queueName: 'queueName',
   taskName: 'taskName',
@@ -507,7 +508,6 @@ export const PublishTaskScalarFieldEnum = {
   publishedAt: 'publishedAt',
   platformPostId: 'platformPostId',
   platformPostUrl: 'platformPostUrl',
-  errorMessage: 'errorMessage',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -29,7 +29,7 @@ export const findLatestTranscriptByMediaIdAndUserId = async (
     }
   })
 
-export const findActiveChapteringJobByMediaIdAndUserId = async (
+export const findActiveGenerateChaptersJobByMediaIdAndUserId = async (
   mediaId: string,
   userId: string
 ): Promise<ProcessingJob | null> =>

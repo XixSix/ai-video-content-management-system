@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import request from 'supertest'
 import type { AuthenticatedUser } from '../auth/auth.types'
 import { MediaError } from '../media/media.error'
-import { ChapteringError } from './chaptering.error'
-import type { ChapterData, GenerateChaptersServiceResult } from './chaptering.types'
+import { GenerateChaptersError } from './chapters.error'
+import type { ChapterData, GenerateChaptersServiceResult } from './chapters.types'
 
 const getAuthenticatedUserMock = jest.fn<(accessToken: string) => Promise<AuthenticatedUser>>()
 const generateChaptersMock = jest.fn<(input: unknown) => Promise<GenerateChaptersServiceResult>>()
@@ -13,7 +13,7 @@ jest.unstable_mockModule('../auth/auth.service', () => ({
   getAuthenticatedUser: getAuthenticatedUserMock
 }))
 
-jest.unstable_mockModule('./chaptering.service', () => ({
+jest.unstable_mockModule('./chapters.service', () => ({
   generateChapters: generateChaptersMock,
   listMediaChapters: listMediaChaptersMock
 }))
@@ -44,6 +44,7 @@ const createJobResult = (wasCreated = true): GenerateChaptersServiceResult => ({
     jobType: 'GENERATE_CHAPTERS',
     status: wasCreated ? 'PENDING' : 'QUEUED',
     progress: 0,
+    errorCode: null,
     errorMessage: null,
     output: null,
     attemptCount: 0,
@@ -81,7 +82,7 @@ const createChapter = (): ChapterData => ({
   updatedAt: now
 })
 
-describe('chaptering routes', () => {
+describe('chapters routes', () => {
   beforeEach(() => {
     userSequence += 1
     authenticatedUser = createUser(userSequence)
@@ -177,7 +178,7 @@ describe('chaptering routes', () => {
     })
   })
 
-  it('returns an active chaptering job with HTTP 200', async () => {
+  it('returns an active generate chapters job with HTTP 200', async () => {
     generateChaptersMock.mockResolvedValue(createJobResult(false))
 
     const response = await request(app)
@@ -235,8 +236,8 @@ describe('chaptering routes', () => {
     })
   })
 
-  it('returns chaptering errors when no transcript is available', async () => {
-    generateChaptersMock.mockRejectedValue(ChapteringError.noTranscript())
+  it('returns generate chapters errors when no transcript is available', async () => {
+    generateChaptersMock.mockRejectedValue(GenerateChaptersError.noTranscript())
 
     const response = await request(app)
       .post(`/api/v1/media/${mediaId}/chapters/generate`)
@@ -247,7 +248,7 @@ describe('chaptering routes', () => {
     expect(response.body).toMatchObject({
       success: false,
       error: {
-        code: 'CHAPTERING_TRANSCRIPT_NOT_FOUND'
+        code: 'GENERATE_CHAPTERS_TRANSCRIPT_NOT_FOUND'
       }
     })
   })

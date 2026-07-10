@@ -32,8 +32,8 @@ describe('rabbitmq publisher', () => {
 
   it('publishes Celery protocol v2 JSON task messages', async () => {
     await publishCeleryTaskToQueue({
-      queueName: 'transcript_queue',
-      taskName: 'transcript_task',
+      queueName: 'transcribe_queue',
+      taskName: 'transcribe_task',
       taskId: '00000000-0000-4000-8000-000000000003',
       kwargs: {
         jobId: '00000000-0000-4000-8000-000000000003',
@@ -41,11 +41,11 @@ describe('rabbitmq publisher', () => {
       }
     })
 
-    expect(assertQueueMock).toHaveBeenCalledWith('transcript_queue', { durable: true })
+    expect(assertQueueMock).toHaveBeenCalledWith('transcribe_queue', { durable: true })
     expect(sendToQueueMock).toHaveBeenCalledTimes(1)
 
     const [queueName, content, options] = sendToQueueMock.mock.calls[0]
-    expect(queueName).toBe('transcript_queue')
+    expect(queueName).toBe('transcribe_queue')
     expect(JSON.parse(content.toString())).toEqual([
       [],
       {
@@ -66,7 +66,7 @@ describe('rabbitmq publisher', () => {
       correlationId: '00000000-0000-4000-8000-000000000003',
       headers: {
         lang: 'py',
-        task: 'transcript_task',
+        task: 'transcribe_task',
         id: '00000000-0000-4000-8000-000000000003',
         root_id: '00000000-0000-4000-8000-000000000003',
         parent_id: null,

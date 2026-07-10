@@ -131,7 +131,7 @@ export function StudioChaptersPanel() {
         }
 
         toast.error("Chapter generation failed", {
-          description: job.errorMessage ?? "Please try again.",
+          description: job.errorMessage ?? job.errorCode ?? "Please try again.",
         })
       },
     })

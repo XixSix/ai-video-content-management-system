@@ -152,7 +152,7 @@
  * /media/{mediaId}/short-clips/generate:
  *   post:
  *     summary: Generate short clips for media
- *     description: Create a short clip generation job for one uploaded video media item. If an active short clip job already exists, the existing job is returned instead.
+ *     description: Create a short clip generation job for one uploaded video media item. If an active generate short clips job already exists, the existing job is returned instead.
  *     tags: [Short Clips]
  *     security:
  *       - bearerAuth: []

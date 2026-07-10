@@ -688,7 +688,7 @@ export function LongToShortWorkspace({
             description:
               job.status === "COMPLETED"
                 ? "Refresh generated candidates and clips for review."
-                : job.errorMessage ?? "The short clip job did not complete.",
+                : job.errorMessage ?? job.errorCode ?? "The short clip job did not complete.",
           })
           void apiCandidateQuery.refetch()
           void apiShortClipsQuery.refetch()

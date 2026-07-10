@@ -45,6 +45,7 @@ export type ProcessingJobMinAggregateOutputType = {
   status: $Enums.JobStatus | null
   progress: number | null
   currentStep: string | null
+  errorCode: string | null
   errorMessage: string | null
   queueName: string | null
   taskName: string | null
@@ -65,6 +66,7 @@ export type ProcessingJobMaxAggregateOutputType = {
   status: $Enums.JobStatus | null
   progress: number | null
   currentStep: string | null
+  errorCode: string | null
   errorMessage: string | null
   queueName: string | null
   taskName: string | null
@@ -85,6 +87,7 @@ export type ProcessingJobCountAggregateOutputType = {
   status: number
   progress: number
   currentStep: number
+  errorCode: number
   errorMessage: number
   queueName: number
   taskName: number
@@ -119,6 +122,7 @@ export type ProcessingJobMinAggregateInputType = {
   status?: true
   progress?: true
   currentStep?: true
+  errorCode?: true
   errorMessage?: true
   queueName?: true
   taskName?: true
@@ -139,6 +143,7 @@ export type ProcessingJobMaxAggregateInputType = {
   status?: true
   progress?: true
   currentStep?: true
+  errorCode?: true
   errorMessage?: true
   queueName?: true
   taskName?: true
@@ -159,6 +164,7 @@ export type ProcessingJobCountAggregateInputType = {
   status?: true
   progress?: true
   currentStep?: true
+  errorCode?: true
   errorMessage?: true
   queueName?: true
   taskName?: true
@@ -268,6 +274,7 @@ export type ProcessingJobGroupByOutputType = {
   status: $Enums.JobStatus
   progress: number | null
   currentStep: string | null
+  errorCode: string | null
   errorMessage: string | null
   queueName: string | null
   taskName: string | null
@@ -313,6 +320,7 @@ export type ProcessingJobWhereInput = {
   status?: Prisma.EnumJobStatusFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableFilter<"ProcessingJob"> | number | null
   currentStep?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
+  errorCode?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
@@ -344,6 +352,7 @@ export type ProcessingJobOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrderInput | Prisma.SortOrder
   currentStep?: Prisma.SortOrderInput | Prisma.SortOrder
+  errorCode?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   queueName?: Prisma.SortOrderInput | Prisma.SortOrder
   taskName?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -378,6 +387,7 @@ export type ProcessingJobWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumJobStatusFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableFilter<"ProcessingJob"> | number | null
   currentStep?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
+  errorCode?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
@@ -409,6 +419,7 @@ export type ProcessingJobOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrderInput | Prisma.SortOrder
   currentStep?: Prisma.SortOrderInput | Prisma.SortOrder
+  errorCode?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   queueName?: Prisma.SortOrderInput | Prisma.SortOrder
   taskName?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -439,6 +450,7 @@ export type ProcessingJobScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableWithAggregatesFilter<"ProcessingJob"> | number | null
   currentStep?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
+  errorCode?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableWithAggregatesFilter<"ProcessingJob"> | string | null
@@ -458,6 +470,7 @@ export type ProcessingJobCreateInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -489,6 +502,7 @@ export type ProcessingJobUncheckedCreateInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -514,6 +528,7 @@ export type ProcessingJobUpdateInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -545,6 +560,7 @@ export type ProcessingJobUncheckedUpdateInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -573,6 +589,7 @@ export type ProcessingJobCreateManyInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -592,6 +609,7 @@ export type ProcessingJobUpdateManyMutationInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -614,6 +632,7 @@ export type ProcessingJobUncheckedUpdateManyInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -646,6 +665,7 @@ export type ProcessingJobCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
+  errorCode?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   queueName?: Prisma.SortOrder
   taskName?: Prisma.SortOrder
@@ -673,6 +693,7 @@ export type ProcessingJobMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
+  errorCode?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   queueName?: Prisma.SortOrder
   taskName?: Prisma.SortOrder
@@ -693,6 +714,7 @@ export type ProcessingJobMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   progress?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
+  errorCode?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   queueName?: Prisma.SortOrder
   taskName?: Prisma.SortOrder
@@ -953,6 +975,7 @@ export type ProcessingJobCreateWithoutUserInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -982,6 +1005,7 @@ export type ProcessingJobUncheckedCreateWithoutUserInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1039,6 +1063,7 @@ export type ProcessingJobScalarWhereInput = {
   status?: Prisma.EnumJobStatusFilter<"ProcessingJob"> | $Enums.JobStatus
   progress?: Prisma.IntNullableFilter<"ProcessingJob"> | number | null
   currentStep?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
+  errorCode?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   queueName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
   taskName?: Prisma.StringNullableFilter<"ProcessingJob"> | string | null
@@ -1058,6 +1083,7 @@ export type ProcessingJobCreateWithoutMediaInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1087,6 +1113,7 @@ export type ProcessingJobUncheckedCreateWithoutMediaInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1138,6 +1165,7 @@ export type ProcessingJobCreateWithoutProjectInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1167,6 +1195,7 @@ export type ProcessingJobUncheckedCreateWithoutProjectInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1218,6 +1247,7 @@ export type ProcessingJobCreateWithoutEventsInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1248,6 +1278,7 @@ export type ProcessingJobUncheckedCreateWithoutEventsInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1288,6 +1319,7 @@ export type ProcessingJobUpdateWithoutEventsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1318,6 +1350,7 @@ export type ProcessingJobUncheckedUpdateWithoutEventsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1342,6 +1375,7 @@ export type ProcessingJobCreateWithoutTranscriptsInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1372,6 +1406,7 @@ export type ProcessingJobUncheckedCreateWithoutTranscriptsInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1412,6 +1447,7 @@ export type ProcessingJobUpdateWithoutTranscriptsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1442,6 +1478,7 @@ export type ProcessingJobUncheckedUpdateWithoutTranscriptsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1466,6 +1503,7 @@ export type ProcessingJobCreateWithoutVideoChaptersInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1496,6 +1534,7 @@ export type ProcessingJobUncheckedCreateWithoutVideoChaptersInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1536,6 +1575,7 @@ export type ProcessingJobUpdateWithoutVideoChaptersInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1566,6 +1606,7 @@ export type ProcessingJobUncheckedUpdateWithoutVideoChaptersInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1590,6 +1631,7 @@ export type ProcessingJobCreateWithoutClipCandidatesInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1620,6 +1662,7 @@ export type ProcessingJobUncheckedCreateWithoutClipCandidatesInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1660,6 +1703,7 @@ export type ProcessingJobUpdateWithoutClipCandidatesInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1690,6 +1734,7 @@ export type ProcessingJobUncheckedUpdateWithoutClipCandidatesInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1714,6 +1759,7 @@ export type ProcessingJobCreateWithoutGeneratedAssetsInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1744,6 +1790,7 @@ export type ProcessingJobUncheckedCreateWithoutGeneratedAssetsInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1784,6 +1831,7 @@ export type ProcessingJobUpdateWithoutGeneratedAssetsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1814,6 +1862,7 @@ export type ProcessingJobUncheckedUpdateWithoutGeneratedAssetsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1838,6 +1887,7 @@ export type ProcessingJobCreateWithoutPublishTasksInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1868,6 +1918,7 @@ export type ProcessingJobUncheckedCreateWithoutPublishTasksInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1908,6 +1959,7 @@ export type ProcessingJobUpdateWithoutPublishTasksInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1938,6 +1990,7 @@ export type ProcessingJobUncheckedUpdateWithoutPublishTasksInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1964,6 +2017,7 @@ export type ProcessingJobCreateManyUserInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -1983,6 +2037,7 @@ export type ProcessingJobUpdateWithoutUserInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2012,6 +2067,7 @@ export type ProcessingJobUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2039,6 +2095,7 @@ export type ProcessingJobUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2060,6 +2117,7 @@ export type ProcessingJobCreateManyMediaInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -2079,6 +2137,7 @@ export type ProcessingJobUpdateWithoutMediaInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2108,6 +2167,7 @@ export type ProcessingJobUncheckedUpdateWithoutMediaInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2135,6 +2195,7 @@ export type ProcessingJobUncheckedUpdateManyWithoutMediaInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2156,6 +2217,7 @@ export type ProcessingJobCreateManyProjectInput = {
   status?: $Enums.JobStatus
   progress?: number | null
   currentStep?: string | null
+  errorCode?: string | null
   errorMessage?: string | null
   queueName?: string | null
   taskName?: string | null
@@ -2175,6 +2237,7 @@ export type ProcessingJobUpdateWithoutProjectInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2204,6 +2267,7 @@ export type ProcessingJobUncheckedUpdateWithoutProjectInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2231,6 +2295,7 @@ export type ProcessingJobUncheckedUpdateManyWithoutProjectInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   queueName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taskName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2329,6 +2394,7 @@ export type ProcessingJobSelect<ExtArgs extends runtime.Types.Extensions.Interna
   status?: boolean
   progress?: boolean
   currentStep?: boolean
+  errorCode?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -2361,6 +2427,7 @@ export type ProcessingJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   status?: boolean
   progress?: boolean
   currentStep?: boolean
+  errorCode?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -2386,6 +2453,7 @@ export type ProcessingJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   status?: boolean
   progress?: boolean
   currentStep?: boolean
+  errorCode?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -2411,6 +2479,7 @@ export type ProcessingJobSelectScalar = {
   status?: boolean
   progress?: boolean
   currentStep?: boolean
+  errorCode?: boolean
   errorMessage?: boolean
   queueName?: boolean
   taskName?: boolean
@@ -2424,7 +2493,7 @@ export type ProcessingJobSelectScalar = {
   completedAt?: boolean
 }
 
-export type ProcessingJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "userId" | "projectId" | "jobType" | "status" | "progress" | "currentStep" | "errorMessage" | "queueName" | "taskName" | "externalTaskId" | "attemptCount" | "input" | "output" | "createdAt" | "updatedAt" | "startedAt" | "completedAt", ExtArgs["result"]["processingJob"]>
+export type ProcessingJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mediaId" | "userId" | "projectId" | "jobType" | "status" | "progress" | "currentStep" | "errorCode" | "errorMessage" | "queueName" | "taskName" | "externalTaskId" | "attemptCount" | "input" | "output" | "createdAt" | "updatedAt" | "startedAt" | "completedAt", ExtArgs["result"]["processingJob"]>
 export type ProcessingJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   media?: boolean | Prisma.MediaDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2470,6 +2539,7 @@ export type $ProcessingJobPayload<ExtArgs extends runtime.Types.Extensions.Inter
     status: $Enums.JobStatus
     progress: number | null
     currentStep: string | null
+    errorCode: string | null
     errorMessage: string | null
     queueName: string | null
     taskName: string | null
@@ -2921,6 +2991,7 @@ export interface ProcessingJobFieldRefs {
   readonly status: Prisma.FieldRef<"ProcessingJob", 'JobStatus'>
   readonly progress: Prisma.FieldRef<"ProcessingJob", 'Int'>
   readonly currentStep: Prisma.FieldRef<"ProcessingJob", 'String'>
+  readonly errorCode: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly errorMessage: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly queueName: Prisma.FieldRef<"ProcessingJob", 'String'>
   readonly taskName: Prisma.FieldRef<"ProcessingJob", 'String'>

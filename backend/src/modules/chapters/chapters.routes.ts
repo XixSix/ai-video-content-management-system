@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth.middleware'
 import { validateRequest } from '../../middleware/validate-request'
-import * as chapteringController from './chaptering.controller'
-import { generateChaptersSchema, mediaChapterParamsSchema } from './chaptering.schema'
+import * as chaptersController from './chapters.controller'
+import { generateChaptersSchema, mediaChapterParamsSchema } from './chapters.schema'
 
 export const mediaChapterRoutes = Router()
 
@@ -11,10 +11,10 @@ mediaChapterRoutes.use(authenticate)
 mediaChapterRoutes.post(
   '/:mediaId/chapters/generate',
   validateRequest({ params: mediaChapterParamsSchema, body: generateChaptersSchema }),
-  chapteringController.generate
+  chaptersController.generate
 )
 mediaChapterRoutes.get(
   '/:mediaId/chapters',
   validateRequest({ params: mediaChapterParamsSchema }),
-  chapteringController.listByMedia
+  chaptersController.listByMedia
 )

@@ -4,34 +4,34 @@ import type { Media, ProcessingJob, Transcript, VideoChapter } from '../../infra
 const findMediaByIdMock = jest.fn<(id: string) => Promise<Media | null>>()
 const findLatestTranscriptByMediaIdAndUserIdMock =
   jest.fn<(mediaId: string, userId: string) => Promise<Transcript | null>>()
-const findActiveChapteringJobByMediaIdAndUserIdMock =
+const findActiveGenerateChaptersJobByMediaIdAndUserIdMock =
   jest.fn<(mediaId: string, userId: string) => Promise<ProcessingJob | null>>()
 const createProcessingJobMock = jest.fn<(data: unknown) => Promise<ProcessingJob>>()
 const updateProcessingJobMock = jest.fn<(id: string, data: unknown) => Promise<ProcessingJob>>()
 const findChaptersByMediaIdAndUserIdMock = jest.fn<(mediaId: string, userId: string) => Promise<VideoChapter[]>>()
-type PublishChapteringJobMockInput = {
+type PublishGenerateChaptersJobMockInput = {
   jobId: string
   mediaId: string
   userId: string
   transcriptId: string
   transcriptVersion: number
 }
-const publishChapteringJobMock = jest.fn<(message: PublishChapteringJobMockInput) => Promise<void>>()
+const publishGenerateChaptersJobMock = jest.fn<(message: PublishGenerateChaptersJobMockInput) => Promise<void>>()
 
-jest.unstable_mockModule('./chaptering.repository', () => ({
+jest.unstable_mockModule('./chapters.repository', () => ({
   createProcessingJob: createProcessingJobMock,
-  findActiveChapteringJobByMediaIdAndUserId: findActiveChapteringJobByMediaIdAndUserIdMock,
+  findActiveGenerateChaptersJobByMediaIdAndUserId: findActiveGenerateChaptersJobByMediaIdAndUserIdMock,
   findChaptersByMediaIdAndUserId: findChaptersByMediaIdAndUserIdMock,
   findLatestTranscriptByMediaIdAndUserId: findLatestTranscriptByMediaIdAndUserIdMock,
   findMediaById: findMediaByIdMock,
   updateProcessingJob: updateProcessingJobMock
 }))
 
-jest.unstable_mockModule('./chaptering.queue', () => ({
-  publishChapteringJob: publishChapteringJobMock
+jest.unstable_mockModule('./chapters.queue', () => ({
+  publishGenerateChaptersJob: publishGenerateChaptersJobMock
 }))
 
-const chapteringService = await import('./chaptering.service')
+const chaptersService = await import('./chapters.service')
 
 const mediaId = '00000000-0000-4000-8000-000000000001'
 const userId = '00000000-0000-4000-8000-000000000002'
@@ -88,6 +88,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   jobType: 'GENERATE_CHAPTERS',
   status: 'PENDING',
   progress: 0,
+  errorCode: null,
   errorMessage: null,
   queueName: null,
   taskName: null,
@@ -140,25 +141,25 @@ const generateInput = {
   useEmbeddings: true
 }
 
-describe('chaptering service', () => {
+describe('chapters service', () => {
   beforeEach(() => {
     findMediaByIdMock.mockReset()
     findLatestTranscriptByMediaIdAndUserIdMock.mockReset()
-    findActiveChapteringJobByMediaIdAndUserIdMock.mockReset()
+    findActiveGenerateChaptersJobByMediaIdAndUserIdMock.mockReset()
     createProcessingJobMock.mockReset()
     updateProcessingJobMock.mockReset()
     findChaptersByMediaIdAndUserIdMock.mockReset()
-    publishChapteringJobMock.mockReset()
+    publishGenerateChaptersJobMock.mockReset()
   })
 
   it('selects the newest transcript, creates a pending job, and publishes it', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveChapteringJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateChaptersJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
-    publishChapteringJobMock.mockResolvedValue()
+    publishGenerateChaptersJobMock.mockResolvedValue()
 
-    const result = await chapteringService.generateChapters(generateInput)
+    const result = await chaptersService.generateChapters(generateInput)
 
     expect(findLatestTranscriptByMediaIdAndUserIdMock).toHaveBeenCalledWith(mediaId, userId)
     expect(createProcessingJobMock).toHaveBeenCalledWith(
@@ -178,12 +179,9 @@ describe('chaptering service', () => {
         }
       })
     )
-    expect(publishChapteringJobMock).toHaveBeenCalledWith({
+    expect(publishGenerateChaptersJobMock).toHaveBeenCalledWith({
       jobId,
-      mediaId,
-      userId,
-      transcriptId,
-      transcriptVersion: 2
+      jobType: 'GENERATE_CHAPTERS'
     })
     expect(result).toMatchObject({
       wasCreated: true,
@@ -196,15 +194,15 @@ describe('chaptering service', () => {
     })
   })
 
-  it('returns an active chaptering job without publishing a duplicate', async () => {
+  it('returns an active generate chapters job without publishing a duplicate', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveChapteringJobByMediaIdAndUserIdMock.mockResolvedValue(createProcessingJob({ status: 'QUEUED' }))
+    findActiveGenerateChaptersJobByMediaIdAndUserIdMock.mockResolvedValue(createProcessingJob({ status: 'QUEUED' }))
 
-    const result = await chapteringService.generateChapters(generateInput)
+    const result = await chaptersService.generateChapters(generateInput)
 
     expect(findLatestTranscriptByMediaIdAndUserIdMock).not.toHaveBeenCalled()
     expect(createProcessingJobMock).not.toHaveBeenCalled()
-    expect(publishChapteringJobMock).not.toHaveBeenCalled()
+    expect(publishGenerateChaptersJobMock).not.toHaveBeenCalled()
     expect(result).toMatchObject({
       wasCreated: false,
       job: {
@@ -216,12 +214,12 @@ describe('chaptering service', () => {
 
   it('allows a new job when old chapters exist but no active job exists', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveChapteringJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateChaptersJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
-    publishChapteringJobMock.mockResolvedValue()
+    publishGenerateChaptersJobMock.mockResolvedValue()
 
-    const result = await chapteringService.generateChapters(generateInput)
+    const result = await chaptersService.generateChapters(generateInput)
 
     expect(findChaptersByMediaIdAndUserIdMock).not.toHaveBeenCalled()
     expect(createProcessingJobMock).toHaveBeenCalled()
@@ -230,12 +228,12 @@ describe('chaptering service', () => {
 
   it('rejects media with no transcript', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveChapteringJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateChaptersJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(null)
 
-    await expect(chapteringService.generateChapters(generateInput)).rejects.toMatchObject({
+    await expect(chaptersService.generateChapters(generateInput)).rejects.toMatchObject({
       statusCode: 409,
-      code: 'CHAPTERING_TRANSCRIPT_NOT_FOUND'
+      code: 'GENERATE_CHAPTERS_TRANSCRIPT_NOT_FOUND'
     })
     expect(createProcessingJobMock).not.toHaveBeenCalled()
   })
@@ -243,7 +241,7 @@ describe('chaptering service', () => {
   it('rejects non-video media', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia({ type: 'IMAGE', mimeType: 'image/png' }))
 
-    await expect(chapteringService.generateChapters(generateInput)).rejects.toMatchObject({
+    await expect(chaptersService.generateChapters(generateInput)).rejects.toMatchObject({
       statusCode: 409,
       code: 'INVALID_MEDIA_STATE'
     })
@@ -253,7 +251,7 @@ describe('chaptering service', () => {
   it('rejects media that is not uploaded', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia({ status: 'UPLOADING' }))
 
-    await expect(chapteringService.generateChapters(generateInput)).rejects.toMatchObject({
+    await expect(chaptersService.generateChapters(generateInput)).rejects.toMatchObject({
       statusCode: 409,
       code: 'INVALID_MEDIA_STATE'
     })
@@ -262,15 +260,15 @@ describe('chaptering service', () => {
 
   it('marks the job failed if queue publish fails', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
-    findActiveChapteringJobByMediaIdAndUserIdMock.mockResolvedValue(null)
+    findActiveGenerateChaptersJobByMediaIdAndUserIdMock.mockResolvedValue(null)
     findLatestTranscriptByMediaIdAndUserIdMock.mockResolvedValue(createTranscript())
     createProcessingJobMock.mockResolvedValue(createProcessingJob())
     updateProcessingJobMock.mockResolvedValue(createProcessingJob({ status: 'FAILED' }))
-    publishChapteringJobMock.mockRejectedValue(new Error('RabbitMQ unavailable'))
+    publishGenerateChaptersJobMock.mockRejectedValue(new Error('RabbitMQ unavailable'))
 
-    await expect(chapteringService.generateChapters(generateInput)).rejects.toMatchObject({
+    await expect(chaptersService.generateChapters(generateInput)).rejects.toMatchObject({
       statusCode: 502,
-      code: 'CHAPTERING_QUEUE_PUBLISH_FAILED'
+      code: 'GENERATE_CHAPTERS_QUEUE_PUBLISH_FAILED'
     })
     expect(updateProcessingJobMock).toHaveBeenCalledWith(
       jobId,
@@ -287,7 +285,7 @@ describe('chaptering service', () => {
     findMediaByIdMock.mockResolvedValue(createMedia())
     findChaptersByMediaIdAndUserIdMock.mockResolvedValue([createChapter()])
 
-    const chapters = await chapteringService.listMediaChapters(userId, mediaId)
+    const chapters = await chaptersService.listMediaChapters(userId, mediaId)
 
     expect(findChaptersByMediaIdAndUserIdMock).toHaveBeenCalledWith(mediaId, userId)
     expect(chapters).toEqual([
@@ -304,7 +302,7 @@ describe('chaptering service', () => {
   it('rejects listing chapters for non-video media', async () => {
     findMediaByIdMock.mockResolvedValue(createMedia({ type: 'IMAGE', mimeType: 'image/png' }))
 
-    await expect(chapteringService.listMediaChapters(userId, mediaId)).rejects.toMatchObject({
+    await expect(chaptersService.listMediaChapters(userId, mediaId)).rejects.toMatchObject({
       statusCode: 409,
       code: 'INVALID_MEDIA_STATE'
     })

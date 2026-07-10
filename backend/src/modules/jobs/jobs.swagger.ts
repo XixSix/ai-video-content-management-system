@@ -21,6 +21,10 @@
  *           type: integer
  *           nullable: true
  *           example: 55
+ *         errorCode:
+ *           type: string
+ *           nullable: true
+ *           example: SOURCE_OBJECT_NOT_FOUND
  *         errorMessage:
  *           type: string
  *           nullable: true

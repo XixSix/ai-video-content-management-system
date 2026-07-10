@@ -250,7 +250,6 @@ const createPublishTask = (overrides: Partial<PublishTask> = {}): PublishTask =>
   publishedAt: null,
   platformPostId: null,
   platformPostUrl: null,
-  errorMessage: null,
   createdAt: now,
   updatedAt: now,
   ...overrides
@@ -263,6 +262,7 @@ const createProcessingJob = (overrides: Partial<ProcessingJob> = {}): Processing
   jobType: 'PUBLISH',
   status: 'PENDING',
   progress: 0,
+  errorCode: null,
   errorMessage: null,
   queueName: null,
   taskName: null,
@@ -643,22 +643,13 @@ describe('publish task service', () => {
       expect.objectContaining({
         jobId,
         status: 'PUBLISHING',
-        scheduledAt: null,
-        errorMessage: null
+        scheduledAt: null
       })
     )
     expect(publishPublishTaskJobMock).toHaveBeenCalledWith(
       {
         jobId,
-        publishTaskId,
-        mediaId,
-        projectId: null,
-        shortClipId: null,
-        exportAssetId: null,
-        userId,
-        platform: 'FACEBOOK',
-        platformAccountId,
-        scheduledAt: null
+        jobType: 'PUBLISH'
       },
       undefined
     )
@@ -700,17 +691,13 @@ describe('publish task service', () => {
       expect.objectContaining({
         jobId,
         status: 'SCHEDULED',
-        scheduledAt: futureScheduledAt,
-        errorMessage: null
+        scheduledAt: futureScheduledAt
       })
     )
     expect(publishPublishTaskJobMock).toHaveBeenCalledWith(
       expect.objectContaining({
         jobId,
-        publishTaskId,
-        mediaId: null,
-        shortClipId,
-        scheduledAt: scheduledAtIso
+        jobType: 'PUBLISH'
       }),
       scheduledAtIso
     )
@@ -735,7 +722,7 @@ describe('publish task service', () => {
         projectId,
         jobType: 'PUBLISH',
         queueName: 'publish_queue',
-        taskName: 'publish_task',
+        taskName: 'publish',
         input: expect.objectContaining({
           publishTaskId,
           mediaId: null,
@@ -748,11 +735,7 @@ describe('publish task service', () => {
     expect(publishPublishTaskJobMock).toHaveBeenCalledWith(
       expect.objectContaining({
         jobId,
-        publishTaskId,
-        mediaId: null,
-        projectId,
-        exportAssetId,
-        scheduledAt: null
+        jobType: 'PUBLISH'
       }),
       undefined
     )
@@ -799,10 +782,7 @@ describe('publish task service', () => {
     )
     expect(publishRenderExportJobMock).toHaveBeenCalledWith({
       jobId,
-      mediaId,
-      projectId,
-      workspaceId,
-      userId
+      jobType: 'EXPORT_RENDER'
     })
     expect(publishPublishTaskJobMock).not.toHaveBeenCalled()
     expect(result.job).toMatchObject({ jobType: 'EXPORT_RENDER' })
@@ -828,8 +808,7 @@ describe('publish task service', () => {
     expect(updatePublishTaskMock).toHaveBeenCalledWith(
       publishTaskId,
       expect.objectContaining({
-        status: 'CANCELED',
-        errorMessage: null
+        status: 'CANCELED'
       })
     )
     expect(result).toMatchObject({ id: publishTaskId, status: 'CANCELED' })
@@ -925,8 +904,7 @@ describe('publish task service', () => {
     expect(updatePublishTaskMock).toHaveBeenLastCalledWith(
       publishTaskId,
       expect.objectContaining({
-        status: 'FAILED',
-        errorMessage: 'Failed to publish task job'
+        status: 'FAILED'
       })
     )
   })

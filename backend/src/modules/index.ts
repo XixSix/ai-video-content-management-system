@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { assetsRoutes } from './assets/assets.routes'
 import { authRoutes } from './auth/auth.routes'
-import { mediaChapterRoutes } from './chaptering/chaptering.routes'
+import { mediaChapterRoutes } from './chapters/chapters.routes'
 import { editorSnapshotsRoutes } from './editor-snapshots/editor-snapshots.routes'
 import { healthRouter } from './health/health.routes'
 import { jobsRoutes } from './jobs/jobs.routes'

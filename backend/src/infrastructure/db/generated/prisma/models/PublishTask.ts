@@ -41,7 +41,6 @@ export type PublishTaskMinAggregateOutputType = {
   publishedAt: Date | null
   platformPostId: string | null
   platformPostUrl: string | null
-  errorMessage: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,7 +62,6 @@ export type PublishTaskMaxAggregateOutputType = {
   publishedAt: Date | null
   platformPostId: string | null
   platformPostUrl: string | null
-  errorMessage: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -86,7 +84,6 @@ export type PublishTaskCountAggregateOutputType = {
   publishedAt: number
   platformPostId: number
   platformPostUrl: number
-  errorMessage: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -110,7 +107,6 @@ export type PublishTaskMinAggregateInputType = {
   publishedAt?: true
   platformPostId?: true
   platformPostUrl?: true
-  errorMessage?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -132,7 +128,6 @@ export type PublishTaskMaxAggregateInputType = {
   publishedAt?: true
   platformPostId?: true
   platformPostUrl?: true
-  errorMessage?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -155,7 +150,6 @@ export type PublishTaskCountAggregateInputType = {
   publishedAt?: true
   platformPostId?: true
   platformPostUrl?: true
-  errorMessage?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -251,7 +245,6 @@ export type PublishTaskGroupByOutputType = {
   publishedAt: Date | null
   platformPostId: string | null
   platformPostUrl: string | null
-  errorMessage: string | null
   createdAt: Date
   updatedAt: Date
   _count: PublishTaskCountAggregateOutputType | null
@@ -295,7 +288,6 @@ export type PublishTaskWhereInput = {
   publishedAt?: Prisma.DateTimeNullableFilter<"PublishTask"> | Date | string | null
   platformPostId?: Prisma.StringNullableFilter<"PublishTask"> | string | null
   platformPostUrl?: Prisma.StringNullableFilter<"PublishTask"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"PublishTask"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -324,7 +316,6 @@ export type PublishTaskOrderByWithRelationInput = {
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   platformPostId?: Prisma.SortOrderInput | Prisma.SortOrder
   platformPostUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -356,7 +347,6 @@ export type PublishTaskWhereUniqueInput = Prisma.AtLeast<{
   publishedAt?: Prisma.DateTimeNullableFilter<"PublishTask"> | Date | string | null
   platformPostId?: Prisma.StringNullableFilter<"PublishTask"> | string | null
   platformPostUrl?: Prisma.StringNullableFilter<"PublishTask"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"PublishTask"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -385,7 +375,6 @@ export type PublishTaskOrderByWithAggregationInput = {
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   platformPostId?: Prisma.SortOrderInput | Prisma.SortOrder
   platformPostUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PublishTaskCountOrderByAggregateInput
@@ -414,7 +403,6 @@ export type PublishTaskScalarWhereWithAggregatesInput = {
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PublishTask"> | Date | string | null
   platformPostId?: Prisma.StringNullableWithAggregatesFilter<"PublishTask"> | string | null
   platformPostUrl?: Prisma.StringNullableWithAggregatesFilter<"PublishTask"> | string | null
-  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"PublishTask"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PublishTask"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PublishTask"> | Date | string
 }
@@ -431,7 +419,6 @@ export type PublishTaskCreateInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
@@ -460,7 +447,6 @@ export type PublishTaskUncheckedCreateInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -477,7 +463,6 @@ export type PublishTaskUpdateInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
@@ -506,7 +491,6 @@ export type PublishTaskUncheckedUpdateInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -529,7 +513,6 @@ export type PublishTaskCreateManyInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -546,7 +529,6 @@ export type PublishTaskUpdateManyMutationInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -569,7 +551,6 @@ export type PublishTaskUncheckedUpdateManyInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -602,7 +583,6 @@ export type PublishTaskCountOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
   platformPostId?: Prisma.SortOrder
   platformPostUrl?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -624,7 +604,6 @@ export type PublishTaskMaxOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
   platformPostId?: Prisma.SortOrder
   platformPostUrl?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -646,7 +625,6 @@ export type PublishTaskMinOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
   platformPostId?: Prisma.SortOrder
   platformPostUrl?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -919,7 +897,6 @@ export type PublishTaskCreateWithoutUserInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   media?: Prisma.MediaCreateNestedOneWithoutPublishTasksInput
@@ -946,7 +923,6 @@ export type PublishTaskUncheckedCreateWithoutUserInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -998,7 +974,6 @@ export type PublishTaskScalarWhereInput = {
   publishedAt?: Prisma.DateTimeNullableFilter<"PublishTask"> | Date | string | null
   platformPostId?: Prisma.StringNullableFilter<"PublishTask"> | string | null
   platformPostUrl?: Prisma.StringNullableFilter<"PublishTask"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"PublishTask"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PublishTask"> | Date | string
 }
@@ -1015,7 +990,6 @@ export type PublishTaskCreateWithoutMediaInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
@@ -1042,7 +1016,6 @@ export type PublishTaskUncheckedCreateWithoutMediaInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1085,7 +1058,6 @@ export type PublishTaskCreateWithoutProjectInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
@@ -1112,7 +1084,6 @@ export type PublishTaskUncheckedCreateWithoutProjectInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1155,7 +1126,6 @@ export type PublishTaskCreateWithoutJobInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
@@ -1182,7 +1152,6 @@ export type PublishTaskUncheckedCreateWithoutJobInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1225,7 +1194,6 @@ export type PublishTaskCreateWithoutShortClipInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
@@ -1252,7 +1220,6 @@ export type PublishTaskUncheckedCreateWithoutShortClipInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1295,7 +1262,6 @@ export type PublishTaskCreateWithoutPlatformAccountInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPublishTasksInput
@@ -1322,7 +1288,6 @@ export type PublishTaskUncheckedCreateWithoutPlatformAccountInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1370,7 +1335,6 @@ export type PublishTaskCreateManyUserInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1387,7 +1351,6 @@ export type PublishTaskUpdateWithoutUserInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   media?: Prisma.MediaUpdateOneWithoutPublishTasksNestedInput
@@ -1414,7 +1377,6 @@ export type PublishTaskUncheckedUpdateWithoutUserInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1436,7 +1398,6 @@ export type PublishTaskUncheckedUpdateManyWithoutUserInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1458,7 +1419,6 @@ export type PublishTaskCreateManyMediaInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1475,7 +1435,6 @@ export type PublishTaskUpdateWithoutMediaInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
@@ -1502,7 +1461,6 @@ export type PublishTaskUncheckedUpdateWithoutMediaInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1524,7 +1482,6 @@ export type PublishTaskUncheckedUpdateManyWithoutMediaInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1546,7 +1503,6 @@ export type PublishTaskCreateManyProjectInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1563,7 +1519,6 @@ export type PublishTaskUpdateWithoutProjectInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
@@ -1590,7 +1545,6 @@ export type PublishTaskUncheckedUpdateWithoutProjectInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1612,7 +1566,6 @@ export type PublishTaskUncheckedUpdateManyWithoutProjectInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1634,7 +1587,6 @@ export type PublishTaskCreateManyJobInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1651,7 +1603,6 @@ export type PublishTaskUpdateWithoutJobInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
@@ -1678,7 +1629,6 @@ export type PublishTaskUncheckedUpdateWithoutJobInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1700,7 +1650,6 @@ export type PublishTaskUncheckedUpdateManyWithoutJobInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1722,7 +1671,6 @@ export type PublishTaskCreateManyShortClipInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1739,7 +1687,6 @@ export type PublishTaskUpdateWithoutShortClipInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
@@ -1766,7 +1713,6 @@ export type PublishTaskUncheckedUpdateWithoutShortClipInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1788,7 +1734,6 @@ export type PublishTaskUncheckedUpdateManyWithoutShortClipInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1810,7 +1755,6 @@ export type PublishTaskCreateManyPlatformAccountInput = {
   publishedAt?: Date | string | null
   platformPostId?: string | null
   platformPostUrl?: string | null
-  errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1827,7 +1771,6 @@ export type PublishTaskUpdateWithoutPlatformAccountInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPublishTasksNestedInput
@@ -1854,7 +1797,6 @@ export type PublishTaskUncheckedUpdateWithoutPlatformAccountInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1876,7 +1818,6 @@ export type PublishTaskUncheckedUpdateManyWithoutPlatformAccountInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   platformPostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platformPostUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1901,7 +1842,6 @@ export type PublishTaskSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   publishedAt?: boolean
   platformPostId?: boolean
   platformPostUrl?: boolean
-  errorMessage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1930,7 +1870,6 @@ export type PublishTaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   publishedAt?: boolean
   platformPostId?: boolean
   platformPostUrl?: boolean
-  errorMessage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1959,7 +1898,6 @@ export type PublishTaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   publishedAt?: boolean
   platformPostId?: boolean
   platformPostUrl?: boolean
-  errorMessage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1988,12 +1926,11 @@ export type PublishTaskSelectScalar = {
   publishedAt?: boolean
   platformPostId?: boolean
   platformPostUrl?: boolean
-  errorMessage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PublishTaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "mediaId" | "projectId" | "shortClipId" | "platformAccountId" | "jobId" | "platform" | "title" | "caption" | "description" | "hashtags" | "status" | "scheduledAt" | "publishedAt" | "platformPostId" | "platformPostUrl" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["publishTask"]>
+export type PublishTaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "mediaId" | "projectId" | "shortClipId" | "platformAccountId" | "jobId" | "platform" | "title" | "caption" | "description" | "hashtags" | "status" | "scheduledAt" | "publishedAt" | "platformPostId" | "platformPostUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["publishTask"]>
 export type PublishTaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.PublishTask$mediaArgs<ExtArgs>
@@ -2047,7 +1984,6 @@ export type $PublishTaskPayload<ExtArgs extends runtime.Types.Extensions.Interna
     publishedAt: Date | null
     platformPostId: string | null
     platformPostUrl: string | null
-    errorMessage: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["publishTask"]>
@@ -2496,7 +2432,6 @@ export interface PublishTaskFieldRefs {
   readonly publishedAt: Prisma.FieldRef<"PublishTask", 'DateTime'>
   readonly platformPostId: Prisma.FieldRef<"PublishTask", 'String'>
   readonly platformPostUrl: Prisma.FieldRef<"PublishTask", 'String'>
-  readonly errorMessage: Prisma.FieldRef<"PublishTask", 'String'>
   readonly createdAt: Prisma.FieldRef<"PublishTask", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PublishTask", 'DateTime'>
 }

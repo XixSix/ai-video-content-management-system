@@ -36,6 +36,7 @@ export const renderExportJobSchema = z.object({
   jobType: z.literal("EXPORT_RENDER"),
   status: renderExportJobStatusSchema,
   progress: z.number().nullable(),
+  errorCode: z.string().nullable(),
   errorMessage: z.string().nullable(),
   output: jsonValueSchema.nullable(),
   attemptCount: z.number().int().nonnegative(),
