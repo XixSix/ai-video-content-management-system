@@ -14,6 +14,11 @@ export type FeaturedTool = {
   title: string
   description: string
   href: string
+  preview: {
+    alt: string
+    darkSrc: string
+    lightSrc: string
+  }
 }
 
 export type ToolShortcut = {

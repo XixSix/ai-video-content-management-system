@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
@@ -11,12 +12,25 @@ type ToolLauncherProps = {
   shortcuts: ToolShortcut[]
 }
 
-function ToolVisualPlaceholder({ title }: { title: string }) {
+function ToolVisual({ tool }: { tool: FeaturedTool }) {
   return (
-    <div className="flex h-full items-center justify-center bg-muted/45">
-      <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-        {title}
-      </span>
+    <div className="relative h-full overflow-hidden bg-muted/45">
+      <Image
+        src={tool.preview.lightSrc}
+        alt={tool.preview.alt}
+        fill
+        sizes="(min-width: 1280px) 33vw, (min-width: 1024px) 33vw, 100vw"
+        className="object-cover transition duration-500 group-hover:scale-[1.02] dark:hidden"
+        priority={false}
+      />
+      <Image
+        src={tool.preview.darkSrc}
+        alt={tool.preview.alt}
+        fill
+        sizes="(min-width: 1280px) 33vw, (min-width: 1024px) 33vw, 100vw"
+        className="hidden object-cover transition duration-500 group-hover:scale-[1.02] dark:block"
+        priority={false}
+      />
     </div>
   )
 }
@@ -35,7 +49,7 @@ export function ToolLauncher({
             className="group overflow-hidden rounded-xl border border-border/70 bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-panel)]"
           >
             <div className="h-32 border-b border-border/60">
-              <ToolVisualPlaceholder title="Preview" />
+              <ToolVisual tool={tool} />
             </div>
             <div className="space-y-1.5 p-4">
               <h3 className="text-[15px] font-semibold text-foreground">
