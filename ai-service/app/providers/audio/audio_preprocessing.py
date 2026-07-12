@@ -7,55 +7,10 @@ import torchaudio
 
 from app.core.config import Settings, get_settings
 from app.provider_contracts.audio_decoder import AudioWaveform
-from app.providers.audio.audio_conversion import convert_audio_bytes_to_float32
 
 
 class AudioPreprocessingError(ValueError):
     pass
-
-
-def preprocess_audio(
-    *,
-    audio_bytes: bytes,
-    sample_rate: int,
-    channels: int,
-    encoding: str,
-    target_sample_rate: int,
-    target_loudness: float,
-    min_loudness: float,
-    min_normalize_seconds: float,
-    peak_ceiling: float,
-    wav_pcm_sample_width_bytes: int,
-    enable_loudness_normalization: bool,
-    loudness_meters: dict[int, pyln.Meter] | None = None,
-    resamplers: dict[tuple[int, int], torchaudio.transforms.Resample] | None = None,
-) -> np.ndarray:
-    """Convert, resample, and normalize audio for transcribe."""
-    if loudness_meters is None:
-        loudness_meters = {}
-
-    if resamplers is None:
-        resamplers = {}
-
-    audio, source_sample_rate = convert_audio_bytes_to_float32(
-        audio_bytes=audio_bytes,
-        sample_rate=sample_rate,
-        channels=channels,
-        encoding=encoding,
-        wav_pcm_sample_width_bytes=wav_pcm_sample_width_bytes,
-    )
-    audio = _resample_linear(audio, source_sample_rate, target_sample_rate, resamplers)
-    audio = _normalize_loudness(
-        audio,
-        target_sample_rate,
-        target_loudness=target_loudness,
-        min_loudness=min_loudness,
-        min_normalize_seconds=min_normalize_seconds,
-        enable_loudness_normalization=enable_loudness_normalization,
-        loudness_meters=loudness_meters,
-    )
-    audio = _normalize_peak(audio, peak_ceiling)
-    return np.ascontiguousarray(audio, dtype=np.float32)
 
 
 def _resample_linear(
@@ -155,14 +110,19 @@ class AudioPreprocessor:
         audio: AudioWaveform,
         target_sample_rate: int | None = None,
     ) -> AudioWaveform:
+        # Convert to Numpy array
         samples = np.asarray(audio.samples, dtype=np.float32)
         target_rate = target_sample_rate or self._settings.audio_target_sample_rate
+
+        # Resample using torchaudio
         samples = _resample_linear(
             samples,
             audio.sample_rate,
             target_rate,
             self._resamplers,
         )
+
+        # Normalize loudness using pyloudnorm
         samples = _normalize_loudness(
             samples,
             target_rate,
@@ -172,6 +132,8 @@ class AudioPreprocessor:
             enable_loudness_normalization=self._enable_loudness_normalization,
             loudness_meters=self._loudness_meters,
         )
+
+        # Normalize peak
         samples = _normalize_peak(samples, self._settings.audio_peak_ceiling)
         samples = np.ascontiguousarray(samples, dtype=np.float32)
 
@@ -182,30 +144,4 @@ class AudioPreprocessor:
                 "duration_seconds": len(samples) / target_rate if target_rate else None,
                 "samples": tuple(float(value) for value in samples.tolist()),
             }
-        )
-
-    def preprocess_bytes(
-        self,
-        *,
-        audio_bytes: bytes,
-        sample_rate: int,
-        channels: int,
-        encoding: str,
-        target_sample_rate: int | None = None,
-    ) -> np.ndarray:
-        return preprocess_audio(
-            audio_bytes=audio_bytes,
-            sample_rate=sample_rate,
-            channels=channels,
-            encoding=encoding,
-            target_sample_rate=target_sample_rate
-            or self._settings.audio_target_sample_rate,
-            target_loudness=self._settings.audio_target_loudness,
-            min_loudness=self._settings.audio_min_loudness,
-            min_normalize_seconds=self._settings.audio_min_normalize_seconds,
-            peak_ceiling=self._settings.audio_peak_ceiling,
-            wav_pcm_sample_width_bytes=self._settings.audio_wav_pcm_sample_width_bytes,
-            enable_loudness_normalization=self._enable_loudness_normalization,
-            loudness_meters=self._loudness_meters,
-            resamplers=self._resamplers,
         )

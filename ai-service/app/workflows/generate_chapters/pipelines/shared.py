@@ -55,6 +55,7 @@ def run_units_pipeline(
         config=config.unit_repair,
     )
 
+    # Cheap pre-score
     gap_scores = score_unit_gaps(
         units,
         media_duration=duration,
@@ -67,12 +68,17 @@ def run_units_pipeline(
         all_gap_candidates,
         context_duration=config.context_window_seconds,
     )
+
+    # Embedding
     semantic_shift_scores_by_time = (
         score_context_windows(all_gap_windows, embedding=embedding)
         if options.use_embeddings and all_gap_windows
         else {}
     )
+
     gap_scores = attach_semantic_shift_scores(gap_scores, semantic_shift_scores_by_time)
+    
+    # TextTiling detect valley
     valley_gap_scores = detect_valley_candidates(
         gap_scores,
         min_candidate_distance_seconds=options.min_chapter_duration_seconds / 2,
@@ -84,6 +90,8 @@ def run_units_pipeline(
         else gap_scores
     )
     scored_candidates = gap_scores_to_candidates(candidate_gap_scores)
+
+    # Calculate score, suppress candidate near each other. Keep top + timeline coverage
     review_candidates = prepare_boundary_candidates_for_review(
         scored_candidates,
         max_chapters=options.max_chapters,

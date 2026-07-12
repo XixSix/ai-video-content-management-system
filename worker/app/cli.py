@@ -52,12 +52,6 @@ def transcribe_worker() -> None:
         log_level=settings.log_level,
     )
 
-
-def transcript_worker() -> None:
-    """Start the transcribe worker using the legacy command alias."""
-    transcribe_worker()
-
-
 def generate_chapters_worker() -> None:
     """Start the chapter generation Celery worker."""
     configure_logging(settings.log_level)

@@ -29,7 +29,6 @@ dev = [
 
 [project.scripts]
 transcribe_worker = "app.cli:transcribe_worker"
-transcript_worker = "app.cli:transcript_worker"
 generate_chapters_worker = "app.cli:generate_chapters_worker"
 media_previews_worker = "app.cli:media_previews_worker"
 generate_short_clips_worker = "app.cli:generate_short_clips_worker"

@@ -257,8 +257,10 @@ def _merge_offline_windows(
 
         previous = merged[-1]
         merged_end = max(previous.end_sample, window.end_sample)
+
+        # Can merge if 2 window near each other and not exceed max window second
         can_merge = (
-            window.start_sample <= previous.end_sample + merge_gap_samples
+            window.start_sample - previous.end_sample <= merge_gap_samples
             and merged_end - previous.start_sample <= max_window_samples
         )
         if can_merge:
@@ -269,6 +271,7 @@ def _merge_offline_windows(
         else:
             merged.append(window)
 
+    # Merge too short window
     planned = _merge_short_offline_windows(
         merged,
         sample_rate=sample_rate,
@@ -348,12 +351,16 @@ def _find_short_window_merge_candidate(
     for candidate_index, candidate in enumerate(windows):
         if candidate_index == index:
             continue
+
+        # Check can merge
         merged_duration = max(window.end_sample, candidate.end_sample) - min(
             window.start_sample,
             candidate.start_sample,
         )
         if merged_duration > max_window_samples:
             continue
+
+        # Calculate distance
         distance = min(
             abs(candidate.start_sample - window.end_sample),
             abs(window.start_sample - candidate.end_sample),

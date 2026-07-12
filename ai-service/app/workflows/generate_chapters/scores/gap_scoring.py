@@ -42,6 +42,7 @@ def score_unit_gaps(
 
     gap_scores: list[ChapterGapScore] = []
     for unit_index, unit in enumerate(units[1:], start=1):
+        # Skip unit that near the min_chapter_duration
         if not _is_hard_valid_gap(
             unit.start_time,
             media_duration=media_duration,
@@ -125,20 +126,29 @@ def _score_gap(
     )
     left_text = context_window.left_text
     right_text = context_window.right_text
-
+    
+    # Score left and right using NLTK tokenize compare word, keep Noun, Verb, Adjective, normalize using lemmatize + stem
     lexical_cohesion_score = calculate_lexical_cohesion_score(left_text, right_text)
     lexical_shift_score = clamp_score(1.0 - lexical_cohesion_score)
+
+    # Score if current unit text start with marker like "Next topic"
     discourse_marker_score = transition_marker_score(current_unit.clean_text)
+
+    # Calculate pause score
     pause_score = calculate_pause_score(
         current_unit.start_time - previous_unit.end_time,
         long_pause_seconds=config.long_pause_seconds,
         max_pause_score_seconds=config.max_pause_score_seconds,
     )
+
+    # Check if 2 side enough text to evaluate
     boundary_quality_score = calculate_boundary_quality_score(
         left_text,
         right_text,
         min_context_text_chars=config.min_context_text_chars,
     )
+
+    # Score by consider not near start, end transcript
     duration_sanity_score = calculate_duration_sanity_score(
         current_unit.start_time,
         media_duration=media_duration,

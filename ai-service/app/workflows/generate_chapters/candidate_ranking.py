@@ -109,6 +109,8 @@ def _suppress_nearby_candidates(
         return sorted(candidates, key=lambda candidate: candidate.time)
 
     selected: list[ChapterCandidate] = []
+
+    # Loop with score desc
     for candidate in sorted(
         candidates,
         key=lambda item: (-item.candidate_score, item.time),

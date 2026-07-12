@@ -36,12 +36,15 @@ def build_segment_chapter_units(
     units: list[ChapterUnit] = []
     current: list[GenerateChaptersTranscriptSegment] = []
     non_empty_segments = [segment for segment in segments if segment.text.strip()]
+
+    # Using regex to check punctuation
     punctuation_poor = _is_punctuation_poor(
         non_empty_segments,
         threshold=punctuation_poor_threshold,
     )
 
     for segment in non_empty_segments:
+        # Check long pause
         if current and _starts_after_long_pause(
             current[-1],
             segment,
@@ -50,6 +53,7 @@ def build_segment_chapter_units(
             units.append(_unit_from_segments(len(units), current))
             current = []
 
+        # Check if add next segment exceed max budget (max_duration, max_word, max_character)
         if current and _would_exceed_max_budget(
             current,
             segment,
@@ -62,6 +66,7 @@ def build_segment_chapter_units(
 
         current.append(segment)
 
+        # Check if after append exceed max_budget, has punctation end, near taget)
         if _should_flush_after_append(
             current,
             punctuation_poor=punctuation_poor,

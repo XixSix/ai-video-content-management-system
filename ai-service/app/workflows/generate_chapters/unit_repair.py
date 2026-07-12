@@ -46,6 +46,13 @@ def repair_micro_units(
     index = 0
 
     while index < len(repaired):
+        # Check if micro unit, and lowest direction to merge depend on pause
+        # !!!Merge rule:
+        # Transition opener (First, Next, ...) => "forward"
+        # Continuation lowercase (this is the first part) => "backward"
+        # Leading fragment (about pricing) => "forward"
+        # Backchannel (Okey., Yes.) => "backward"
+        # Has punctuation => "backward"
         direction = _repair_direction(
             repaired,
             index,
