@@ -1,4 +1,9 @@
-.matplotlib_cache
-.venv
-.uv_cache
-__pycache__
+# Python virtual environments and package cache
+.venv/
+.uv_cache/
+
+# Python bytecode and caches
+__pycache__/
+
+# Local matplotlib cache
+.matplotlib_cache/

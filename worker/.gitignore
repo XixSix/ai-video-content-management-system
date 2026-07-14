@@ -1,6 +1,11 @@
+# Python bytecode and caches
 __pycache__/
 **/__pycache__/
 *.py[cod]
+
+# Runtime storage and generated media
 storage/*
 app/storage/*
+
+# Keep the storage folder present in Git.
 !app/storage/.gitkeep

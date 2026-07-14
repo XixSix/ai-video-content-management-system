@@ -1,20 +1,25 @@
+# Agent-local workspace files
 .agents/
+.codex/
+.kiro/
+
+# Dependencies and package outputs
 node_modules/
 packages/*/dist/
 skills-lock.json
+
+# Local environment files
 .env
-docs
-AGENTS.md
-!frontend/AGENTS.md
-.vscode
-.codex
-frontend/public/transcript-thumbnail-mock.png
-frontend/public/transcript-thumbnail-retail.png
-frontend/CODE_ORGANIZATION.md
-todo.txt
-.kiro/
-.config.kiro/
+
+# Legacy docs workspace is removed/ignored until a new rule set is added.
+docs/
+
+# Editor settings
+.vscode/
+
+# Python and test caches
 .pytest_cache
-checklist.txt
-snapshot
-performance-results
+
+# Generated local artifacts
+snapshot/
+performance-results/

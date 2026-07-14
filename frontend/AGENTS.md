@@ -17,10 +17,9 @@ Primary workspace flows:
 - Review clip candidates and rendered short clips.
 - Prepare publishing drafts and platform-specific content.
 
-Use `../docs/Plan.md`, `../docs/Editor.md`,
-`../docs/Transcript_pipeline.md`, `../docs/Chaptering_pipeline.md`, and
-`../docs/Long_to_short_pipeline.md` as product/domain references when building
-Studio features.
+The previous `../docs/` product reference set has been removed. Until a new
+rule set is added, use this guide, the current frontend code, the workspace
+README, and the user's latest request as the working direction.
 
 ## Code Organization
 
@@ -249,7 +248,7 @@ Prefer one clean implementation over repeated narrow patches.
 
 Before editing:
 
-- Read the current component, nearby feature files, and relevant docs.
+- Read the current component, nearby feature files, and relevant workspace guidance.
 - Identify the intended owner file for state, types, data, and UI.
 - Remove or replace obsolete code paths when a new abstraction takes over.
 - Check for unused props, unused state, unused types, dead mock data, and unused

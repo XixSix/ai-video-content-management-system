@@ -1,7 +1,14 @@
+# Python bytecode and caches
 __pycache__/
 **/__pycache__/
 *.py[cod]
+
+# Local environment files
 .env
+
+# Local model and runtime artifacts
 models/
 storage/
+
+# Test/build output
 build_unit_result/

@@ -1,8 +1,15 @@
-node_modules
-dist
-build
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# OS files
 .DS_Store
+
+# Local environment files
 .env
 
-# Ignore the output video from Git but not videos you import into src/.
-out
+# Render output videos. Videos imported into source folders can still be tracked.
+out/

@@ -1,7 +1,15 @@
+# Dependencies
 node_modules/
-dist/
-.env
-/src/db/generated
-.agents/
 
+# Build output
+dist/
+
+# Local environment files
+.env
+
+# Generated database clients
+/src/db/generated
 /src/generated/prisma
+
+# Agent-local workspace files
+.agents/
